@@ -47,6 +47,9 @@ int main() {
     xs_color(MAGENTA);
     x_write(10, 420, "E entao o texto fica assim!");
     
+    xs_color(RED);
+    xs_font(NULL);
+    x_write(10, 450, "xs_font(NULL) para voltar a font default");
     x_save("exe_texto.png");
     x_close();
     return 0;

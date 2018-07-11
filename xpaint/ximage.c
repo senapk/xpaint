@@ -40,6 +40,7 @@ typedef struct{
 static XColor   __pallete[256];
 static XBitmap* __bitmap;
 static XFont*   __font;
+static XFont*   __font_default;
 static int      __font_size;
 static bool     __using_default_font;
 static uchar    __color[3];
@@ -80,14 +81,12 @@ void x_init(int width, int height){
     //inicializando a cor de desenho e escrita
     xs_color(make_color(200, 200, 200));
 
-    //carregando a font default da variavel font_buffer_profont
-    __font = malloc(sizeof(XFont));
-    //copiando a font default para memoria dinamica
-    __font->buffer = malloc(sizeof(font_buffer_profont));
-    memcpy(__font->buffer, font_buffer_profont, sizeof(font_buffer_profont));
+    __font_default = malloc(sizeof(XFont));
+    __font_default->buffer = font_buffer_profont;
+    stbtt_InitFont(&__font_default->info, __font_default->buffer, 0);
 
-    //criando os atributos da fonte
-    stbtt_InitFont(&__font->info, __font->buffer, 0);
+    //setando a font default como fonte do sistema
+    __font = __font_default;
     xs_font_size(20);
 
     __pallete['r'] = RED;
@@ -100,12 +99,15 @@ void x_init(int width, int height){
     __pallete['w'] = WHITE;
     __pallete['v'] = VIOLET;
     __pallete['o'] = ORANGE;
+
 }
 
 void x_close(){
     x_bitmap_destroy(__bitmap);
-    free(__font->buffer);
-    free(__font);
+    if(__using_default_font == false){
+        free(__font->buffer);
+        free(__font);
+    }
 }
 
 void x_clear(XColor color){
@@ -155,19 +157,25 @@ uchar * x_buffer_create(const char* filename){
 }
 
 void xs_font(const char* filename){
-    XFont * font = malloc(sizeof(XFont));
-    font->buffer = x_buffer_create(filename);
-    unsigned error = stbtt_InitFont(&font->info, font->buffer, 0);
-    if(error == 0){
-        printf("Erro no carregamento da fonte\n");
-        free(font->buffer);
-        free(font);
-    }else{
-        if(__font != NULL){
+    if(filename == NULL){
+        if(__using_default_font == false){
+            __using_default_font = true;
             free(__font->buffer);
             free(__font);
+            __font = __font_default;
         }
-        __font = font;
+    }else{
+        XFont * font = malloc(sizeof(XFont));
+        font->buffer = x_buffer_create(filename);
+        unsigned error = stbtt_InitFont(&font->info, font->buffer, 0);
+        if(error == 0){
+            printf("Erro no carregamento da fonte\n");
+            free(font->buffer);
+            free(font);
+        }else{
+            __font = font;
+            __using_default_font = false;
+        }
     }
     xs_font_size(__font_size);
 }
