@@ -11,13 +11,7 @@
 #endif
 
 
-#define SWAP(x, y) do {x = x ^ y; y = y ^ x; x = x ^ y;} while(0)
 int main() {
-
-//pegar monokai bright and dark colors e usar como RGB rgb
-//COLOR_BBLUE, COLOR_DBLUE
-
-#if 1
     //teste de cores
     x_init(600, 600);
     xs_font_size(70);
@@ -47,53 +41,16 @@ int main() {
         x = x_write(x, 500, "%c", colors[i]);
     }
 
-    xs_font("font_alex.ttf");
-    xs_font_size(50);
+    xs_font("script12.ttf");
+    xs_font_size(30);
     xs_color(YELLOW);
-    x_write(30, 0, "cores.png : Cores do copiadas do solarized.");
-    x_write(15, 470, "Na paleta, cada letra corresponde a uma cor.");
+    x_write(40, 20, "cores.png : Cores do copiadas do solarized.");
+    x_write(40, 470, "Na paleta, cada letra corresponde a uma cor.");
     // e seus respectivos caracteres na paleta de cores
 
-    x_save("cores.png");
+    x_save("exe_cores.png");
 
     x_close();
-    return 0;
-#endif
-
-#if 0
-    x_init(600, 600);
-    int vet[34];
-    int size = sizeof(vet)/sizeof(int);
-    int i, j;
-
-    for(i = 0; i < size; i++)
-        vet[i] = rand() % 500;
-    {
-        int indices[] = {0, 2, 4, size - 1};
-        xc_vet_show(vet, size, indices, "rgbv");
-    }
-
-    //selection sort
-    for(i = 1; i < size; i++){
-        for(j = i; j > 0; j--){
-            if(vet[j] < vet[j - 1])
-                SWAP(vet[j], vet[j - 1]);
-            else
-                break;
-        }
-    }
-    {
-        x_clear(BLACK);
-        xc_vet_show(vet, size, NULL, "");
-        x_save("vet.png");
-        getchar();
-        //printf("%d, ", cont++);
-    }
-    x_close();
-
-
-#endif
-
     return 0;
 }
 

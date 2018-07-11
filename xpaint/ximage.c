@@ -40,8 +40,8 @@ typedef struct{
 static XColor   __pallete[256];
 static XBitmap* __bitmap;
 static XFont*   __font;
-//static int      __font_size;
-//static bool     __using_default_font;
+static int      __font_size;
+static bool     __using_default_font;
 static uchar    __color[3];
 
 
@@ -169,10 +169,11 @@ void xs_font(const char* filename){
         }
         __font = font;
     }
-    xs_font_size(20);
+    xs_font_size(__font_size);
 }
 
 void xs_font_size(int size){
+    __font_size = size;
     __font->scale = stbtt_ScaleForPixelHeight(&__font->info, size);
     stbtt_GetFontVMetrics(&__font->info, &__font->ascent, &__font->descent, &__font->lineGap);
     __font->ascent *= __font->scale;
@@ -193,6 +194,26 @@ int x_write(int x, int y, const char * format, ...){
     __font->info.userdata = (void *) __color;
 
     for (i = 0; i < (int) strlen(text); ++i) {
+        if(text[i] == '\n'){
+            y += __font_size;
+            _x = x;
+            continue;
+        }
+
+        /* how wide is this character */
+        int ax;
+        stbtt_GetCodepointHMetrics(&__font->info, text[i], &ax, 0);
+        ax = ax * __font->scale;
+
+        if(_x + ax > __bitmap->width){
+            y += __font_size;
+            _x = 10;
+        }
+
+        if(y + __font_size > __bitmap->height){
+            return _x;
+        }
+
         /* get bounding box for character (may be offset to account for chars that dip above or below the line */
         int c_x1, c_y1, c_x2, c_y2;
         stbtt_GetCodepointBitmapBox(&__font->info, text[i], __font->scale, __font->scale, &c_x1, &c_y1, &c_x2, &c_y2);
@@ -205,10 +226,7 @@ int x_write(int x, int y, const char * format, ...){
         stbtt_MakeCodepointBitmap(&__font->info, __bitmap->image + 3 * byteOffset, c_x2 - c_x1, c_y2 - c_y1,
                                   __bitmap->width, __font->scale, __font->scale, text[i]);
 
-        /* how wide is this character */
-        int ax;
-        stbtt_GetCodepointHMetrics(&__font->info, text[i], &ax, 0);
-        _x += ax * __font->scale;
+        _x += ax; //desloca x para proximo caractere
 
         /* add kerning */
         int kern;
