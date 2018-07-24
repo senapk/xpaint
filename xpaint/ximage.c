@@ -8,7 +8,6 @@
 #include "xttf.h" //XDDDX
 #include "xfont.h" //XDDDX
 
-
 XColor RED    = {211, 1, 2};
 XColor GREEN  = {133, 153, 0};
 XColor BLUE   = {38, 139, 210};

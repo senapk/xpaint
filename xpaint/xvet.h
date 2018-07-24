@@ -1,8 +1,8 @@
-#ifndef XVET_H
-#define XVET_H
+#ifndef XVET_H //XDDDX
+#define XVET_H //XDDDX
 
-#include "ximage.h"
-#include "xdraw.h"
+#include "ximage.h" //XDDDX
+#include "xdraw.h" //XDDDX
 #include "string.h"
 
 void __xc_vet_draw_i(int * vet, int i, int thick, int delta, int xbase, int ybase){
@@ -33,4 +33,4 @@ void xc_vet_show(int * vet, int qtd, int * indices, char * colors){
     }
 }
 
-#endif // XVET_H
+#endif // XVET_H //XDDDX

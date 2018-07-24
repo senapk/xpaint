@@ -1,13 +1,13 @@
 #include <stdio.h>
 
-#if 1
+#if 0
 #include "ximage.h"
 #include "xdraw.h"
 #include "xvet.h"
 #include "stdlib.h"
 #else
 #define   X_FULL
-#include "xdraw.h"
+#include "xpaint.h"
 #endif
 
 
