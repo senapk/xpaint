@@ -3,10 +3,10 @@
 
 O objetivo desse projeto é criar uma biblioteca header only para programar em C que seja capaz de criar, escrever e desenhar em pngs sem a necessidade de bibliotecas externas ou dependencias.
 
-O código a seguir cria um bitmap, escreve um texto, pinta um círculo, salva no arquivo exemplo.png e sai.
+O código a seguir cria um bitmap, escreve um texto, pinta um círculo, salva no arquivo exemplo.png e sai. Baixe o arquivo **xpaint.h** para o seu computador e crie o arquivo **exemplo.c** com o seguinte conteúdo. 
 
 ```c
-//arquivo basico.c
+//arquivo exemplo.c
 #define X_FULL
 #include "xpaint.h"
 
