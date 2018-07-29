@@ -33,15 +33,15 @@ gcc basico.c -o basico
 
 Ele deve gerar o arquivo basico.png que se parece com isso:
 
-![](exemplo.png)
+![](exemplos/figuras/exemplo.png)
 
 Outros código de exemplo são o ecores.c, edraw.c, etexto.c.
 
-![](figuras/ecores.png)
+![](exemplos/figuras/ecores.png)
 
-![](figuras/etexto.png)
+![](exemplos/figuras/etexto.png)
 
-![](figuras/edraw.png)
+![](exemplos/figuras/edraw.png)
 
 
 # Documentação das funções

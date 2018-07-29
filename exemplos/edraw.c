@@ -5,7 +5,7 @@
 #include "libs/xdraw.h"
 #else
 #define X_FULL
-#include "xpaint.h"
+#include "../xpaint.h"
 #endif
 
 int main(){
