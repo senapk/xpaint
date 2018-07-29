@@ -1,10 +1,7 @@
 #include <stdio.h>
 
-#if 0
-#include "ximage.h"
-#include "xdraw.h"
-#include "xvet.h"
-#include "stdlib.h"
+#if 1
+#include "libs/ximage.h"
 #else
 #define   X_FULL
 #include "xpaint.h"
@@ -13,7 +10,7 @@
 
 int main() {
     //teste de cores
-    x_init(600, 600);
+    x_open(600, 600);
     xs_font_size(18);
     xs_color(WHITE);
     x_write(130, 30, "texto.png - Escrevendo em imagens");
@@ -50,7 +47,7 @@ int main() {
     xs_color(RED);
     xs_font(NULL);
     x_write(10, 450, "xs_font(NULL) para voltar a font default");
-    x_save("exe_texto.png");
+    x_save("exe_texto");
     x_close();
     return 0;
 }

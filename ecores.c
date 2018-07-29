@@ -1,9 +1,8 @@
 #include <stdio.h>
 
-#if 0
-#include "ximage.h"
-#include "xdraw.h"
-#include "xvet.h"
+#if 1
+#include "libs/ximage.h"
+#include "libs/xdraw.h"
 #include "stdlib.h"
 #else
 #define   X_FULL
@@ -13,14 +12,14 @@
 
 int main() {
     //teste de cores
-    x_init(600, 600);
+    x_open(600, 600);
     xs_font_size(70);
 
     xs_color(BLACK);
-    xd_filled_square(20, 60, 580, 470);
+    xd_filled_rect(20, 60, 580, 470);
     //xd_filled_triangle(20, 60, 280, 460, 280, 60);
     xs_color(WHITE);
-    xd_filled_square(190, 70, 390, 410);
+    xd_filled_rect(190, 70, 390, 410);
 
     int x = 300;
     xs_color(RED);    x_write(20, 70, "    RED");
@@ -37,18 +36,17 @@ int main() {
     x = 50;
     xs_font_size(100);
     for(int i = 0; i < 10; i++){
-        xs_color(xg_pallete(colors[i]));
+        xs_color(xg_palette(colors[i]));
         x = x_write(x, 500, "%c", colors[i]);
     }
 
-    xs_font("script12.ttf");
-    xs_font_size(30);
-    xs_color(YELLOW);
+    xs_font_size(25);
+    xs_color(WHITE);
     x_write(40, 20, "cores.png : Cores do copiadas do solarized.");
-    x_write(40, 470, "Na paleta, cada letra corresponde a uma cor.");
+    x_write(40, 480, "Na paleta, cada letra corresponde a uma cor.");
     // e seus respectivos caracteres na paleta de cores
 
-    x_save("exe_cores.png");
+    x_save("exe_cores");
 
     x_close();
     return 0;

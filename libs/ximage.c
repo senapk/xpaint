@@ -36,7 +36,7 @@ typedef struct{
 } XFont;
 
 
-static XColor   __pallete[256];
+static XColor   __palette[256];
 static XBitmap* __bitmap;
 static XFont*   __font;
 static XFont*   __font_default;
@@ -73,7 +73,7 @@ void x_bitmap_destroy(XBitmap * bitmap){
     free(bitmap);
 }
 
-void x_init(int width, int height){
+void x_open(int width, int height){
     //inicializando a cor de fundo
     uchar cinza[] = {30, 30, 30};
     __bitmap = x_bitmap_create(width, height, cinza);
@@ -86,18 +86,19 @@ void x_init(int width, int height){
 
     //setando a font default como fonte do sistema
     __font = __font_default;
+    __using_default_font = true;
     xs_font_size(20);
 
-    __pallete['r'] = RED;
-    __pallete['g'] = GREEN;
-    __pallete['b'] = BLUE;
-    __pallete['y'] = YELLOW;
-    __pallete['m'] = MAGENTA;
-    __pallete['c'] = CYAN;
-    __pallete['k'] = BLACK;
-    __pallete['w'] = WHITE;
-    __pallete['v'] = VIOLET;
-    __pallete['o'] = ORANGE;
+    __palette['r'] = RED;
+    __palette['g'] = GREEN;
+    __palette['b'] = BLUE;
+    __palette['y'] = YELLOW;
+    __palette['m'] = MAGENTA;
+    __palette['c'] = CYAN;
+    __palette['k'] = BLACK;
+    __palette['w'] = WHITE;
+    __palette['v'] = VIOLET;
+    __palette['o'] = ORANGE;
 
 }
 
@@ -244,13 +245,17 @@ int x_write(int x, int y, const char * format, ...){
 }
 
 void x_save(const char* filename){
-    unsigned error = lodepng_encode_file(filename, __bitmap->image, __bitmap->width, __bitmap->height, LCT_RGB, 8);
+    char * dest = malloc(strlen(filename + 10));
+    strcpy(dest, filename);
+    strcat(dest, ".png");
+    unsigned error = lodepng_encode_file(dest, __bitmap->image, __bitmap->width, __bitmap->height, LCT_RGB, 8);
     if(error)
         printf("error %u: %s\n", error, lodepng_error_text(error));
+    free(dest);
 }
 
 void x_plot(int x, int y){
-    if((x >= 0) && (x < (int) __bitmap->width) && (y >= 0) && (x <  (int) __bitmap->height))
+    if((x >= 0) && (x < (int) __bitmap->width) && (y >= 0) && (y <  (int) __bitmap->height))
         memcpy(x_get_pixel_pos(x, y), &__color, sizeof(__color));
 }
 
@@ -259,12 +264,12 @@ XColor make_color(uchar r, uchar g, uchar b){
     return x;
 }
 
-void xs_pallete(char c, XColor color){
-    __pallete[(int)c] = color;
+void xs_palette(char c, XColor color){
+    __palette[(int)c] = color;
 }
 
-XColor xg_pallete(char c){
-    return __pallete[(int)c];
+XColor xg_palette(char c){
+    return __palette[(int)c];
 }
 
 

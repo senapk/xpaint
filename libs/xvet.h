@@ -28,7 +28,7 @@ void xc_vet_show(int * vet, int qtd, int * indices, char * colors){
     int j = 0;
     for(j = 0; j < qtd_indices; j++){
         i = indices[j];
-        xs_color(xg_pallete(colors[j]));
+        xs_color(xg_palette(colors[j]));
         __xc_vet_draw_i(vet, i, thick, delta, xbase, ybase);
     }
 }

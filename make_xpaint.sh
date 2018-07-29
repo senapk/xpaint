@@ -1,5 +1,5 @@
 #!/bin/bash
-cd xpaint
+cd libs
 final="xpaint.h"
 temp="xpaint.hh"
 echo "#ifndef XPAINT_H" > $temp

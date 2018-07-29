@@ -5,6 +5,7 @@
 #include <stdlib.h>//abs
 #include <assert.h>
 #include <stdio.h>
+#include <inttypes.h>
 
 #define SWAP(x, y, T) do { T SWAP = x; x = y; y = SWAP; } while (0)
 
@@ -111,28 +112,28 @@ void xd_thick_line(float ax, float ay, float bx, float by, int thickness){
     xd_filled_triangle(p3.x, p3.y, p2.x, p2.y, p4.x, p4.y);
 }
 
-void xd_filled_square(int x0, int y0, int x1, int y1){
+void xd_filled_rect(int x0, int y0, int x1, int y1){
     int i;
     for(i = x0; i <= x1; i++)
         xd_line(i, y0, i, y1);
 }
 
 //https://en.wikipedia.org/wiki/Midpoint_circle_algorithm
-void xd_circle(int x0, int y0, int radius){
+void xd_circle(int centerx, int centery, int radius){
     int x = radius - 1;
     int y = 0;
     int dx = 1;
     int dy = 1;
     int err = dx - (radius << 1);
     while(x >= y){
-        x_plot(x0 + x, y0 + y);
-        x_plot(x0 - x, y0 + y);
-        x_plot(x0 + x, y0 - y);
-        x_plot(x0 - x, y0 - y);
-        x_plot(x0 + y, y0 + x);
-        x_plot(x0 - y, y0 + x);
-        x_plot(x0 - y, y0 - x);
-        x_plot(x0 + y, y0 - x);
+        x_plot(centerx + x, centery + y);
+        x_plot(centerx - x, centery + y);
+        x_plot(centerx + x, centery - y);
+        x_plot(centerx - x, centery - y);
+        x_plot(centerx + y, centery + x);
+        x_plot(centerx - y, centery + x);
+        x_plot(centerx - y, centery - x);
+        x_plot(centerx + y, centery - x);
 
         if(err <= 0){
             y++;
@@ -330,7 +331,7 @@ static inline int32_t __COS(int d) {
     }
 }
 
-void xd_arc(float centerx, float centery, int radius, int thickness, int degrees_begin, int degrees_end) {
+void xd_filled_arc(float centerx, float centery, int radius, int thickness, int degrees_begin, int degrees_end) {
     if(degrees_begin > degrees_end)
         puts("drawArc: s deve ser menor que e");
     XY center = {centerx, centery};

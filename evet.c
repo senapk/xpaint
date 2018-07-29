@@ -1,10 +1,9 @@
 #include <stdio.h>
 
 #if 1
-#include "ximage.h"
-#include "xdraw.h"
-#include "xvet.h"
-#include "stdlib.h"
+#include "libs/ximage.h"
+#include "libs/xdraw.h"
+#include "libs/xvet.h"
 #else
 #define   X_FULL
 #include "xdraw.h"
@@ -12,6 +11,7 @@
 
 
 #define SWAP(x, y) do {x = x ^ y; y = y ^ x; x = x ^ y;} while(0)
+
 int main() {
 
     x_init(600, 600);
@@ -38,7 +38,7 @@ int main() {
     {
         x_clear(BLACK);
         xc_vet_show(vet, size, NULL, "");
-        x_save("vet.png");
+        x_save("vet");
         getchar();
         //printf("%d, ", cont++);
     }
