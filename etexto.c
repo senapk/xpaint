@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#if 1
+#if 0
 #include "libs/ximage.h"
 #else
 #define   X_FULL

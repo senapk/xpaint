@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#if 1
+#if 0
 #include "libs/ximage.h"
 #include "libs/xdraw.h"
 #include "stdlib.h"
