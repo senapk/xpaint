@@ -3,28 +3,27 @@
 
 O objetivo desse projeto é criar uma biblioteca header only para programar em C que seja capaz de criar, escrever e desenhar em pngs sem a necessidade de bibliotecas externas ou dependencias.
 
-O código a seguir cria um bitmap, escreve um texto, pinta um círculo, salva no arquivo exemplo.png e sai. Baixe o arquivo **xpaint.h** para o seu computador e crie o arquivo **exemplo.c** com o seguinte conteúdo. 
+O código a seguir cria um bitmap, escreve um texto, pinta um círculo, salva no arquivo exemplo.png e sai. Baixe o arquivo **xpaint.h** para o seu computador e crie o arquivo **exemplo_base.c** com o seguinte conteúdo. 
 
 
 ```c
-//arquivo exemplo.c
 #define X_FULL
 #include "xpaint.h"
 
 int main(){
     int largura = 800, altura = 600;
-    //cria um bitmap de 800x600
+    /* cria um bitmap de 800x600 */
     x_open(largura, altura); 
-    //escreve usando a font default na posicao x=50, y=30
-    //utilizando o mesmo formato do printf
+    /* escreve usando a font default na posicao x=50, y=30 */
+    /* utilizando o mesmo formato do printf */
     x_write(50, 30, "Pintarei um circulo vermelho em %d %d", largura/2, altura/2);
-    //muda a cor do pincel para vermelho
+    /* muda a cor do pincel para vermelho */
     xs_color(RED);
-    //desenha um circulo preenchido com centro no meio da tela e raio 200
+    /* desenha um circulo preenchido com centro no meio da tela e raio 200 */
     xd_filled_circle(largura/2, altura/2, 200);
-    //salva no arquivo exemplo.png
-    x_save("exemplo");
-    //libera os recursos alocados
+    /* salva no arquivo exemplo.png */
+    x_save("figura_base");
+    /* libera os recursos alocados */
     x_close();
     return 0;
 }
@@ -32,25 +31,25 @@ int main(){
 
 ## Compilando e rodando
 
-Se estiver fazendo manual, copie o arquivo xpaint.h para a pasta, crie o arquivo exemplo.c e compile manualmente. Se estiver utilizando alguma ide como _Geany_ ou _Dev c++_, basta colocar os dois arquivos na mesma pasta e mandar rodar o exemplo.c.
+Se estiver fazendo manual, copie o arquivo xpaint.h para a pasta e o arquivo exemplo_base.c e compile manualmente. Se estiver utilizando alguma ide como _Geany_ ou _Dev c++_, basta colocar os dois arquivos no mesmo pasta e mandar executar o exemplo_base.c.
 
 ```
 # rodando pelo terminal
-gcc exemplo.c -o exemplo
-./exemplo
+gcc exemplo_base.c -o exemplo_base
+./exemplo_base
 ```
 
-Ele deve gerar o arquivo exemplo.png que se parece com isso:
+Ele deve gerar o arquivo figura_base.png que se parece com isso:
 
-![](exemplos/figuras/exemplo.png)
+![](exemplos/figura_base.png)
 
-Outros código de exemplo estão na pasta **exemplos** são o ecores.c, edraw.c, etexto.c.
+Outros código de exemplo são os exemplo_cores.c, exemplo_draw.c, exemplo_texto.c.
 
-![](exemplos/figuras/ecores.png)
+![](exemplos/figura_cores.png)
 
-![](exemplos/figuras/etexto.png)
+![](exemplos/figuras_texto.png)
 
-![](exemplos/figuras/edraw.png)
+![](exemplos/figura_draw.png)
 
 Esta é uma biblioteca header only, ou seja, não está dividida em .c e .h. Declarações e definições estão todas no .h. 
 

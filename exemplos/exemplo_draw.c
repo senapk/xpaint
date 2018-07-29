@@ -1,8 +1,8 @@
 #include <stdio.h>
 
 #if 1
-#include "libs/ximage.h"
-#include "libs/xdraw.h"
+#include "../libs/ximage.h"
+#include "../libs/xdraw.h"
 #else
 #define X_FULL
 #include "../xpaint.h"
@@ -12,7 +12,7 @@ int main(){
     x_open(1000, 600);
     x_clear(BLACK);
 
-    //cada exemplo vai ser apresentado num espaço de 200x200 pixels
+    /* cada exemplo vai ser apresentado num espaço de 200x200 pixels */
     xs_font_size(35);
     xs_color(GREEN);
     x_write(30, 30, "Exemplo das funcoes de desenho de formas geometricas");
@@ -61,6 +61,7 @@ int main(){
     x_write(x, y, "xd_filled_rect");
     xd_filled_rect(x + 30, y + 50, x + 180, y + 180);  
 
-    x_save("figuras/edraw");
+    x_save("figura_draw");
     x_close();
+    return 0;
 }

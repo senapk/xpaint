@@ -1,5 +1,5 @@
-#include "xy.h" //XDDDX
-#include "xmath.h" //XDDDX
+#include "xy.h" /* XDDDX */
+#include "xmath.h" /* XDDDX */
 
 XY make_xy(float x, float y){
     XY v = {x, y};

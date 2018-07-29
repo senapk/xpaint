@@ -1,15 +1,14 @@
 #include <stdio.h>
 
-#if 1
+#if 0
 #include "libs/ximage.h"
 #else
 #define   X_FULL
-#include "../xpaint.h"
+#include "xpaint.h"
 #endif
 
 
 int main() {
-    //teste de cores
     x_open(600, 600);
     xs_font_size(18);
     xs_color(WHITE);
@@ -47,7 +46,7 @@ int main() {
     xs_color(RED);
     xs_font(NULL);
     x_write(10, 450, "xs_font(NULL) para voltar a font default");
-    x_save("figuras/etexto");
+    x_save("figura_texto");
     x_close();
     return 0;
 }
