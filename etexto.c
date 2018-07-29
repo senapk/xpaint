@@ -47,7 +47,7 @@ int main() {
     xs_color(RED);
     xs_font(NULL);
     x_write(10, 450, "xs_font(NULL) para voltar a font default");
-    x_save("exe_texto");
+    x_save("exemplo_texto");
     x_close();
     return 0;
 }

@@ -93,9 +93,9 @@ void xd_filled_triangle(float v1x, float v1y, float v2x, float v2y, float v3x, f
     }
 }
 
-void xd_thick_line(float ax, float ay, float bx, float by, int thickness){
-    XY a = {ax, ay};
-    XY b = {bx, by};
+void xd_thick_line(float x0, float y0, float x1, float y1, int thickness){
+    XY a = {x0, y0};
+    XY b = {x1, y1};
     if(thickness == 1){
         xd_line(a.x, a.y, b.x, b.y);
         return;
@@ -147,17 +147,17 @@ void xd_circle(int centerx, int centery, int radius){
     }
 }
 
-void xd_filled_circle(int mx, int my, int radius){
+void xd_filled_circle(int centerx, int centery, int radius){
     int x = radius - 1;
     int y = 0;
     int dx = 1;
     int dy = 1;
     int err = dx - (radius << 1);
     while(x >= y){
-        xd_line(mx + x, my + y, mx - x, my + y);
-        xd_line(mx + x, my - y, mx - x, my - y);
-        xd_line(mx + y, my + x, mx - y, my + x);
-        xd_line(mx - y, my - x, mx + y, my - x);
+        xd_line(centerx + x, centery + y, centerx - x, centery + y);
+        xd_line(centerx + x, centery - y, centerx - x, centery - y);
+        xd_line(centerx + y, centery + x, centerx - y, centery + x);
+        xd_line(centerx - y, centery - x, centerx + y, centery - x);
         if(err <= 0){
             y++;
             err += dy;

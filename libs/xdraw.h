@@ -18,6 +18,6 @@ void xd_bezier(int x0, int y0, int x1, int y1, int x2, int y2);
 void xd_filled_arc(float centerx, float centery, int radius, int thickness, int degrees_begin, int degrees_end);
 void xd_filled_triangle(float v1x, float v1y, float v2x, float v2y, float v3x, float v3y);
 void xd_filled_rect(int x0, int y0, int x1, int y1);
-void xd_filled_circle(int mx, int my, int radius);
+void xd_filled_circle(int centerx, int centery, int radius);
 void xd_filled_ellipse(int x0, int y0, int x1, int y1);
 #endif // XDRAW_H XDDDX

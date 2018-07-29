@@ -56,6 +56,6 @@ int main(){
     x_write(x, y, "xd_filled_rect");
     xd_filled_rect(x + 30, y + 50, x + 180, y + 180);  
 
-    x_save("edraw");
+    x_save("exemplo_edraw");
     x_close();
 }
