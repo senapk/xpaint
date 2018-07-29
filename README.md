@@ -5,6 +5,7 @@ O objetivo desse projeto é criar uma biblioteca header only para programar em C
 
 O código a seguir cria um bitmap, escreve um texto, pinta um círculo, salva no arquivo exemplo.png e sai. Baixe o arquivo **xpaint.h** para o seu computador e crie o arquivo **exemplo.c** com o seguinte conteúdo. 
 
+
 ```c
 //arquivo exemplo.c
 #define X_FULL
@@ -12,28 +13,38 @@ O código a seguir cria um bitmap, escreve um texto, pinta um círculo, salva no
 
 int main(){
     int largura = 800, altura = 600;
-    x_open(largura, altura);
-    x_write(0, 30, "Pintarei um circulo vermelho em %d %d", largura/2, altura/2);
+    //cria um bitmap de 800x600
+    x_open(largura, altura); 
+    //escreve usando a font default na posicao x=50, y=30
+    //utilizando o mesmo formato do printf
+    x_write(50, 30, "Pintarei um circulo vermelho em %d %d", largura/2, altura/2);
+    //muda a cor do pincel para vermelho
     xs_color(RED);
+    //desenha um circulo preenchido com centro no meio da tela e raio 200
     xd_filled_circle(largura/2, altura/2, 200);
+    //salva no arquivo exemplo.png
     x_save("exemplo");
+    //libera os recursos alocados
     x_close();
     return 0;
 }
 ```
 
-Você pode compilar e rodar seu código apenas usando
+## Compilando e rodando
+
+Se estiver fazendo manual, copie o arquivo xpaint.h para a pasta, crie o arquivo exemplo.c e compile manualmente. Se estiver utilizando alguma ide como _Geany_ ou _Dev c++_, basta colocar os dois arquivos na mesma pasta e mandar rodar o exemplo.c.
 
 ```
-gcc basico.c -o basico
-./basico
+# rodando pelo terminal
+gcc exemplo.c -o exemplo
+./exemplo
 ```
 
-Ele deve gerar o arquivo basico.png que se parece com isso:
+Ele deve gerar o arquivo exemplo.png que se parece com isso:
 
 ![](exemplos/figuras/exemplo.png)
 
-Outros código de exemplo são o ecores.c, edraw.c, etexto.c.
+Outros código de exemplo estão na pasta **exemplos** são o ecores.c, edraw.c, etexto.c.
 
 ![](exemplos/figuras/ecores.png)
 

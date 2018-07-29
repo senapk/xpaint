@@ -1,8 +1,8 @@
 
-#include "ximage.h" //XDDDX
-#include "xy.h" //XDDDX
-#include "xmath.h" //XDDDX
-#include <stdlib.h>//abs
+#include "ximage.h" /*XDDDX*/
+#include "xy.h" /*XDDDX*/
+#include "xmath.h" /*XDDDX*/
+#include <stdlib.h>/*abs*/
 #include <assert.h>
 #include <stdio.h>
 #include <inttypes.h>
@@ -10,7 +10,7 @@
 #define SWAP(x, y, T) do { T SWAP = x; x = y; y = SWAP; } while (0)
 
 void xd_line(int x0, int y0, int x1, int y1){
-    // Bresenham's Line Algorithm
+    /* Bresenham's Line Algorithm */
     int dx = (x0 > x1) ? x0 - x1 : x1 - x0;
     int dy = (y0 > y1) ? y0 - y1 : y1 - y0;
     int sx = (x0 < x1) ? 1 : -1;
@@ -39,8 +39,9 @@ void __x_fill_bottom_flat_triangle(float v1x, float v1y, float v2x, float v2y, f
 
     float curx1 = v1x;
     float curx2 = v1x;
+    int scanlineY;
 
-    for (int scanlineY = v1y; scanlineY <= (int)v2y; scanlineY++){
+    for (scanlineY = v1y; scanlineY <= (int)v2y; scanlineY++){
         xd_line(curx1, scanlineY, curx2, scanlineY);
         curx1 += invslope1;
         curx2 += invslope2;
@@ -55,7 +56,9 @@ void __x_fill_top_flat_triangle(float v1x, float v1y, float v2x, float v2y, floa
     float curx1 = v3x;
     float curx2 = v3x;
 
-    for (int scanlineY = v3y; scanlineY >= v1y; scanlineY--)
+    int scanlineY;
+    
+    for (scanlineY = v3y; scanlineY >= v1y; scanlineY--)
     {
         xd_line(curx1, scanlineY, curx2, scanlineY);
         curx1 -= invslope1;
@@ -118,7 +121,7 @@ void xd_filled_rect(int x0, int y0, int x1, int y1){
         xd_line(i, y0, i, y1);
 }
 
-//https://en.wikipedia.org/wiki/Midpoint_circle_algorithm
+/* https://en.wikipedia.org/wiki/Midpoint_circle_algorithm */
 void xd_circle(int centerx, int centery, int radius){
     int x = radius - 1;
     int y = 0;
@@ -289,7 +292,7 @@ void xd_bezier(int x0, int y0, int x1, int y1, int x2, int y2)
     __x_plot_quad_bezier_seg(x0,y0, x1,y1, x2,y2);                  /* remaining part */
 }
 
-//https://github.com/Jnmattern/Minimalist_2.0/blob/master/src/bitmap.h
+/* https://github.com/Jnmattern/Minimalist_2.0/blob/master/src/bitmap.h */
 #define __TRIG_MAX (1<<24)
 #define __TRIG_NORM(v) ((v)>>24)
 #define __TRIG_MULT(v) ((v)<<24)
@@ -305,7 +308,7 @@ const int32_t __sinTable__[91] = {
     16766995, 16774660, 16777216
 };
 
-static inline int32_t __SIN(int d) {
+static int32_t __SIN(int d) {
     d = d%360;
     if (d < 90) {
         return __sinTable__[d];
@@ -318,7 +321,7 @@ static inline int32_t __SIN(int d) {
     }
 }
 
-static inline int32_t __COS(int d) {
+static int32_t __COS(int d) {
     d = d%360;
     if (d < 90) {
         return __sinTable__[90-d];
@@ -350,9 +353,10 @@ void xd_filled_arc(float centerx, float centery, int radius, int thickness, int 
 
     int ir2 = (radius - thickness) * (radius - thickness);
     int or2 = radius * radius;
+    int x, y;
 
-    for (int x = -radius; x <= radius; x++) {
-        for (int y = -radius; y <= radius; y++)
+    for (x = -radius; x <= radius; x++) {
+        for (y = -radius; y <= radius; y++)
         {
             int x2 = x * x;
             int y2 = y * y;

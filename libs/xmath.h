@@ -1,11 +1,11 @@
-#ifndef XMATH_H //XDDDX
-#define XMATH_H //XDDDX
+#ifndef XMATH_H /* XDDDX */
+#define XMATH_H /* XDDDX */
 
-
-//###############################################
-//############ FUNÇÕES MATEMATICAS ##############
-//###############################################
-
+/*
+###############################################
+############ FUNÇÕES MATEMATICAS ##############
+###############################################
+*/
 
 /*
 Essas funções foram adicionadas para que a biblioteca
@@ -23,14 +23,14 @@ float xm_cos(float d);
 float xm_acos(float x);
 float xm_fabs(float f);
 
+/*
+###################################################
+#         INICIO DA IMPLEMENTACAO                 #  
+#                                                 #
+#   O código abaixo apenas será inserido se       #
+#   você incluir o #define XFULL antes de incluir #
+#   essa biblioteca.                              #
+###################################################
+*/
 
-//###################################################
-//#         INICIO DA IMPLEMENTACAO                 #  
-//#                                                 #
-//#   O código abaixo apenas será inserido se       #
-//#   você incluir o #define XFULL antes de incluir #
-//#   essa biblioteca.                              #
-//###################################################
-
-
-#endif // XMATH_H XDDDX
+#endif /* XMATH_H XDDDX */

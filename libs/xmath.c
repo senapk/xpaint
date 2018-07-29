@@ -1,14 +1,14 @@
-#include "xmath.h" //XDDDX
+#include "xmath.h" /* XDDDX */
 #include <stdint.h>
 
-//https://stackoverflow.com/questions/5122993/floor-int-function-implementaton?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
+/* https://stackoverflow.com/questions/5122993/floor-int-function-implementaton?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa */
 int xm_floor(double x) {
     int xi = (int) x;
     return x < xi ? xi - 1 : xi;
 }
 
 
-//funcao necessario para o po
+/* funcao necessario para o po */
 float xm_sqrt(const float m)
 {
    float i=0;
@@ -16,7 +16,8 @@ float xm_sqrt(const float m)
    while( (i*i) <= m )
           i+=0.1f;
    x1=i;
-   for(int j=0;j<10;j++)
+   int j;
+   for(j=0;j<10;j++)
    {
        x2=m;
       x2/=x1;
@@ -27,53 +28,28 @@ float xm_sqrt(const float m)
    return x2;
 }
 
-// used for testing if a float is an integer or not
-static const uint8_t  __gMaskShift[256] = {	0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,    //16
-                                            0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,    //32
-                                            0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,    //48
-                                            0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,    //64
-                                            0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,    //80
-                                            0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,    //96
-                                            0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,    //112
-                                            0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7,    //128
-                                            8, 9,10,11, 12,13,14,15,16,17,18,19,20,21,22,23,    //144
-                                           24,25,26,27, 28,29,30,31,31,31,31,31,31,31,31,31,    //160
-                                           31,31,31,31, 31,31,31,31,31,31,31,31,31,31,31,31,    //176
-                                           31,31,31,31, 31,31,31,31,31,31,31,31,31,31,31,31,    //192
-                                           31,31,31,31, 31,31,31,31,31,31,31,31,31,31,31,31,    //208
-                                           31,31,31,31, 31,31,31,31,31,31,31,31,31,31,31,31,    //224
-                                           31,31,31,31, 31,31,31,31,31,31,31,31,31,31,31,31,    //240
-                                           31,31,31,31, 31,31,31,31,31,31,31,31,31,31,31,31,    //256
+/* used for testing if a float is an integer or not */
+static const uint8_t  __gMaskShift[256] = {	0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,    /* 16 */
+                                            0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,    /* 32 */
+                                            0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,    /* 48 */
+                                            0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,    /* 64 */
+                                            0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,    /* 80 */
+                                            0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,    /* 96 */
+                                            0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,    /* 112 */
+                                            0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7,    /* 128 */
+                                            8, 9,10,11, 12,13,14,15,16,17,18,19,20,21,22,23,    /* 144 */
+                                           24,25,26,27, 28,29,30,31,31,31,31,31,31,31,31,31,    /* 160 */
+                                           31,31,31,31, 31,31,31,31,31,31,31,31,31,31,31,31,    /* 176 */
+                                           31,31,31,31, 31,31,31,31,31,31,31,31,31,31,31,31,    /* 192 */
+                                           31,31,31,31, 31,31,31,31,31,31,31,31,31,31,31,31,    /* 208 */
+                                           31,31,31,31, 31,31,31,31,31,31,31,31,31,31,31,31,    /* 224 */
+                                           31,31,31,31, 31,31,31,31,31,31,31,31,31,31,31,31,    /* 240 */
+                                           31,31,31,31, 31,31,31,31,31,31,31,31,31,31,31,31,    /* 256 */
                                         };
 
-// Table of  1/(1+a/127), log2( 1 + a/127 )
-//    produced by:
-//
-//		#include <stdio.h>
-//		#include <stdint.h>
-//		#include <math.h>
-//
-//		int main( void )
-//		{
-//			int i;
-//
-//			for( i = 0; i < 128; i++ )
-//			{
-//				long double a = 1.0L /( 1.0L + (long double) i / (long double) 127 );
-//
-//				printf( "%a,\t%a,\t// %Lg, -log2l(%Lg)\n", (double) a, (double) -log2l( a ), a, a );
-//			}
-//
-//			return 0;
-//		}
-//
-// We use 127 rather than 128 here so that the two end points that need extra accuracy x E {1.0f+ulp, 1.0f-ulp}
-// end up being reduced by exact powers of two and accumulate no rounding error in reduction. We use the Taylor
-// polynomial for log(1+r) to produce very high precision calculations for these values. Values outside the
-// range [1.0-2**-7, 1.0+2**-7] require far less accuracy. For these, the 5th order Taylor polynomial should be good to
-// at least (5+1)*7 = 42 bits of precision, which should be good enough. 0x1.02 ** y overflows at around 10,000, meaning
-// we need  around 24+14=38 bits of precsion.
+static const double powf_log_table[256]  = {(double)(1.0), (double)(-0.0), (double)(0.9921875), (double)(0.0113153132278341461), (double)(0.9844961240310077244), (double)(0.02254256865108826557), (double)(0.976923076923076894), (double)(0.0336831262562886577), (double)(0.9694656488549617812), (double)(0.04473831476528442735), (double)(0.9621212121212121549), (double)(0.05570943258628758415), (double)(0.9548872180451127845), (double)(0.06659774872902374243), (double)(0.9477611940298507065), (double)(0.0774045036856065849), (double)(0.9407407407407407662), (double)(0.08813091027866504223), (double)(0.9338235294117647189), (double)(0.09877815447817354932), (double)(0.9270072992700729708), (double)(0.1093473961883608681), (double)(0.9202898550724637472), (double)(0.1198397700060031962), (double)(0.9136690647482014205), (double)(0.1302563859513415911), (double)(0.9071428571428571397), (double)(0.1405983301728006007), (double)(0.9007092198581559961), (double)(0.1508666656266277051), (double)(0.8943661971830986213), (double)(0.1610624327325162197), (double)(0.8881118881118881259), (double)(0.171186650006223573), (double)(0.8819444444444444198), (double)(0.1812403146701465073), (double)(0.8758620689655172153), (double)(0.1912244032427686258), (double)(0.869863013698630172), (double)(0.2011398721078513641), (double)(0.863945578231292477), (double)(0.21098765806419853), (double)(0.8581081081081081141), (double)(0.2207686788567839176), (double)(0.8523489932885905951), (double)(0.2304838336899957263), (double)(0.8466666666666666785), (double)(0.2401340037237150171), (double)(0.841059602649006588), (double)(0.2497200525529130466), (double)(0.8355263157894736725), (double)(0.2592428266714196239), (double)(0.8300653594771242316), (double)(0.2687031559204859366), (double)(0.8246753246753246724), (double)(0.2781018539227355091), (double)(0.8193548387096774022), (double)(0.2874397185020717282), (double)(0.8141025641025640969), (double)(0.2967175320900825031), (double)(0.8089171974522293418), (double)(0.3059360621194611718), (double)(0.8037974683544303334), (double)(0.3150960614049370667), (double)(0.7987421383647799189), (double)(0.3241982685121895247), (double)(0.7937499999999999556), (double)(0.3332434081151964822), (double)(0.788819875776397561), (double)(0.3422321913424511419), (double)(0.783950617283950657), (double)(0.3511653161124588807), (double)(0.7791411042944785814), (double)(0.3600434674589116923), (double)(0.7743902439024390461), (double)(0.3688673178459178637), (double)(0.7696969696969696573), (double)(0.3776375274736499255), (double)(0.7650602409638553869), (double)(0.3863547445747588793), (double)(0.760479041916167664), (double)(0.3950196057018863782), (double)(0.7559523809523809312), (double)(0.4036327360065944392), (double)(0.7514792899408283544), (double)(0.4121947495100184433), (double)(0.7470588235294117752), (double)(0.4207062493655359114), (double)(0.742690058479532178), (double)(0.4291678281137319972), (double)(0.7383720930232557933), (double)(0.4375800679299320928), (double)(0.7341040462427745883), (double)(0.4459435408645587851), (double)(0.7298850574712644201), (double)(0.4542588090765624642), (double)(0.7257142857142857562), (double)(0.462526425060162949), (double)(0.7215909090909090606), (double)(0.4707469318651313905), (double)(0.7175141242937853603), (double)(0.4789208633108316127), (double)(0.7134831460674156967), (double)(0.4870487441942318863), (double)(0.7094972067039105879), (double)(0.4951310904920905864), (double)(0.7055555555555556024), (double)(0.5031684095575088556), (double)(0.7016574585635358963), (double)(0.5111612003110395097), (double)(0.6978021978021977656), (double)(0.5191099534265304349), (double)(0.6939890710382513594), (double)(0.5270151515118766117), (double)(0.6902173913043477826), (double)(0.5348772692848470234), (double)(0.6864864864864864691), (double)(0.5426967737441462658), (double)(0.6827956989247311315), (double)(0.5504741243358655112), (double)(0.6791443850267380178), (double)(0.5582097731154708198), (double)(0.6755319148936169693), (double)(0.5659041649054715739), (double)(0.6719576719576719759), (double)(0.5735577374489068125), (double)(0.6684210526315789158), (double)(0.5811709215587820276), (double)(0.6649214659685863671), (double)(0.5887441412635828764), (double)(0.6614583333333333703), (double)(0.5962778139489903761), (double)(0.6580310880829015607), (double)(0.6037723504959146004), (double)(0.6546391752577319645), (double)(0.6112281554149617824), (double)(0.6512820512820512997), (double)(0.6186456269774448513), (double)(0.6479591836734693855), (double)(0.6260251573430423155), (double)(0.6446700507614213649), (double)(0.6333671326842104099), (double)(0.6414141414141414366), (double)(0.6406719333074437639), (double)(0.6381909547738693345), (double)(0.6479399337714829565), (double)(0.6350000000000000089), (double)(0.655171503002558886), (double)(0.631840796019900508), (double)(0.6623670044067627716), (double)(0.6287128712871287162), (double)(0.6695267959796288304), (double)(0.6256157635467980427), (double)(0.6766512304130103406), (double)(0.622549019607843146), (double)(0.6837406551993296944), (double)(0.6195121951219512146), (double)(0.6907954127332801564), (double)(0.6165048543689319871), (double)(0.6978158404110524904), (double)(0.6135265700483091278), (double)(0.7048022707271593967), (double)(0.6105769230769231282), (double)(0.7117550313689262609), (double)(0.6076555023923444487), (double)(0.718674445308716936), (double)(0.6047619047619047228), (double)(0.7255608308939567319), (double)(0.6018957345971563955), (double)(0.7324145019350193353), (double)(0.5990566037735849392), (double)(0.7392357677910332825), (double)(0.5962441314553990068), (double)(0.7460249334536723786), (double)(0.5934579439252336552), (double)(0.752782299628981133), (double)(0.5906976744186046568), (double)(0.7595081628172943855), (double)(0.5879629629629629095), (double)(0.7662028153913026385), (double)(0.5852534562211981761), (double)(0.7728665456723134985), (double)(0.5825688073394494904), (double)(0.77949963800476052), (double)(0.5799086757990867813), (double)(0.786102372829007523), (double)(0.5772727272727272707), (double)(0.7926750267524937943), (double)(0.5746606334841628527), (double)(0.7992178726192656901), (double)(0.5720720720720721131), (double)(0.8057311795779401598), (double)(0.5695067264573990817), (double)(0.812215213148138826), (double)(0.5669642857142856984), (double)(0.8186702352854382525), (double)(0.5644444444444444153), (double)(0.8250965044448712593), (double)(0.5619469026548672419), (double)(0.8314942756430218074), (double)(0.5594713656387665379), (double)(0.8378638005187490911), (double)(0.557017543859649078), (double)(0.8442053273925758106), (double)(0.5545851528384279083), (double)(0.8505191013247780374), (double)(0.5521739130434782927), (double)(0.8568053641722093161), (double)(0.5497835497835498186), (double)(0.8630643546438916403), (double)(0.5474137931034482873), (double)(0.8692963083554062775), (double)(0.5450643776824034559), (double)(0.87550145788211442), (double)(0.5427350427350426942), (double)(0.8816800328112386342), (double)(0.5404255319148936199), (double)(0.8878322597928338666), (double)(0.5381355932203389925), (double)(0.893958362589675426), (double)(0.5358649789029535926), (double)(0.9000585621260932534), (double)(0.5336134453781512521), (double)(0.9061330765357776817), (double)(0.5313807531380753124), (double)(0.9121821212085826636), (double)(0.5291666666666666741), (double)(0.9182059088363526689), (double)(0.5269709543568464882), (double)(0.9242046494577957905), (double)(0.5247933884297520946), (double)(0.9301785505024287026), (double)(0.5226337448559670307), (double)(0.9361278168336150118), (double)(0.5204918032786884918), (double)(0.942052650790720425), (double)(0.5183673469387755084), (double)(0.9479532522304047193), (double)(0.5162601626016259937), (double)(0.9538298185670740503), (double)(0.5141700404858299267), (double)(0.9596825448125118063), (double)(0.5120967741935483764), (double)(0.9655116236147093245), (double)(0.5100401606425702949), (double)(0.9713172452959151215), (double)(0.5080000000000000071), (double)(0.9770995978899211787), (double)(0.5059760956175298752), (double)(0.9828588671786061548), (double)(0.5039682539682539542), (double)(0.9885952367277506259), (double)(0.5019762845849802257), (double)(0.9943088879221442244), (double)(0.5), (double)(1.0)};
 
+/*
 static const double powf_log_table[256] = {
                                             0x1p+0,	-0x0p+0,	// 1, -log2l(1)
                                             0x1.fcp-1,	0x1.72c7ba20f7327p-7,	// 0.992188, -log2l(0.992188)
@@ -204,8 +180,9 @@ static const double powf_log_table[256] = {
                                             0x1.0103091b51f5ep-1,	0x1.fd160df77ed7ap-1,	// 0.501976, -log2l(0.501976)
                                             0x1p-1,	0x1p+0,	// 0.5, -log2l(0.5)
                                         };
+*/
 
-
+/* https://opensource.apple.com/source/Libm/Libm-315/Source/ARM/powf.c.auto.html */
 float xm_pow( float x, float y )
 {
     static const double recip_ln2 = 0x1.71547652b82fep0;
@@ -213,7 +190,6 @@ float xm_pow( float x, float y )
     if( x == 1.0f || y == 1.0f)
         return x;
 
-    //Move the arguments to the integer registers for bitwise inspection
     union{ float f; uint32_t u; } ux, uy;
     ux.f = x;
     uy.f = y;
@@ -221,29 +197,22 @@ float xm_pow( float x, float y )
     uint32_t absuy = uy.u & 0x7fffffff;
 
 
-    // Handle most edge cases
-    //If |x| or |y| is in { +-0, +-Inf, +-NaN }
+
     if( (ux.u - 1U) >= 0x7f7fffff || (absuy - 1) >= 0x4affffff )
     {
-        // any**0 = 1.0f for all values, including NaN
         if( 0 == absuy )
             return 1.0f;
 
-        // handle NaNs
         if( x != x || y != y )
             return x + y;
 
-        //figure out if y is an odd integer
-        //Find out if y is an integer or not without raising inexact
-        //	Note -- independently tested over entire range. Fails for Inf/NaN. We don't care about that here.
-        uint32_t fractMask = 0x3fffffffU >> __gMaskShift[ absuy >> 23 ];			//mask bits cover fractional part of value
-        uint32_t onesMask = 0x40000000U >> __gMaskShift[ absuy >> 23 ];			// we get away with this because leading exponent bit is never set for |y| < 2.0
+        uint32_t fractMask = 0x3fffffffU >> __gMaskShift[ absuy >> 23 ];			
+        uint32_t onesMask = 0x40000000U >> __gMaskShift[ absuy >> 23 ];			
         uint32_t fractionalBits = absuy & fractMask;
         uint32_t onesBit = absuy & onesMask;
 
         if( 0 == absux )
         {
-            //if y is an odd integer
             if( 0 == fractionalBits && 0 != onesBit )
             {
                 if( y < 0.0f )
@@ -252,29 +221,28 @@ float xm_pow( float x, float y )
                 return x;
             }
 
-            // y is not an odd integer
             if( 0.0f < y )
                 return 0.0f;
 
-            return 1.0f / __builtin_fabsf(x);			// return Inf and set div/0
+            return 1.0f / __builtin_fabsf(x);
 
         }
 
-        // deal with infinite y
+
         if( 0x7f800000 == absuy )
         {
             if( -1.0f == x )
                 return 1.0f;
 
-            if( absux > 0x3f800000 )	// |x| > 1.0f
-            {	// |x| > 1.0f
+            if( absux > 0x3f800000 )
+            {
                 if( 0.0f < y )
                     return y;
                 else
                     return 0.0f;
             }
             else
-            {	// |x| < 1.0f
+            {
                 if( 0.0f < y )
                     return 0.0f;
                 else
@@ -282,7 +250,6 @@ float xm_pow( float x, float y )
             }
         }
 
-        // we can also deal with x == +inf at this point.
         if( x == __builtin_inff() )
         {
             if( y < 0.0f )
@@ -299,20 +266,18 @@ float xm_pow( float x, float y )
             goto ipowf;
         }
 
-        // At this point, we know that x is in { +-0, -Inf } and y is finite non-zero.
-        // Deal with y is odd integer cases
-        if( 0 == fractionalBits && 0 != onesBit )	// if( |y| >= 1.0f || |y| < 0x1.0p24f )
+
+        if( 0 == fractionalBits && 0 != onesBit )
             return 0.0f < y ? x : -0.0f;
 
-        // x == -inf
         return 0.0f < y ? -x : 0.0f;
     }
 
-    //special case for sqrts
+
     if( 0x3f000000U == absuy )
         goto nan_sqrt;
 
-    // break |x| into exponent and fractional parts:		|x| = 2**i * m		1.0 <= m < 2.0
+
     int32_t	i = ((absux >> 23) & 0xff) - 127;
     union
     {
@@ -320,42 +285,26 @@ float xm_pow( float x, float y )
         float		f;
     }m = { (absux & 0x007fffffU) | 0x3f800000U };
 
-    //normalize denormals
+
     if( -127 == i )
-    {	//denormal
-        m.f -= 1.0f;								//	exact
+    {
+        m.f -= 1.0f;
         i = ((m.u >> 23) & 0xff) - (127+126);
         m.u = (m.u & 0x807fffffU) | 0x3f800000U;
     }
-
-    //
-    //	We further break down m as :
-    //
-    //          m = (1+a/256.0)(1+r)              a = high 8 explicit bits of mantissa(m), b = next 7 bits
-    //          log2f(m) = log2(1+a/256.0) + log2(1+r)
-    //
-    //      We use the high 7 bits of the mantissa to look up log2(1+a/256.0) in log2f_table above
-    //      We calculate 1+r as:
-    //
-    //          1+r = m * (1 /(1+a/256.0))
-    //
-    //      We can lookup (from the same table) the value of 1/(1+a/256.0) based on a too.
 
     double log2x = i;
 
     if( m.f != 1.0f )
     {
-        int index = (m.u >> (23-7-4)) & 0x7f0;		//top 7 bits of mantissa
+        int index = (m.u >> (23-7-4)) & 0x7f0;		
         const double *tablep = (void*) powf_log_table + index;
         double r = (double) m.f;
 
-        // reduce
-        r *= tablep[0];		// reduce r to  1-2**-7 < r < 1+2**-7
-        log2x += tablep[1]; // do this early to force -1.0 + 1.0 to cancel so that we don't end up with (1.0 + tiny) - 1.0 later on.
-        r -= 1.0;			// -2**-7 < r < 1+2**-7
+        r *= tablep[0];		
+        log2x += tablep[1]; 
+        r -= 1.0;			
 
-        // ln(1+r) = r - rr/2 + rrr/3 - rrrr/4 + rrrrr/5
-        //	should provide log(1+r) to at least 35 bits of accuracy for the worst case
         double rr = r*r;
         double small = -0.5 + 0.3333333333333333333333*r;
         double large = -0.25 + 0.2*r;
@@ -367,25 +316,19 @@ float xm_pow( float x, float y )
         log2x += r * recip_ln2;
     }
 
-    // multiply by Y
     double ylog2x = y * log2x;
 
-// now we need to calculate 2**ylog2x
-
-    //deal with overflow
     if( ylog2x >= 128.0 )
-        return (float) (0x1.0p128 * ylog2x);		//set overflow and return inf
+        return (float) (0x1.0p128 * ylog2x);		
 
-    //deal with underflow
+
     if( ylog2x <= -150.0 )
-        return (float) ( ylog2x * 0x1.0p-1022 );		//minimum y * maximum log2(x) is ~-1.0p128 * ~128 = -1.0p135, so we can be sure that we'll drive this to underflow
+        return (float) ( ylog2x * (double)(2.225073858507201383e-308) );		
 
-    //separate ylog2x into integer and fractional parts
+
     int exp = (int) ylog2x;
-    double f = ylog2x - exp;		//may be negative
+    double f = ylog2x - exp;		
 
-    // Calculate 2**fract
-    // 8th order minimax fit of exp2 on [-1.0,1.0].  |error| < 0.402865722354948566583852e-9:
     static const double c0 =  1.0 + 0.278626872016317130037181614004e-10;
     static const double c1 = .693147176943623740308984004029708;
     static const double c2 = .240226505817268621584559118975830;
@@ -398,7 +341,7 @@ float xm_pow( float x, float y )
 
     double z = 1.0;
     if( 0.0 != f )
-    { // don't set inexact if we don't need to
+    { 
         double ff = f * f;
         double s7 = c7overc8 * f;			double s3 = c3 * f;
         double s5 = c5overc8 * f;			double s1 = c1 * f;
@@ -414,14 +357,11 @@ float xm_pow( float x, float y )
     }
 
 
-    //prepare 2**i
     union{ uint64_t u; double d; } two_exp = { ((uint64_t) exp + 1023) << 52 };
 
     return (float) (z * two_exp.d );
 
 
-    //one last edge case -- pow(x, y) returns NaN and raises invalid for x < 0 and finite non-integer y
-    // and one special case --	call sqrt for |y| == 0.5
 nan_sqrt:
     if( x < 0.0f || y > 0.0f )
         return xm_sqrt(x);
@@ -429,7 +369,6 @@ nan_sqrt:
     return (float) xm_sqrt( 1.0 / (double) x );
 
 ipowf:
-    // clamp  -0x1.0p31 < y < 0x1.0p31
     y = y > -0x1.fffffep30f ? y : -0x1.fffffep30f;
     y = y <  0x1.fffffep30f ? y :  0x1.fffffep30f;
     i = (int) y;
@@ -468,8 +407,9 @@ int xm_ceil(float n){
 }
 
 
-//Sin e Cos retirados de
-// http://forum.arduino.cc/index.php?topic=69723.0
+/* Sin e Cos retirados de
+   http://forum.arduino.cc/index.php?topic=69723.0
+*/
 
 unsigned int __isinTable16[] = {
     0, 1144, 2287, 3430, 4571, 5712, 6850, 7987, 9121, 10252, 11380,
@@ -488,7 +428,7 @@ unsigned int __isinTable16[] = {
 
 float __isin(long x)
 {
-    int bool_pos = 1;  // positive - keeps an eye on the sign.
+    int bool_pos = 1;  /* positive - keeps an eye on the sign. */
     if (x < 0)
     {
         x = -x;
@@ -501,9 +441,7 @@ float __isin(long x)
         bool_pos = !bool_pos;
     }
     if (x > 90) x = 180 - x;
-    //  if (pos) return isinTable8[x] * 0.003921568627; // = /255.0
-    //  return isinTable8[x] * -0.003921568627 ;
-    if (bool_pos) return __isinTable16[x] * 0.0000152590219; // = /65535.0
+    if (bool_pos) return __isinTable16[x] * 0.0000152590219; 
     return __isinTable16[x] * -0.0000152590219 ;
 }
 
@@ -526,7 +464,7 @@ float xm_cos(float d)
     return a + (d-(int)d) * (b-a);
 }
 
-//Nvidia
+/* Nvidia */
 float xm_acos(float x) {
     float negate = (float)(x < 0);
     x = (x >= 0) ? x : -x;

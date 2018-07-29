@@ -28,7 +28,7 @@ The manual and changelog are in the header file "lodepng.h"
 Rename this file to lodepng.cpp to use it for C++, or to lodepng.c to use it for C.
 */
 
-#include "xpng.h" //XDDDX
+#include "xpng.h" /* XDDDX */
 
 #include <limits.h>
 #include <stdio.h>

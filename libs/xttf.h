@@ -1,10 +1,10 @@
-//inclusão David Sena
+/* inclusão David Sena */
 #define STB_TRUETYPE_IMPLEMENTATION
 
-#define STBTT_RGB_MODE //alteracao para escrever 3 cores
+#define STBTT_RGB_MODE /* alteracao para escrever 3 cores */
 #define STBTT_RASTERIZER_VERSION 2
 
-#include "xmath.h" //XDDDX
+#include "xmath.h" /* XDDDX */
 
 #define STBTT_ifloor(x)   ((int) xm_floor(x))
 #define STBTT_iceil(x)    (xm_ceil(x))

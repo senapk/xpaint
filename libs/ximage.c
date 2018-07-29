@@ -3,10 +3,10 @@
 #include <string.h>
 #include <stdarg.h>
 #include <stdbool.h>
-#include "xpng.h" //XDDDX
-#include "ximage.h" //XDDDX
-#include "xttf.h" //XDDDX
-#include "xfont.h" //XDDDX
+#include "xpng.h" /* XDDDX */
+#include "ximage.h" /* XDDDX */
+#include "xttf.h" /* XDDDX */
+#include "xfont.h" /* XDDDX */
 
 XColor RED    = {211, 1, 2};
 XColor GREEN  = {133, 153, 0};
@@ -19,7 +19,7 @@ XColor VIOLET = {108, 113, 196};
 XColor WHITE = {253, 246, 227};
 XColor BLACK = {0, 43, 54};
 
-//Definicoes das funcoes da biblioteca
+/* Definicoes das funcoes da biblioteca */
 typedef struct{
     uchar* image;
     unsigned width;
@@ -48,7 +48,7 @@ static uchar    __color[3];
 XBitmap * x_bitmap_create(unsigned width, unsigned height, const uchar * color);
 void         x_bitmap_destroy(XBitmap * bitmap);
 
-//se quiser trocar a font default, passe o nome do arquivo e crie um buffer
+/* se quiser trocar a font default, passe o nome do arquivo e crie um buffer */
 uchar *x_buffer_create(const char* filename);
 uchar * x_get_pixel_pos(int x, int y);
 
@@ -74,17 +74,17 @@ void x_bitmap_destroy(XBitmap * bitmap){
 }
 
 void x_open(int width, int height){
-    //inicializando a cor de fundo
+    /* inicializando a cor de fundo */
     uchar cinza[] = {30, 30, 30};
     __bitmap = x_bitmap_create(width, height, cinza);
-    //inicializando a cor de desenho e escrita
+    /* inicializando a cor de desenho e escrita */
     xs_color(make_color(200, 200, 200));
 
     __font_default = malloc(sizeof(XFont));
     __font_default->buffer = font_buffer_profont;
     stbtt_InitFont(&__font_default->info, __font_default->buffer, 0);
 
-    //setando a font default como fonte do sistema
+    /* setando a font default como fonte do sistema */
     __font = __font_default;
     __using_default_font = true;
     xs_font_size(20);
@@ -198,7 +198,7 @@ int x_write(int x, int y, const char * format, ...){
     int i;
     unsigned _x = x;
 
-    //setando a cor
+    /* setando a cor */
     __font->info.userdata = (void *) __color;
 
     for (i = 0; i < (int) strlen(text); ++i) {
@@ -234,7 +234,7 @@ int x_write(int x, int y, const char * format, ...){
         stbtt_MakeCodepointBitmap(&__font->info, __bitmap->image + 3 * byteOffset, c_x2 - c_x1, c_y2 - c_y1,
                                   __bitmap->width, __font->scale, __font->scale, text[i]);
 
-        _x += ax; //desloca x para proximo caractere
+        _x += ax; /* desloca x para proximo caractere */
 
         /* add kerning */
         int kern;
