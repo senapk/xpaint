@@ -46,7 +46,7 @@ int main() {
     x_write(40, 480, "Na paleta, cada letra corresponde a uma cor.");
     // e seus respectivos caracteres na paleta de cores
 
-    x_save("exemplo_cores");
+    x_save("figuras/ecores");
 
     x_close();
     return 0;

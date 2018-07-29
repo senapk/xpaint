@@ -37,6 +37,13 @@ Ele deve gerar o arquivo basico.png que se parece com isso:
 
 Outros código de exemplo são o ecores.c, edraw.c, etexto.c.
 
+![](figuras/ecores.png)
+
+![](figuras/etexto.png)
+
+![](figuras/edraw.png)
+
+
 # Documentação das funções
 
 Você pode encontrar as funções todas documentadas no arquivo xpaint.h, mas eu copio e colo abaixo.
