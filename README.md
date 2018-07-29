@@ -41,15 +41,15 @@ gcc exemplo_base.c -o exemplo_base
 
 Ele deve gerar o arquivo figura_base.png que se parece com isso:
 
-![](exemplos/figura_base.png)
+![](figura_base.png)
 
 Outros código de exemplo são os exemplo_cores.c, exemplo_draw.c, exemplo_texto.c.
 
-![](exemplos/figura_cores.png)
+![](figura_cores.png)
 
-![](exemplos/figuras_texto.png)
+![](figura_texto.png)
 
-![](exemplos/figura_draw.png)
+![](figura_draw.png)
 
 Você pode apagar os arquivos figura* e dar um make nessa pasta para gerar novamente e testar os códigos.
 
