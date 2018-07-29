@@ -38,13 +38,14 @@ extern XColor BLACK;
 //###############################################
 
 
-//inicia um bitmap com essas dimensões
-void x_init(int width, int height);
+//abre um bitmap com essas dimensões
+void x_open(int width, int height);
 
 //finaliza o bitmap liberando os recursos
 void x_close();
 
 //para salvar um png no arquivo
+//não inclua a extensão .png no nome do arquivo
 void x_save(const char* filename);
 
 
@@ -111,12 +112,12 @@ XColor xg_palette(char c);
 //Desenha as seguintes formas sem preenchimento
 void xd_line(int x0, int y0, int x1, int y1);
 void xd_thick_line(float ax, float ay, float bx, float by, int thickness);
-void xd_circle(int x0, int y0, int radius);
+void xd_circle(int centerx, int centery, int radius);
 void xd_ellipse(int x0, int y0, int x1, int y1);
 void xd_bezier(int x0, int y0, int x1, int y1, int x2, int y2);
-void xd_filled_arc(float centerx, float centery, int radius, int thickness, int degrees_begin, int degrees_end);
 
 //Desenha formas preenchidas (filled)
+void xd_filled_arc(float centerx, float centery, int radius, int thickness, int degrees_begin, int degrees_end);
 void xd_filled_triangle(float v1x, float v1y, float v2x, float v2y, float v3x, float v3y);
 void xd_filled_rect(int x0, int y0, int x1, int y1);
 void xd_filled_circle(int mx, int my, int radius);
@@ -16137,7 +16138,7 @@ void x_bitmap_destroy(XBitmap * bitmap){
     free(bitmap);
 }
 
-void x_init(int width, int height){
+void x_open(int width, int height){
     //inicializando a cor de fundo
     uchar cinza[] = {30, 30, 30};
     __bitmap = x_bitmap_create(width, height, cinza);
@@ -16150,6 +16151,7 @@ void x_init(int width, int height){
 
     //setando a font default como fonte do sistema
     __font = __font_default;
+    __using_default_font = true;
     xs_font_size(20);
 
     __palette['r'] = RED;
@@ -16308,13 +16310,17 @@ int x_write(int x, int y, const char * format, ...){
 }
 
 void x_save(const char* filename){
-    unsigned error = lodepng_encode_file(filename, __bitmap->image, __bitmap->width, __bitmap->height, LCT_RGB, 8);
+    char * dest = malloc(strlen(filename + 10));
+    strcpy(dest, filename);
+    strcat(dest, ".png");
+    unsigned error = lodepng_encode_file(dest, __bitmap->image, __bitmap->width, __bitmap->height, LCT_RGB, 8);
     if(error)
         printf("error %u: %s\n", error, lodepng_error_text(error));
+    free(dest);
 }
 
 void x_plot(int x, int y){
-    if((x >= 0) && (x < (int) __bitmap->width) && (y >= 0) && (x <  (int) __bitmap->height))
+    if((x >= 0) && (x < (int) __bitmap->width) && (y >= 0) && (y <  (int) __bitmap->height))
         memcpy(x_get_pixel_pos(x, y), &__color, sizeof(__color));
 }
 
@@ -16348,6 +16354,7 @@ int xg_width(){
 #include <stdlib.h>//abs
 #include <assert.h>
 #include <stdio.h>
+#include <inttypes.h>
 
 #define SWAP(x, y, T) do { T SWAP = x; x = y; y = SWAP; } while (0)
 
@@ -16461,21 +16468,21 @@ void xd_filled_rect(int x0, int y0, int x1, int y1){
 }
 
 //https://en.wikipedia.org/wiki/Midpoint_circle_algorithm
-void xd_circle(int x0, int y0, int radius){
+void xd_circle(int centerx, int centery, int radius){
     int x = radius - 1;
     int y = 0;
     int dx = 1;
     int dy = 1;
     int err = dx - (radius << 1);
     while(x >= y){
-        x_plot(x0 + x, y0 + y);
-        x_plot(x0 - x, y0 + y);
-        x_plot(x0 + x, y0 - y);
-        x_plot(x0 - x, y0 - y);
-        x_plot(x0 + y, y0 + x);
-        x_plot(x0 - y, y0 + x);
-        x_plot(x0 - y, y0 - x);
-        x_plot(x0 + y, y0 - x);
+        x_plot(centerx + x, centery + y);
+        x_plot(centerx - x, centery + y);
+        x_plot(centerx + x, centery - y);
+        x_plot(centerx - x, centery - y);
+        x_plot(centerx + y, centery + x);
+        x_plot(centerx - y, centery + x);
+        x_plot(centerx - y, centery - x);
+        x_plot(centerx + y, centery - x);
 
         if(err <= 0){
             y++;
