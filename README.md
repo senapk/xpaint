@@ -51,6 +51,8 @@ Outros código de exemplo são os exemplo_cores.c, exemplo_draw.c, exemplo_texto
 
 ![](exemplos/figura_draw.png)
 
+Você pode apagar os arquivos figura* e dar um make nessa pasta para gerar novamente e testar os códigos.
+
 Esta é uma biblioteca header only, ou seja, não está dividida em .c e .h. Declarações e definições estão todas no .h. 
 
 Para carregar os cabeçalhos das funções e declarações de estruturas você pode dar o include quantas vezes quiser.
