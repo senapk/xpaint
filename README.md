@@ -22,8 +22,6 @@ int main(){
 }
 ```
 
-Como é uma biblioteca header only, ou seja, não está dividida em .c e .h, você pode dar o #include várias vezes para carregar as declarações, mas apenas uma única vez no seu projeto você deve utilizar a macro #define X_FULL antes do include para carregar as implementações. Como não estamos utilizando módulos, basta lembrar de definir X_FULL **ANTES** do include.
-
 Você pode compilar e rodar seu código apenas usando
 
 ```
@@ -43,6 +41,11 @@ Outros código de exemplo são o ecores.c, edraw.c, etexto.c.
 
 ![](exemplos/figuras/edraw.png)
 
+Esta é uma biblioteca header only, ou seja, não está dividida em .c e .h. Declarações e definições estão todas no .h. 
+
+Para carregar os cabeçalhos das funções e declarações de estruturas você pode dar o include quantas vezes quiser.
+
+Porém você deve **uma e somente uma vez** utilizar o **#define X_FULL** **ANTES** de incluir a biblioteca **para carregar a implementação dos códigos**.
 
 # Documentação das funções
 
