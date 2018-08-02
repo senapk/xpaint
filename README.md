@@ -41,17 +41,17 @@ gcc exemplo_base.c -o exemplo_base
 
 Ele deve gerar o arquivo figura_base.png que se parece com isso:
 
-![](figura_base.png)
+![](figuras/figura_base.png)
 
 Outros código de exemplo são os exemplo_cores.c, exemplo_draw.c, exemplo_texto.c.
 
-![](figura_cores.png)
+![](figuras/figura_cores.png)
 
-![](figura_texto.png)
+![](figuras/figura_texto.png)
 
-![](figura_draw.png)
+![](figuras/figura_draw.png)
 
-Você pode apagar os arquivos figura* e dar um make nessa pasta para gerar novamente e testar os códigos.
+Se der uma make, ele vai compilar e gerar na pasta as mesmas figuras que estão na pasta de figuras.
 
 Esta é uma biblioteca header only, ou seja, não está dividida em .c e .h. Declarações e definições estão todas no .h. 
 
