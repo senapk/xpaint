@@ -10,8 +10,8 @@ O código a seguir cria um bitmap, escreve um texto, pinta um círculo, salva no
 #include "xpaint.h"
 
 int main(){
-    int largura = 800, altura = 600;
-    /* cria um bitmap de 800x600 */
+    int largura = 600, altura = 500;
+    /* cria um bitmap de 600x600 */
     x_open(largura, altura); 
     /* escreve usando a font default na posicao x=50, y=30 */
     /* utilizando o mesmo formato do printf */
