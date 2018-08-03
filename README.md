@@ -50,7 +50,9 @@ Outros código de exemplo são os exemplo_cores.c, exemplo_draw.c, exemplo_texto
 
 ![](figuras/figura_draw.png)
 
-![](figuras/figura_fractal.png)
+![](figuras/figura_triangulo.png)
+
+![](figuras/figura_arvore.png)
 
 Se der um make, ele vai compilar e gerar na pasta as mesmas figuras que estão na pasta de figuras.
 

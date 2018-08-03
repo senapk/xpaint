@@ -20,7 +20,7 @@ int main(){
     xs_font_size(30);
     x_write(140, 0, "Exemplo do fractal de Sierpinski");
     fractal(50, 650, 700, 60);
-    x_save("figura_fractal");
+    x_save("figura_triangulo");
     x_close();
     return 0;
 }

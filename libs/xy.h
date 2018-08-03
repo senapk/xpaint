@@ -22,9 +22,6 @@ float xy_lenght(float x, float y);
 /* retorna a distancia entre dois pontos */
 float xy_distance(float ax, float ay, float bx, float by);
 
-/* move x e y para o nova posição usando angulo e distancia */
-void xy_move(float *x, float *y, float degrees, float dist);
-
 /* retorna a + b */
 XY xy_sum(XY a, XY b);
 
