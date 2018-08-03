@@ -42,7 +42,7 @@ Ele deve gerar o arquivo figura_base.png que se parece com isso:
 
 ![](figuras/figura_base.png)
 
-Outros código de exemplo são os exemplo_cores.c, exemplo_draw.c, exemplo_texto.c.
+Outros código de exemplo estão nos arquivos que iniciam por exemplo_*, a saída deles pode ser vista abaixo.
 
 ![](figuras/figura_cores.png)
 
