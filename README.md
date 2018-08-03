@@ -3,11 +3,10 @@
 
 O objetivo desse projeto é criar uma biblioteca header only para programar em C que seja capaz de criar, escrever e desenhar em pngs sem a necessidade de bibliotecas externas ou dependencias.
 
-O código a seguir cria um bitmap, escreve um texto, pinta um círculo, salva no arquivo exemplo.png e sai. Baixe o arquivo **xpaint.h** para o seu computador e crie o arquivo **exemplo_base.c** com o seguinte conteúdo. 
+O código a seguir cria um bitmap, escreve um texto, pinta um círculo, salva no arquivo exemplo.png e sai. Você precisará apenas da biblioteca **xpaint.h** para o seu computador e criar o arquivo **exemplo_base.c** com o seguinte conteúdo.
 
 
 ```c
-#define X_FULL
 #include "xpaint.h"
 
 int main(){
@@ -51,19 +50,39 @@ Outros código de exemplo são os exemplo_cores.c, exemplo_draw.c, exemplo_texto
 
 ![](figuras/figura_draw.png)
 
-Se der uma make, ele vai compilar e gerar na pasta as mesmas figuras que estão na pasta de figuras.
+![](figuras/figura_fractal.png)
+
+Se der um make, ele vai compilar e gerar na pasta as mesmas figuras que estão na pasta de figuras.
 
 Esta é uma biblioteca header only, ou seja, não está dividida em .c e .h. Declarações e definições estão todas no .h. 
 
-Para carregar os cabeçalhos das funções e declarações de estruturas você pode dar o include quantas vezes quiser.
+Se você der o include na biblioteca ele vai incluir as declarações e as definições, ou seja, cabeçalhos e implementações. Se estiver utilizando módulos e precisar fazer outras inclusões da biblioteca, todas as outras inclusões devem ser precedidas de 
 
-Porém você deve **uma e somente uma vez** utilizar o **#define X_FULL** **ANTES** de incluir a biblioteca **para carregar a implementação dos códigos**.
+```
+#define H_ONLY
+```
 
 # Documentação das funções
 
 Você pode encontrar as funções todas documentadas no arquivo xpaint.h, mas eu copio e colo abaixo.
 
 ```c
+/*
+Autor: 
+    nome: David Sena Oliveira
+    email: sena.ufc@gmail.com
+
+Principais fontes:
+    png: https://lodev.org/lodepng
+    tff: https://github.com/nothings/stb
+    funções de desenho e matemáticas estão comentadas nas funções 
+
+Licença: GPLv3
+
+Versão: 0.1
+*/
+
+
 /*
 ###############################################
 ######## DEFINES e TIPOS BASICOS ##############
@@ -235,10 +254,10 @@ typedef struct{
 XY make_xy(float x, float y);
 
 /* retorna o tamanho de um vetor da origem */
-float xy_lenght(XY v);
+float xy_lenght(float x, float y);
 
 /* retorna a distancia entre dois pontos */
-float xy_distance(XY a, XY b);
+float xy_distance(float ax, float ay, float bx, float by);
 
 /* retorna a + b */
 XY xy_sum(XY a, XY b);
@@ -277,5 +296,6 @@ float xm_sin(float d);
 float xm_cos(float d);
 float xm_acos(float x);
 float xm_fabs(float f);
-
+int   xm_rand();
+int   xm_rand_interval(int min, int max);
 ```

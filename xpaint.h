@@ -11,6 +11,8 @@ Principais fontes:
     funções de desenho e matemáticas estão comentadas nas funções 
 
 Licença: GPLv3
+
+Versão: 0.1
 */
 
 
@@ -30,8 +32,8 @@ typedef struct{
     uchar b;
 } XColor;
 
-/* cria e retorna uma cor passando rgb */
-XColor make_color(uchar r, uchar g, uchar b);
+/* cria e retorna uma struct XColor passando rgb */
+XColor make_xcolor(uchar r, uchar g, uchar b);
 
 /* lista de cores default */
 extern XColor RED;
@@ -185,10 +187,13 @@ typedef struct{
 XY make_xy(float x, float y);
 
 /* retorna o tamanho de um vetor da origem */
-float xy_lenght(XY v);
+float xy_lenght(float x, float y);
 
 /* retorna a distancia entre dois pontos */
-float xy_distance(XY a, XY b);
+float xy_distance(float ax, float ay, float bx, float by);
+
+/* move x e y para o nova posição usando angulo e distancia */
+void xy_move(float *x, float *y, float degrees, float dist);
 
 /* retorna a + b */
 XY xy_sum(XY a, XY b);
@@ -227,6 +232,7 @@ float xm_sin(float d);
 float xm_cos(float d);
 float xm_acos(float x);
 float xm_fabs(float f);
+int   xm_rand(int min, int max);
 
 /*
 ###################################################
@@ -239,7 +245,7 @@ float xm_fabs(float f);
 */
 
 #endif /* XPAINT_H */
-#ifdef X_FULL
+#ifndef H_ONLY /* inicio da implementacao */
 /*
 LodePNG version 20180611
 
@@ -16107,6 +16113,7 @@ extern unsigned char font_buffer_profont[46628];
 /* EOF */
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include <string.h>
 #include <stdarg.h>
 #include <stdbool.h>
@@ -16181,7 +16188,7 @@ void x_open(int width, int height){
     uchar cinza[] = {30, 30, 30};
     __bitmap = x_bitmap_create(width, height, cinza);
     /* inicializando a cor de desenho e escrita */
-    xs_color(make_color(200, 200, 200));
+    xs_color(make_xcolor(200, 200, 200));
 
     __font_default = malloc(sizeof(XFont));
     __font_default->buffer = font_buffer_profont;
@@ -16203,6 +16210,7 @@ void x_open(int width, int height){
     __palette['v'] = VIOLET;
     __palette['o'] = ORANGE;
 
+    srand(time(NULL));
 }
 
 void x_close(){
@@ -16362,7 +16370,7 @@ void x_plot(int x, int y){
         memcpy(x_get_pixel_pos(x, y), &__color, sizeof(__color));
 }
 
-XColor make_color(uchar r, uchar g, uchar b){
+XColor make_xcolor(uchar r, uchar g, uchar b){
     XColor x = {r, g, b};
     return x;
 }
@@ -16773,12 +16781,12 @@ XY make_xy(float x, float y){
     return v;
 }
 
-float xy_lenght(XY v){
-    return xm_sqrt(v.x * v.x + v.y * v.y);
+float xy_lenght(float x, float y){
+    return xm_sqrt(x * x + y * y);
 }
 
-float xy_distance(XY a, XY b){
-    return xy_lenght(make_xy(b.x - a.x, b.y - a.y));
+float xy_distance(float ax, float ay, float bx, float by){
+    return xy_lenght(bx - ax, by - ay);
 }
 
 XY xy_sum(XY a, XY b){
@@ -16794,7 +16802,7 @@ XY xy_dot(XY a, float value){
 }
 
 XY xy_normalize(XY v){
-    float lenght = xy_lenght(v);
+    float lenght = xy_lenght(v.x, v.y);
     if(lenght == 0)
         return v;
     v.x = v.x * (1.0/lenght);
@@ -16806,6 +16814,10 @@ XY xy_ortho(XY v){
     return make_xy(v.y, -v.x);
 }
 #include <stdint.h>
+
+int   xm_rand(int min, int max){
+    return rand() % (max + 1 - min) + min;
+}
 
 /* https://stackoverflow.com/questions/5122993/floor-int-function-implementaton?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa */
 int xm_floor(double x) {
@@ -17289,4 +17301,5 @@ float xm_acos(float x) {
 float xm_fabs(float f){
     return f < 0 ? -f : f;
 }
-#endif /* X_FULL */
+#endif /* H_ONLY */
+#undef H_ONLY /* Para evitar a propagação da Flag ela deve ser apagada */

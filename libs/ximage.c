@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include <string.h>
 #include <stdarg.h>
 #include <stdbool.h>
@@ -78,7 +79,7 @@ void x_open(int width, int height){
     uchar cinza[] = {30, 30, 30};
     __bitmap = x_bitmap_create(width, height, cinza);
     /* inicializando a cor de desenho e escrita */
-    xs_color(make_color(200, 200, 200));
+    xs_color(make_xcolor(200, 200, 200));
 
     __font_default = malloc(sizeof(XFont));
     __font_default->buffer = font_buffer_profont;
@@ -100,6 +101,7 @@ void x_open(int width, int height){
     __palette['v'] = VIOLET;
     __palette['o'] = ORANGE;
 
+    srand(time(NULL));
 }
 
 void x_close(){
@@ -259,7 +261,7 @@ void x_plot(int x, int y){
         memcpy(x_get_pixel_pos(x, y), &__color, sizeof(__color));
 }
 
-XColor make_color(uchar r, uchar g, uchar b){
+XColor make_xcolor(uchar r, uchar g, uchar b){
     XColor x = {r, g, b};
     return x;
 }

@@ -18,8 +18,8 @@ typedef struct{
     uchar b;
 } XColor;
 
-/* cria e retorna uma cor passando rgb */
-XColor make_color(uchar r, uchar g, uchar b);
+/* cria e retorna uma struct XColor passando rgb */
+XColor make_xcolor(uchar r, uchar g, uchar b);
 
 /* lista de cores default */
 extern XColor RED;

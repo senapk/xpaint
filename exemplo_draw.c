@@ -1,12 +1,4 @@
-#include <stdio.h>
-
-#if 0
-#include "libs/ximage.h"
-#include "libs/xdraw.h"
-#else
-#define X_FULL
 #include "xpaint.h"
-#endif
 
 int main(){
     x_open(1000, 600);

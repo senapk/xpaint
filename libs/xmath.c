@@ -1,6 +1,10 @@
 #include "xmath.h" /* XDDDX */
 #include <stdint.h>
 
+int   xm_rand(int min, int max){
+    return rand() % (max + 1 - min) + min;
+}
+
 /* https://stackoverflow.com/questions/5122993/floor-int-function-implementaton?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa */
 int xm_floor(double x) {
     int xi = (int) x;

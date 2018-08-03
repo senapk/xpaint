@@ -9,4 +9,6 @@ Principais fontes:
     funções de desenho e matemáticas estão comentadas nas funções 
 
 Licença: GPLv3
+
+Versão: 0.1
 */

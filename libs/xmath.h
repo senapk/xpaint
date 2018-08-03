@@ -22,6 +22,7 @@ float xm_sin(float d);
 float xm_cos(float d);
 float xm_acos(float x);
 float xm_fabs(float f);
+int   xm_rand(int min, int max);
 
 /*
 ###################################################
