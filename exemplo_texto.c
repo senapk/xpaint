@@ -1,7 +1,7 @@
 #include "xpaint.h"
 
 int main() {
-    x_open(600, 600);
+    x_open(600, 500);
     xs_font_size(18);
     xs_color(WHITE);
     x_write(130, 30, "texto.png - Escrevendo em imagens");
