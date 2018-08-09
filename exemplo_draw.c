@@ -46,7 +46,7 @@ int main(){
     xd_filled_circle(x + 100, y + 100, 80);
 
     x += 200;
-    x_write(x, y, "xd_filled_elipse");
+    x_write(x, y, "xd_filled_ellipse");
     xd_filled_ellipse(x + 20, y + 50, x + 180, y + 180);  
 
     x += 200;
