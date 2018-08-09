@@ -50,6 +50,14 @@ void x_close();
 */
 void x_save(const char* filename);
 
+/* cada vez que a funcao é chamada, salva um arquivo com prefixo numérico
+   incremental. Ex: se você chamar x_log("teste") 4 vezes vai salvar os
+   seguintes arquivos:
+   00000_teste.png 00001_teste.png 00002_teste.png 00003_teste.png
+   retorna o indice atual do arquivo que foi salvo.
+*/
+int x_log(const char* filename);
+
 /*
 ###############################################
 #### PLOTANDO, ESCREVENDO, LIMPANDO ###########

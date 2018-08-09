@@ -64,6 +64,14 @@ void x_close();
 */
 void x_save(const char* filename);
 
+/* cada vez que a funcao é chamada, salva um arquivo com prefixo numérico
+   incremental. Ex: se você chamar x_log("teste") 4 vezes vai salvar os
+   seguintes arquivos:
+   00000_teste.png 00001_teste.png 00002_teste.png 00003_teste.png
+   retorna o indice atual do arquivo que foi salvo.
+*/
+int x_log(const char* filename);
+
 /*
 ###############################################
 #### PLOTANDO, ESCREVENDO, LIMPANDO ###########
@@ -16362,6 +16370,17 @@ void x_save(const char* filename){
     free(dest);
 }
 
+int x_log(const char* filename){
+    static int i = 0;
+    char * name = malloc((strlen(filename) + 10) * sizeof(char));
+    sprintf(name, "%05d_%s", i, filename);
+    
+    x_save(name);
+    i++;
+    free(name);
+    return i - 1;
+}
+
 void x_plot(int x, int y){
     if((x >= 0) && (x < (int) __bitmap->width) && (y >= 0) && (y <  (int) __bitmap->height))
         memcpy(x_get_pixel_pos(x, y), &__color, sizeof(__color));
@@ -16399,7 +16418,7 @@ int xg_width(){
 #include <stdio.h>
 #include <inttypes.h>
 
-#define SWAP(x, y, T) do { T SWAP = x; x = y; y = SWAP; } while (0)
+#define X_SWAP(x, y, T) do { T X_SWAP = x; x = y; y = X_SWAP; } while (0)
 
 void xd_line(int x0, int y0, int x1, int y1){
     /* Bresenham's Line Algorithm */
@@ -16465,11 +16484,11 @@ void xd_filled_triangle(float v1x, float v1y, float v2x, float v2y, float v3x, f
     XY v3 = {v3x, v3y};
     /* at first sort the three vertices by y-coordinate ascending so v1 is the topmost vertice */
     if((v2.y <= v1.y) && (v2.y <= v3.y))
-        SWAP(v1, v2, XY);
+        X_SWAP(v1, v2, XY);
     if((v3.y <= v1.y) && (v3.y <= v2.y))
-        SWAP(v1, v3, XY);
+        X_SWAP(v1, v3, XY);
     if(v3.y < v2.y)
-        SWAP(v2, v3, XY);
+        X_SWAP(v2, v3, XY);
 
     /* here we know that v1.y <= v2.y <= v3.y */
     /* check for trivial case of bottom-flat triangle */

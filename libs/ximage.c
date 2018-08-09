@@ -256,6 +256,17 @@ void x_save(const char* filename){
     free(dest);
 }
 
+int x_log(const char* filename){
+    static int i = 0;
+    char * name = malloc((strlen(filename) + 10) * sizeof(char));
+    sprintf(name, "%05d_%s", i, filename);
+    
+    x_save(name);
+    i++;
+    free(name);
+    return i - 1;
+}
+
 void x_plot(int x, int y){
     if((x >= 0) && (x < (int) __bitmap->width) && (y >= 0) && (y <  (int) __bitmap->height))
         memcpy(x_get_pixel_pos(x, y), &__color, sizeof(__color));

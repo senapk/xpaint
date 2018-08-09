@@ -25,7 +25,7 @@ int main(){
     xd_circle(x + 100, y + 100, 80);
 
     x += 200;
-    x_write(x, y, "xd_elipse");
+    x_write(x, y, "xd_ellipse");
     xd_ellipse(x + 20, y + 50, x + 180, y + 180);  
 
     x += 200;

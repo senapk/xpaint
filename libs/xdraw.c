@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <inttypes.h>
 
-#define SWAP(x, y, T) do { T SWAP = x; x = y; y = SWAP; } while (0)
+#define X_SWAP(x, y, T) do { T X_SWAP = x; x = y; y = X_SWAP; } while (0)
 
 void xd_line(int x0, int y0, int x1, int y1){
     /* Bresenham's Line Algorithm */
@@ -73,11 +73,11 @@ void xd_filled_triangle(float v1x, float v1y, float v2x, float v2y, float v3x, f
     XY v3 = {v3x, v3y};
     /* at first sort the three vertices by y-coordinate ascending so v1 is the topmost vertice */
     if((v2.y <= v1.y) && (v2.y <= v3.y))
-        SWAP(v1, v2, XY);
+        X_SWAP(v1, v2, XY);
     if((v3.y <= v1.y) && (v3.y <= v2.y))
-        SWAP(v1, v3, XY);
+        X_SWAP(v1, v3, XY);
     if(v3.y < v2.y)
-        SWAP(v2, v3, XY);
+        X_SWAP(v2, v3, XY);
 
     /* here we know that v1.y <= v2.y <= v3.y */
     /* check for trivial case of bottom-flat triangle */
