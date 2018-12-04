@@ -15,7 +15,6 @@ Licença: GPLv3
 Versão: 0.1
 */
 
-
 /*
 ###############################################
 ######## DEFINES e TIPOS BASICOS ##############
@@ -71,6 +70,11 @@ void x_save(const char* filename);
    retorna o indice atual do arquivo que foi salvo.
 */
 int x_log(const char* filename);
+
+/*  salva o arquivo, mas permite ao usuário controlar
+    os estados salvos intermediários através da interação com o terminal.
+*/
+void x_step(const char * filename);
 
 /*
 ###############################################
@@ -16379,6 +16383,25 @@ int x_log(const char* filename){
     i++;
     free(name);
     return i - 1;
+}
+
+void x_step(const char * filename){
+    static int jump = 1;
+    static int rounds = 0;
+    static int state = 0;
+    char line[200];
+    rounds += 1;
+    state += 1;
+    if(rounds >= jump){
+        x_save(filename);
+        printf("(state: %i, jump: %i) press{enter/jump value/0 to skip}:", state, jump);
+        fgets(line, sizeof(line), stdin);
+        char * ptr = line;
+        int value = (int) strtol(line, &ptr, 10);
+        if(ptr != line)
+            jump = value;
+        rounds = 0;
+    }
 }
 
 void x_plot(int x, int y){

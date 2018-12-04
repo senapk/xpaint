@@ -267,6 +267,25 @@ int x_log(const char* filename){
     return i - 1;
 }
 
+void x_step(const char * filename){
+    static int jump = 1;
+    static int rounds = 0;
+    static int state = 0;
+    char line[200];
+    rounds += 1;
+    state += 1;
+    if(rounds >= jump){
+        x_save(filename);
+        printf("(state: %i, jump: %i) press{enter/jump value/0 to skip}:", state, jump);
+        fgets(line, sizeof(line), stdin);
+        char * ptr = line;
+        int value = (int) strtol(line, &ptr, 10);
+        if(ptr != line)
+            jump = value;
+        rounds = 0;
+    }
+}
+
 void x_plot(int x, int y){
     if((x >= 0) && (x < (int) __bitmap->width) && (y >= 0) && (y <  (int) __bitmap->height))
         memcpy(x_get_pixel_pos(x, y), &__color, sizeof(__color));

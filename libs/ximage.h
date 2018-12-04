@@ -1,7 +1,6 @@
 #ifndef XIMAGE_H /* XDDDX */
 #define XIMAGE_H /* XDDDX */
 
-
 /*
 ###############################################
 ######## DEFINES e TIPOS BASICOS ##############
@@ -57,6 +56,11 @@ void x_save(const char* filename);
    retorna o indice atual do arquivo que foi salvo.
 */
 int x_log(const char* filename);
+
+/*  salva o arquivo, mas permite ao usuário controlar
+    os estados salvos intermediários através da interação com o terminal.
+*/
+void x_step(const char * filename);
 
 /*
 ###############################################
