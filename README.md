@@ -1,7 +1,23 @@
 
 # Escrevendo, desenhando e pintando em PNGs usando C
 
-O objetivo desse projeto é criar uma biblioteca header only para programar em C que seja capaz de criar, escrever e desenhar em pngs sem a necessidade de bibliotecas externas ou dependencias.
+O objetivo desse projeto é criar uma biblioteca header only para programar em C que seja capaz de criar, escrever e desenhar em pngs sem a necessidade de bibliotecas externas ou dependências.
+
+---
+## Instalação
+
+Para utilizar basta você baixar a biblioteca para o diretório onde está o seu código fonte, compilar e executar. Se estiver no linux, pode usar os seguintes comandos para baixar a biblioteca e rodar um exemplo.
+
+```
+wget https://raw.githubusercontent.com/senapk/xpaint/master/xpaint.h
+wget https://raw.githubusercontent.com/senapk/xpaint/master/exemplo_base.c
+gcc exemplo_base.c -o exemplo_base
+./exemplo_base
+```
+
+Ao executar, deve ser criado o arquivo exemplo_base.png no seu diretório atual. Se estiver no windows, basta abrir os links e clicar em salvar como para salvar o arquivo.
+---
+## Funções
 
 O código a seguir cria um bitmap, escreve um texto, pinta um círculo, salva no arquivo exemplo.png e sai. Você precisará apenas da biblioteca **xpaint.h** para o seu computador e criar o arquivo **exemplo_base.c** com o seguinte conteúdo.
 
