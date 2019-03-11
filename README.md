@@ -16,6 +16,7 @@ gcc exemplo_base.c -o exemplo_base
 ```
 
 Ao executar, deve ser criado o arquivo exemplo_base.png no seu diretório atual. Se estiver no windows, basta abrir os links e clicar em salvar como para salvar o arquivo.
+
 ---
 ## Funções
 
