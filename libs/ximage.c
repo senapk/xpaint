@@ -269,6 +269,10 @@ int x_log(const char* filename){
     return i - 1;
 }
 
+void x_lock(){
+    xstep_jump = 1;
+}
+
 void x_step(const char * filename){
     static int rounds = 0;
     static int state = 0;

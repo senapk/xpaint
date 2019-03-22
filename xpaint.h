@@ -78,7 +78,7 @@ void x_step(const char * filename);
 
 /*  retorna o salto do xstep para 1.
 */
-void x_lock(const char * filename);
+void x_lock();
 
 /*
 ###############################################
@@ -16389,6 +16389,10 @@ int x_log(const char* filename){
     i++;
     free(name);
     return i - 1;
+}
+
+void x_lock(){
+    xstep_jump = 1;
 }
 
 void x_step(const char * filename){

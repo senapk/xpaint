@@ -64,7 +64,7 @@ void x_step(const char * filename);
 
 /*  retorna o salto do xstep para 1.
 */
-void x_lock(const char * filename);
+void x_lock();
 
 /*
 ###############################################
