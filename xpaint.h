@@ -12,7 +12,7 @@ Principais fontes:
 
 Licença: GPLv3
 
-Versão: 0.1
+Versão: 0.2
 */
 
 /*
@@ -75,6 +75,10 @@ int x_log(const char* filename);
     os estados salvos intermediários através da interação com o terminal.
 */
 void x_step(const char * filename);
+
+/*  retorna o salto do xstep para 1.
+*/
+void x_lock(const char * filename);
 
 /*
 ###############################################
@@ -16163,6 +16167,8 @@ static int      __font_size;
 static bool     __using_default_font;
 static uchar    __color[3];
 
+static int xstep_jump = 1;
+
 
 XBitmap * x_bitmap_create(unsigned width, unsigned height, const uchar * color);
 void         x_bitmap_destroy(XBitmap * bitmap);
@@ -16386,20 +16392,21 @@ int x_log(const char* filename){
 }
 
 void x_step(const char * filename){
-    static int jump = 1;
     static int rounds = 0;
     static int state = 0;
     char line[200];
     rounds += 1;
     state += 1;
-    if(rounds >= jump){
+    if(xstep_jump == 0)
+        return;
+    if(rounds >= xstep_jump){
         x_save(filename);
-        printf("(state: %i, jump: %i) press{enter/jump value/0 to skip}:", state, jump);
+        printf("(state: %i, jump: %i) press{enter/jump value/0 to skip}:", state, xstep_jump);
         fgets(line, sizeof(line), stdin);
         char * ptr = line;
         int value = (int) strtol(line, &ptr, 10);
         if(ptr != line)
-            jump = value;
+            xstep_jump = value;
         rounds = 0;
     }
 }
