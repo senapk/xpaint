@@ -30,7 +30,7 @@ XColor CYAN      = {42 , 161, 152};
 XColor MAGENTA   = {211, 54 , 130};
 XColor ORANGE    = {255, 160, 122};
 XColor WHITE     = {238, 232, 213};
-XColor VIOLET    = {255, 192, 203};
+XColor VIOLET    = {108, 113, 196};
 
 
 /* Definicoes das funcoes da biblioteca */
