@@ -20,14 +20,17 @@ int main() {
     xs_color(ORANGE); x_write(x, 280, "ORANGE");
     xs_color(BLACK);  x_write(x - 100, 350, "BLACK");
     xs_color(WHITE);  x_write(x - 100, 410, "WHITE");
-    char * colors = "rgbymcwkvo";
-    x = 50;
-    xs_font_size(100);
-    int i;
-    for(i = 0; i < 10; i++){
-        xs_color(xg_palette(colors[i]));
-        x = x_write(x, 500, "%c", colors[i]);
+    {
+        char * colors = "rgbymcwkvo";
+        x = 50;
+        xs_font_size(100);
+        int i;
+        for(i = 0; i < 10; i++){
+            xs_color(xg_palette(colors[i]));
+            x = x_write(x, 500, "%c", colors[i]);
+        }
     }
+
 
     xs_font_size(25);
     xs_color(WHITE);

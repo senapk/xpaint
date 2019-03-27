@@ -12,7 +12,12 @@ Principais fontes:
 
 Licença: GPLv3
 
-Versão: 0.2
+Versão: 0.4
+
+- 0.4 26/04/2019
+    - adicionas cores de background
+    - alterada a função de xs_log(diretorio)
+
 */
 
 /*
@@ -42,9 +47,20 @@ extern XColor YELLOW;
 extern XColor CYAN;
 extern XColor MAGENTA;
 extern XColor ORANGE;
-extern XColor VIOLET;
 extern XColor WHITE;
 extern XColor BLACK;
+
+/* variantes 
+extern XColor RED_B;
+extern XColor GREEN_B;
+extern XColor BLUE_B;
+extern XColor YELLOW_B;
+extern XColor CYAN_B;
+extern XColor MAGENTA_B;
+extern XColor ORANGE_B;
+extern XColor WHITE_B;
+extern XColor BLACK_B;
+*/
 
 /*
 ###############################################
@@ -53,7 +69,7 @@ extern XColor BLACK;
 */
 
 /* abre um bitmap com essas dimensões */
-void x_open(int width, int height);
+void x_open(unsigned int width, unsigned int height);
 
 /* finaliza o bitmap liberando os recursos */
 void x_close();
@@ -61,24 +77,27 @@ void x_close();
 /* para salvar um png no arquivo
    não inclua a extensão .png no nome do arquivo
 */
-void x_save(const char* filename);
+void x_save(const char *filename);
 
-/* cada vez que a funcao é chamada, salva um arquivo com prefixo numérico
-   incremental. Ex: se você chamar x_log("teste") 4 vezes vai salvar os
-   seguintes arquivos:
-   00000_teste.png 00001_teste.png 00002_teste.png 00003_teste.png
-   retorna o indice atual do arquivo que foi salvo.
+/*  Define um diretório onde serão salvos todas imagens invocadas no comando x_step.
+
+    Se directory for "", ele não salvará os estados.
+    Utilize o path completo incluindo a /
+    Exemplo xs_log("imgs/")
+
+    00000.png 00001.png 00002.png 00003.png
 */
-int x_log(const char* filename);
+void xs_log(const char *directory);
+
+/*
+    Redefine o valor de salto do x_step
+*/
+void xs_jump(int value);
 
 /*  salva o arquivo, mas permite ao usuário controlar
     os estados salvos intermediários através da interação com o terminal.
 */
-void x_step(const char * filename);
-
-/*  retorna o salto do xstep para 1.
-*/
-void x_lock();
+int x_step(const char *filename);
 
 /*
 ###############################################
@@ -16131,16 +16150,29 @@ extern unsigned char font_buffer_profont[46628];
 #include <stdarg.h>
 #include <stdbool.h>
 
-XColor RED    = {211, 1, 2};
-XColor GREEN  = {133, 153, 0};
-XColor BLUE   = {38, 139, 210};
-XColor YELLOW = {181, 137, 0};
-XColor CYAN   = {42, 161, 152};
-XColor MAGENTA = {211, 54, 130};
-XColor ORANGE = {203, 75, 22};
-XColor VIOLET = {108, 113, 196};
-XColor WHITE = {253, 246, 227};
-XColor BLACK = {0, 43, 54};
+/*
+XColor BLACK_B=  {0  , 43 , 54 };
+XColor GREEN_B   = {88 , 110, 117};
+XColor RED_B     = {203, 75 , 22 };
+XColor BLUE_B    = {131, 148, 150};
+XColor YELLOW_B  = {101, 148, 150};
+XColor CYAN_B    = {147, 161, 161};
+XColor MAGENTA_B = {108, 113, 196};
+XColor ORANGE_B  = {255, 127, 80};
+XColor WHITE_B   = {253, 246, 227};
+XColor VIOLET_B  = {199, 21 , 133};
+*/
+XColor BLACK    = {7  , 54 , 66 };
+XColor GREEN     = {133, 153, 0  };
+XColor RED       = {211, 1  , 2  };
+XColor BLUE      = {38 , 139, 210};
+XColor YELLOW    = {181, 137, 0  };
+XColor CYAN      = {42 , 161, 152};
+XColor MAGENTA   = {211, 54 , 130};
+XColor ORANGE    = {255, 160, 122};
+XColor WHITE     = {238, 232, 213};
+XColor VIOLET    = {255, 192, 203};
+
 
 /* Definicoes das funcoes da biblioteca */
 typedef struct{
@@ -16167,11 +16199,13 @@ static int      __font_size;
 static bool     __using_default_font;
 static uchar    __color[3];
 
-static int xstep_jump = 1;
+static int __x_step_jump = 1;
+static char __x_log_directory[100];
+static int __x_initialized = 0;
 
 
 XBitmap * x_bitmap_create(unsigned width, unsigned height, const uchar * color);
-void         x_bitmap_destroy(XBitmap * bitmap);
+void      x_bitmap_destroy(XBitmap * bitmap);
 
 /* se quiser trocar a font default, passe o nome do arquivo e crie um buffer */
 uchar *x_buffer_create(const char* filename);
@@ -16198,7 +16232,12 @@ void x_bitmap_destroy(XBitmap * bitmap){
     free(bitmap);
 }
 
-void x_open(int width, int height){
+void x_open(unsigned int width, unsigned int height){
+    if(__x_initialized){
+        puts("bitmap ja inicializado");
+        return;
+    }
+    __x_initialized = 1;
     /* inicializando a cor de fundo */
     uchar cinza[] = {30, 30, 30};
     __bitmap = x_bitmap_create(width, height, cinza);
@@ -16222,13 +16261,38 @@ void x_open(int width, int height){
     __palette['c'] = CYAN;
     __palette['k'] = BLACK;
     __palette['w'] = WHITE;
-    __palette['v'] = VIOLET;
     __palette['o'] = ORANGE;
+    __palette['v'] = VIOLET;
+
+/*
+    __palette['R'] = RED_B;
+    __palette['G'] = GREEN_B;
+    __palette['B'] = BLUE_B;
+    __palette['Y'] = YELLOW_B;
+    __palette['M'] = MAGENTA_B;
+    __palette['C'] = CYAN_B;
+    __palette['K'] = BLACK_B;
+    __palette['W'] = WHITE_B;
+    __palette['O'] = ORANGE_B;
+    __palette['V'] = VIOLET_B;
+*/
+
+    /*https://htmlcolorcodes.com/color-names/*/
+
+    __palette[' '] = make_xcolor(230, 230, 250); /*khaki*/
+    __palette['.'] = make_xcolor(240, 230, 140); /*lavender*/
+    __palette['#'] = make_xcolor(25, 25, 112); /*midnight blue*/
+    __palette['x'] = make_xcolor(255, 99, 71); /*tomato*/
 
     srand(time(NULL));
 }
 
 void x_close(){
+    if(__x_initialized == 0){
+        fprintf(stderr, "fail: x_open(weight, width) missing!");
+        exit(1);
+    }
+    __x_initialized = 0;
     x_bitmap_destroy(__bitmap);
     if(__using_default_font == false){
         free(__font->buffer);
@@ -16370,7 +16434,7 @@ int x_write(int x, int y, const char * format, ...){
     return _x;
 }
 
-void x_save(const char* filename){
+void x_save(const char *filename){
     char * dest = malloc(strlen(filename + 10));
     strcpy(dest, filename);
     strcat(dest, ".png");
@@ -16380,42 +16444,49 @@ void x_save(const char* filename){
     free(dest);
 }
 
-int x_log(const char* filename){
-    static int i = 0;
-    char * name = malloc((strlen(filename) + 10) * sizeof(char));
-    sprintf(name, "%05d_%s", i, filename);
-    
+void xs_log(const char *directory){
+    strcpy(__x_log_directory, directory);
+}
+
+void __x_log(int index){
+    char * name = malloc((strlen(__x_log_directory) + 10) * sizeof(char));
+    sprintf(name, "%s%05d", __x_log_directory, index);
+
     x_save(name);
-    i++;
     free(name);
-    return i - 1;
 }
 
-void x_lock(){
-    xstep_jump = 1;
+void xs_jump(int value){
+    __x_step_jump = value;
 }
 
-void x_step(const char * filename){
-    static int rounds = 0;
-    static int state = 0;
+int x_step(const char *filename){
+    static int rounds = 0; /* each save reset the round */
+    static int state = 0; /* each save generate a new state */
+    if(strcmp(__x_log_directory, "") != 0){
+        __x_log(state);
+    }
     char line[200];
     rounds += 1;
     state += 1;
-    if(xstep_jump == 0)
-        return;
-    if(rounds >= xstep_jump){
+    if((__x_step_jump != 0) && (rounds >= __x_step_jump)){
         x_save(filename);
-        printf("(state: %i, jump: %i) press{enter/jump value/0 to skip}:", state, xstep_jump);
+        printf("(state: %i, jump: %i) press{enter/jump value/0 to skip}:", state, __x_step_jump);
         fgets(line, sizeof(line), stdin);
         char * ptr = line;
         int value = (int) strtol(line, &ptr, 10);
         if(ptr != line)
-            xstep_jump = value;
+            __x_step_jump = value;
         rounds = 0;
     }
+    return state;
 }
 
 void x_plot(int x, int y){
+    if(__x_initialized == 0){
+        fprintf(stderr, "fail: x_open(weight, width) missing\n");
+        exit(1);
+    }
     if((x >= 0) && (x < (int) __bitmap->width) && (y >= 0) && (y <  (int) __bitmap->height))
         memcpy(x_get_pixel_pos(x, y), &__color, sizeof(__color));
 }

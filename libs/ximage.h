@@ -28,9 +28,20 @@ extern XColor YELLOW;
 extern XColor CYAN;
 extern XColor MAGENTA;
 extern XColor ORANGE;
-extern XColor VIOLET;
 extern XColor WHITE;
 extern XColor BLACK;
+
+/* variantes 
+extern XColor RED_B;
+extern XColor GREEN_B;
+extern XColor BLUE_B;
+extern XColor YELLOW_B;
+extern XColor CYAN_B;
+extern XColor MAGENTA_B;
+extern XColor ORANGE_B;
+extern XColor WHITE_B;
+extern XColor BLACK_B;
+*/
 
 /*
 ###############################################
@@ -39,7 +50,7 @@ extern XColor BLACK;
 */
 
 /* abre um bitmap com essas dimensões */
-void x_open(int width, int height);
+void x_open(unsigned int width, unsigned int height);
 
 /* finaliza o bitmap liberando os recursos */
 void x_close();
@@ -47,24 +58,27 @@ void x_close();
 /* para salvar um png no arquivo
    não inclua a extensão .png no nome do arquivo
 */
-void x_save(const char* filename);
+void x_save(const char *filename);
 
-/* cada vez que a funcao é chamada, salva um arquivo com prefixo numérico
-   incremental. Ex: se você chamar x_log("teste") 4 vezes vai salvar os
-   seguintes arquivos:
-   00000_teste.png 00001_teste.png 00002_teste.png 00003_teste.png
-   retorna o indice atual do arquivo que foi salvo.
+/*  Define um diretório onde serão salvos todas imagens invocadas no comando x_step.
+
+    Se directory for "", ele não salvará os estados.
+    Utilize o path completo incluindo a /
+    Exemplo xs_log("imgs/")
+
+    00000.png 00001.png 00002.png 00003.png
 */
-int x_log(const char* filename);
+void xs_log(const char *directory);
+
+/*
+    Redefine o valor de salto do x_step
+*/
+void xs_jump(int value);
 
 /*  salva o arquivo, mas permite ao usuário controlar
     os estados salvos intermediários através da interação com o terminal.
 */
-void x_step(const char * filename);
-
-/*  retorna o salto do xstep para 1.
-*/
-void x_lock();
+int x_step(const char *filename);
 
 /*
 ###############################################

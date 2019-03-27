@@ -10,5 +10,10 @@ Principais fontes:
 
 Licença: GPLv3
 
-Versão: 0.2
+Versão: 0.4
+
+- 0.4 26/04/2019
+    - adicionas cores de background
+    - alterada a função de xs_log(diretorio)
+
 */
