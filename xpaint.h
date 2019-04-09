@@ -16204,18 +16204,18 @@ static char __x_log_directory[100];
 static int __x_initialized = 0;
 
 
-XBitmap * x_bitmap_create(unsigned width, unsigned height, const uchar * color);
-void      x_bitmap_destroy(XBitmap * bitmap);
+XBitmap * __x_bitmap_create(unsigned width, unsigned height, const uchar *color);
+void      __x_bitmap_destroy(XBitmap *bitmap);
 
 /* se quiser trocar a font default, passe o nome do arquivo e crie um buffer */
-uchar *x_buffer_create(const char* filename);
-uchar * x_get_pixel_pos(int x, int y);
+uchar * __x_buffer_create(const char *filename);
+uchar * __x_get_pixel_pos(int x, int y);
 
-uchar * x_get_pixel_pos(int x, int y){
+uchar * __x_get_pixel_pos(int x, int y){
     return __bitmap->image + 3 * (__bitmap->width * y + x);
 }
 
-XBitmap * x_bitmap_create(unsigned width, unsigned height, const uchar * color){
+XBitmap * __x_bitmap_create(unsigned width, unsigned height, const uchar *color){
     XBitmap * bitmap = (XBitmap*) malloc(sizeof(XBitmap));
     bitmap->height = height;
     bitmap->width = width;
@@ -16227,7 +16227,7 @@ XBitmap * x_bitmap_create(unsigned width, unsigned height, const uchar * color){
     return bitmap;
 }
 
-void x_bitmap_destroy(XBitmap * bitmap){
+void __x_bitmap_destroy(XBitmap *bitmap){
     free(bitmap->image);
     free(bitmap);
 }
@@ -16240,7 +16240,7 @@ void x_open(unsigned int width, unsigned int height){
     __x_initialized = 1;
     /* inicializando a cor de fundo */
     uchar cinza[] = {30, 30, 30};
-    __bitmap = x_bitmap_create(width, height, cinza);
+    __bitmap = __x_bitmap_create(width, height, cinza);
     /* inicializando a cor de desenho e escrita */
     xs_color(make_xcolor(200, 200, 200));
 
@@ -16293,7 +16293,7 @@ void x_close(){
         exit(1);
     }
     __x_initialized = 0;
-    x_bitmap_destroy(__bitmap);
+    __x_bitmap_destroy(__bitmap);
     if(__using_default_font == false){
         free(__font->buffer);
         free(__font);
@@ -16304,7 +16304,7 @@ void x_clear(XColor color){
     unsigned x, y;
     for(x = 0; x < __bitmap->width; x++){
         for(y = 0; y < __bitmap->height; y++){
-            uchar * pixel = x_get_pixel_pos(x, y);
+            uchar * pixel = __x_get_pixel_pos(x, y);
             pixel[0] = color.r;
             pixel[1] = color.g;
             pixel[2] = color.b;
@@ -16324,12 +16324,12 @@ XColor xg_color(){
 }
 
 XColor xg_pixel(int x, int y){
-    uchar * pixel = x_get_pixel_pos(x, y);
+    uchar * pixel = __x_get_pixel_pos(x, y);
     XColor color = {pixel[0], pixel[1], pixel[2]};
     return color;
 }
 
-uchar * x_buffer_create(const char* filename){
+uchar * __x_buffer_create(const char *filename){
     long size;
     uchar * font_buffer;
     FILE* font_file = fopen(filename, "rb");
@@ -16356,7 +16356,7 @@ void xs_font(const char* filename){
         }
     }else{
         XFont * font = malloc(sizeof(XFont));
-        font->buffer = x_buffer_create(filename);
+        font->buffer = __x_buffer_create(filename);
         unsigned error = stbtt_InitFont(&font->info, font->buffer, 0);
         if(error == 0){
             printf("Erro no carregamento da fonte\n");
@@ -16448,6 +16448,8 @@ void xs_log(const char *directory){
     strcpy(__x_log_directory, directory);
 }
 
+
+/*salva o a imagem no diretorio de log */
 void __x_log(int index){
     char * name = malloc((strlen(__x_log_directory) + 10) * sizeof(char));
     sprintf(name, "%s%05d", __x_log_directory, index);
@@ -16488,7 +16490,7 @@ void x_plot(int x, int y){
         exit(1);
     }
     if((x >= 0) && (x < (int) __bitmap->width) && (y >= 0) && (y <  (int) __bitmap->height))
-        memcpy(x_get_pixel_pos(x, y), &__color, sizeof(__color));
+        memcpy(__x_get_pixel_pos(x, y), &__color, sizeof(__color));
 }
 
 XColor make_xcolor(uchar r, uchar g, uchar b){
