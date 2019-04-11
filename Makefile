@@ -11,4 +11,5 @@ clean:
 make_lib:
 	./make_xpaint.sh
 cpp:
-	g++ -Wall base.cpp libs/xdraw.c libs/ximage.c libs/xmath.c libs/xpng.c libs/xy.c -o base
+	g++ -Wall base.cpp -o base
+
