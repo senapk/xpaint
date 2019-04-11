@@ -14,11 +14,18 @@ Licença: GPLv3
 
 Versão: 0.4
 
+
+- 0.5 11/05/2019
+    - adaptação feita para aceitar includes de cpp.
 - 0.4 26/04/2019
     - adicionas cores de background
     - alterada a função de xs_log(diretorio)
 
 */
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*
 ###############################################
@@ -156,6 +163,16 @@ XColor xg_pixel(int x, int y);
 */
 XColor xg_palette(char c);
 
+#ifdef __cplusplus
+}
+#endif
+
+
+
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* ############################################### */
 /* ############ FUNÇÕES DE DESENHO DE LINHAS ##### */
@@ -206,6 +223,18 @@ void xd_filled_circle(int centerx, int centery, int radius);
 /* e ponto inferior direito (x1, y1) */
 void xd_filled_ellipse(int x0, int y0, int x1, int y1);
 
+
+#ifdef __cplusplus
+}
+#endif
+
+
+
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*
 ###############################################
 ####### ALGEBRA DE VETORES BIDIMENSIONAIS #####
@@ -242,6 +271,14 @@ XY xy_normalize(XY v);
 /* retorna o vetor orthogonal */
 XY xy_ortho(XY v);
 
+#ifdef __cplusplus
+}
+#endif
+
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*
 ###############################################
@@ -264,6 +301,7 @@ float xm_sin(float d);
 float xm_cos(float d);
 float xm_acos(float x);
 float xm_fabs(float f);
+/* generates a number [min, max] */
 int   xm_rand(int min, int max);
 
 /*
@@ -275,6 +313,14 @@ int   xm_rand(int min, int max);
 #   essa biblioteca.                              #
 ###################################################
 */
+
+#ifdef __cplusplus
+}
+#endif
+
+
+
+
 
 #endif /* XPAINT_H */
 #ifndef H_ONLY /* inicio da implementacao */
@@ -8354,6 +8400,8 @@ unsigned encode(const std::string& filename,
 #define STBTT_RASTERIZER_VERSION 2
 
 
+
+
 #define STBTT_ifloor(x)   ((int) xm_floor(x))
 #define STBTT_iceil(x)    (xm_ceil(x))
 #define STBTT_sqrt(x)      xm_sqrt(x)
@@ -11545,7 +11593,7 @@ static void stbtt__rasterize_sorted_edges(stbtt__bitmap *result, stbtt__edge *e,
 #ifndef STBTT_RGB_MODE
             result->pixels[j*result->stride + i] = (unsigned char) m;
 #else
-            const unsigned char * color = userdata;
+            const unsigned char * color = (const unsigned char*) userdata;
             unsigned char * pos = result->pixels + 3 * j * result->stride + 3 * i;
             pos[0] = pos[0] + (color[0] - pos[0]) * (m/255.f);
             pos[1] = pos[1] + (color[1] - pos[1]) * (m/255.f);
@@ -13220,6 +13268,10 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 /* This file was generated automatically. Do not edit. */
 #ifndef DATA_DECLARATION_ONLY
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 unsigned char font_buffer_profont[46628] = {
 	0x00, 0x01, 0x00, 0x00, 0x00, 0x10, 0x01, 0x00, 0x00, 0x04, 0x00, 0x00, 0x46, 0x46, 0x54, 0x4d, 
@@ -16142,6 +16194,10 @@ unsigned char font_buffer_profont[46628] = {
 extern unsigned char font_buffer_profont[46628];
 #endif
 
+#ifdef __cplusplus
+}
+#endif
+
 /* EOF */
 #include <stdio.h>
 #include <stdlib.h>
@@ -16149,6 +16205,10 @@ extern unsigned char font_buffer_profont[46628];
 #include <string.h>
 #include <stdarg.h>
 #include <stdbool.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*
 XColor BLACK_B=  {0  , 43 , 54 };
@@ -16234,7 +16294,7 @@ void __x_bitmap_destroy(XBitmap *bitmap){
 
 void x_open(unsigned int width, unsigned int height){
     if(__x_initialized){
-        puts("bitmap ja inicializado");
+        fprintf(stderr, "fail: bitmat already initialized\n");
         return;
     }
     __x_initialized = 1;
@@ -16244,7 +16304,7 @@ void x_open(unsigned int width, unsigned int height){
     /* inicializando a cor de desenho e escrita */
     xs_color(make_xcolor(200, 200, 200));
 
-    __font_default = malloc(sizeof(XFont));
+    __font_default = (XFont*) malloc(sizeof(XFont));
     __font_default->buffer = font_buffer_profont;
     stbtt_InitFont(&__font_default->info, __font_default->buffer, 0);
 
@@ -16334,13 +16394,13 @@ uchar * __x_buffer_create(const char *filename){
     uchar * font_buffer;
     FILE* font_file = fopen(filename, "rb");
     if(font_file == NULL){
-        puts("arquivo não encontrado");
+        fprintf(stderr, "fail: file not found\n");
         exit(1);
     }
     fseek(font_file, 0, SEEK_END);
     size = ftell(font_file); /* how long is the file ? */
     fseek(font_file, 0, SEEK_SET); /* reset */
-    font_buffer = malloc(size);
+    font_buffer = (uchar *) malloc(size);
     fread(font_buffer, size, 1, font_file);
     fclose(font_file);
     return font_buffer;
@@ -16355,11 +16415,11 @@ void xs_font(const char* filename){
             __font = __font_default;
         }
     }else{
-        XFont * font = malloc(sizeof(XFont));
+        XFont * font = (XFont*) malloc(sizeof(XFont));
         font->buffer = __x_buffer_create(filename);
         unsigned error = stbtt_InitFont(&font->info, font->buffer, 0);
         if(error == 0){
-            printf("Erro no carregamento da fonte\n");
+            fprintf(stderr, "fail: font load failure\n");
             free(font->buffer);
             free(font);
         }else{
@@ -16408,7 +16468,7 @@ int x_write(int x, int y, const char * format, ...){
             _x = 10;
         }
 
-        if(y + __font_size > __bitmap->height){
+        if((unsigned) y + __font_size > __bitmap->height){
             return _x;
         }
 
@@ -16435,7 +16495,7 @@ int x_write(int x, int y, const char * format, ...){
 }
 
 void x_save(const char *filename){
-    char * dest = malloc(strlen(filename + 10));
+    char * dest = (char*) malloc(strlen(filename + 10));
     strcpy(dest, filename);
     strcat(dest, ".png");
     unsigned error = lodepng_encode_file(dest, __bitmap->image, __bitmap->width, __bitmap->height, LCT_RGB, 8);
@@ -16451,7 +16511,7 @@ void xs_log(const char *directory){
 
 /*salva o a imagem no diretorio de log */
 void __x_log(int index){
-    char * name = malloc((strlen(__x_log_directory) + 10) * sizeof(char));
+    char * name = (char *) malloc((strlen(__x_log_directory) + 10) * sizeof(char));
     sprintf(name, "%s%05d", __x_log_directory, index);
 
     x_save(name);
@@ -16510,20 +16570,30 @@ XColor xg_palette(char c){
 
 int xg_height(){
     if(__bitmap == NULL)
-        puts("voce esqueceu o x_init();");
+        fprintf(stderr, "fail: x_open(weight, width) missing\n");
     return __bitmap->height;
 }
 
 int xg_width(){
     if(__bitmap == NULL)
-        puts("voce esqueceu o x_init();");
+        fprintf(stderr, "fail: x_open(weight, width) missing\n");
     return __bitmap->width;
 }
+
+#ifdef __cplusplus
+}
+#endif
+
+
 
 #include <stdlib.h>/*abs*/
 #include <assert.h>
 #include <stdio.h>
 #include <inttypes.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define X_SWAP(x, y, T) do { T X_SWAP = x; x = y; y = X_SWAP; } while (0)
 
@@ -16899,6 +16969,16 @@ void xd_filled_arc(float centerx, float centery, int radius, int thickness, int 
     }
 }
 
+
+#ifdef __cplusplus
+}
+#endif
+
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 XY make_xy(float x, float y){
     XY v = {x, y};
     return v;
@@ -16936,7 +17016,20 @@ XY xy_normalize(XY v){
 XY xy_ortho(XY v){
     return make_xy(v.y, -v.x);
 }
+
+#ifdef __cplusplus
+}
+#endif
+
+
+
+
 #include <stdint.h>
+#include <stdlib.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 int   xm_rand(int min, int max){
     return rand() % (max + 1 - min) + min;
@@ -16969,373 +17062,20 @@ float xm_sqrt(const float m)
    return x2;
 }
 
-/* used for testing if a float is an integer or not */
-static const uint8_t  __gMaskShift[256] = {	0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,    /* 16 */
-                                            0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,    /* 32 */
-                                            0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,    /* 48 */
-                                            0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,    /* 64 */
-                                            0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,    /* 80 */
-                                            0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,    /* 96 */
-                                            0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,    /* 112 */
-                                            0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7,    /* 128 */
-                                            8, 9,10,11, 12,13,14,15,16,17,18,19,20,21,22,23,    /* 144 */
-                                           24,25,26,27, 28,29,30,31,31,31,31,31,31,31,31,31,    /* 160 */
-                                           31,31,31,31, 31,31,31,31,31,31,31,31,31,31,31,31,    /* 176 */
-                                           31,31,31,31, 31,31,31,31,31,31,31,31,31,31,31,31,    /* 192 */
-                                           31,31,31,31, 31,31,31,31,31,31,31,31,31,31,31,31,    /* 208 */
-                                           31,31,31,31, 31,31,31,31,31,31,31,31,31,31,31,31,    /* 224 */
-                                           31,31,31,31, 31,31,31,31,31,31,31,31,31,31,31,31,    /* 240 */
-                                           31,31,31,31, 31,31,31,31,31,31,31,31,31,31,31,31,    /* 256 */
-                                        };
-
-static const double powf_log_table[256]  = {(double)(1.0), (double)(-0.0), (double)(0.9921875), (double)(0.0113153132278341461), (double)(0.9844961240310077244), (double)(0.02254256865108826557), (double)(0.976923076923076894), (double)(0.0336831262562886577), (double)(0.9694656488549617812), (double)(0.04473831476528442735), (double)(0.9621212121212121549), (double)(0.05570943258628758415), (double)(0.9548872180451127845), (double)(0.06659774872902374243), (double)(0.9477611940298507065), (double)(0.0774045036856065849), (double)(0.9407407407407407662), (double)(0.08813091027866504223), (double)(0.9338235294117647189), (double)(0.09877815447817354932), (double)(0.9270072992700729708), (double)(0.1093473961883608681), (double)(0.9202898550724637472), (double)(0.1198397700060031962), (double)(0.9136690647482014205), (double)(0.1302563859513415911), (double)(0.9071428571428571397), (double)(0.1405983301728006007), (double)(0.9007092198581559961), (double)(0.1508666656266277051), (double)(0.8943661971830986213), (double)(0.1610624327325162197), (double)(0.8881118881118881259), (double)(0.171186650006223573), (double)(0.8819444444444444198), (double)(0.1812403146701465073), (double)(0.8758620689655172153), (double)(0.1912244032427686258), (double)(0.869863013698630172), (double)(0.2011398721078513641), (double)(0.863945578231292477), (double)(0.21098765806419853), (double)(0.8581081081081081141), (double)(0.2207686788567839176), (double)(0.8523489932885905951), (double)(0.2304838336899957263), (double)(0.8466666666666666785), (double)(0.2401340037237150171), (double)(0.841059602649006588), (double)(0.2497200525529130466), (double)(0.8355263157894736725), (double)(0.2592428266714196239), (double)(0.8300653594771242316), (double)(0.2687031559204859366), (double)(0.8246753246753246724), (double)(0.2781018539227355091), (double)(0.8193548387096774022), (double)(0.2874397185020717282), (double)(0.8141025641025640969), (double)(0.2967175320900825031), (double)(0.8089171974522293418), (double)(0.3059360621194611718), (double)(0.8037974683544303334), (double)(0.3150960614049370667), (double)(0.7987421383647799189), (double)(0.3241982685121895247), (double)(0.7937499999999999556), (double)(0.3332434081151964822), (double)(0.788819875776397561), (double)(0.3422321913424511419), (double)(0.783950617283950657), (double)(0.3511653161124588807), (double)(0.7791411042944785814), (double)(0.3600434674589116923), (double)(0.7743902439024390461), (double)(0.3688673178459178637), (double)(0.7696969696969696573), (double)(0.3776375274736499255), (double)(0.7650602409638553869), (double)(0.3863547445747588793), (double)(0.760479041916167664), (double)(0.3950196057018863782), (double)(0.7559523809523809312), (double)(0.4036327360065944392), (double)(0.7514792899408283544), (double)(0.4121947495100184433), (double)(0.7470588235294117752), (double)(0.4207062493655359114), (double)(0.742690058479532178), (double)(0.4291678281137319972), (double)(0.7383720930232557933), (double)(0.4375800679299320928), (double)(0.7341040462427745883), (double)(0.4459435408645587851), (double)(0.7298850574712644201), (double)(0.4542588090765624642), (double)(0.7257142857142857562), (double)(0.462526425060162949), (double)(0.7215909090909090606), (double)(0.4707469318651313905), (double)(0.7175141242937853603), (double)(0.4789208633108316127), (double)(0.7134831460674156967), (double)(0.4870487441942318863), (double)(0.7094972067039105879), (double)(0.4951310904920905864), (double)(0.7055555555555556024), (double)(0.5031684095575088556), (double)(0.7016574585635358963), (double)(0.5111612003110395097), (double)(0.6978021978021977656), (double)(0.5191099534265304349), (double)(0.6939890710382513594), (double)(0.5270151515118766117), (double)(0.6902173913043477826), (double)(0.5348772692848470234), (double)(0.6864864864864864691), (double)(0.5426967737441462658), (double)(0.6827956989247311315), (double)(0.5504741243358655112), (double)(0.6791443850267380178), (double)(0.5582097731154708198), (double)(0.6755319148936169693), (double)(0.5659041649054715739), (double)(0.6719576719576719759), (double)(0.5735577374489068125), (double)(0.6684210526315789158), (double)(0.5811709215587820276), (double)(0.6649214659685863671), (double)(0.5887441412635828764), (double)(0.6614583333333333703), (double)(0.5962778139489903761), (double)(0.6580310880829015607), (double)(0.6037723504959146004), (double)(0.6546391752577319645), (double)(0.6112281554149617824), (double)(0.6512820512820512997), (double)(0.6186456269774448513), (double)(0.6479591836734693855), (double)(0.6260251573430423155), (double)(0.6446700507614213649), (double)(0.6333671326842104099), (double)(0.6414141414141414366), (double)(0.6406719333074437639), (double)(0.6381909547738693345), (double)(0.6479399337714829565), (double)(0.6350000000000000089), (double)(0.655171503002558886), (double)(0.631840796019900508), (double)(0.6623670044067627716), (double)(0.6287128712871287162), (double)(0.6695267959796288304), (double)(0.6256157635467980427), (double)(0.6766512304130103406), (double)(0.622549019607843146), (double)(0.6837406551993296944), (double)(0.6195121951219512146), (double)(0.6907954127332801564), (double)(0.6165048543689319871), (double)(0.6978158404110524904), (double)(0.6135265700483091278), (double)(0.7048022707271593967), (double)(0.6105769230769231282), (double)(0.7117550313689262609), (double)(0.6076555023923444487), (double)(0.718674445308716936), (double)(0.6047619047619047228), (double)(0.7255608308939567319), (double)(0.6018957345971563955), (double)(0.7324145019350193353), (double)(0.5990566037735849392), (double)(0.7392357677910332825), (double)(0.5962441314553990068), (double)(0.7460249334536723786), (double)(0.5934579439252336552), (double)(0.752782299628981133), (double)(0.5906976744186046568), (double)(0.7595081628172943855), (double)(0.5879629629629629095), (double)(0.7662028153913026385), (double)(0.5852534562211981761), (double)(0.7728665456723134985), (double)(0.5825688073394494904), (double)(0.77949963800476052), (double)(0.5799086757990867813), (double)(0.786102372829007523), (double)(0.5772727272727272707), (double)(0.7926750267524937943), (double)(0.5746606334841628527), (double)(0.7992178726192656901), (double)(0.5720720720720721131), (double)(0.8057311795779401598), (double)(0.5695067264573990817), (double)(0.812215213148138826), (double)(0.5669642857142856984), (double)(0.8186702352854382525), (double)(0.5644444444444444153), (double)(0.8250965044448712593), (double)(0.5619469026548672419), (double)(0.8314942756430218074), (double)(0.5594713656387665379), (double)(0.8378638005187490911), (double)(0.557017543859649078), (double)(0.8442053273925758106), (double)(0.5545851528384279083), (double)(0.8505191013247780374), (double)(0.5521739130434782927), (double)(0.8568053641722093161), (double)(0.5497835497835498186), (double)(0.8630643546438916403), (double)(0.5474137931034482873), (double)(0.8692963083554062775), (double)(0.5450643776824034559), (double)(0.87550145788211442), (double)(0.5427350427350426942), (double)(0.8816800328112386342), (double)(0.5404255319148936199), (double)(0.8878322597928338666), (double)(0.5381355932203389925), (double)(0.893958362589675426), (double)(0.5358649789029535926), (double)(0.9000585621260932534), (double)(0.5336134453781512521), (double)(0.9061330765357776817), (double)(0.5313807531380753124), (double)(0.9121821212085826636), (double)(0.5291666666666666741), (double)(0.9182059088363526689), (double)(0.5269709543568464882), (double)(0.9242046494577957905), (double)(0.5247933884297520946), (double)(0.9301785505024287026), (double)(0.5226337448559670307), (double)(0.9361278168336150118), (double)(0.5204918032786884918), (double)(0.942052650790720425), (double)(0.5183673469387755084), (double)(0.9479532522304047193), (double)(0.5162601626016259937), (double)(0.9538298185670740503), (double)(0.5141700404858299267), (double)(0.9596825448125118063), (double)(0.5120967741935483764), (double)(0.9655116236147093245), (double)(0.5100401606425702949), (double)(0.9713172452959151215), (double)(0.5080000000000000071), (double)(0.9770995978899211787), (double)(0.5059760956175298752), (double)(0.9828588671786061548), (double)(0.5039682539682539542), (double)(0.9885952367277506259), (double)(0.5019762845849802257), (double)(0.9943088879221442244), (double)(0.5), (double)(1.0)};
-
-/*
-static const double powf_log_table[256] = {
-                                            0x1p+0,	-0x0p+0,	// 1, -log2l(1)
-                                            0x1.fcp-1,	0x1.72c7ba20f7327p-7,	// 0.992188, -log2l(0.992188)
-                                            0x1.f80fe03f80fep-1,	0x1.715662c7f3dbcp-6,	// 0.984496, -log2l(0.984496)
-                                            0x1.f42f42f42f42fp-1,	0x1.13eea2b6545dfp-5,	// 0.976923, -log2l(0.976923)
-                                            0x1.f05dcd30dadecp-1,	0x1.6e7f0bd9710ddp-5,	// 0.969466, -log2l(0.969466)
-                                            0x1.ec9b26c9b26cap-1,	0x1.c85f25e12da51p-5,	// 0.962121, -log2l(0.962121)
-                                            0x1.e8e6fa39be8e7p-1,	0x1.10c8cd0c74414p-4,	// 0.954887, -log2l(0.954887)
-                                            0x1.e540f4898d5f8p-1,	0x1.3d0c813e48ep-4,	// 0.947761, -log2l(0.947761)
-                                            0x1.e1a8c536fe1a9p-1,	0x1.68fbf5169e028p-4,	// 0.940741, -log2l(0.940741)
-                                            0x1.de1e1e1e1e1e2p-1,	0x1.949866f0b017bp-4,	// 0.933824, -log2l(0.933824)
-                                            0x1.daa0b3630957dp-1,	0x1.bfe30e28821cp-4,	// 0.927007, -log2l(0.927007)
-                                            0x1.d7303b5cc0ed7p-1,	0x1.eadd1b4ef9a1fp-4,	// 0.92029, -log2l(0.92029)
-                                            0x1.d3cc6e80ebbdbp-1,	0x1.0ac3dc2e0ca0cp-3,	// 0.913669, -log2l(0.913669)
-                                            0x1.d075075075075p-1,	0x1.1ff2046fb7116p-3,	// 0.907143, -log2l(0.907143)
-                                            0x1.cd29c244fe2f3p-1,	0x1.34f99517622aep-3,	// 0.900709, -log2l(0.900709)
-                                            0x1.c9ea5dbf193d5p-1,	0x1.49db19c99a54dp-3,	// 0.894366, -log2l(0.894366)
-                                            0x1.c6b699f5423cep-1,	0x1.5e971b3a4ee8p-3,	// 0.888112, -log2l(0.888112)
-                                            0x1.c38e38e38e38ep-1,	0x1.732e1f41ccdbap-3,	// 0.881944, -log2l(0.881944)
-                                            0x1.c070fe3c070fep-1,	0x1.87a0a8f0ff9b2p-3,	// 0.875862, -log2l(0.875862)
-                                            0x1.bd5eaf57abd5fp-1,	0x1.9bef38a4ffae5p-3,	// 0.869863, -log2l(0.869863)
-                                            0x1.ba5713280dee9p-1,	0x1.b01a4c19f6811p-3,	// 0.863946, -log2l(0.863946)
-                                            0x1.b759f2298375ap-1,	0x1.c4225e7d5e3c6p-3,	// 0.858108, -log2l(0.858108)
-                                            0x1.b4671655e7f24p-1,	0x1.d807e87fa4521p-3,	// 0.852349, -log2l(0.852349)
-                                            0x1.b17e4b17e4b18p-1,	0x1.ebcb6065350a2p-3,	// 0.846667, -log2l(0.846667)
-                                            0x1.ae9f5d3eba7d7p-1,	0x1.ff6d3a16f617fp-3,	// 0.84106, -log2l(0.84106)
-                                            0x1.abca1af286bcap-1,	0x1.0976f3991af9ep-2,	// 0.835526, -log2l(0.835526)
-                                            0x1.a8fe53a8fe53bp-1,	0x1.1326eb8c0aba3p-2,	// 0.830065, -log2l(0.830065)
-                                            0x1.a63bd81a98ef6p-1,	0x1.1cc6bb7e3870fp-2,	// 0.824675, -log2l(0.824675)
-                                            0x1.a3827a3827a38p-1,	0x1.265698fa26c0ap-2,	// 0.819355, -log2l(0.819355)
-                                            0x1.a0d20d20d20d2p-1,	0x1.2fd6b881e82d3p-2,	// 0.814103, -log2l(0.814103)
-                                            0x1.9e2a65187566cp-1,	0x1.39474d95e1649p-2,	// 0.808917, -log2l(0.808917)
-                                            0x1.9b8b577e61371p-1,	0x1.42a88abb54986p-2,	// 0.803797, -log2l(0.803797)
-                                            0x1.98f4bac46d7cp-1,	0x1.4bfaa182b7fe3p-2,	// 0.798742, -log2l(0.798742)
-                                            0x1.9666666666666p-1,	0x1.553dc28dd9724p-2,	// 0.79375, -log2l(0.79375)
-                                            0x1.93e032e1c9f02p-1,	0x1.5e721d95d124dp-2,	// 0.78882, -log2l(0.78882)
-                                            0x1.9161f9add3c0dp-1,	0x1.6797e170c5221p-2,	// 0.783951, -log2l(0.783951)
-                                            0x1.8eeb9533d4065p-1,	0x1.70af3c177f74p-2,	// 0.779141, -log2l(0.779141)
-                                            0x1.8c7ce0c7ce0c8p-1,	0x1.79b85aaad8878p-2,	// 0.77439, -log2l(0.77439)
-                                            0x1.8a15b8a15b8a1p-1,	0x1.82b36978f76d5p-2,	// 0.769697, -log2l(0.769697)
-                                            0x1.87b5f9d4d1bc2p-1,	0x1.8ba09402697edp-2,	// 0.76506, -log2l(0.76506)
-                                            0x1.855d824ca58e9p-1,	0x1.948004ff12dbfp-2,	// 0.760479, -log2l(0.760479)
-                                            0x1.830c30c30c30cp-1,	0x1.9d51e662f92a2p-2,	// 0.755952, -log2l(0.755952)
-                                            0x1.80c1e4bbd595fp-1,	0x1.a6166162e9ec8p-2,	// 0.751479, -log2l(0.751479)
-                                            0x1.7e7e7e7e7e7e8p-1,	0x1.aecd9e78fdbeap-2,	// 0.747059, -log2l(0.747059)
-                                            0x1.7c41df1077c42p-1,	0x1.b777c568f9ae2p-2,	// 0.74269, -log2l(0.74269)
-                                            0x1.7a0be82fa0be8p-1,	0x1.c014fd448fe3ap-2,	// 0.738372, -log2l(0.738372)
-                                            0x1.77dc7c4cf2aeap-1,	0x1.c8a56c6f80bcap-2,	// 0.734104, -log2l(0.734104)
-                                            0x1.75b37e875b37fp-1,	0x1.d12938a39d6fp-2,	// 0.729885, -log2l(0.729885)
-                                            0x1.7390d2a6c405ep-1,	0x1.d9a086f4ad416p-2,	// 0.725714, -log2l(0.725714)
-                                            0x1.71745d1745d17p-1,	0x1.e20b7bd4365a8p-2,	// 0.721591, -log2l(0.721591)
-                                            0x1.6f5e02e4850ffp-1,	0x1.ea6a3b152b1e6p-2,	// 0.717514, -log2l(0.717514)
-                                            0x1.6d4da9b536a6dp-1,	0x1.f2bce7ef7d06bp-2,	// 0.713483, -log2l(0.713483)
-                                            0x1.6b4337c6cb157p-1,	0x1.fb03a50395dbap-2,	// 0.709497, -log2l(0.709497)
-                                            0x1.693e93e93e93fp-1,	0x1.019f4a2edc134p-1,	// 0.705556, -log2l(0.705556)
-                                            0x1.673fa57b0cbabp-1,	0x1.05b6ebbca3d9ap-1,	// 0.701657, -log2l(0.701657)
-                                            0x1.6546546546546p-1,	0x1.09c8c7a1fd74cp-1,	// 0.697802, -log2l(0.697802)
-                                            0x1.63528917c80b3p-1,	0x1.0dd4ee107ae0ap-1,	// 0.693989, -log2l(0.693989)
-                                            0x1.61642c8590b21p-1,	0x1.11db6ef5e7873p-1,	// 0.690217, -log2l(0.690217)
-                                            0x1.5f7b282135f7bp-1,	0x1.15dc59fdc06b7p-1,	// 0.686486, -log2l(0.686486)
-                                            0x1.5d9765d9765d9p-1,	0x1.19d7be92a231p-1,	// 0.682796, -log2l(0.682796)
-                                            0x1.5bb8d015e75bcp-1,	0x1.1dcdabdfad537p-1,	// 0.679144, -log2l(0.679144)
-                                            0x1.59df51b3bea36p-1,	0x1.21be30d1e0ddbp-1,	// 0.675532, -log2l(0.675532)
-                                            0x1.580ad602b580bp-1,	0x1.25a95c196bef3p-1,	// 0.671958, -log2l(0.671958)
-                                            0x1.563b48c20563bp-1,	0x1.298f3c2af6595p-1,	// 0.668421, -log2l(0.668421)
-                                            0x1.5470961d7ca63p-1,	0x1.2d6fdf40e09c5p-1,	// 0.664921, -log2l(0.664921)
-                                            0x1.52aaaaaaaaaabp-1,	0x1.314b535c7b89ep-1,	// 0.661458, -log2l(0.661458)
-                                            0x1.50e97366227cbp-1,	0x1.3521a64737cf3p-1,	// 0.658031, -log2l(0.658031)
-                                            0x1.4f2cddb0d3225p-1,	0x1.38f2e593cda73p-1,	// 0.654639, -log2l(0.654639)
-                                            0x1.4d74d74d74d75p-1,	0x1.3cbf1e9f5cf2fp-1,	// 0.651282, -log2l(0.651282)
-                                            0x1.4bc14e5e0a72fp-1,	0x1.40865e9285f33p-1,	// 0.647959, -log2l(0.647959)
-                                            0x1.4a1231617641p-1,	0x1.4448b2627ade3p-1,	// 0.64467, -log2l(0.64467)
-                                            0x1.48676f31219dcp-1,	0x1.480626d20a876p-1,	// 0.641414, -log2l(0.641414)
-                                            0x1.46c0f6feb6ac6p-1,	0x1.4bbec872a4505p-1,	// 0.638191, -log2l(0.638191)
-                                            0x1.451eb851eb852p-1,	0x1.4f72a3a555958p-1,	// 0.635, -log2l(0.635)
-                                            0x1.4380a3065e3fbp-1,	0x1.5321c49bc0c91p-1,	// 0.631841, -log2l(0.631841)
-                                            0x1.41e6a74981447p-1,	0x1.56cc37590e6c5p-1,	// 0.628713, -log2l(0.628713)
-                                            0x1.4050b59897548p-1,	0x1.5a7207b2d815ap-1,	// 0.625616, -log2l(0.625616)
-                                            0x1.3ebebebebebecp-1,	0x1.5e1341520dbp-1,	// 0.622549, -log2l(0.622549)
-                                            0x1.3d30b3d30b3d3p-1,	0x1.61afefb3d5201p-1,	// 0.619512, -log2l(0.619512)
-                                            0x1.3ba68636adfbp-1,	0x1.65481e2a6477bp-1,	// 0.616505, -log2l(0.616505)
-                                            0x1.3a2027932b48fp-1,	0x1.68dbd7ddd6e15p-1,	// 0.613527, -log2l(0.613527)
-                                            0x1.389d89d89d89ep-1,	0x1.6c6b27ccfc698p-1,	// 0.610577, -log2l(0.610577)
-                                            0x1.371e9f3c04e64p-1,	0x1.6ff618ce24cd7p-1,	// 0.607656, -log2l(0.607656)
-                                            0x1.35a35a35a35a3p-1,	0x1.737cb58fe5716p-1,	// 0.604762, -log2l(0.604762)
-                                            0x1.342bad7f64b39p-1,	0x1.76ff0899daa49p-1,	// 0.601896, -log2l(0.601896)
-                                            0x1.32b78c13521dp-1,	0x1.7a7d1c4d6452p-1,	// 0.599057, -log2l(0.599057)
-                                            0x1.3146e92a10d38p-1,	0x1.7df6fae65e424p-1,	// 0.596244, -log2l(0.596244)
-                                            0x1.2fd9b8396ba9ep-1,	0x1.816cae7bd40b1p-1,	// 0.593458, -log2l(0.593458)
-                                            0x1.2e6fecf2e6fedp-1,	0x1.84de4100b0ce2p-1,	// 0.590698, -log2l(0.590698)
-                                            0x1.2d097b425ed09p-1,	0x1.884bbc446ae3fp-1,	// 0.587963, -log2l(0.587963)
-                                            0x1.2ba6574cae996p-1,	0x1.8bb529f3ab8f3p-1,	// 0.585253, -log2l(0.585253)
-                                            0x1.2a46756e62a46p-1,	0x1.8f1a9398f2d58p-1,	// 0.582569, -log2l(0.582569)
-                                            0x1.28e9ca3a728eap-1,	0x1.927c029d3798ap-1,	// 0.579909, -log2l(0.579909)
-                                            0x1.27904a7904a79p-1,	0x1.95d980488409ap-1,	// 0.577273, -log2l(0.577273)
-                                            0x1.2639eb2639eb2p-1,	0x1.993315c28e8fbp-1,	// 0.574661, -log2l(0.574661)
-                                            0x1.24e6a171024e7p-1,	0x1.9c88cc134f3c3p-1,	// 0.572072, -log2l(0.572072)
-                                            0x1.239662b9f91cbp-1,	0x1.9fdaac2391e1cp-1,	// 0.569507, -log2l(0.569507)
-                                            0x1.2249249249249p-1,	0x1.a328bebd84e8p-1,	// 0.566964, -log2l(0.566964)
-                                            0x1.20fedcba98765p-1,	0x1.a6730c8d44efap-1,	// 0.564444, -log2l(0.564444)
-                                            0x1.1fb78121fb781p-1,	0x1.a9b99e21655ebp-1,	// 0.561947, -log2l(0.561947)
-                                            0x1.1e7307e4ef157p-1,	0x1.acfc7beb75e94p-1,	// 0.559471, -log2l(0.559471)
-                                            0x1.1d31674c59d31p-1,	0x1.b03bae40852ap-1,	// 0.557018, -log2l(0.557018)
-                                            0x1.1bf295cc93903p-1,	0x1.b3773d59a05ffp-1,	// 0.554585, -log2l(0.554585)
-                                            0x1.1ab68a0473c1bp-1,	0x1.b6af315450638p-1,	// 0.552174, -log2l(0.552174)
-                                            0x1.197d3abc65f4fp-1,	0x1.b9e3923313e58p-1,	// 0.549784, -log2l(0.549784)
-                                            0x1.18469ee58469fp-1,	0x1.bd1467ddd70a7p-1,	// 0.547414, -log2l(0.547414)
-                                            0x1.1712ad98b8957p-1,	0x1.c041ba2268731p-1,	// 0.545064, -log2l(0.545064)
-                                            0x1.15e15e15e15e1p-1,	0x1.c36b90b4ebc3ap-1,	// 0.542735, -log2l(0.542735)
-                                            0x1.14b2a7c2fee92p-1,	0x1.c691f33049bap-1,	// 0.540426, -log2l(0.540426)
-                                            0x1.1386822b63cbfp-1,	0x1.c9b4e9169de22p-1,	// 0.538136, -log2l(0.538136)
-                                            0x1.125ce4feeb7a1p-1,	0x1.ccd479d1a1f94p-1,	// 0.535865, -log2l(0.535865)
-                                            0x1.1135c81135c81p-1,	0x1.cff0acb3170e3p-1,	// 0.533613, -log2l(0.533613)
-                                            0x1.10112358e75d3p-1,	0x1.d30988f52c6d3p-1,	// 0.531381, -log2l(0.531381)
-                                            0x1.0eeeeeeeeeeefp-1,	0x1.d61f15bae4663p-1,	// 0.529167, -log2l(0.529167)
-                                            0x1.0dcf230dcf231p-1,	0x1.d9315a1076fa2p-1,	// 0.526971, -log2l(0.526971)
-                                            0x1.0cb1b810ecf57p-1,	0x1.dc405cebb27dcp-1,	// 0.524793, -log2l(0.524793)
-                                            0x1.0b96a673e2808p-1,	0x1.df4c252c5a3e1p-1,	// 0.522634, -log2l(0.522634)
-                                            0x1.0a7de6d1d6086p-1,	0x1.e254b99c83339p-1,	// 0.520492, -log2l(0.520492)
-                                            0x1.096771e4d528cp-1,	0x1.e55a20f0eecf9p-1,	// 0.518367, -log2l(0.518367)
-                                            0x1.0853408534085p-1,	0x1.e85c61c963f0dp-1,	// 0.51626, -log2l(0.51626)
-                                            0x1.07414ba8f0741p-1,	0x1.eb5b82b10609bp-1,	// 0.51417, -log2l(0.51417)
-                                            0x1.06318c6318c63p-1,	0x1.ee578a1eaa83fp-1,	// 0.512097, -log2l(0.512097)
-                                            0x1.0523fbe3367d7p-1,	0x1.f1507e752c6c8p-1,	// 0.51004, -log2l(0.51004)
-                                            0x1.04189374bc6a8p-1,	0x1.f4466603be71dp-1,	// 0.508, -log2l(0.508)
-                                            0x1.030f4c7e7859cp-1,	0x1.f73947063b3fdp-1,	// 0.505976, -log2l(0.505976)
-                                            0x1.0208208208208p-1,	0x1.fa2927a574422p-1,	// 0.503968, -log2l(0.503968)
-                                            0x1.0103091b51f5ep-1,	0x1.fd160df77ed7ap-1,	// 0.501976, -log2l(0.501976)
-                                            0x1p-1,	0x1p+0,	// 0.5, -log2l(0.5)
-                                        };
-*/
-
-/* https://opensource.apple.com/source/Libm/Libm-315/Source/ARM/powf.c.auto.html */
-float xm_pow( float x, float y )
-{
-    static const double recip_ln2 = 0x1.71547652b82fep0;
-
-    if( x == 1.0f || y == 1.0f)
-        return x;
-
-    union{ float f; uint32_t u; } ux, uy;
-    ux.f = x;
-    uy.f = y;
-    uint32_t absux = ux.u & 0x7fffffff;
-    uint32_t absuy = uy.u & 0x7fffffff;
-
-
-
-    if( (ux.u - 1U) >= 0x7f7fffff || (absuy - 1) >= 0x4affffff )
-    {
-        if( 0 == absuy )
-            return 1.0f;
-
-        if( x != x || y != y )
-            return x + y;
-
-        uint32_t fractMask = 0x3fffffffU >> __gMaskShift[ absuy >> 23 ];			
-        uint32_t onesMask = 0x40000000U >> __gMaskShift[ absuy >> 23 ];			
-        uint32_t fractionalBits = absuy & fractMask;
-        uint32_t onesBit = absuy & onesMask;
-
-        if( 0 == absux )
-        {
-            if( 0 == fractionalBits && 0 != onesBit )
-            {
-                if( y < 0.0f )
-                    return 1.0f / x;
-
-                return x;
-            }
-
-            if( 0.0f < y )
-                return 0.0f;
-
-            return 1.0f / __builtin_fabsf(x);
-
-        }
-
-
-        if( 0x7f800000 == absuy )
-        {
-            if( -1.0f == x )
-                return 1.0f;
-
-            if( absux > 0x3f800000 )
-            {
-                if( 0.0f < y )
-                    return y;
-                else
-                    return 0.0f;
-            }
-            else
-            {
-                if( 0.0f < y )
-                    return 0.0f;
-                else
-                    return __builtin_fabsf(y);
-            }
-        }
-
-        if( x == __builtin_inff() )
-        {
-            if( y < 0.0f )
-                return 0.0f;
-            else
-                return x;
-        }
-
-        if( x > -__builtin_inff() )
-        {
-            if( fractionalBits )
-                goto nan_sqrt;
-
-            goto ipowf;
-        }
-
-
-        if( 0 == fractionalBits && 0 != onesBit )
-            return 0.0f < y ? x : -0.0f;
-
-        return 0.0f < y ? -x : 0.0f;
+float xm_pow( float x, float z ){
+    int y =  z;
+    double temp;
+    if (y == 0)
+    return 1;
+    temp = xm_pow (x, y / 2);
+    if ((y % 2) == 0) {
+        return temp * temp;
+    } else {
+        if (y > 0)
+            return x * temp * temp;
+        else
+            return (temp * temp) / x;
     }
-
-
-    if( 0x3f000000U == absuy )
-        goto nan_sqrt;
-
-
-    int32_t	i = ((absux >> 23) & 0xff) - 127;
-    union
-    {
-        uint32_t	u;
-        float		f;
-    }m = { (absux & 0x007fffffU) | 0x3f800000U };
-
-
-    if( -127 == i )
-    {
-        m.f -= 1.0f;
-        i = ((m.u >> 23) & 0xff) - (127+126);
-        m.u = (m.u & 0x807fffffU) | 0x3f800000U;
-    }
-
-    double log2x = i;
-
-    if( m.f != 1.0f )
-    {
-        int index = (m.u >> (23-7-4)) & 0x7f0;		
-        const double *tablep = (void*) powf_log_table + index;
-        double r = (double) m.f;
-
-        r *= tablep[0];		
-        log2x += tablep[1]; 
-        r -= 1.0;			
-
-        double rr = r*r;
-        double small = -0.5 + 0.3333333333333333333333*r;
-        double large = -0.25 + 0.2*r;
-        double rrrr = rr * rr;
-        small *= rr;
-        small += r;
-        large *= rrrr;
-        r = small + large;
-        log2x += r * recip_ln2;
-    }
-
-    double ylog2x = y * log2x;
-
-    if( ylog2x >= 128.0 )
-        return (float) (0x1.0p128 * ylog2x);		
-
-
-    if( ylog2x <= -150.0 )
-        return (float) ( ylog2x * (double)(2.225073858507201383e-308) );		
-
-
-    int exp = (int) ylog2x;
-    double f = ylog2x - exp;		
-
-    static const double c0 =  1.0 + 0.278626872016317130037181614004e-10;
-    static const double c1 = .693147176943623740308984004029708;
-    static const double c2 = .240226505817268621584559118975830;
-    static const double c3 = 0.555041568519883074165425891257052e-1;
-    static const double c4overc8 = 0.961813690023115610862381719985771e-2 / 0.134107709538786543922336536865157e-5;
-    static const double c5overc8 = 0.133318252930790403741964203236548e-2 / 0.134107709538786543922336536865157e-5;
-    static const double c6overc8 = 0.154016177542147239746127455226575e-3 / 0.134107709538786543922336536865157e-5;
-    static const double c7overc8 = 0.154832722143258821052933667742417e-4 / 0.134107709538786543922336536865157e-5;
-    static const double c8 = 0.134107709538786543922336536865157e-5;
-
-    double z = 1.0;
-    if( 0.0 != f )
-    { 
-        double ff = f * f;
-        double s7 = c7overc8 * f;			double s3 = c3 * f;
-        double s5 = c5overc8 * f;			double s1 = c1 * f;
-        double ffff = ff * ff;
-        s7 += c6overc8;						s3 += c2;
-        s5 += c4overc8;						s1 += c0;
-        s7 *= ff;							s3 *= ff;
-        s5 += ffff;
-        double c8ffff = ffff * c8;
-        s7 += s5;							s3 += s1;
-        s7 *= c8ffff;
-        z = s3 + s7;
-    }
-
-
-    union{ uint64_t u; double d; } two_exp = { ((uint64_t) exp + 1023) << 52 };
-
-    return (float) (z * two_exp.d );
-
-
-nan_sqrt:
-    if( x < 0.0f || y > 0.0f )
-        return xm_sqrt(x);
-
-    return (float) xm_sqrt( 1.0 / (double) x );
-
-ipowf:
-    y = y > -0x1.fffffep30f ? y : -0x1.fffffep30f;
-    y = y <  0x1.fffffep30f ? y :  0x1.fffffep30f;
-    i = (int) y;
-    double dx = (double) x;
-    double r = 1.0;
-
-    if( i < 0 )
-    {
-        i = -i;
-        dx = 1.0 / dx;
-    }
-
-    if( i & 1 )
-        r = dx;
-
-    do
-    {
-        i >>= 1;
-        if( 0 == i )
-            break;
-        dx *= dx;
-        if( i & 1 )
-            r *= dx;
-    }while(1);
-
-    return (float) r;
 }
 
 float xm_fmod(float a, float b)
@@ -17424,5 +17164,10 @@ float xm_acos(float x) {
 float xm_fabs(float f){
     return f < 0 ? -f : f;
 }
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif /* H_ONLY */
 #undef H_ONLY /* Para evitar a propagação da Flag ela deve ser apagada */

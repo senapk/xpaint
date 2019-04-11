@@ -7,6 +7,10 @@
 #include <stdio.h>
 #include <inttypes.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define X_SWAP(x, y, T) do { T X_SWAP = x; x = y; y = X_SWAP; } while (0)
 
 void xd_line(int x0, int y0, int x1, int y1){
@@ -380,3 +384,9 @@ void xd_filled_arc(float centerx, float centery, int radius, int thickness, int 
         }
     }
 }
+
+
+#ifdef __cplusplus
+}
+#endif
+

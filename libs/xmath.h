@@ -1,6 +1,10 @@
 #ifndef XMATH_H /* XDDDX */
 #define XMATH_H /* XDDDX */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*
 ###############################################
 ############ FUNÇÕES MATEMATICAS ##############
@@ -22,6 +26,7 @@ float xm_sin(float d);
 float xm_cos(float d);
 float xm_acos(float x);
 float xm_fabs(float f);
+/* generates a number [min, max] */
 int   xm_rand(int min, int max);
 
 /*
@@ -34,4 +39,12 @@ int   xm_rand(int min, int max);
 ###################################################
 */
 
+#ifdef __cplusplus
+}
+#endif
+
+
+
 #endif /* XMATH_H XDDDX */
+
+

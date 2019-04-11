@@ -1,6 +1,10 @@
 #include "xy.h" /* XDDDX */
 #include "xmath.h" /* XDDDX */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 XY make_xy(float x, float y){
     XY v = {x, y};
     return v;
@@ -38,3 +42,9 @@ XY xy_normalize(XY v){
 XY xy_ortho(XY v){
     return make_xy(v.y, -v.x);
 }
+
+#ifdef __cplusplus
+}
+#endif
+
+

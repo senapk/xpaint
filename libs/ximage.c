@@ -9,6 +9,10 @@
 #include "xttf.h" /* XDDDX */
 #include "xfont.h" /* XDDDX */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*
 XColor BLACK_B=  {0  , 43 , 54 };
 XColor GREEN_B   = {88 , 110, 117};
@@ -93,7 +97,7 @@ void __x_bitmap_destroy(XBitmap *bitmap){
 
 void x_open(unsigned int width, unsigned int height){
     if(__x_initialized){
-        puts("bitmap ja inicializado");
+        fprintf(stderr, "fail: bitmat already initialized\n");
         return;
     }
     __x_initialized = 1;
@@ -103,7 +107,7 @@ void x_open(unsigned int width, unsigned int height){
     /* inicializando a cor de desenho e escrita */
     xs_color(make_xcolor(200, 200, 200));
 
-    __font_default = malloc(sizeof(XFont));
+    __font_default = (XFont*) malloc(sizeof(XFont));
     __font_default->buffer = font_buffer_profont;
     stbtt_InitFont(&__font_default->info, __font_default->buffer, 0);
 
@@ -193,13 +197,13 @@ uchar * __x_buffer_create(const char *filename){
     uchar * font_buffer;
     FILE* font_file = fopen(filename, "rb");
     if(font_file == NULL){
-        puts("arquivo não encontrado");
+        fprintf(stderr, "fail: file not found\n");
         exit(1);
     }
     fseek(font_file, 0, SEEK_END);
     size = ftell(font_file); /* how long is the file ? */
     fseek(font_file, 0, SEEK_SET); /* reset */
-    font_buffer = malloc(size);
+    font_buffer = (uchar *) malloc(size);
     fread(font_buffer, size, 1, font_file);
     fclose(font_file);
     return font_buffer;
@@ -214,11 +218,11 @@ void xs_font(const char* filename){
             __font = __font_default;
         }
     }else{
-        XFont * font = malloc(sizeof(XFont));
+        XFont * font = (XFont*) malloc(sizeof(XFont));
         font->buffer = __x_buffer_create(filename);
         unsigned error = stbtt_InitFont(&font->info, font->buffer, 0);
         if(error == 0){
-            printf("Erro no carregamento da fonte\n");
+            fprintf(stderr, "fail: font load failure\n");
             free(font->buffer);
             free(font);
         }else{
@@ -267,7 +271,7 @@ int x_write(int x, int y, const char * format, ...){
             _x = 10;
         }
 
-        if(y + __font_size > __bitmap->height){
+        if((unsigned) y + __font_size > __bitmap->height){
             return _x;
         }
 
@@ -294,7 +298,7 @@ int x_write(int x, int y, const char * format, ...){
 }
 
 void x_save(const char *filename){
-    char * dest = malloc(strlen(filename + 10));
+    char * dest = (char*) malloc(strlen(filename + 10));
     strcpy(dest, filename);
     strcat(dest, ".png");
     unsigned error = lodepng_encode_file(dest, __bitmap->image, __bitmap->width, __bitmap->height, LCT_RGB, 8);
@@ -310,7 +314,7 @@ void xs_log(const char *directory){
 
 /*salva o a imagem no diretorio de log */
 void __x_log(int index){
-    char * name = malloc((strlen(__x_log_directory) + 10) * sizeof(char));
+    char * name = (char *) malloc((strlen(__x_log_directory) + 10) * sizeof(char));
     sprintf(name, "%s%05d", __x_log_directory, index);
 
     x_save(name);
@@ -369,12 +373,18 @@ XColor xg_palette(char c){
 
 int xg_height(){
     if(__bitmap == NULL)
-        puts("voce esqueceu o x_init();");
+        fprintf(stderr, "fail: x_open(weight, width) missing\n");
     return __bitmap->height;
 }
 
 int xg_width(){
     if(__bitmap == NULL)
-        puts("voce esqueceu o x_init();");
+        fprintf(stderr, "fail: x_open(weight, width) missing\n");
     return __bitmap->width;
 }
+
+#ifdef __cplusplus
+}
+#endif
+
+

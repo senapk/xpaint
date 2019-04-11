@@ -1,6 +1,9 @@
 #ifndef XDRAW_H /* XDDDX */
 #define XDRAW_H /* XDDDX */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* ############################################### */
 /* ############ FUNÇÕES DE DESENHO DE LINHAS ##### */
@@ -50,4 +53,12 @@ void xd_filled_circle(int centerx, int centery, int radius);
 /* desenha uma elipse dentro do rect de ponto superior esquerdo(x0, y0) */
 /* e ponto inferior direito (x1, y1) */
 void xd_filled_ellipse(int x0, int y0, int x1, int y1);
+
+
+#ifdef __cplusplus
+}
+#endif
+
+
 #endif /* XDRAW_H XDDDX */
+

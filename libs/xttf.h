@@ -6,6 +6,8 @@
 
 #include "xmath.h" /* XDDDX */
 
+
+
 #define STBTT_ifloor(x)   ((int) xm_floor(x))
 #define STBTT_iceil(x)    (xm_ceil(x))
 #define STBTT_sqrt(x)      xm_sqrt(x)
@@ -3197,7 +3199,7 @@ static void stbtt__rasterize_sorted_edges(stbtt__bitmap *result, stbtt__edge *e,
 #ifndef STBTT_RGB_MODE
             result->pixels[j*result->stride + i] = (unsigned char) m;
 #else
-            const unsigned char * color = userdata;
+            const unsigned char * color = (const unsigned char*) userdata;
             unsigned char * pos = result->pixels + 3 * j * result->stride + 3 * i;
             pos[0] = pos[0] + (color[0] - pos[0]) * (m/255.f);
             pos[1] = pos[1] + (color[1] - pos[1]) * (m/255.f);

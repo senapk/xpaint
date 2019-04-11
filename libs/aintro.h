@@ -10,8 +10,11 @@ Principais fontes:
 
 Licença: GPLv3
 
-Versão: 0.4
+Versão: 0.5
 
+
+- 0.5 11/05/2019
+    - adaptação feita para aceitar includes de cpp.
 - 0.4 26/04/2019
     - adicionas cores de background
     - alterada a função de xs_log(diretorio)

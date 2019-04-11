@@ -1,6 +1,10 @@
 #ifndef VEC2D_H /* XDDDX */
 #define VEC2D_H /* XDDDX */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*
 ###############################################
 ####### ALGEBRA DE VETORES BIDIMENSIONAIS #####
@@ -36,5 +40,9 @@ XY xy_normalize(XY v);
 
 /* retorna o vetor orthogonal */
 XY xy_ortho(XY v);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* VEC2D_H XDDDX */

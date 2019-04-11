@@ -1,6 +1,10 @@
 #ifndef XIMAGE_H /* XDDDX */
 #define XIMAGE_H /* XDDDX */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*
 ###############################################
 ######## DEFINES e TIPOS BASICOS ##############
@@ -136,4 +140,11 @@ XColor xg_pixel(int x, int y);
    outros podem ser definidos ou redefinidor com xs_palette
 */
 XColor xg_palette(char c);
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif /* IMAGE_H XDDDX */
+
+
