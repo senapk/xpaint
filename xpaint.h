@@ -12,7 +12,7 @@ Principais fontes:
 
 Licença: GPLv3
 
-Versão: 0.4
+Versão: 0.5
 
 
 - 0.5 11/05/2019
@@ -270,15 +270,6 @@ XY xy_normalize(XY v);
 
 /* retorna o vetor orthogonal */
 XY xy_ortho(XY v);
-
-#ifdef __cplusplus
-}
-#endif
-
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /*
 ###############################################
@@ -16505,6 +16496,8 @@ void x_save(const char *filename){
 }
 
 void xs_log(const char *directory){
+    if(directory == NULL)
+        directory = "";
     strcpy(__x_log_directory, directory);
 }
 
@@ -16523,6 +16516,11 @@ void xs_jump(int value){
 }
 
 int x_step(const char *filename){
+    static int init = 1;
+    if(init == 1){
+        init = 0;
+        printf("press{enter/jump value/0 to skip}\n");
+    }
     static int rounds = 0; /* each save reset the round */
     static int state = 0; /* each save generate a new state */
     if(strcmp(__x_log_directory, "") != 0){
@@ -16533,7 +16531,7 @@ int x_step(const char *filename){
     state += 1;
     if((__x_step_jump != 0) && (rounds >= __x_step_jump)){
         x_save(filename);
-        printf("(state: %i, jump: %i) press{enter/jump value/0 to skip}:", state, __x_step_jump);
+        printf("(state: %i, jump: %i): ", state, __x_step_jump);
         fgets(line, sizeof(line), stdin);
         char * ptr = line;
         int value = (int) strtol(line, &ptr, 10);
@@ -16975,6 +16973,10 @@ void xd_filled_arc(float centerx, float centery, int radius, int thickness, int 
 #endif
 
 
+
+#include <stdint.h>
+#include <stdlib.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -17016,20 +17018,6 @@ XY xy_normalize(XY v){
 XY xy_ortho(XY v){
     return make_xy(v.y, -v.x);
 }
-
-#ifdef __cplusplus
-}
-#endif
-
-
-
-
-#include <stdint.h>
-#include <stdlib.h>
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 int   xm_rand(int min, int max){
     return rand() % (max + 1 - min) + min;
