@@ -1,3 +1,4 @@
+#define XPAINT_FULL
 #include "xpaint.h"
 
 void fractal(float x, float y, float lado, float ang){

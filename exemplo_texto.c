@@ -1,3 +1,4 @@
+#define XPAINT_FULL
 #include "xpaint.h"
 
 int main() {
