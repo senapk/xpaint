@@ -2,43 +2,42 @@
 #include "xpaint.h"
 
 int main() {
-    x_open(600, 600);
-    xs_font_size(70);
+    x_open(600, 600, "figura_cores");
+    x_set_font_size(70);
 
-    xs_color(BLACK);
-    xd_filled_rect(20, 60, 580, 470);
-    xs_color(WHITE);
-    xd_filled_rect(190, 70, 390, 410);
+    x_set_color(X_COLOR_BLACK);
+    x_fill_rect(20, 60, 560, 410);
+    x_set_color(X_COLOR_WHITE);
+    x_fill_rect(190, 70, 200, 340);
 
     int x = 300;
-    xs_color(RED);    x_write(20, 70, "    RED");
-    xs_color(GREEN);  x_write(x, 70,  "GREEN");
-    xs_color(BLUE);   x_write(20, 140,"   BLUE");
-    xs_color(YELLOW); x_write(x, 140, "YELLOW");
-    xs_color(CYAN);   x_write(20, 210,"   CYAN");
-    xs_color(MAGENTA);x_write(x, 210, "MAGUENTA");
-    xs_color(VIOLET); x_write(20, 280," VIOLET");
-    xs_color(ORANGE); x_write(x, 280, "ORANGE");
-    xs_color(BLACK);  x_write(x - 100, 350, "BLACK");
-    xs_color(WHITE);  x_write(x - 100, 410, "WHITE");
+    x_set_color(X_COLOR_RED);    x_write(20, 70, "    RED");
+    x_set_color(X_COLOR_GREEN);  x_write(x, 70,  "GREEN");
+    x_set_color(X_COLOR_BLUE);   x_write(20, 140,"   BLUE");
+    x_set_color(X_COLOR_YELLOW); x_write(x, 140, "YELLOW");
+    x_set_color(X_COLOR_CYAN);   x_write(20, 210,"   CYAN");
+    x_set_color(X_COLOR_MAGENTA);x_write(x, 210, "MAGUENTA");
+    x_set_color(X_COLOR_VIOLET); x_write(20, 280," VIOLET");
+    x_set_color(X_COLOR_ORANGE); x_write(x, 280, "ORANGE");
+    x_set_color(X_COLOR_BLACK);  x_write(x - 100, 350, "BLACK");
+    x_set_color(X_COLOR_WHITE);  x_write(x - 100, 410, "WHITE");
     {
         char * colors = "rgbymcwkvo";
         x = 50;
-        xs_font_size(100);
+        x_set_font_size(100);
         int i;
         for(i = 0; i < 10; i++){
-            xs_color(xg_palette(colors[i]));
+            x_set_pcolor(colors[i]);
             x = x_write(x, 500, "%c", colors[i]);
         }
     }
 
-
-    xs_font_size(25);
-    xs_color(WHITE);
+    x_set_font_size(25);
+    x_set_color(X_COLOR_WHITE);
     x_write(40, 20, "cores.png : Cores do copiadas do solarized.");
     x_write(40, 480, "Na paleta, cada letra corresponde a uma cor.");
 
-    x_save("figura_cores");
+    x_save();
 
     x_close();
     return 0;

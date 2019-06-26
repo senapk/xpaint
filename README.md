@@ -34,9 +34,9 @@ int main(){
     /* utilizando o mesmo formato do printf */
     x_write(50, 30, "Pintarei um circulo vermelho em %d %d", largura/2, altura/2);
     /* muda a cor do pincel para vermelho */
-    xs_color(RED);
+    x_set_color(RED);
     /* desenha um circulo preenchido com centro no meio da tela e raio 200 */
-    xd_filled_circle(largura/2, altura/2, 200);
+    x_fill_circle(largura/2, altura/2, 200);
     /* salva no arquivo exemplo.png */
     x_save("figura_base");
     /* libera os recursos alocados */
@@ -174,16 +174,16 @@ void x_clear(XColor color);
 */
 
 /* muda a cor do pincel para todas as funcoes de desenho */
-void xs_color(XColor color);
+void x_set_color(XColor color);
 
 /* define uma cor na palheta de caracteres */
 void xs_palette(char c, XColor color);
 
 /* mudar o tamanho da fonte em pixels */
-void xs_font_size(int size);
+void x_set_font_size(int size);
 
 /* muda a font passando o path da nova fonte */
-void xs_font(const char* filename);
+void x_set_font(const char* filename);
 
 /*
 ###############################################
@@ -216,21 +216,21 @@ XColor xg_palette(char c);
 /* Desenha as seguintes formas sem preenchimento */
 
 /* desenha uma linha com espessura de 1 pixel entre os pontos (x0, y0) e (x1, y1) */
-void xd_line(int x0, int y0, int x1, int y1);
+void x_draw_line(int x0, int y0, int x1, int y1);
 
 /* desenha uma linha com espessura de thickness pixels entre os pontos (x0, y0) e (x1, y1) */
-void xd_thick_line(float x0, float y0, float x1, float y1, int thickness);
+void x_fill_line(float x0, float y0, float x1, float y1, int thickness);
 
 /* desenha um circulo com centro (centerx, centerx) e raio radius */
-void xd_circle(int centerx, int centery, int radius);
+void x_draw_circle(int centerx, int centery, int radius);
 
 /* desenha uma elipse dentro do rect de ponto superior esquerdo(x0, y0) */
 /* e ponto inferior direito (x1, y1) */
-void xd_ellipse(int x0, int y0, int x1, int y1);
+void x_draw_ellipse(int x0, int y0, int x1, int y1);
 
 /* desenha uma curva de bezier entre os pontos (x0, y0) e (x2, y2) */
 /* a curvatura eh dada pelo ponto (x1, y1) */
-void xd_bezier(int x0, int y0, int x1, int y1, int x2, int y2);
+void x_draw_bezier(int x0, int y0, int x1, int y1, int x2, int y2);
 
 
 /* ############################################### */
@@ -242,20 +242,20 @@ void xd_bezier(int x0, int y0, int x1, int y1, int x2, int y2);
 /* o angulo de inicio deve ser sempre menor que o angulo de fim */
 /* o desenho é feito no sentido anti horario */
 /* o angulo pode superar 360 */
-void xd_filled_arc(float centerx, float centery, int radius, int thickness, int degrees_begin, int degrees_end);
+void x_fill_arc(float centerx, float centery, int radius, int thickness, int degrees_begin, int degrees_end);
 
 /* desenha um triangulo dados os 3 vertices */
-void xd_filled_triangle(float v1x, float v1y, float v2x, float v2y, float v3x, float v3y);
+void x_fill_triangle(float v1x, float v1y, float v2x, float v2y, float v3x, float v3y);
 
 /* desenha um retangulo dados os cantos superior esquerdo (x0, y0) e inferior direito (x1, y1) */
-void xd_filled_rect(int x0, int y0, int x1, int y1);
+void x_fill_rect(int x0, int y0, int x1, int y1);
 
 /* desenha um circulo dado centro e raio */
-void xd_filled_circle(int centerx, int centery, int radius);
+void x_fill_circle(int centerx, int centery, int radius);
 
 /* desenha uma elipse dentro do rect de ponto superior esquerdo(x0, y0) */
 /* e ponto inferior direito (x1, y1) */
-void xd_filled_ellipse(int x0, int y0, int x1, int y1);
+void x_fill_ellipse(int x0, int y0, int x1, int y1);
 
 /*
 ###############################################

@@ -10,7 +10,7 @@ void fractal(float x, float y, float ang, float lado){
     
     float fx = x + lado * xm_cos(ang);
     float fy = y - lado * xm_sin(ang);
-    xd_line(x, y, fx, fy); /* desenha a linha */
+    x_draw_line(x, y, fx, fy); /* desenha a linha */
     
     fractal(fx, fy, ang - delta, lado * dec);
     fractal(fx, fy, ang        , lado * dec);
@@ -18,10 +18,10 @@ void fractal(float x, float y, float ang, float lado){
 }
 
 int main(){
-    x_open(800, 500);
+    x_open(800, 500, "figura_arvore");
     srand(0); /* comente para ter sempre uma arvore diferente */
     fractal(400, 450, 90, 100);
-    x_save("figura_arvore");
+    x_save();
     x_close();
     return 0;
 }
