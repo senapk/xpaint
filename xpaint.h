@@ -27,6 +27,17 @@ Versão: 0.6
 
 */
 
+
+
+/*
+Merging all .png into a single mp4 movie.
+
+ffmpeg -framerate 5 -pattern_type glob -i '*.png' -c:v libx264 -profile:v high -crf 20 -pix_fmt yuv420p video.mp4
+*/
+
+
+
+
 /*
 ###############################################
 ######## DEFINES e TIPOS BASICOS ##############
@@ -48,6 +59,9 @@ typedef struct{
     uchar g;
     uchar b;
 } X_Color;
+
+/* Faz o SWAP entre dois tipos */
+#define X_SWAP(x, y, T) do { T X_SWAP = x; x = y; y = X_SWAP; } while (0)
 
 /* cria e retorna uma struct X_Color passando rgb */
 X_Color x_make_color(uchar r, uchar g, uchar b);
@@ -110,8 +124,11 @@ void x_set_viewer(const char * viewer);
 */
 void x_log();
 
+/* set the step for x_control */
+void x_set_step(int value);
 
-/*  Interage com o usuario para saltar saves */
+/* Interage com o usuario para saltar saves */
+/* Returns true if save is desired */
 int x_control();
 
 /*
@@ -307,6 +324,39 @@ void x_grid_number(int l, int c, int value);
 void x_grid_text(int l, int c, const char *text);
 
 
+/*
+###############################################
+####### FUNÇÕES PARA VISUALIZAR VETORES #######
+###############################################
+*/
+
+
+/**
+ * @brief initialize the module to print bars for show sort
+ * 
+ * @param size the size of the array
+ * @param max the max value of the array
+ */
+void x_bar_init(int size, int max);
+
+/**
+ * @brief print a single bar
+ * 
+ * @param i the index
+ * @param value the value of the bar size
+ */
+void x_bar_one(int i, int value);
+
+/**
+ * @brief show the entire array
+ * 
+ * @param vet the vector with the values
+ * @param size of the vector
+ * @param colors the array of color to mark unique elements or NULL
+ * @param indices the array with the unique indices to be marked with the colors
+ */
+void x_bar_all(int * vet, int size, const char * colors, int * indices);
+
 #ifdef __cplusplus
 }
 #endif
@@ -422,9 +472,10 @@ typedef struct{
     uchar    color[3];
     char     filename[100];
     char     viewer[100];
+    int      step;
 } X_Board;
 
-static X_Board __board = {false};
+static X_Board __board;
 
 X_Bitmap * __x_bitmap_create(unsigned width, unsigned height, const uchar *color);
 void      __x_bitmap_destroy(X_Bitmap *bitmap);
@@ -501,6 +552,7 @@ void x_open(unsigned int width, unsigned int height, const char * filename){
     __board.palette['#'] = x_make_color(25, 25, 112); /*midnight blue*/
     __board.palette['x'] = x_make_color(255, 99, 71); /*tomato*/
 
+    __board.step = 1;
     srand(time(NULL));
 }
 
@@ -691,31 +743,34 @@ void x_log(){
     char * name = (char *) malloc((strlen(__board.filename) + 10) * sizeof(char));
     sprintf(name, "%s%05d", __board.filename, index);
     index += 1;
-
+    printf("saving: %s.png\n", name);
     __x_save(name);
     free(name);
 }
 
+void x_set_step(int value){
+    __board.step = value;
+}
 
 int x_control(){
     static int init = 1;
-    if(init == 1){
-        init = 0;
-        printf("press{enter/jump value/0 to skip}\n");
-    }
     static int rounds = 0;
     static int state = 0;
-    static int jump = 1;
+    if(init == 1){
+        init = 0;
+        printf("press{enter/step value/0 to skip}\n");
+    }
+
     rounds += 1;
     state += 1;
-    if((jump != 0) && (rounds >= jump)){
-        printf("(state: %i, jump: %i): ", state, jump);
+    if((__board.step != 0) && (rounds >= __board.step)){
+        printf("(state: %i, step: %i): ", state, __board.step);
         char line[200];
         fgets(line, sizeof(line), stdin);
         char * ptr = line;
         int value = (int) strtol(line, &ptr, 10);
         if(ptr != line)
-            jump = value;
+            __board.step = value;
         rounds = 0;
         return true;
     }
@@ -763,7 +818,7 @@ int x_get_width(){
 #include <inttypes.h>
 
 
-#define X_SWAP(x, y, T) do { T X_SWAP = x; x = y; y = X_SWAP; } while (0)
+
 
 void x_draw_line(int x0, int y0, int x1, int y1){
     /* Bresenham's Line Algorithm */
@@ -1204,7 +1259,60 @@ void x_grid_number(int l, int c, int value){
     x_grid_text(l, c, data);
 }
 
-/* X_MATH */
+/*########################*/
+/*###### X_BAR MODULE ####*/
+/*########################*/
+
+
+static float __X_BAR_WIDTH = 20; /* bar width */
+static float __X_BAR_YFACTOR = 1; /* multiplicative factor of bar height  */
+static int __X_BAR_SIZE = 0;
+static int __X_BAR_MAX = 0;
+
+void x_bar_init(int size, int max){
+    __X_BAR_SIZE = size;
+    __X_BAR_MAX = max;
+    __X_BAR_WIDTH = x_get_width() / (size + 2);
+    __X_BAR_YFACTOR = (x_get_height() - 4.0 * __X_BAR_WIDTH);
+    __X_BAR_YFACTOR = __X_BAR_YFACTOR < 0 ? -__X_BAR_YFACTOR : __X_BAR_YFACTOR;
+    __X_BAR_YFACTOR /= max;
+    if(__X_BAR_YFACTOR < 0.2)
+        __X_BAR_YFACTOR = 0.2;
+}
+
+void x_bar_one(int i, int value){
+    if((i < 0)||(i >= __X_BAR_SIZE))
+        return;
+    int x = __X_BAR_WIDTH * (i + 1);
+    int ybase = x_get_height() - __X_BAR_WIDTH;
+    int j;
+    for(j = 0; j < ((int) __X_BAR_WIDTH - 2) ; j++)
+        x_draw_line(x + j, ybase, x + j, ybase - __X_BAR_YFACTOR * value);
+}
+
+void x_bar_all(int * vet, int size, const char * colors, int * indices){
+    x_set_pcolor('k');
+    x_clear();
+    int i = 0;
+    x_set_color(X_COLOR_WHITE);
+    for(i = 0; i < size; i++)
+        x_bar_one(i, vet[i]);
+    if(colors != NULL && (strcmp(colors, "") != 0)){
+        int qtd = strlen(colors);
+        for(i = 0; i < qtd; i++){
+            x_set_pcolor(colors[i]);
+            x_bar_one(indices[i], vet[indices[i]]);
+        }
+    }
+    static int atual = 0;
+    x_set_pcolor('w'); /* desenhando estado */
+    x_write(0, 0, "%d", atual++);
+}
+
+
+/*########################*/
+/*###### X_MATH MODULE ####*/
+/*########################*/
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -17260,5 +17368,5 @@ unsigned char __x_font_buffer_profont[46628] = {
   0xd5, 0x15, 0x03, 0xf7
   };
 
-#endif /* XFULL */
+#endif
 #undef XPAINT_FULL
