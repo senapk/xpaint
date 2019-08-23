@@ -1,9 +1,10 @@
 #define XPAINT_FULL
-#include "xpaint.h"
+#include "../xpaint.h"
 #include <vector>
 #include <iostream>
 #include <list>
 #include <sstream>
+#include <fstream>
 using namespace std;
 
 struct Item{
@@ -106,14 +107,15 @@ list<Pos> find_path(matriz<Item> mat, Pos begin, Pos end){
 
 int main(){
     int nl, nc;
-    cin >> nl >> nc;
+    ifstream mapa("floodfill_map.txt");
+    mapa >> nl >> nc;
     matriz<Item> mat(nl, nc, Item(false, false, -1));
     int l, c;
     Pos begin{0, 0}, end{0, 0};
     for(l = 0; l < nl; l++){
         for(c = 0; c < nc; c++){
             char value;
-            cin >> value;
+            mapa >> value;
             Pos p{l, c};
             mat.get(p).wall = (value == '#');
             mat.get(p).visited = false;
@@ -123,14 +125,14 @@ int main(){
         }
     }
     auto path = find_path(mat, begin, end);
-    char resp[nl][nc];
+/*     char resp[nl][nc];
     for(int l = 0; l < nl; l++){
         for(int c = 0; c < nc; c++){
             resp[l][c] = mat.get(Pos{l, c}).wall ? '#':' ';
         }
-    }
+    } */
 //    int i = 0;
-    for(auto p : path)
+/*     for(auto p : path)
         resp[p.l][p.c] = 'o';//(i++ % 10) + '0';
     
     for(int l = 0; l < nl; l++){
@@ -141,15 +143,13 @@ int main(){
                 cout << resp[l][c];
         }
         cout << '\n';
-    }
-    /*
-    x_open(1002, 402, "floodfill");
-    x_set_viewer("eog");
+    } */
+    
+    x_open(1002, 402, "figura_floodfill");
     x_grid_init(1002/nc, 1);
     xgrid_matrix(mat, path);
     x_save();
     x_close();
-    */
-   
+    
     return 0;
 }

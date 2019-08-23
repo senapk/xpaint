@@ -1,0 +1,16 @@
+- 0.7 35/08/2019
+    - [x] início da tradução de nomes e comentários para o ingles
+    - [x] inserção do x_bar
+        - [x] exemplo_insertion
+        - [x] exemplo_movie
+    - [x] exemplo_grid
+    - [x] exemplo_pathfinding
+- 0.6 26/06/2019
+    - [x] grande refatoramento de nomes e funções
+    - [x] adição de x_grid
+    - [x] correção do x_fill_arc
+- 0.5 11/05/2019
+    - [x] adaptação feita para aceitar includes de cpp.
+- 0.4 26/04/2019
+    - [x] adicionas cores de background
+    - [x] alterada a função de x_set_log(diretorio)

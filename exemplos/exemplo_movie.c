@@ -1,13 +1,11 @@
 #include <stdio.h>
 #define XPAINT_FULL
-#include "xpaint.h"
-#include "xvet.h"
+#include "../xpaint.h"
 
 #define vet_show(vet, size, colors, ...) do{\
     int __indices[] = {__VA_ARGS__};\
     x_bar_all(vet, size, colors, __indices);\
-    if(x_control())\
-        x_save();\
+    x_log();\
 }while(0);
 
 void insertion(int * vet, int size){
@@ -43,7 +41,6 @@ int main() {
     
     int size = 30, max = 900;
     x_bar_init(size, max);
-    x_set_viewer("eog");
     srand(2); 
 
     int vet[size];

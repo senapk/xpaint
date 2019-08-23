@@ -1,3 +1,8 @@
+/*
+You must use the following define in your code before #include the library
+#define XPAINT_FULL
+*/
+
 #ifndef XPAINT_H
 #define XPAINT_H
 
@@ -13,30 +18,26 @@ Principais fontes:
 
 Licença: GPLv3
 
-Versão: 0.6
-
-- 0.6 26/06/2019
-    - grande refatoramento de nomes e funções
-    - adição de x_grid
-    - correção do x_fill_arc
-- 0.5 11/05/2019
-    - adaptação feita para aceitar includes de cpp.
-- 0.4 26/04/2019
-    - adicionas cores de background
-    - alterada a função de x_set_log(diretorio)
+Versão: 0.7
 
 */
 
+/* Exemplo de uso */
 
-
-/*
-Merging all .png into a single mp4 movie.
-
-ffmpeg -framerate 5 -pattern_type glob -i '*.png' -c:v libx264 -profile:v high -crf 20 -pix_fmt yuv420p video.mp4
-*/
-
-
-
+#if 0
+#define XPAINT_FULL
+#include "xpaint.h"
+int main(){
+    int largura = 600, altura = 500;
+    x_open(largura, altura, "figura_base"); 
+    x_write(50, 30, "Pintarei um circulo vermelho em %d %d", largura/2, altura/2);
+    x_set_color(X_COLOR_RED);
+    x_fill_circle(largura/2, altura/2, 200);
+    x_save();
+    x_close();
+    return 0;
+}
+#endif
 
 /*
 ###############################################
@@ -127,8 +128,8 @@ void x_log();
 /* set the step for x_control */
 void x_set_step(int value);
 
-/* Interage com o usuario para saltar saves */
-/* Returns true if save is desired */
+/* Interact with user to perform saves */
+/* Returns true if save is should be done */
 int x_control();
 
 /*
@@ -547,10 +548,12 @@ void x_open(unsigned int width, unsigned int height, const char * filename){
 
     /*https://htmlcolorcodes.com/color-names/*/
 
+#if 0
     __board.palette[' '] = x_make_color(230, 230, 250); /*khaki*/
     __board.palette['.'] = x_make_color(240, 230, 140); /*lavender*/
     __board.palette['#'] = x_make_color(25, 25, 112); /*midnight blue*/
     __board.palette['x'] = x_make_color(255, 99, 71); /*tomato*/
+#endif
 
     __board.step = 1;
     srand(time(NULL));

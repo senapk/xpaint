@@ -1,5 +1,5 @@
 #define XPAINT_FULL
-#include "xpaint.h"
+#include "../xpaint.h"
 
 int main(){
     x_open(1000, 600, "figura_draw");
