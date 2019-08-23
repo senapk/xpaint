@@ -545,7 +545,7 @@ void x_open(unsigned int width, unsigned int height, const char * filename){
     __board.palette['w'] = X_COLOR_WHITE;
     __board.palette['o'] = X_COLOR_ORANGE;
     __board.palette['v'] = X_COLOR_VIOLET;
-
+    strcpy(__board.viewer, "");
     /*https://htmlcolorcodes.com/color-names/*/
 
 #if 0
@@ -726,8 +726,10 @@ void x_save(){
     if(init){
         init = 0;
         char cmd[250];
-        if((__board.viewer != NULL) && (strcmp(__board.viewer, "") != 0)){
+        if(strcmp(__board.viewer, "") != 0){
+
             sprintf(cmd, "%s %s.png&",__board.viewer, __board.filename);
+            puts(cmd);
             system(cmd);
         }
     }
