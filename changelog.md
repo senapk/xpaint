@@ -1,4 +1,11 @@
-- 0.7 35/08/2019
+- 0.8 [ ] split in many files
+    - [ ] detach write and save insepared files
+    - [ ] ver requisitos em cada módulo
+    - [ ] colocar módulos como opcionais
+    - [ ] moving current color from colors to base
+    - [x] consertando xmath
+    - [x] consertando xcolor
+- 0.7 23/08/2019
     - [x] início da tradução de nomes e comentários para o ingles
     - [x] inserção do x_bar
         - [x] exemplo_insertion

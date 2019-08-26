@@ -545,15 +545,7 @@ void x_open(unsigned int width, unsigned int height, const char * filename){
     __board.palette['w'] = X_COLOR_WHITE;
     __board.palette['o'] = X_COLOR_ORANGE;
     __board.palette['v'] = X_COLOR_VIOLET;
-    strcpy(__board.viewer, "");
     /*https://htmlcolorcodes.com/color-names/*/
-
-#if 0
-    __board.palette[' '] = x_make_color(230, 230, 250); /*khaki*/
-    __board.palette['.'] = x_make_color(240, 230, 140); /*lavender*/
-    __board.palette['#'] = x_make_color(25, 25, 112); /*midnight blue*/
-    __board.palette['x'] = x_make_color(255, 99, 71); /*tomato*/
-#endif
 
     __board.step = 1;
     srand(time(NULL));
