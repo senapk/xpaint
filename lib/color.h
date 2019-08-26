@@ -11,6 +11,8 @@
 /* apelido para um char sem sinal */
 typedef unsigned char uchar;
 
+#define X_BYTES_PER_PIXEL 3
+
 /* struct que representa uma cor RGB */
 typedef struct{
     uchar r;

@@ -53,6 +53,8 @@ int main(){
 /* apelido para um char sem sinal */
 typedef unsigned char uchar;
 
+#define X_BYTES_PER_PIXEL 3
+
 /* struct que representa uma cor RGB */
 typedef struct{
     uchar r;
@@ -11649,10 +11651,11 @@ static void stbtt__rasterize_sorted_edges(stbtt__bitmap *result, stbtt__edge *e,
             result->pixels[j*result->stride + i] = (unsigned char) m;
 #else
             const unsigned char * color = (const unsigned char*) userdata;
-            unsigned char * pos = result->pixels + 3 * j * result->stride + 3 * i;
-            pos[0] = pos[0] + (color[0] - pos[0]) * (m/255.f);
-            pos[1] = pos[1] + (color[1] - pos[1]) * (m/255.f);
-            pos[2] = pos[2] + (color[2] - pos[2]) * (m/255.f);
+            unsigned char * pos = result->pixels + X_BYTES_PER_PIXEL * j * result->stride + X_BYTES_PER_PIXEL * i;
+            for(int qbbp = 0; qbbp < X_BYTES_PER_PIXEL; qbbp++){
+               pos[qbbp] = pos[qbbp] + (color[qbbp] - pos[qbbp]) * (m/255.f);
+            }
+            
 #endif
          }
       }
@@ -16326,6 +16329,7 @@ void x_init_font();
 
 /* #define X_SAVE_PPM */
 
+
 #ifndef X_SAVE_PPM
 const char * __board_extension = ".png";
 #else
@@ -16333,11 +16337,11 @@ const char * __board_extension = ".ppm";
 #endif
 
 
-static uchar *   __board_bitmap  = NULL; /* 3 uchar per pixel */
+static uchar *   __board_bitmap  = NULL;
 static unsigned  __board_width  = 0;
 static unsigned  __board_height = 0;
 
-static uchar     __board_color[3];
+static uchar     __board_color[X_BYTES_PER_PIXEL];
 
 static bool      __board_is_open = false;
 static char      __board_filename[200] = "";
@@ -16348,7 +16352,7 @@ static int       __board_step          = 1;
 uchar * __x_get_pixel_pos(unsigned int x, unsigned int y);
 
 uchar * __x_get_pixel_pos(unsigned x, unsigned y){
-    return __board_bitmap + 3 * (__board_width * y + x);
+    return __board_bitmap + X_BYTES_PER_PIXEL * (__board_width * y + x);
 }
 
 
@@ -16363,7 +16367,7 @@ void x_open(unsigned int width, unsigned int height, const char * filename){
     __board_width = width;
     strcpy(__board_filename, filename);
 
-    __board_bitmap = (uchar*) calloc(sizeof(uchar), width * height * 3);
+    __board_bitmap = (uchar*) calloc(sizeof(uchar), width * height * X_BYTES_PER_PIXEL);
     __board_color[0] = 200;
     __board_color[1] = 200;
     __board_color[2] = 200;
@@ -16417,24 +16421,26 @@ void x_plot(int x, int y){
         fprintf(stderr, "fail: x_open(weight, width, filename) missing\n");
         exit(1);
     }
-    if((x >= 0) && (x < (int) __board_width) && (y >= 0) && (y <  (int) __board_height))
-        memcpy(__x_get_pixel_pos((unsigned) x, (unsigned) y), __board_color, 3 * sizeof(uchar));
+    if((x >= 0) && (x < (int) __board_width) && (y >= 0) && (y <  (int) __board_height)){
+        uchar * pos = __x_get_pixel_pos((unsigned) x, (unsigned) y);
+        memcpy(pos, __board_color, X_BYTES_PER_PIXEL * sizeof(uchar));
+    }
 }
 
 X_Color x_get_pixel(int x, int y){
     uchar * pixel = __x_get_pixel_pos((unsigned) x, (unsigned) y);
-    X_Color color = {pixel[0], pixel[1], pixel[2]};
+    X_Color color;
+    memcpy(&color, pixel, X_BYTES_PER_PIXEL * sizeof(uchar));
     return color;
 }
 
 void x_set_color(X_Color color){
-    __board_color[0] = color.r;
-    __board_color[1] = color.g;
-    __board_color[2] = color.b;
+    memcpy(__board_color, &color, X_BYTES_PER_PIXEL * sizeof(uchar));
 }
 
 X_Color x_get_color(void){
-    X_Color color = {__board_color[0], __board_color[1], __board_color[2]};
+    X_Color color;
+    memcpy(&color, __board_color, X_BYTES_PER_PIXEL * sizeof(uchar));
     return color;
 }
 
@@ -16442,7 +16448,7 @@ void x_clear(void){
     unsigned x, y;
     for(x = 0; x < __board_width; x++)
         for(y = 0; y < __board_height; y++)
-            memcpy(__x_get_pixel_pos((unsigned) x, (unsigned) y), __board_color, 3 * sizeof(uchar));
+            memcpy(__x_get_pixel_pos((unsigned) x, (unsigned) y), __board_color, X_BYTES_PER_PIXEL * sizeof(uchar));
 }
 
 void x_save(){
