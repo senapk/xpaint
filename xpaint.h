@@ -1,10 +1,13 @@
+#ifndef XPAINT_H
+#define XPAINT_H
+#ifdef __cplusplus
+extern "C" {
+#endif
 /*
 You must use the following define in your code before #include the library
 #define XPAINT_FULL
 */
 
-#ifndef XPAINT_H
-#define XPAINT_H
 
 /*
 Autor:
@@ -39,17 +42,13 @@ int main(){
 }
 #endif
 
+
+
 /*
 ###############################################
 ######## DEFINES e TIPOS BASICOS ##############
 ###############################################
 */
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#include <stdbool.h>
 
 /* apelido para um char sem sinal */
 typedef unsigned char uchar;
@@ -60,12 +59,6 @@ typedef struct{
     uchar g;
     uchar b;
 } X_Color;
-
-/* Faz o SWAP entre dois tipos */
-#define X_SWAP(x, y, T) do { T X_SWAP = x; x = y; y = X_SWAP; } while (0)
-
-/* cria e retorna uma struct X_Color passando rgb */
-X_Color x_make_color(uchar r, uchar g, uchar b);
 
 /* lista de cores default */
 extern X_Color X_COLOR_RED;
@@ -79,43 +72,74 @@ extern X_Color X_COLOR_VIOLET;
 extern X_Color X_COLOR_WHITE;
 extern X_Color X_COLOR_BLACK;
 
+/* cria e retorna uma struct X_Color passando rgb */
+X_Color x_make_color(uchar r, uchar g, uchar b);
+
+/*
+###############################################
+### FUNÇÕES SET: Cor, Fonte, Paleta de Cores ##
+###############################################
+*/
+
+/* define uma cor na palheta de caracteres */
+void x_set_palette(char c, X_Color color);
+
+/* retorna uma cor dado um char.
+   os char default da paleta são rgbmcybk
+   outros podem ser definidos ou redefinidor com x_set_palette
+*/
+X_Color x_get_palette(char c);
+
+/* inicializa as cores da paleta
+*/
+void __x_init_colors(void);
+
+
+
 /*
 ###############################################
 ######## ABRINDO, FECHANDO, SALVANDO ##########
 ###############################################
 */
 
-/**
- * @brief Open the board to draw
- * 
- * @param width
- * @param height 
- * @param filename path to save the png 
- */
+/* @brief Open the board to draw */
+/* @param filename path to save the png */
 void x_open(unsigned int width, unsigned int height, const char * filename);
 
-/**
- * @brief Clear all resources
- * 
- */
-void x_close();
+/* retorna altura, largura, filename and bitmap */
+int           x_get_height(void);
+int           x_get_width(void);
+const char *  x_get_filename(void);
+uchar * x_get_bitmap(void);
 
-/**
- * @brief Save the image using the path defined in x_open
- * 
- */
-void x_save();
+/* @brief Clear all resources */
+void x_close(void);
 
-/**
- * @brief Changes the the default filename to save the image
- * 
- * @param filename new path
- */
+/* @brief Changes the the default filename to save the image */
+/* @param filename path */
 void x_set_filename(const char * filename);
 
 /* define the path ou command to external tool to open the image in first save */
 /* Ex: "eog", "gthumb" */
 void x_set_viewer(const char * viewer);
+
+/* a funcao plot pinta o pixel usando a cor padrão */
+void x_plot(int x, int y);
+
+/* retorna a cor do pixel dessa posicao do bitmap */
+X_Color x_get_pixel(int x, int y);
+
+/* muda a cor do pincel para todas as funcoes de desenho */
+void x_set_color(X_Color color);
+
+/* return the current color for brush */
+X_Color x_get_color(void);
+
+/* limpa a tela inteira com a mesma cor */
+void x_clear(void);
+
+/* save the bitmap in filename.png */
+void x_save(void);
 
 /*
     saves the file with a numeric sufix at the end
@@ -132,70 +156,10 @@ void x_set_step(int value);
 /* Returns true if save is should be done */
 int x_control();
 
-/*
-###############################################
-#### PLOTANDO, ESCREVENDO, LIMPANDO ###########
-###############################################
-*/
-
-/* a funcao plot pinta o pixel usando a cor padrão */
-void x_plot(int x, int y);
-
-/* a funcao write escreve um texto text, na posição px, py.
-   retorna o x da posição após o último caractere escrito.
-*/
-int x_write(int x, int y, const char * format, ...);
-
-/* limpa a tela inteira com a mesma cor */
-void x_clear();
-
-/*
-###############################################
-### FUNÇÕES SET: Cor, Fonte, Paleta de Cores ##
-###############################################
-*/
-
-/* muda a cor do pincel para todas as funcoes de desenho */
-void x_set_color(X_Color color);
-
-/* change colors using palette colors */
-void x_set_pcolor(char color);
-
-/* retorna a cor corrente do pincel */
-X_Color x_get_color();
-
-/* define uma cor na palheta de caracteres */
-void x_set_palette(char c, X_Color color);
-
-/* retorna uma cor dado um char.
-   os char default da paleta são rgbmcybk
-   outros podem ser definidos ou redefinidor com x_set_palette
-*/
-X_Color x_get_palette(char c);
-
-/* mudar o tamanho da fonte em pixels */
-void x_set_font_size(int size);
-
-/* muda a font passando o path da nova fonte */
-void x_set_font(const char *filename);
-
-/*
-###############################################
-############## FUNÇÕES GET ####################
-###############################################
-*/
-
-/* retorna altura e largura do bitmap criado */
-int    x_get_height();
-int    x_get_width();
-
-/* retorna a cor do pixel dessa posicao do bitmap */
-X_Color x_get_pixel(int x, int y);
 
 /* ############################################### */
 /* ############ FUNÇÕES DE DESENHO DE LINHAS ##### */
 /* ############################################### */
-
 
 /* Desenha as seguintes formas sem preenchimento */
 
@@ -239,6 +203,30 @@ void x_fill_circle(int centerx, int centery, int radius);
 /* e ponto inferior direito (x1, y1) */
 void x_fill_ellipse(int x0, int y0, int x1, int y1);
 
+
+//saves the bitmap in ppm format
+void x_save_ppm(unsigned dimx, unsigned dimy, unsigned char * bitmap, const char * filename);
+
+//saves the bitmap in png format
+void x_save_png(unsigned dimx, unsigned dimy, unsigned char * bitmap, const char * filename);
+
+
+
+
+//inicializa o módulo de escrita
+void __x_init_font();
+
+// muda o tamanho da font
+void x_set_font_size(int size);
+
+// escreve utilizando o formato printf
+int  x_write(int x, int y, const char * format, ...);
+
+
+
+/* Faz o SWAP entre dois tipos */
+#define X_SWAP(x, y, T) do { T X_SWAP = x; x = y; y = X_SWAP; } while (0)
+
 /*
 ###############################################
 ####### ALGEBRA DE VETORES BIDIMENSIONAIS #####
@@ -247,18 +235,18 @@ void x_fill_ellipse(int x0, int y0, int x1, int y1);
 
 /* Define um vetor bidimensional com x e y */
 typedef struct{
-    float x;
-    float y;
+    double x;
+    double y;
 } X_V2d;
 
 /* cria e retorna um vetor */
-X_V2d x_make_v2d(float x, float y);
+X_V2d x_make_v2d(double x, double y);
 
 /* retorna o tamanho de um vetor da origem */
-float x_v2d_length(float x, float y);
+double x_v2d_length(double x, double y);
 
 /* retorna a distancia entre dois pontos */
-float x_v2d_distance(float ax, float ay, float bx, float by);
+double x_v2d_distance(double ax, double ay, double bx, double by);
 
 /* retorna a + b */
 X_V2d x_v2d_sum(X_V2d a, X_V2d b);
@@ -267,7 +255,7 @@ X_V2d x_v2d_sum(X_V2d a, X_V2d b);
 X_V2d x_v2d_sub(X_V2d a, X_V2d b);
 
 /* retorna (a.x * value, a.y * value) */
-X_V2d x_v2d_dot(X_V2d a, float value);
+X_V2d x_v2d_dot(X_V2d a, double value);
 
 /* retorna o vetor normalizado */
 X_V2d x_v2d_normalize(X_V2d v);
@@ -287,16 +275,16 @@ xpaint não dependesse de incluir a biblioteca math.h
 nos parametros de compilação com o -lm
 */
 
-float xm_sqrt(const float m);
-float xm_pow( float x, float y );
+double xm_sqrt(const double m);
+double xm_pow( double x, double y );
 int   xm_floor(double x);
-float xm_fmod(float a, float b);
-int   xm_ceil(float n);
+double xm_fmod(double a, double b);
+int   xm_ceil(double n);
 /* degrees */
-float xm_sin(float d);
-float xm_cos(float d);
-float xm_acos(float x);
-float xm_fabs(float f);
+double xm_sin(double d);
+double xm_cos(double d);
+double xm_acos(double x);
+double xm_fabs(double f);
 /* Generates a int number in interval [min, max] */
 int   xm_rand(int min, int max);
 
@@ -358,1144 +346,19 @@ void x_bar_one(int i, int value);
  */
 void x_bar_all(int * vet, int size, const char * colors, int * indices);
 
+
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* XPAINT_H*/
-
-/* ####################################################### */
-/* ####################################################### */
-/* ################# IMPLEMENTATION ###################### */
-/* ####################################################### */
-/* ####################################################### */
-
-#ifdef XPAINT_FULL
-
+#endif /* XPAINT_H */
+#ifdef XPAINT_FULL /* inicio da implementacao */
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/* FORWARD PNG and TTF declarations */
-extern unsigned char __x_font_buffer_profont[46628];
-
-typedef struct
-{
-   unsigned char *data;
-   int cursor;
-   int size;
-} stbtt__buf;
-
-struct stbtt_fontinfo
-{
-   void           * userdata;
-   unsigned char  * data;              /* pointer to .ttf file */
-   int              fontstart;         /* offset of start of font */
-
-   int numGlyphs;                     /* number of glyphs, needed for range checking */
-
-   int loca,head,glyf,hhea,hmtx,kern,gpos; /* table locations as offset from start of .ttf */
-   int index_map;                     /* a cmap mapping for our chosen character encoding */
-   int indexToLocFormat;              /* format needed to map from glyph index to glyph */
-
-   stbtt__buf cff;                    /* cff font data */
-   stbtt__buf charstrings;            /* the charstring index */
-   stbtt__buf gsubrs;                 /* global charstring subroutines index */
-   stbtt__buf subrs;                  /* private charstring subroutines index */
-   stbtt__buf fontdicts;              /* array of font dicts */
-   stbtt__buf fdselect;               /* map from glyph to fontdict */
-};
-
-typedef struct stbtt_fontinfo stbtt_fontinfo;
-
-typedef enum LodePNGColorType
-{
-  LCT_GREY = 0, /*greyscale: 1,2,4,8,16 bit*/
-  LCT_RGB = 2, /*RGB: 8,16 bit*/
-  LCT_PALETTE = 3, /*palette: 1,2,4,8 bit*/
-  LCT_GREY_ALPHA = 4, /*greyscale with alpha: 8,16 bit*/
-  LCT_RGBA = 6 /*RGB with alpha: 8,16 bit*/
-} LodePNGColorType;
-
-int stbtt_InitFont(stbtt_fontinfo *info, const unsigned char *data, int offset);
-float stbtt_ScaleForPixelHeight(const stbtt_fontinfo *info, float height);
-void stbtt_GetFontVMetrics(const stbtt_fontinfo *info, int *ascent, int *descent, int *lineGap);
-void stbtt_GetCodepointHMetrics(const stbtt_fontinfo *info, int codepoint, int *advanceWidth, int *leftSideBearing);
-void stbtt_GetCodepointBitmapBox(const stbtt_fontinfo *font, int codepoint, float scale_x, float scale_y, int *ix0, int *iy0, int *ix1, int *iy1);
-int  stbtt_GetCodepointKernAdvance(const stbtt_fontinfo *info, int ch1, int ch2);
-void stbtt_MakeCodepointBitmap(const stbtt_fontinfo *info, unsigned char *output, int out_w, int out_h, int out_stride, float scale_x, float scale_y, int codepoint);
-unsigned lodepng_encode_file(const char* filename, const unsigned char* image, unsigned w, unsigned h, LodePNGColorType colortype, unsigned bitdepth);
-const char* lodepng_error_text(unsigned code);
-/* KAPO */
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
-#include <string.h>
-#include <stdarg.h>
-#include <stdbool.h>
-
-X_Color X_COLOR_WHITE     = {238, 232, 213};
-X_Color X_COLOR_BLACK     = {7  , 54 , 66 };
-X_Color X_COLOR_GREEN     = {133, 153, 0  };
-X_Color X_COLOR_RED       = {211, 1  , 2  };
-X_Color X_COLOR_BLUE      = {38 , 139, 210};
-X_Color X_COLOR_YELLOW    = {181, 137, 0  };
-X_Color X_COLOR_CYAN      = {42 , 161, 152};
-X_Color X_COLOR_MAGENTA   = {211, 54 , 130};
-X_Color X_COLOR_ORANGE    = {253, 106, 2  };
-X_Color X_COLOR_VIOLET    = {108, 113, 196};
-
-/* Definicoes das funcoes da biblioteca */
-typedef struct{
-    uchar* image;
-    unsigned width;
-    unsigned height;
-} X_Bitmap;
-
-typedef struct{
-    uchar * buffer;
-    struct stbtt_fontinfo info;
-    float scale;
-    int ascent;
-    int descent;
-    int lineGap;
-} X_Font;
-
-typedef struct{
-    bool     initialized;
-    X_Color   palette[256];
-    X_Bitmap* bitmap;
-    X_Font*   font;
-    X_Font*   font_default;
-    int      font_size;
-    bool     using_default_font;
-    uchar    color[3];
-    char     filename[100];
-    char     viewer[100];
-    int      step;
-} X_Board;
-
-static X_Board __board;
-
-X_Bitmap * __x_bitmap_create(unsigned width, unsigned height, const uchar *color);
-void      __x_bitmap_destroy(X_Bitmap *bitmap);
-
-/* se quiser trocar a font default, passe o nome do arquivo e crie um buffer */
-uchar * __x_buffer_create(const char *filename);
-uchar * __x_get_pixel_pos(int x, int y);
-
-uchar * __x_get_pixel_pos(int x, int y){
-    return __board.bitmap->image + 3 * (__board.bitmap->width * y + x);
-}
-
-X_Bitmap * __x_bitmap_create(unsigned width, unsigned height, const uchar *color){
-    X_Bitmap * bitmap = (X_Bitmap*) malloc(sizeof(X_Bitmap));
-    bitmap->height = height;
-    bitmap->width = width;
-    bitmap->image = (uchar*) malloc(width * height * 3);
-    unsigned y = 0, x = 0;
-    for(y = 0; y < height; y++)
-        for(x = 0; x < width; x++)
-            memcpy(bitmap->image + 3 * (width * y + x), color, 3);
-    return bitmap;
-}
-
-void __x_bitmap_destroy(X_Bitmap *bitmap){
-    free(bitmap->image);
-    free(bitmap);
-}
-
-void x_open(unsigned int width, unsigned int height, const char * filename){
-    static int init = 0;
-    if(init == 0)
-        init = 1;
-    else{
-        fprintf(stderr, "fail: bitmat already initialized\n");
-        return;
-    }
-    __board.initialized = true;
-    strcpy(__board.filename, filename);
-    strcpy(__board.viewer, "");
-    /* inicializando a cor de fundo */
-    uchar cinza[] = {30, 30, 30};
-    __board.bitmap = __x_bitmap_create(width, height, cinza);
-    /* inicializando a cor de desenho e escrita */
-    x_set_color(x_make_color(200, 200, 200));
-
-    __board.font_default = (X_Font*) malloc(sizeof(X_Font));
-    __board.font_default->buffer = __x_font_buffer_profont;
-    stbtt_InitFont(&__board.font_default->info, __board.font_default->buffer, 0);
-
-    /* setando a font default como fonte do sistema */
-    __board.font = __board.font_default;
-    __board.using_default_font = true;
-    x_set_font_size(20);
-    int i = 0;
-    for(i = 0; i < 256; i++)
-        __board.palette[i] = X_COLOR_WHITE;
-
-    __board.palette['r'] = X_COLOR_RED;
-    __board.palette['g'] = X_COLOR_GREEN;
-    __board.palette['b'] = X_COLOR_BLUE;
-    __board.palette['y'] = X_COLOR_YELLOW;
-    __board.palette['m'] = X_COLOR_MAGENTA;
-    __board.palette['c'] = X_COLOR_CYAN;
-    __board.palette['k'] = X_COLOR_BLACK;
-    __board.palette['w'] = X_COLOR_WHITE;
-    __board.palette['o'] = X_COLOR_ORANGE;
-    __board.palette['v'] = X_COLOR_VIOLET;
-    /*https://htmlcolorcodes.com/color-names/*/
-
-    __board.step = 1;
-    srand(time(NULL));
-}
-
-void x_close(){
-    __x_bitmap_destroy(__board.bitmap);
-    if(__board.using_default_font == false){
-        free(__board.font->buffer);
-        free(__board.font);
-    }
-}
-
-void x_clear(){
-    unsigned x, y;
-    for(x = 0; x < __board.bitmap->width; x++){
-        for(y = 0; y < __board.bitmap->height; y++){
-            uchar * pixel = __x_get_pixel_pos(x, y);
-            pixel[0] = __board.color[0];
-            pixel[1] = __board.color[1];
-            pixel[2] = __board.color[2];
-        }
-    }
-}
-
-void x_set_color(X_Color color){
-    __board.color[0] = color.r;
-    __board.color[1] = color.g;
-    __board.color[2] = color.b;
-}
-
-void x_set_pcolor(char color){
-    x_set_color(x_get_palette(color));
-}
-
-X_Color x_get_color(){
-    X_Color color = {__board.color[0], __board.color[1], __board.color[2]};
-    return color;
-}
-
-X_Color x_get_pixel(int x, int y){
-    uchar * pixel = __x_get_pixel_pos(x, y);
-    X_Color color = {pixel[0], pixel[1], pixel[2]};
-    return color;
-}
-
-uchar * __x_buffer_create(const char *filename){
-    long size;
-    uchar * font_buffer;
-    FILE* font_file = fopen(filename, "rb");
-    if(font_file == NULL){
-        fprintf(stderr, "fail: file not found\n");
-        exit(1);
-    }
-    fseek(font_file, 0, SEEK_END);
-    size = ftell(font_file); /* how long is the file ? */
-    fseek(font_file, 0, SEEK_SET); /* reset */
-    font_buffer = (uchar *) malloc(size);
-    fread(font_buffer, size, 1, font_file);
-    fclose(font_file);
-    return font_buffer;
-}
-
-void x_set_font(const char *filename){
-    if(filename == NULL){
-        if(__board.using_default_font == false){
-            __board.using_default_font = true;
-            free(__board.font->buffer);
-            free(__board.font);
-            __board.font = __board.font_default;
-        }
-    }else{
-        X_Font * font = (X_Font*) malloc(sizeof(X_Font));
-        font->buffer = __x_buffer_create(filename);
-        unsigned error = stbtt_InitFont(&font->info, font->buffer, 0);
-        if(error == 0){
-            fprintf(stderr, "fail: font load failure\n");
-            free(font->buffer);
-            free(font);
-        }else{
-            __board.font = font;
-            __board.using_default_font = false;
-        }
-    }
-    x_set_font_size(__board.font_size);
-}
-
-void x_set_font_size(int size){
-    __board.font_size = size;
-    __board.font->scale = stbtt_ScaleForPixelHeight(&__board.font->info, size);
-    stbtt_GetFontVMetrics(&__board.font->info, &__board.font->ascent, &__board.font->descent, &__board.font->lineGap);
-    __board.font->ascent *= __board.font->scale;
-    __board.font->descent *= __board.font->scale;
-}
-
-int x_write(int x, int y, const char * format, ...){
-    char text[1000];
-    va_list args;
-    va_start( args, format );
-    vsprintf(text, format, args);
-    va_end( args );
-
-    int i;
-    unsigned _x = x;
-
-    /* setando a cor */
-    __board.font->info.userdata = (void *) __board.color;
-
-    for (i = 0; i < (int) strlen(text); ++i) {
-        if(text[i] == '\n'){
-            y += __board.font_size;
-            _x = x;
-            continue;
-        }
-
-        /* how wide is this character */
-        int ax;
-        stbtt_GetCodepointHMetrics(&__board.font->info, text[i], &ax, 0);
-        ax = ax * __board.font->scale;
-
-        if(_x + ax > __board.bitmap->width){
-            y += __board.font_size;
-            _x = 10;
-        }
-
-        if((unsigned) y + __board.font_size > __board.bitmap->height){
-            return _x;
-        }
-
-        /* get bounding box for character (may be offset to account for chars that dip above or below the line */
-        int c_x1, c_y1, c_x2, c_y2;
-        stbtt_GetCodepointBitmapBox(&__board.font->info, text[i], __board.font->scale, __board.font->scale, &c_x1, &c_y1, &c_x2, &c_y2);
-
-        /* compute y (different characters have different heights */
-        int _y = y + __board.font->ascent + c_y1;
-
-        /* render character (stride and offset is important here) */
-        int byteOffset = _x + (_y  * __board.bitmap->width);
-        stbtt_MakeCodepointBitmap(&__board.font->info, __board.bitmap->image + 3 * byteOffset, c_x2 - c_x1, c_y2 - c_y1,
-                                  __board.bitmap->width, __board.font->scale, __board.font->scale, text[i]);
-
-        _x += ax; /* desloca x para proximo caractere */
-
-        /* add kerning */
-        int kern;
-        kern = stbtt_GetCodepointKernAdvance(&__board.font->info, text[i], text[i + 1]);
-        _x += kern * __board.font->scale;
-    }
-    return _x;
-}
-
-void __x_save(const char * filename){
-    char * dest = (char*) malloc(strlen(filename + 10));
-    strcpy(dest, filename);
-    strcat(dest, ".png");
-    unsigned error = lodepng_encode_file(dest, __board.bitmap->image, __board.bitmap->width, __board.bitmap->height, LCT_RGB, 8);
-    if(error)
-        printf("error %u: %s\n", error, lodepng_error_text(error));
-    free(dest);
-}
-
-void x_set_viewer(const char * viewer){
-    if(viewer != NULL){
-        strcpy(__board.viewer, viewer); 
-    }
-}
-
-void x_save(){
-    static int init = 1;
-    if(init){
-        init = 0;
-        char cmd[250];
-        if(strcmp(__board.viewer, "") != 0){
-
-            sprintf(cmd, "%s %s.png&",__board.viewer, __board.filename);
-            puts(cmd);
-            system(cmd);
-        }
-    }
-    __x_save(__board.filename);
-}
-
-void x_set_filename(const char * filename){
-    if(filename != NULL)
-        strcpy(__board.filename, filename);
-    else
-        strcpy(__board.filename, "");
-}
-
-void x_log(){
-    static int index = 0;
-    char * name = (char *) malloc((strlen(__board.filename) + 10) * sizeof(char));
-    sprintf(name, "%s%05d", __board.filename, index);
-    index += 1;
-    printf("saving: %s.png\n", name);
-    __x_save(name);
-    free(name);
-}
-
-void x_set_step(int value){
-    __board.step = value;
-}
-
-int x_control(){
-    static int init = 1;
-    static int rounds = 0;
-    static int state = 0;
-    if(init == 1){
-        init = 0;
-        printf("press{enter/step value/0 to skip}\n");
-    }
-
-    rounds += 1;
-    state += 1;
-    if((__board.step != 0) && (rounds >= __board.step)){
-        printf("(state: %i, step: %i): ", state, __board.step);
-        char line[200];
-        fgets(line, sizeof(line), stdin);
-        char * ptr = line;
-        int value = (int) strtol(line, &ptr, 10);
-        if(ptr != line)
-            __board.step = value;
-        rounds = 0;
-        return true;
-    }
-    return false;
-}
-
-void x_plot(int x, int y){
-    if(__board.initialized == false){
-        fprintf(stderr, "fail: x_open(weight, width) missing\n");
-        exit(1);
-    }
-    if((x >= 0) && (x < (int) __board.bitmap->width) && (y >= 0) && (y <  (int) __board.bitmap->height))
-        memcpy(__x_get_pixel_pos(x, y), &__board.color, sizeof(__board.color));
-}
-
-X_Color x_make_color(uchar r, uchar g, uchar b){
-    X_Color x = {r, g, b};
-    return x;
-}
-
-void x_set_palette(char c, X_Color color){
-    __board.palette[(int)c] = color;
-}
-
-X_Color x_get_palette(char c){
-    return __board.palette[(int)c];
-}
-
-int x_get_height(){
-    if(__board.bitmap == NULL)
-        fprintf(stderr, "fail: x_open(weight, width) missing\n");
-    return __board.bitmap->height;
-}
-
-int x_get_width(){
-    if(__board.bitmap == NULL)
-        fprintf(stderr, "fail: x_open(weight, width) missing\n");
-    return __board.bitmap->width;
-}
-
-/* X_DRAW */
-
-#include <assert.h>
-#include <stdio.h>
-#include <inttypes.h>
-
-
-
-
-void x_draw_line(int x0, int y0, int x1, int y1){
-    /* Bresenham's Line Algorithm */
-    int dx = (x0 > x1) ? x0 - x1 : x1 - x0;
-    int dy = (y0 > y1) ? y0 - y1 : y1 - y0;
-    int sx = (x0 < x1) ? 1 : -1;
-    int sy = (y0 < y1) ? 1 : -1;
-    int err = dx - dy;
-
-    while (1) {
-        x_plot(x0, y0);
-        if (x0 == x1 && y0 == y1) break;
-        int e2 = 2 * err;
-        if (e2 > -dy) {
-            err -= dy;
-            x0 += sx;
-        }
-        if (e2 < dx) {
-            err += dx;
-            y0 += sy;
-        }
-    }
-}
-
-void __x_fill_bottom_flat_triangle(float v1x, float v1y, float v2x, float v2y, float v3x, float v3y)
-{
-    float invslope1 = ((int)v2x - (int)v1x) / (float)((int)v2y - (int)v1y);
-    float invslope2 = ((int)v3x - (int)v1x) / (float)((int)v3y - (int)v1y);
-
-    float curx1 = v1x;
-    float curx2 = v1x;
-    int scanlineY;
-
-    for (scanlineY = v1y; scanlineY <= (int)v2y; scanlineY++){
-        x_draw_line(curx1, scanlineY, curx2, scanlineY);
-        curx1 += invslope1;
-        curx2 += invslope2;
-    }
-}
-
-void __x_fill_top_flat_triangle(float v1x, float v1y, float v2x, float v2y, float v3x, float v3y)
-{
-    float invslope1 = ((int)v3x - (int)v1x) / (float)((int)v3y - (int)v1y);
-    float invslope2 = ((int)v3x - (int)v2x) / (float)((int)v3y - (int)v2y);
-
-    float curx1 = v3x;
-    float curx2 = v3x;
-
-    int scanlineY;
-
-    for (scanlineY = v3y; scanlineY >= v1y; scanlineY--)
-    {
-        x_draw_line(curx1, scanlineY, curx2, scanlineY);
-        curx1 -= invslope1;
-        curx2 -= invslope2;
-    }
-}
-
-void x_fill_triangle(float v1x, float v1y, float v2x, float v2y, float v3x, float v3y)
-{
-    X_V2d v1 = {v1x, v1y};
-    X_V2d v2 = {v2x, v2y};
-    X_V2d v3 = {v3x, v3y};
-    /* at first sort the three vertices by y-coordinate ascending so v1 is the topmost vertice */
-    if((v2.y <= v1.y) && (v2.y <= v3.y))
-        X_SWAP(v1, v2, X_V2d);
-    if((v3.y <= v1.y) && (v3.y <= v2.y))
-        X_SWAP(v1, v3, X_V2d);
-    if(v3.y < v2.y)
-        X_SWAP(v2, v3, X_V2d);
-
-    /* here we know that v1.y <= v2.y <= v3.y */
-    /* check for trivial case of bottom-flat triangle */
-    if (v2.y == v3.y)
-        __x_fill_bottom_flat_triangle(v1.x, v1.y, v2.x, v2.y, v3.x, v3.y);
-    else if (v1.y == v2.y)
-        __x_fill_top_flat_triangle(v1.x, v1.y, v2.x, v2.y, v3.x, v3.y);
-    else
-    {
-        /* general case - split the triangle in a topflat and bottom-flat one */
-        X_V2d v4 = {0.f, 0.f};
-        v4.x = (v1.x + ((float)(v2.y - v1.y) / (float)(v3.y - v1.y)) * (v3.x - v1.x));
-        v4.y = v2.y;
-        __x_fill_bottom_flat_triangle(v1.x, v1.y, v2.x, v2.y, v4.x, v4.y);
-        __x_fill_top_flat_triangle(v2.x, v2.y, v4.x, v4.y, v3.x, v3.y);
-    }
-}
-
-void x_fill_line(float x0, float y0, float x1, float y1, int thickness){
-    X_V2d a = {x0, y0};
-    X_V2d b = {x1, y1};
-    if(thickness == 1){
-        x_draw_line(a.x, a.y, b.x, b.y);
-        return;
-    }
-    X_V2d _offset = x_make_v2d(b.x - a.x, b.y - a.y);
-    _offset = x_v2d_dot(x_v2d_ortho(x_v2d_normalize(_offset)), (thickness / 2.f));
-
-    X_V2d p1 = x_v2d_sub(a, _offset);
-    X_V2d p2 = x_v2d_sub(b, _offset);
-    X_V2d p3 = x_v2d_sum(a, _offset);
-    X_V2d p4 = x_v2d_sum(b, _offset);
-
-    x_fill_triangle(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);
-    x_fill_triangle(p3.x, p3.y, p2.x, p2.y, p4.x, p4.y);
-}
-
-void x_fill_rect(int x0, int y0, int width, int height){
-    int i, x1 = x0 + width - 1, y1 = y0 + height - 1;
-    for(i = x0; i <= x1; i++)
-        x_draw_line(i, y0, i, y1);
-}
-
-/* https://en.wikipedia.org/wiki/Midpoint_circle_algorithm */
-void x_draw_circle(int centerx, int centery, int radius){
-    int x = radius - 1;
-    int y = 0;
-    int dx = 1;
-    int dy = 1;
-    int err = dx - (radius << 1);
-    while(x >= y){
-        x_plot(centerx + x, centery + y);
-        x_plot(centerx - x, centery + y);
-        x_plot(centerx + x, centery - y);
-        x_plot(centerx - x, centery - y);
-        x_plot(centerx + y, centery + x);
-        x_plot(centerx - y, centery + x);
-        x_plot(centerx - y, centery - x);
-        x_plot(centerx + y, centery - x);
-
-        if(err <= 0){
-            y++;
-            err += dy;
-            dy += 2;
-        }else{
-            x--;
-            dx += 2;
-            err += dx - (radius << 1);
-        }
-    }
-}
-
-void x_fill_circle(int centerx, int centery, int radius){
-    int x = radius - 1;
-    int y = 0;
-    int dx = 1;
-    int dy = 1;
-    int err = dx - (radius << 1);
-    while(x >= y){
-        x_draw_line(centerx + x, centery + y, centerx - x, centery + y);
-        x_draw_line(centerx + x, centery - y, centerx - x, centery - y);
-        x_draw_line(centerx + y, centery + x, centerx - y, centery + x);
-        x_draw_line(centerx - y, centery - x, centerx + y, centery - x);
-        if(err <= 0){
-            y++;
-            err += dy;
-            dy += 2;
-        }else{
-            x--;
-            dx += 2;
-            err += dx - (radius << 1);
-        }
-    }
-}
-
-void x_draw_ellipse(int x0, int y0, int x1, int y1)
-{
-    int a = abs(x1-x0), b = abs(y1-y0), b1 = b&1; /* values of diameter */
-    long dx = 4*(1-a)*b*b, dy = 4*(b1+1)*a*a; /* error increment */
-    long err = dx+dy+b1*a*a, e2; /* error of 1.step */
-
-    if (x0 > x1) { x0 = x1; x1 += a; } /* if called with swapped points */
-    if (y0 > y1) y0 = y1; /* .. exchange them */
-    y0 += (b+1)/2; y1 = y0-b1;   /* starting pixel */
-    a *= 8*a; b1 = 8*b*b;
-
-    do {
-        x_plot(x1, y0); /*   I. Quadrant */
-        x_plot(x0, y0); /*  II. Quadrant */
-        x_plot(x0, y1); /* III. Quadrant */
-        x_plot(x1, y1); /*  IV. Quadrant */
-        e2 = 2*err;
-        if (e2 <= dy) { y0++; y1--; err += dy += a; }  /* y step */
-        if (e2 >= dx || 2*err > dy) { x0++; x1--; err += dx += b1; } /* x step */
-    } while (x0 <= x1);
-
-    while (y0-y1 < b) {  /* too early stop of flat ellipses a=1 */
-        x_plot(x0-1, y0); /* -> finish tip of ellipse */
-        x_plot(x1+1, y0++);
-        x_plot(x0-1, y1);
-        x_plot(x1+1, y1--);
-    }
-}
-
-void x_fill_ellipse(int x0, int y0, int x1, int y1)
-{
-    int a = abs(x1-x0), b = abs(y1-y0), b1 = b&1; /* values of diameter */
-    long dx = 4*(1-a)*b*b, dy = 4*(b1+1)*a*a; /* error increment */
-    long err = dx+dy+b1*a*a, e2; /* error of 1.step */
-
-    if (x0 > x1) { x0 = x1; x1 += a; } /* if called with swapped points */
-    if (y0 > y1) y0 = y1; /* .. exchange them */
-    y0 += (b+1)/2; y1 = y0-b1;   /* starting pixel */
-    a *= 8*a; b1 = 8*b*b;
-
-    do {
-        x_draw_line(x1, y0, x0, y0); /*   I. Quadrant */
-        x_draw_line(x0, y1, x1, y1); /* III. Quadrant */
-        e2 = 2*err;
-        if (e2 <= dy) { y0++; y1--; err += dy += a; }  /* y step */
-        if (e2 >= dx || 2*err > dy) { x0++; x1--; err += dx += b1; } /* x step */
-    } while (x0 <= x1);
-
-    while (y0-y1 < b) {  /* too early stop of flat ellipses a=1 */
-        x_plot(x0-1, y0); /* -> finish tip of ellipse */
-        x_plot(x1+1, y0++);
-        x_plot(x0-1, y1);
-        x_plot(x1+1, y1--);
-    }
-}
-
-void __x_plot_quad_bezier_seg(int x0, int y0, int x1, int y1, int x2, int y2)
-{
-    int sx = x2-x1, sy = y2-y1;
-    long xx = x0-x1, yy = y0-y1, xy;         /* relative values for checks */
-    double dx, dy, err, cur = xx*sy-yy*sx;                    /* curvature */
-
-    assert(xx*sx <= 0 && yy*sy <= 0);  /* sign of gradient must not change */
-
-    if (sx*(long)sx+sy*(long)sy > xx*xx+yy*yy) { /* begin with longer part */
-        x2 = x0; x0 = sx+x1; y2 = y0; y0 = sy+y1; cur = -cur;  /* swap P0 P2 */
-    }
-    if (cur != 0) {                                    /* no straight line */
-        xx += sx; xx *= sx = x0 < x2 ? 1 : -1;           /* x step direction */
-        yy += sy; yy *= sy = y0 < y2 ? 1 : -1;           /* y step direction */
-        xy = 2*xx*yy; xx *= xx; yy *= yy;          /* differences 2nd degree */
-        if (cur*sx*sy < 0) {                           /* negated curvature? */
-            xx = -xx; yy = -yy; xy = -xy; cur = -cur;
-        }
-        dx = 4.0*sy*cur*(x1-x0)+xx-xy;             /* differences 1st degree */
-        dy = 4.0*sx*cur*(y0-y1)+yy-xy;
-        xx += xx; yy += yy; err = dx+dy+xy;                /* error 1st step */
-        do {
-            x_plot(x0,y0);                                     /* plot curve */
-            if (x0 == x2 && y0 == y2) return;  /* last pixel -> curve finished */
-            y1 = 2*err < dx;                  /* save value for test of y step */
-            if (2*err > dy) { x0 += sx; dx -= xy; err += dy += yy; } /* x step */
-            if (    y1    ) { y0 += sy; dy -= xy; err += dx += xx; } /* y step */
-        } while (dy < dx );           /* gradient negates -> algorithm fails */
-    }
-    x_draw_line(x0, y0, x2, y2);                  /* plot remaining part to end */
-}
-void x_draw_bezier(int x0, int y0, int x1, int y1, int x2, int y2)
-{                                          /* plot any quadratic Bezier curve */
-    int x = x0-x1, y = y0-y1;
-    double t = x0-2*x1+x2, r;
-
-    if ((long)x*(x2-x1) > 0) {                        /* horizontal cut at P4? */
-        if ((long)y*(y2-y1) > 0)                     /* vertical cut at P6 too? */
-            if (xm_fabs((y0-2*y1+y2)/t*x) > abs(y)) {               /* which first? */
-                x0 = x2; x2 = x+x1; y0 = y2; y2 = y+y1;            /* swap points */
-            }                            /* now horizontal cut at P4 comes first */
-        t = (x0-x1)/t;
-        r = (1-t)*((1-t)*y0+2.0*t*y1)+t*t*y2;                       /* By(t=P4) */
-        t = (x0*x2-x1*x1)*t/(x0-x1);                       /* gradient dP4/dx=0 */
-        x = xm_floor(t+0.5); y = xm_floor(r+0.5);
-        r = (y1-y0)*(t-x0)/(x1-x0)+y0;                  /* intersect P3 | P0 P1 */
-        __x_plot_quad_bezier_seg(x0,y0, x,xm_floor(r+0.5), x,y);
-        r = (y1-y2)*(t-x2)/(x1-x2)+y2;                  /* intersect P4 | P1 P2 */
-        x0 = x1 = x; y0 = y; y1 = xm_floor(r+0.5);             /* P0 = P4, P1 = P8 */
-    }
-    if ((long)(y0-y1)*(y2-y1) > 0) {                    /* vertical cut at P6? */
-        t = y0-2*y1+y2; t = (y0-y1)/t;
-        r = (1-t)*((1-t)*x0+2.0*t*x1)+t*t*x2;                       /* Bx(t=P6) */
-        t = (y0*y2-y1*y1)*t/(y0-y1);                       /* gradient dP6/dy=0 */
-        x = xm_floor(r+0.5); y = xm_floor(t+0.5);
-        r = (x1-x0)*(t-y0)/(y1-y0)+x0;                  /* intersect P6 | P0 P1 */
-        __x_plot_quad_bezier_seg(x0,y0, xm_floor(r+0.5),y, x,y);
-        r = (x1-x2)*(t-y2)/(y1-y2)+x2;                  /* intersect P7 | P1 P2 */
-        x0 = x; x1 = xm_floor(r+0.5); y0 = y1 = y;             /* P0 = P6, P1 = P7 */
-    }
-    __x_plot_quad_bezier_seg(x0,y0, x1,y1, x2,y2);                  /* remaining part */
-}
-
-/* https://github.com/Jnmattern/Minimalist_2.0/blob/master/src/bitmap.h */
-#define __TRIG_MAX (1<<24)
-#define __TRIG_NORM(v) ((v)>>24)
-#define __TRIG_MULT(v) ((v)<<24)
-
-const int32_t __sinTable__[91] = {
-    0, 292802, 585516, 878051, 1170319, 1462230, 1753696, 2044628, 2334937, 2624534, 2913332, 3201243, 3488179, 3774052,
-    4058775, 4342263, 4624427, 4905183, 5184444, 5462127, 5738145, 6012416, 6284855, 6555380, 6823908, 7090357, 7354647,
-    7616696, 7876425, 8133755, 8388607, 8640905, 8890569, 9137526, 9381700, 9623015, 9861400, 10096780, 10329085, 10558244,
-    10784186, 11006844, 11226148, 11442033, 11654433, 11863283, 12068519, 12270079, 12467901, 12661925, 12852093, 13038345,
-    13220626, 13398880, 13573052, 13743090, 13908942, 14070557, 14227886, 14380880, 14529495, 14673683, 14813402, 14948608,
-    15079261, 15205321, 15326749, 15443508, 15555563, 15662880, 15765426, 15863169, 15956080, 16044131, 16127295, 16205546,
-    16278860, 16347217, 16410593, 16468971, 16522332, 16570660, 16613941, 16652161, 16685308, 16713373, 16736347, 16754223,
-    16766995, 16774660, 16777216
-};
-
-static int32_t __SIN(int d) {
-    d = d%360;
-    if (d < 90) {
-        return __sinTable__[d];
-    } else if (d < 180) {
-        return __sinTable__[180-d];
-    } else if (d < 270) {
-        return -__sinTable__[d-180];
-    } else {
-        return -__sinTable__[360-d];
-    }
-}
-
-static int32_t __COS(int d) {
-    d = d%360;
-    if (d < 90) {
-        return __sinTable__[90-d];
-    } else if (d < 180) {
-        return -__sinTable__[d-90];
-    } else if (d < 270) {
-        return -__sinTable__[270-d];
-    } else {
-        return __sinTable__[d-270];
-    }
-}
-
-/* begin should be smaller than end, and both must be in interval [0, 360] */
-void __x_fill_arc(float centerx, float centery, int radius, int thickness, int degrees_begin, int degrees_end) {
-    X_V2d center = {centerx, centery};
-    float sslope = (float)__COS(degrees_begin) / (float)__SIN(degrees_begin);
-    float eslope = (float)__COS(degrees_end) / (float)__SIN(degrees_end);
-
-    if (degrees_end == 360) eslope = -1000000;
-
-    int ir2 = (radius - thickness) * (radius - thickness);
-    int or2 = radius * radius;
-    int x, y;
-
-    for (x = -radius; x <= radius; x++) {
-        for (y = -radius; y <= radius; y++)
-        {
-            int x2 = x * x;
-            int y2 = y * y;
-
-            if (
-                    (x2 + y2 < or2 && x2 + y2 >= ir2) && (
-                            (y > 0 && degrees_begin < 180 && x <= y * sslope) ||
-                            (y < 0 && degrees_begin > 180 && x >= y * sslope) ||
-                            (y < 0 && degrees_begin <= 180) ||
-                            (y == 0 && degrees_begin <= 180 && x < 0) ||
-                            (y == 0 && degrees_begin == 0 && x > 0)
-                    ) && (
-                            (y > 0 && degrees_end < 180 && x >= y * eslope) ||
-                            (y < 0 && degrees_end > 180 && x <= y * eslope) ||
-                            (y > 0 && degrees_end >= 180) ||
-                            (y == 0 && degrees_end >= 180 && x < 0) ||
-                            (y == 0 && degrees_begin == 0 && x > 0)
-                    )
-                    )
-                x_plot(center.x+x, center.y-y);
-        }
-    }
-
-}
-
-void x_fill_arc(float centerx, float centery, int radius, int thickness, int degrees_begin, int degrees_lenght){
-    if(degrees_lenght % 360 == 0)
-        degrees_lenght = 360;
-    else
-        degrees_lenght %= 360;
-    if(degrees_lenght < 0){
-        degrees_lenght *= -1;
-        degrees_begin -= degrees_lenght;
-    }
-    degrees_begin %= 360;
-    if(degrees_begin < 0)
-        degrees_begin += 360;
-    int degrees_end = degrees_begin + degrees_lenght;
-
-    if(degrees_end <= 360){
-        __x_fill_arc(centerx, centery, radius, thickness, degrees_begin, degrees_end);
-    }else{
-        __x_fill_arc(centerx, centery, radius, thickness, degrees_begin, 360);
-        __x_fill_arc(centerx, centery, radius, thickness, 0, degrees_end - 360);
-    }
-
-}
-
-/* XGRID */
-
-int __X_GRID_SIZE = 50;
-int __X_GRID_SEP = 1;
-
-void x_grid_init(int side, int sep){
-    __X_GRID_SIZE = side;
-    __X_GRID_SEP = sep;
-}
-
-void x_grid_square(int l, int c){
-    int size = __X_GRID_SIZE, sep = __X_GRID_SEP;
-    x_fill_rect(c * size + sep, l * size + sep, size - sep, size - sep);
-}
-
-void x_grid_circle(int l, int c){
-    x_fill_circle(c * __X_GRID_SIZE + __X_GRID_SIZE / 2, l * __X_GRID_SIZE + __X_GRID_SIZE / 2,
-                  __X_GRID_SIZE / 2 - __X_GRID_SEP + 1);
-}
-
-
-void x_grid_text(int l, int c, const char *text){
-    float font_factor = 1.0;
-    float fsize = 0, xdelta = 0, ydelta = 0;
-    static char text2[1000];
-    strcpy(text2, text);
-    int value = strlen(text);
-    if(value == 1){
-        fsize = 0.9; xdelta = 0.3; ydelta = 0.1;
-    }else if(value == 2){
-        fsize = 0.7; xdelta = 0.2; ydelta = 0.2;
-    }else if(value == 3){
-        fsize = 0.5; xdelta = 0.18; ydelta = 0.3;
-    }else if(value == 4){
-        fsize = 0.4; xdelta = 0.13; ydelta = 0.35;
-    }else if(value == 5){
-        fsize = 0.35; xdelta = 0.1; ydelta = 0.35;
-    }else {
-        fsize = 0.35; xdelta = 0.1; ydelta = 0.35;
-        text2[5] = '\0';
-    }
-    x_set_font_size(__X_GRID_SIZE * fsize * font_factor);
-    x_write((c + xdelta) * __X_GRID_SIZE, (l + ydelta) * __X_GRID_SIZE, "%s", text2);
-
-}
-
-void x_grid_number(int l, int c, int value){
-    char data[50];
-    sprintf(data, "%d", value);
-    x_grid_text(l, c, data);
-}
-
-/*########################*/
-/*###### X_BAR MODULE ####*/
-/*########################*/
-
-
-static float __X_BAR_WIDTH = 20; /* bar width */
-static float __X_BAR_YFACTOR = 1; /* multiplicative factor of bar height  */
-static int __X_BAR_SIZE = 0;
-static int __X_BAR_MAX = 0;
-
-void x_bar_init(int size, int max){
-    __X_BAR_SIZE = size;
-    __X_BAR_MAX = max;
-    __X_BAR_WIDTH = x_get_width() / (size + 2);
-    __X_BAR_YFACTOR = (x_get_height() - 4.0 * __X_BAR_WIDTH);
-    __X_BAR_YFACTOR = __X_BAR_YFACTOR < 0 ? -__X_BAR_YFACTOR : __X_BAR_YFACTOR;
-    __X_BAR_YFACTOR /= max;
-    if(__X_BAR_YFACTOR < 0.2)
-        __X_BAR_YFACTOR = 0.2;
-}
-
-void x_bar_one(int i, int value){
-    if((i < 0)||(i >= __X_BAR_SIZE))
-        return;
-    int x = __X_BAR_WIDTH * (i + 1);
-    int ybase = x_get_height() - __X_BAR_WIDTH;
-    int j;
-    for(j = 0; j < ((int) __X_BAR_WIDTH - 2) ; j++)
-        x_draw_line(x + j, ybase, x + j, ybase - __X_BAR_YFACTOR * value);
-}
-
-void x_bar_all(int * vet, int size, const char * colors, int * indices){
-    x_set_pcolor('k');
-    x_clear();
-    int i = 0;
-    x_set_color(X_COLOR_WHITE);
-    for(i = 0; i < size; i++)
-        x_bar_one(i, vet[i]);
-    if(colors != NULL && (strcmp(colors, "") != 0)){
-        int qtd = strlen(colors);
-        for(i = 0; i < qtd; i++){
-            x_set_pcolor(colors[i]);
-            x_bar_one(indices[i], vet[indices[i]]);
-        }
-    }
-    static int atual = 0;
-    x_set_pcolor('w'); /* desenhando estado */
-    x_write(0, 0, "%d", atual++);
-}
-
-
-/*########################*/
-/*###### X_MATH MODULE ####*/
-/*########################*/
-
-#include <stdint.h>
-#include <stdlib.h>
-
-X_V2d x_make_v2d(float x, float y){
-    X_V2d v = {x, y};
-    return v;
-}
-
-float x_v2d_length(float x, float y){
-    return xm_sqrt(x * x + y * y);
-}
-
-float x_v2d_distance(float ax, float ay, float bx, float by){
-    return x_v2d_length(bx - ax, by - ay);
-}
-
-X_V2d x_v2d_sum(X_V2d a, X_V2d b){
-    return x_make_v2d(a.x + b.x, a.y + b.y);
-}
-
-X_V2d x_v2d_sub(X_V2d a, X_V2d b){
-    return x_make_v2d(a.x - b.x, a.y - b.y);
-}
-
-X_V2d x_v2d_dot(X_V2d a, float value){
-    return x_make_v2d(a.x * value, a.y * value);
-}
-
-X_V2d x_v2d_normalize(X_V2d v){
-    float lenght = x_v2d_length(v.x, v.y);
-    if(lenght == 0)
-        return v;
-    v.x = v.x * (1.0/lenght);
-    v.y = v.y * (1.0/lenght);
-    return v;
-}
-
-X_V2d x_v2d_ortho(X_V2d v){
-    return x_make_v2d(v.y, -v.x);
-}
-
-int   xm_rand(int min, int max){
-    return rand() % (max + 1 - min) + min;
-}
-
-/* https://stackoverflow.com/questions/5122993/floor-int-function-implementaton?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa */
-int xm_floor(double x) {
-    int xi = (int) x;
-    return x < xi ? xi - 1 : xi;
-}
-
-
-/* funcao necessario para o po */
-float xm_sqrt(const float m)
-{
-   float i=0;
-   float x1,x2;
-   while( (i*i) <= m )
-          i+=0.1f;
-   x1=i;
-   int j;
-   for(j=0;j<10;j++)
-   {
-       x2=m;
-      x2/=x1;
-      x2+=x1;
-      x2/=2;
-      x1=x2;
-   }
-   return x2;
-}
-
-float xm_pow( float x, float z ){
-    int y =  z;
-    double temp;
-    if (y == 0)
-    return 1;
-    temp = xm_pow (x, y / 2);
-    if ((y % 2) == 0) {
-        return temp * temp;
-    } else {
-        if (y > 0)
-            return x * temp * temp;
-        else
-            return (temp * temp) / x;
-    }
-}
-
-float xm_fmod(float a, float b)
-{
-    return (a - b * xm_floor(a / b));
-}
-
-int xm_ceil(float n){
-    return -xm_floor(-n);
-}
-
-
-/* Sin e Cos retirados de
-   http://forum.arduino.cc/index.php?topic=69723.0
-*/
-
-unsigned int __isinTable16[] = {
-    0, 1144, 2287, 3430, 4571, 5712, 6850, 7987, 9121, 10252, 11380,
-    12505, 13625, 14742, 15854, 16962, 18064, 19161, 20251, 21336, 22414,
-    23486, 24550, 25607, 26655, 27696, 28729, 29752, 30767, 31772, 32768,
-
-    33753, 34728, 35693, 36647, 37589, 38521, 39440, 40347, 41243, 42125,
-    42995, 43851, 44695, 45524, 46340, 47142, 47929, 48702, 49460, 50203,
-    50930, 51642, 52339, 53019, 53683, 54331, 54962, 55577, 56174, 56755,
-
-    57318, 57864, 58392, 58902, 59395, 59869, 60325, 60763, 61182, 61583,
-    61965, 62327, 62671, 62996, 63302, 63588, 63855, 64103, 64331, 64539,
-    64728, 64897, 65047, 65176, 65286, 65375, 65445, 65495, 65525, 65535,
-};
-
-
-float __isin(long x)
-{
-    int bool_pos = 1;  /* positive - keeps an eye on the sign. */
-    if (x < 0)
-    {
-        x = -x;
-        bool_pos = !bool_pos;
-    }
-    if (x >= 360) x %= 360;
-    if (x > 180)
-    {
-        x -= 180;
-        bool_pos = !bool_pos;
-    }
-    if (x > 90) x = 180 - x;
-    if (bool_pos) return __isinTable16[x] * 0.0000152590219;
-    return __isinTable16[x] * -0.0000152590219 ;
-}
-
-float __icos(long x)
-{
-    return __isin(x+90);
-}
-
-float xm_sin(float d)
-{
-    float a = __isin(d);
-    float b = __isin(d+1);
-    return a + (d-(int)d) * (b-a);
-}
-
-float xm_cos(float d)
-{
-    float a = __icos(d);
-    float b = __icos(d+1);
-    return a + (d-(int)d) * (b-a);
-}
-
-/* Nvidia */
-float xm_acos(float x) {
-    float negate = (float)(x < 0);
-    x = (x >= 0) ? x : -x;
-    float ret = -0.0187293;
-    ret = ret * x;
-    ret = ret + 0.0742610;
-    ret = ret * x;
-    ret = ret - 0.2121144;
-    ret = ret * x;
-    ret = ret + 1.5707288;
-    ret = ret * xm_sqrt(1.0-x);
-    ret = ret - 2 * negate * ret;
-    return negate * 3.14159265358979 + ret;
-}
-
-float xm_fabs(float f){
-    return f < 0 ? -f : f;
-}
-
-#ifdef __cplusplus
-}
-#endif
-
-/* X_PNG */
-
 /*
-LodePNG version 20180611
+LodePNG version 20190814
 
-Copyright (c) 2005-2018 Lode Vandevenne
+Copyright (c) 2005-2019 Lode Vandevenne
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -1538,36 +401,44 @@ the custom_zlib field of the compress and decompress settings*/
 #ifndef LODEPNG_NO_COMPILE_ZLIB
 #define LODEPNG_COMPILE_ZLIB
 #endif
+
 /*png encoder and png decoder*/
 #ifndef LODEPNG_NO_COMPILE_PNG
 #define LODEPNG_COMPILE_PNG
 #endif
+
 /*deflate&zlib decoder and png decoder*/
 #ifndef LODEPNG_NO_COMPILE_DECODER
 #define LODEPNG_COMPILE_DECODER
 #endif
+
 /*deflate&zlib encoder and png encoder*/
 #ifndef LODEPNG_NO_COMPILE_ENCODER
 #define LODEPNG_COMPILE_ENCODER
 #endif
+
 /*the optional built in harddisk file loading and saving functions*/
 #ifndef LODEPNG_NO_COMPILE_DISK
 #define LODEPNG_COMPILE_DISK
 #endif
+
 /*support for chunks other than IHDR, IDAT, PLTE, tRNS, IEND: ancillary and unknown chunks*/
 #ifndef LODEPNG_NO_COMPILE_ANCILLARY_CHUNKS
 #define LODEPNG_COMPILE_ANCILLARY_CHUNKS
 #endif
+
 /*ability to convert error numerical codes to English text string*/
 #ifndef LODEPNG_NO_COMPILE_ERROR_TEXT
 #define LODEPNG_COMPILE_ERROR_TEXT
 #endif
+
 /*Compile the default allocators (C's free, malloc and realloc). If you disable this,
 you can define the functions lodepng_free, lodepng_malloc and lodepng_realloc in your
 source files with custom allocators.*/
 #ifndef LODEPNG_NO_COMPILE_ALLOCATORS
 #define LODEPNG_COMPILE_ALLOCATORS
 #endif
+
 /*compile the C++ version (you can disable the C++ wrapper here even when compiling for C++)*/
 #ifdef __cplusplus
 #ifndef LODEPNG_NO_COMPILE_CPP
@@ -1581,18 +452,20 @@ source files with custom allocators.*/
 #endif /*LODEPNG_COMPILE_CPP*/
 
 #ifdef LODEPNG_COMPILE_PNG
-/*The PNG color types (also used for raw).*/
-
-#if 0 /*moved to beginning*/
-typedef enum LodePNGColorType
-{
-  LCT_GREY = 0, /*greyscale: 1,2,4,8,16 bit*/
+/*The PNG color types (also used for raw image).*/
+typedef enum LodePNGColorType {
+  LCT_GREY = 0, /*grayscale: 1,2,4,8,16 bit*/
   LCT_RGB = 2, /*RGB: 8,16 bit*/
   LCT_PALETTE = 3, /*palette: 1,2,4,8 bit*/
-  LCT_GREY_ALPHA = 4, /*greyscale with alpha: 8,16 bit*/
-  LCT_RGBA = 6 /*RGB with alpha: 8,16 bit*/
+  LCT_GREY_ALPHA = 4, /*grayscale with alpha: 8,16 bit*/
+  LCT_RGBA = 6, /*RGB with alpha: 8,16 bit*/
+  /*LCT_MAX_OCTET_VALUE lets the compiler allow this enum to represent any invalid
+  byte value from 0 to 255 that could be present in an invalid PNG file header. Do
+  not use, compare with or set the name LCT_MAX_OCTET_VALUE, instead either use
+  the valid color type names above, or numeric values like 1 or 7 when checking for
+  particular disallowed color type byte values, or cast to integer to print it.*/
+  LCT_MAX_OCTET_VALUE = 255
 } LodePNGColorType;
-#endif
 
 #ifdef LODEPNG_COMPILE_DECODER
 /*
@@ -1693,8 +566,7 @@ unsigned lodepng_encode24_file(const char* filename,
 
 
 #ifdef LODEPNG_COMPILE_CPP
-namespace lodepng
-{
+namespace lodepng {
 #ifdef LODEPNG_COMPILE_DECODER
 /*Same as lodepng_decode_memory, but decodes to an std::vector. The colortype
 is the format to output the pixels to. Default is RGBA 8-bit per channel.*/
@@ -1750,10 +622,10 @@ const char* lodepng_error_text(unsigned code);
 #ifdef LODEPNG_COMPILE_DECODER
 /*Settings for zlib decompression*/
 typedef struct LodePNGDecompressSettings LodePNGDecompressSettings;
-struct LodePNGDecompressSettings
-{
-  /* Check LodePNGDecoderSettings for more ignorable errors */
+struct LodePNGDecompressSettings {
+  /* Check LodePNGDecoderSettings for more ignorable errors such as ignore_crc */
   unsigned ignore_adler32; /*if 1, continue and don't give an error message if the Adler32 checksum is corrupted*/
+  unsigned ignore_nlen; /*ignore complement of len checksum in uncompressed blocks*/
 
   /*use custom zlib decoder instead of built in one (default: null)*/
   unsigned (*custom_zlib)(unsigned char**, size_t*,
@@ -1779,8 +651,7 @@ Settings for zlib compression. Tweaking these settings tweaks the balance
 between speed and compression ratio.
 */
 typedef struct LodePNGCompressSettings LodePNGCompressSettings;
-struct LodePNGCompressSettings /*deflate = compress*/
-{
+struct LodePNGCompressSettings /*deflate = compress*/ {
   /*LZ77 related settings*/
   unsigned btype; /*the block type for LZ (0, 1, 2 or 3, see zlib standard). Should be 2 for proper compression.*/
   unsigned use_lz77; /*whether or not to use LZ77. Should be 1 for proper compression.*/
@@ -1813,8 +684,7 @@ Color mode of an image. Contains all information required to decode the pixel
 bits to RGBA colors. This information is the same as used in the PNG file
 format, and is used both for PNG and raw image data in LodePNG.
 */
-typedef struct LodePNGColorMode
-{
+typedef struct LodePNGColorMode {
   /*header (IHDR)*/
   LodePNGColorType colortype; /*color type, see PNG standard or documentation further in this header file*/
   unsigned bitdepth;  /*bits per sample, see PNG standard or documentation further in this header file*/
@@ -1839,7 +709,7 @@ typedef struct LodePNGColorMode
   transparent color key (tRNS)
 
   This color uses the same bit depth as the bitdepth value in this struct, which can be 1-bit to 16-bit.
-  For greyscale PNGs, r, g and b will all 3 be set to the same.
+  For grayscale PNGs, r, g and b will all 3 be set to the same.
 
   When decoding, by default you can ignore this information, since LodePNG sets
   pixels with this key to transparent already in the raw RGBA output.
@@ -1847,7 +717,7 @@ typedef struct LodePNGColorMode
   The color key is only supported for color types 0 and 2.
   */
   unsigned key_defined; /*is a transparent color key given? 0 = false, 1 = true*/
-  unsigned key_r;       /*red/greyscale component of color key*/
+  unsigned key_r;       /*red/grayscale component of color key*/
   unsigned key_g;       /*green component of color key*/
   unsigned key_b;       /*blue component of color key*/
 } LodePNGColorMode;
@@ -1857,6 +727,8 @@ void lodepng_color_mode_init(LodePNGColorMode* info);
 void lodepng_color_mode_cleanup(LodePNGColorMode* info);
 /*return value is error code (0 means no error)*/
 unsigned lodepng_color_mode_copy(LodePNGColorMode* dest, const LodePNGColorMode* source);
+/* Makes a temporary LodePNGColorMode that does not need cleanup (no palette) */
+LodePNGColorMode lodepng_color_mode_make(LodePNGColorType colortype, unsigned bitdepth);
 
 void lodepng_palette_clear(LodePNGColorMode* info);
 /*add 1 color to the palette*/
@@ -1868,7 +740,7 @@ unsigned lodepng_get_bpp(const LodePNGColorMode* info);
 /*get the amount of color channels used, based on colortype in the struct.
 If a palette is used, it counts as 1 channel.*/
 unsigned lodepng_get_channels(const LodePNGColorMode* info);
-/*is it a greyscale type? (only colortype 0 or 4)*/
+/*is it a grayscale type? (only colortype 0 or 4)*/
 unsigned lodepng_is_greyscale_type(const LodePNGColorMode* info);
 /*has it got an alpha channel? (only colortype 2 or 6)*/
 unsigned lodepng_is_alpha_type(const LodePNGColorMode* info);
@@ -1890,8 +762,7 @@ size_t lodepng_get_raw_size(unsigned w, unsigned h, const LodePNGColorMode* colo
 
 #ifdef LODEPNG_COMPILE_ANCILLARY_CHUNKS
 /*The information of a Time chunk in PNG.*/
-typedef struct LodePNGTime
-{
+typedef struct LodePNGTime {
   unsigned year;    /*2 bytes used (0-65535)*/
   unsigned month;   /*1-12*/
   unsigned day;     /*1-31*/
@@ -1902,8 +773,7 @@ typedef struct LodePNGTime
 #endif /*LODEPNG_COMPILE_ANCILLARY_CHUNKS*/
 
 /*Information about the PNG image, except pixels, width and height.*/
-typedef struct LodePNGInfo
-{
+typedef struct LodePNGInfo {
   /*header (IHDR), palette (PLTE) and transparency (tRNS) chunks*/
   unsigned compression_method;/*compression method of the original file. Always 0.*/
   unsigned filter_method;     /*filter method of the original file*/
@@ -1912,18 +782,30 @@ typedef struct LodePNGInfo
 
 #ifdef LODEPNG_COMPILE_ANCILLARY_CHUNKS
   /*
-  suggested background color chunk (bKGD)
-  This color uses the same color mode as the PNG (except alpha channel), which can be 1-bit to 16-bit.
+  Suggested background color chunk (bKGD)
 
-  For greyscale PNGs, r, g and b will all 3 be set to the same. When encoding
-  the encoder writes the red one. For palette PNGs: When decoding, the RGB value
-  will be stored, not a palette index. But when encoding, specify the index of
-  the palette in background_r, the other two are then ignored.
+  This uses the same color mode and bit depth as the PNG (except no alpha channel),
+  with values truncated to the bit depth in the unsigned integer.
 
-  The decoder does not use this background color to edit the color of pixels.
+  For grayscale and palette PNGs, the value is stored in background_r. The values
+  in background_g and background_b are then unused.
+
+  So when decoding, you may get these in a different color mode than the one you requested
+  for the raw pixels.
+
+  When encoding with auto_convert, you must use the color model defined in info_png.color for
+  these values. The encoder normally ignores info_png.color when auto_convert is on, but will
+  use it to interpret these values (and convert copies of them to its chosen color model).
+
+  When encoding, avoid setting this to an expensive color, such as a non-gray value
+  when the image is gray, or the compression will be worse since it will be forced to
+  write the PNG with a more expensive color mode (when auto_convert is on).
+
+  The decoder does not use this background color to edit the color of pixels. This is a
+  completely optional metadata feature.
   */
   unsigned background_defined; /*is a suggested background color given?*/
-  unsigned background_r;       /*red component of suggested background color*/
+  unsigned background_r;       /*red/gray/palette component of suggested background color*/
   unsigned background_g;       /*green component of suggested background color*/
   unsigned background_b;       /*blue component of suggested background color*/
 
@@ -1933,6 +815,10 @@ typedef struct LodePNGInfo
   The char** arrays each contain num strings. The actual messages are in
   text_strings, while text_keys are keywords that give a short description what
   the actual text represents, e.g. Title, Author, Description, or anything else.
+
+  All the string fields below including keys, names and language tags are null terminated.
+  The PNG specification uses null characters for the keys, names and tags, and forbids null
+  characters to appear in the main text which is why we can use null termination everywhere here.
 
   A keyword is minimum 1 character and maximum 79 characters long. It's
   discouraged to use a single line length longer than 79 characters for texts.
@@ -1966,11 +852,86 @@ typedef struct LodePNGInfo
   unsigned phys_unit; /*may be 0 (unknown unit) or 1 (metre)*/
 
   /*
-  unknown chunks
-  There are 3 buffers, one for each position in the PNG where unknown chunks can appear
-  each buffer contains all unknown chunks for that position consecutively
-  The 3 buffers are the unknown chunks between certain critical chunks:
-  0: IHDR-PLTE, 1: PLTE-IDAT, 2: IDAT-IEND
+  Color profile related chunks: gAMA, cHRM, sRGB, iCPP
+
+  LodePNG does not apply any color conversions on pixels in the encoder or decoder and does not interpret these color
+  profile values. It merely passes on the information. If you wish to use color profiles and convert colors, please
+  use these values with a color management library.
+
+  See the PNG, ICC and sRGB specifications for more information about the meaning of these values.
+  */
+
+  /* gAMA chunk: optional, overridden by sRGB or iCCP if those are present. */
+  unsigned gama_defined; /* Whether a gAMA chunk is present (0 = not present, 1 = present). */
+  unsigned gama_gamma;   /* Gamma exponent times 100000 */
+
+  /* cHRM chunk: optional, overridden by sRGB or iCCP if those are present. */
+  unsigned chrm_defined; /* Whether a cHRM chunk is present (0 = not present, 1 = present). */
+  unsigned chrm_white_x; /* White Point x times 100000 */
+  unsigned chrm_white_y; /* White Point y times 100000 */
+  unsigned chrm_red_x;   /* Red x times 100000 */
+  unsigned chrm_red_y;   /* Red y times 100000 */
+  unsigned chrm_green_x; /* Green x times 100000 */
+  unsigned chrm_green_y; /* Green y times 100000 */
+  unsigned chrm_blue_x;  /* Blue x times 100000 */
+  unsigned chrm_blue_y;  /* Blue y times 100000 */
+
+  /*
+  sRGB chunk: optional. May not appear at the same time as iCCP.
+  If gAMA is also present gAMA must contain value 45455.
+  If cHRM is also present cHRM must contain respectively 31270,32900,64000,33000,30000,60000,15000,6000.
+  */
+  unsigned srgb_defined; /* Whether an sRGB chunk is present (0 = not present, 1 = present). */
+  unsigned srgb_intent;  /* Rendering intent: 0=perceptual, 1=rel. colorimetric, 2=saturation, 3=abs. colorimetric */
+
+  /*
+  iCCP chunk: optional. May not appear at the same time as sRGB.
+
+  LodePNG does not parse or use the ICC profile (except its color space header field for an edge case), a
+  separate library to handle the ICC data (not included in LodePNG) format is needed to use it for color
+  management and conversions.
+
+  For encoding, if iCCP is present, gAMA and cHRM are recommended to be added as well with values that match the ICC
+  profile as closely as possible, if you wish to do this you should provide the correct values for gAMA and cHRM and
+  enable their '_defined' flags since LodePNG will not automatically compute them from the ICC profile.
+
+  For encoding, the ICC profile is required by the PNG specification to be an "RGB" profile for non-gray
+  PNG color types and a "GRAY" profile for gray PNG color types. If you disable auto_convert, you must ensure
+  the ICC profile type matches your requested color type, else the encoder gives an error. If auto_convert is
+  enabled (the default), and the ICC profile is not a good match for the pixel data, this will result in an encoder
+  error if the pixel data has non-gray pixels for a GRAY profile, or a silent less-optimal compression of the pixel
+  data if the pixels could be encoded as grayscale but the ICC profile is RGB.
+
+  To avoid this do not set an ICC profile in the image unless there is a good reason for it, and when doing so
+  make sure you compute it carefully to avoid the above problems.
+  */
+  unsigned iccp_defined;      /* Whether an iCCP chunk is present (0 = not present, 1 = present). */
+  char* iccp_name;            /* Null terminated string with profile name, 1-79 bytes */
+  /*
+  The ICC profile in iccp_profile_size bytes.
+  Don't allocate this buffer yourself. Use the init/cleanup functions
+  correctly and use lodepng_set_icc and lodepng_clear_icc.
+  */
+  unsigned char* iccp_profile;
+  unsigned iccp_profile_size; /* The size of iccp_profile in bytes */
+
+  /* End of color profile related chunks */
+
+
+  /*
+  unknown chunks: chunks not known by LodePNG, passed on byte for byte.
+
+  There are 3 buffers, one for each position in the PNG where unknown chunks can appear.
+  Each buffer contains all unknown chunks for that position consecutively.
+  The 3 positions are:
+  0: between IHDR and PLTE, 1: between PLTE and IDAT, 2: between IDAT and IEND.
+
+  For encoding, do not store critical chunks or known chunks that are enabled with a "_defined" flag
+  above in here, since the encoder will blindly follow this and could then encode an invalid PNG file
+  (such as one with two IHDR chunks or the disallowed combination of sRGB with iCCP). But do use
+  this if you wish to store an ancillary chunk that is not supported by LodePNG (such as sPLT or hIST),
+  or any non-standard PNG chunk.
+
   Do not allocate or traverse this data yourself. Use the chunk traversing functions declared
   later, such as lodepng_chunk_next and lodepng_chunk_append, to read/write this struct.
   */
@@ -1986,12 +947,16 @@ void lodepng_info_cleanup(LodePNGInfo* info);
 unsigned lodepng_info_copy(LodePNGInfo* dest, const LodePNGInfo* source);
 
 #ifdef LODEPNG_COMPILE_ANCILLARY_CHUNKS
-void lodepng_clear_text(LodePNGInfo* info); /*use this to clear the texts again after you filled them in*/
 unsigned lodepng_add_text(LodePNGInfo* info, const char* key, const char* str); /*push back both texts at once*/
+void lodepng_clear_text(LodePNGInfo* info); /*use this to clear the texts again after you filled them in*/
 
-void lodepng_clear_itext(LodePNGInfo* info); /*use this to clear the itexts again after you filled them in*/
 unsigned lodepng_add_itext(LodePNGInfo* info, const char* key, const char* langtag,
                            const char* transkey, const char* str); /*push back the 4 texts of 1 chunk at once*/
+void lodepng_clear_itext(LodePNGInfo* info); /*use this to clear the itexts again after you filled them in*/
+
+/*replaces if exists*/
+unsigned lodepng_set_icc(LodePNGInfo* info, const char* name, const unsigned char* profile, unsigned profile_size);
+void lodepng_clear_icc(LodePNGInfo* info); /*use this to clear the texts again after you filled them in*/
 #endif /*LODEPNG_COMPILE_ANCILLARY_CHUNKS*/
 
 /*
@@ -2014,14 +979,17 @@ unsigned lodepng_convert(unsigned char* out, const unsigned char* in,
 Settings for the decoder. This contains settings for the PNG and the Zlib
 decoder, but not the Info settings from the Info structs.
 */
-typedef struct LodePNGDecoderSettings
-{
+typedef struct LodePNGDecoderSettings {
   LodePNGDecompressSettings zlibsettings; /*in here is the setting to ignore Adler32 checksums*/
 
-  /* Check LodePNGDecompressSettings for more ignorable errors */
+  /* Check LodePNGDecompressSettings for more ignorable errors such as ignore_adler32 */
   unsigned ignore_crc; /*ignore CRC checksums*/
   unsigned ignore_critical; /*ignore unknown critical chunks*/
   unsigned ignore_end; /*ignore issues at end of file if possible (missing IEND chunk, too large chunk, ...)*/
+  /* TODO: make a system involving warnings with levels and a strict mode instead. Other potentially recoverable
+     errors: srgb rendering intent value, size of content of ancillary chunks, more than 79 characters for some
+     strings, placement/combination rules for ancillary chunks, crc of unknown chunks, allowed characters
+     in string keys, etc... */
 
   unsigned color_convert; /*whether to convert the PNG to the color type you want. Default: yes*/
 
@@ -2037,10 +1005,14 @@ void lodepng_decoder_settings_init(LodePNGDecoderSettings* settings);
 
 #ifdef LODEPNG_COMPILE_ENCODER
 /*automatically use color type with less bits per pixel if losslessly possible. Default: AUTO*/
-typedef enum LodePNGFilterStrategy
-{
+typedef enum LodePNGFilterStrategy {
   /*every filter at zero*/
-  LFS_ZERO,
+  LFS_ZERO = 0,
+  /*every filter at 1, 2, 3 or 4 (paeth), unlike LFS_ZERO not a good choice, but for testing*/
+  LFS_ONE = 1,
+  LFS_TWO = 2,
+  LFS_THREE = 3,
+  LFS_FOUR = 4,
   /*Use filter that gives minimum sum, as described in the official PNG filter heuristic.*/
   LFS_MINSUM,
   /*Use the filter type that gives smallest Shannon entropy for this scanline. Depending
@@ -2055,36 +1027,45 @@ typedef enum LodePNGFilterStrategy
   LFS_PREDEFINED
 } LodePNGFilterStrategy;
 
-/*Gives characteristics about the colors of the image, which helps decide which color model to use for encoding.
+/*Gives characteristics about the integer RGBA colors of the image (count, alpha channel usage, bit depth, ...),
+which helps decide which color model to use for encoding.
 Used internally by default if "auto_convert" is enabled. Public because it's useful for custom algorithms.*/
-typedef struct LodePNGColorProfile
-{
-  unsigned colored; /*not greyscale*/
+typedef struct LodePNGColorStats {
+  unsigned colored; /*not grayscale*/
   unsigned key; /*image is not opaque and color key is possible instead of full alpha*/
   unsigned short key_r; /*key values, always as 16-bit, in 8-bit case the byte is duplicated, e.g. 65535 means 255*/
   unsigned short key_g;
   unsigned short key_b;
   unsigned alpha; /*image is not opaque and alpha channel or alpha palette required*/
-  unsigned numcolors; /*amount of colors, up to 257. Not valid if bits == 16.*/
-  unsigned char palette[1024]; /*Remembers up to the first 256 RGBA colors, in no particular order*/
-  unsigned bits; /*bits per channel (not for palette). 1,2 or 4 for greyscale only. 16 if 16-bit per channel required.*/
-} LodePNGColorProfile;
+  unsigned numcolors; /*amount of colors, up to 257. Not valid if bits == 16 or allow_palette is disabled.*/
+  unsigned char palette[1024]; /*Remembers up to the first 256 RGBA colors, in no particular order, only valid when numcolors is valid*/
+  unsigned bits; /*bits per channel (not for palette). 1,2 or 4 for grayscale only. 16 if 16-bit per channel required.*/
+  size_t numpixels;
 
-void lodepng_color_profile_init(LodePNGColorProfile* profile);
+  /*user settings for computing/using the stats*/
+  unsigned allow_palette; /*default 1. if 0, disallow choosing palette colortype in auto_choose_color, and don't count numcolors*/
+  unsigned allow_greyscale; /*default 1. if 0, choose RGB or RGBA even if the image only has gray colors*/
+} LodePNGColorStats;
 
-/*Get a LodePNGColorProfile of the image.*/
-unsigned lodepng_get_color_profile(LodePNGColorProfile* profile,
-                                   const unsigned char* image, unsigned w, unsigned h,
-                                   const LodePNGColorMode* mode_in);
-/*The function LodePNG uses internally to decide the PNG color with auto_convert.
-Chooses an optimal color model, e.g. grey if only grey pixels, palette if < 256 colors, ...*/
+void lodepng_color_stats_init(LodePNGColorStats* stats);
+
+/*Get a LodePNGColorStats of the image. The stats must already have been inited.*/
+void lodepng_compute_color_stats(LodePNGColorStats* stats,
+                                 const unsigned char* image, unsigned w, unsigned h,
+                                 const LodePNGColorMode* mode_in);
+/*Computes a minimal PNG color model that can contain all colors as indicated by the stats and it settings.
+The stats should be computed with lodepng_compute_color_stats.
+mode_in is raw color profile of the image the stats were computed on, to copy palette order from when relevant.
+Minimal PNG color model means the color type and bit depth that gives smallest amount of bits in the output image,
+e.g. gray if only grayscale pixels, palette if less than 256 colors, color key if only single transparent color, ...
+LodePNG uses this function internally if auto_convert is enabled (it is by default).
+*/
 unsigned lodepng_auto_choose_color(LodePNGColorMode* mode_out,
-                                   const unsigned char* image, unsigned w, unsigned h,
-                                   const LodePNGColorMode* mode_in);
+                                   const LodePNGColorMode* mode_in,
+                                   const LodePNGColorMode* stats);
 
 /*Settings for the encoder.*/
-typedef struct LodePNGEncoderSettings
-{
+typedef struct LodePNGEncoderSettings {
   LodePNGCompressSettings zlibsettings; /*settings for the zlib encoder, such as window size, ...*/
 
   unsigned auto_convert; /*automatically choose output PNG color type. Default: true*/
@@ -2120,8 +1101,7 @@ void lodepng_encoder_settings_init(LodePNGEncoderSettings* settings);
 
 #if defined(LODEPNG_COMPILE_DECODER) || defined(LODEPNG_COMPILE_ENCODER)
 /*The settings, state and information for extended encoding and decoding.*/
-typedef struct LodePNGState
-{
+typedef struct LodePNGState {
 #ifdef LODEPNG_COMPILE_DECODER
   LodePNGDecoderSettings decoder; /*the decoding settings*/
 #endif /*LODEPNG_COMPILE_DECODER*/
@@ -2154,7 +1134,7 @@ unsigned lodepng_decode(unsigned char** out, unsigned* w, unsigned* h,
 
 /*
 Read the PNG header, but not the actual data. This returns only the information
-that is in the header chunk of the PNG, such as width, height and color type. The
+that is in the IHDR chunk of the PNG, such as width, height and color type. The
 information is placed in the info_png field of the LodePNGState.
 */
 unsigned lodepng_inspect(unsigned* w, unsigned* h,
@@ -2162,6 +1142,20 @@ unsigned lodepng_inspect(unsigned* w, unsigned* h,
                          const unsigned char* in, size_t insize);
 #endif /*LODEPNG_COMPILE_DECODER*/
 
+/*
+Reads one metadata chunk (other than IHDR) of the PNG file and outputs what it
+read in the state. Returns error code on failure.
+Use lodepng_inspect first with a new state, then e.g. lodepng_chunk_find_const
+to find the desired chunk type, and if non null use lodepng_inspect_chunk (with
+chunk_pointer - start_of_file as pos).
+Supports most metadata chunks from the PNG standard (gAMA, bKGD, tEXt, ...).
+Ignores unsupported, unknown, non-metadata or IHDR chunks (without error).
+Requirements: &in[pos] must point to start of a chunk, must use regular
+lodepng_inspect first since format of most other chunks depends on IHDR, and if
+there is a PLTE chunk, that one must be inspected before tRNS or bKGD.
+*/
+unsigned lodepng_inspect_chunk(LodePNGState* state, size_t pos,
+                               const unsigned char* in, size_t insize);
 
 #ifdef LODEPNG_COMPILE_ENCODER
 /*This function allocates the out buffer with standard malloc and stores the size in *outsize.*/
@@ -2175,11 +1169,23 @@ The lodepng_chunk functions are normally not needed, except to traverse the
 unknown chunks stored in the LodePNGInfo struct, or add new ones to it.
 It also allows traversing the chunks of an encoded PNG file yourself.
 
-PNG standard chunk naming conventions:
-First byte: uppercase = critical, lowercase = ancillary
-Second byte: uppercase = public, lowercase = private
-Third byte: must be uppercase
-Fourth byte: uppercase = unsafe to copy, lowercase = safe to copy
+The chunk pointer always points to the beginning of the chunk itself, that is
+the first byte of the 4 length bytes.
+
+In the PNG file format, chunks have the following format:
+-4 bytes length: length of the data of the chunk in bytes (chunk itself is 12 bytes longer)
+-4 bytes chunk type (ASCII a-z,A-Z only, see below)
+-length bytes of data (may be 0 bytes if length was 0)
+-4 bytes of CRC, computed on chunk name + data
+
+The first chunk starts at the 8th byte of the PNG file, the entire rest of the file
+exists out of concatenated chunks with the above format.
+
+PNG standard chunk ASCII naming conventions:
+-First byte: uppercase = critical, lowercase = ancillary
+-Second byte: uppercase = public, lowercase = private
+-Third byte: must be uppercase
+-Fourth byte: uppercase = unsafe to copy, lowercase = safe to copy
 */
 
 /*
@@ -2214,9 +1220,23 @@ unsigned lodepng_chunk_check_crc(const unsigned char* chunk);
 /*generates the correct CRC from the data and puts it in the last 4 bytes of the chunk*/
 void lodepng_chunk_generate_crc(unsigned char* chunk);
 
-/*iterate to next chunks. don't use on IEND chunk, as there is no next chunk then*/
+/*
+Iterate to next chunks, allows iterating through all chunks of the PNG file.
+Input must be at the beginning of a chunk (result of a previous lodepng_chunk_next call,
+or the 8th byte of a PNG file which always has the first chunk), or alternatively may
+point to the first byte of the PNG file (which is not a chunk but the magic header, the
+function will then skip over it and return the first real chunk).
+Expects at least 8 readable bytes of memory in the input pointer.
+Will output pointer to the start of the next chunk or the end of the file if there
+is no more chunk after this. Start this process at the 8th byte of the PNG file.
+In a non-corrupt PNG file, the last chunk should have name "IEND".
+*/
 unsigned char* lodepng_chunk_next(unsigned char* chunk);
 const unsigned char* lodepng_chunk_next_const(const unsigned char* chunk);
+
+/*Finds the first chunk with the given type in the range [chunk, end), or returns NULL if not found.*/
+unsigned char* lodepng_chunk_find(unsigned char* chunk, const unsigned char* end, const char type[5]);
+const unsigned char* lodepng_chunk_find_const(const unsigned char* chunk, const unsigned char* end, const char type[5]);
 
 /*
 Appends chunk to the data in out. The given chunk should already have its chunk header.
@@ -2315,11 +1335,9 @@ unsigned lodepng_save_file(const unsigned char* buffer, size_t buffersize, const
 
 #ifdef LODEPNG_COMPILE_CPP
 /* The LodePNG C++ wrapper uses std::vectors instead of manually allocated memory buffers. */
-namespace lodepng
-{
+namespace lodepng {
 #ifdef LODEPNG_COMPILE_PNG
-class State : public LodePNGState
-{
+class State : public LodePNGState {
   public:
     State();
     State(const State& other);
@@ -2391,16 +1409,22 @@ TODO:
 [.] test if there are no memory leaks or security exploits - done a lot but needs to be checked often
 [.] check compatibility with various compilers  - done but needs to be redone for every newer version
 [X] converting color to 16-bit per channel types
-[ ] read all public PNG chunk types (but never let the color profile and gamma ones touch RGB values)
+[X] support color profile chunk types (but never let them touch RGB values by default)
+[ ] support all public PNG chunk types (almost done except sBIT, sPLT and hIST)
 [ ] make sure encoder generates no chunks with size > (2^31)-1
 [ ] partial decoding (stream processing)
 [X] let the "isFullyOpaque" function check color keys and transparent palettes too
 [X] better name for the variables "codes", "codesD", "codelengthcodes", "clcl" and "lldl"
-[ ] don't stop decoding on errors like 69, 57, 58 (make warnings)
+[ ] allow treating some errors like warnings, when image is recoverable (e.g. 69, 57, 58)
 [ ] make warnings like: oob palette, checksum fail, data after iend, wrong/unknown crit chunk, no null terminator in text, ...
+[ ] error messages with line numbers (and version)
+[ ] errors in state instead of as return code?
+[ ] new errors/warnings like suspiciously big decompressed ztxt or iccp chunk
 [ ] let the C++ wrapper catch exceptions coming from the standard library and return LodePNG error codes
 [ ] allow user to provide custom color conversion functions, e.g. for premultiplied alpha, padding bits or not, ...
 [ ] allow user to give data (void*) to custom allocator
+[ ] provide alternatives for C library functions not present on some platforms (memcpy, ...)
+[ ] rename "grey" to "gray" everywhere since "color" also uses US spelling (keep "grey" copies for backwards compatibility)
 */
 
 #endif /*LODEPNG_H inclusion guard*/
@@ -2495,8 +1519,10 @@ The following features are supported by the decoder:
 *) zlib decompression (inflate)
 *) zlib compression (deflate)
 *) CRC32 and ADLER32 checksums
+*) colorimetric color profile conversions: currently experimentally available in lodepng_util.cpp only,
+   plus alternatively ability to pass on chroma/gamma/ICC profile information to other color management system.
 *) handling of unknown chunks, allowing making a PNG editor that stores custom and unknown chunks.
-*) the following chunks are supported (generated/interpreted) by both encoder and decoder:
+*) the following chunks are supported by both encoder and decoder:
     IHDR: header information
     PLTE: color palette
     IDAT: pixel data
@@ -2508,6 +1534,10 @@ The following features are supported by the decoder:
     bKGD: suggested background color
     pHYs: physical dimensions
     tIME: modification time
+    cHRM: RGB chromaticities
+    gAMA: RGB gamma correction
+    iCCP: ICC color profile
+    sRGB: rendering intent
 
 1.2. features not supported
 ---------------------------
@@ -2516,10 +1546,10 @@ The following features are _not_ supported:
 
 *) some features needed to make a conformant PNG-Editor might be still missing.
 *) partial loading/stream processing. All data must be available and is processed in one call.
-*) The following public chunks are not supported but treated as unknown chunks by LodePNG
-    cHRM, gAMA, iCCP, sRGB, sBIT, hIST, sPLT
-   Some of these are not supported on purpose: LodePNG wants to provide the RGB values
-   stored in the pixels, not values modified by system dependent gamma or color models.
+*) The following public chunks are not (yet) supported but treated as unknown chunks by LodePNG:
+    sBIT
+    hIST
+    sPLT
 
 
 2. C and C++ version
@@ -2593,7 +1623,7 @@ LodePNGColorMode info_raw
 When decoding, here you can specify which color type you want
 the resulting raw image to be. If this is different from the colortype of the
 PNG, then the decoder will automatically convert the result. This conversion
-always works, except if you want it to convert a color PNG to greyscale or to
+always works, except if you want it to convert a color PNG to grayscale or to
 a palette with missing colors.
 
 By default, 32-bit color is used for the result.
@@ -2689,7 +1719,7 @@ can encode the colors of all pixels without information loss.
 An important thing to note about LodePNG, is that the color type of the PNG, and
 the color type of the raw image, are completely independent. By default, when
 you decode a PNG, you get the result as a raw image in the color type you want,
-no matter whether the PNG was encoded with a palette, greyscale or RGBA color.
+no matter whether the PNG was encoded with a palette, grayscale or RGBA color.
 And if you encode an image, by default LodePNG will automatically choose the PNG
 color type that gives good compression based on the values of colors and amount
 of colors in the image. It can be configured to let you control it instead as
@@ -2697,10 +1727,10 @@ well, though.
 
 To be able to do this, LodePNG does conversions from one color mode to another.
 It can convert from almost any color type to any other color type, except the
-following conversions: RGB to greyscale is not supported, and converting to a
+following conversions: RGB to grayscale is not supported, and converting to a
 palette when the palette doesn't have a required color is not supported. This is
 not supported on purpose: this is information loss which requires a color
-reduction algorithm that is beyong the scope of a PNG encoder (yes, RGB to grey
+reduction algorithm that is beyong the scope of a PNG encoder (yes, RGB to gray
 is easy, but there are multiple ways if you want to give some channels more
 weight).
 
@@ -2721,10 +1751,10 @@ decoding to have another color type, a conversion is done by LodePNG.
 
 The PNG specification gives the following color types:
 
-0: greyscale, bit depths 1, 2, 4, 8, 16
+0: grayscale, bit depths 1, 2, 4, 8, 16
 2: RGB, bit depths 8 and 16
 3: palette, bit depths 1, 2, 4 and 8
-4: greyscale with alpha, bit depths 8 and 16
+4: grayscale with alpha, bit depths 8 and 16
 6: RGBA, bit depths 8 and 16
 
 Bit depth is the amount of bits per pixel per color channel. So the total amount
@@ -2773,15 +1803,22 @@ To avoid some confusion:
  the raw image correctly before encoding.
 -both encoder and decoder use the same color converter.
 
+The function lodepng_convert does the color conversion. It is available in the
+interface but normally isn't needed since the encoder and decoder already call
+it.
+
 Non supported color conversions:
--color to greyscale: no error is thrown, but the result will look ugly because
-only the red channel is taken
--anything to palette when that palette does not have that color in it: in this
-case an error is thrown
+-color to grayscale when non-gray pixels are present: no error is thrown, but
+the result will look ugly because only the red channel is taken (it assumes all
+three channels are the same in this case so ignores green and blue). The reason
+no error is given is to allow converting from three-channel grayscale images to
+one-channel even if there are numerical imprecisions.
+-anything to palette when the palette does not have an exact match for a from-color
+in it: in this case an error is thrown
 
 Supported color conversions:
 -anything to 8-bit RGB, 8-bit RGBA, 16-bit RGB, 16-bit RGBA
--any grey or grey+alpha, to grey or grey+alpha
+-any gray or gray+alpha, to gray or gray+alpha
 -anything to a palette, as long as the palette has the requested colors in it
 -removing alpha channel
 -higher to smaller bitdepth, and vice versa
@@ -2793,10 +1830,6 @@ false.
 -In the decoder, you can make it store the pixel data in the same color type
 as the PNG has, by setting the color_convert setting to false. Settings in
 info_raw are then ignored.
-
-The function lodepng_convert does the color conversion. It is available in the
-interface but normally isn't needed since the encoder and decoder already call
-it.
 
 6.3. padding bits
 -----------------
@@ -3021,8 +2054,7 @@ examples can be found on the LodePNG website.
 #include "lodepng.h"
 #include <iostream>
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
   const char* filename = argc > 1 ? argv[1] : "test.png";
 
   //load and decode
@@ -3041,8 +2073,7 @@ int main(int argc, char *argv[])
 
 #include "lodepng.h"
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
   unsigned error;
   unsigned char* image;
   size_t width, height;
@@ -3111,6 +2142,15 @@ yyyymmdd.
 Some changes aren't backwards compatible. Those are indicated with a (!)
 symbol.
 
+*) 14 aug 2019: around 25% faster decoding thanks to huffman lookup tables.
+*) 15 jun 2019 (!): auto_choose_color API changed (for bugfix: don't use palette
+   if gray ICC profile) and non-ICC LodePNGColorProfile renamed to LodePNGColorStats.
+*) 30 dec 2018: code style changes only: removed newlines before opening braces.
+*) 10 sep 2018: added way to inspect metadata chunks without full decoding.
+*) 19 aug 2018 (!): fixed color mode bKGD is encoded with and made it use
+   palette index in case of palette.
+*) 10 aug 2018 (!): added support for gAMA, cHRM, sRGB and iCCP chunks. This
+   change is backwards compatible unless you relied on unknown_chunks for those.
 *) 11 jun 2018: less restrictive check for pixel size integer overflow
 *) 14 jan 2018: allow optionally ignoring a few more recoverable errors
 *) 17 sep 2017: fix memory leak for some encoder input error cases
@@ -3263,15 +2303,12 @@ Domain: gmail dot com.
 Account: lode dot vandevenne.
 
 
-Copyright (c) 2005-2018 Lode Vandevenne
+Copyright (c) 2005-2019 Lode Vandevenne
 */
-
-/* X_PNG */
-
 /*
-LodePNG version 20180611
+LodePNG version 20190814
 
-Copyright (c) 2005-2018 Lode Vandevenne
+Copyright (c) 2005-2019 Lode Vandevenne
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -3298,16 +2335,22 @@ The manual and changelog are in the header file "lodepng.h"
 Rename this file to lodepng.cpp to use it for C++, or to lodepng.c to use it for C.
 */
 
-#include <limits.h>
-#include <stdio.h>
-#include <stdlib.h>
+
+#ifdef LODEPNG_COMPILE_DISK
+#include <limits.h> /* LONG_MAX */
+#include <stdio.h> /* file handling */
+#endif /* LODEPNG_COMPILE_DISK */
+
+#ifdef LODEPNG_COMPILE_ALLOCATORS
+#include <stdlib.h> /* allocations */
+#endif /* LODEPNG_COMPILE_ALLOCATORS */
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1310) /*Visual Studio: A few warning types are not desired here.*/
 #pragma warning( disable : 4244 ) /*implicit conversions: not warned by gcc -Wall -Wextra and requires too much casts*/
 #pragma warning( disable : 4996 ) /*VS does not like fopen, but fopen_s is not standard C so unusable here*/
 #endif /*_MSC_VER */
 
-const char* LODEPNG_VERSION_STRING = "20180611";
+const char* LODEPNG_VERSION_STRING = "20190814";
 
 /*
 This source file is built up in the following large parts. The code sections
@@ -3317,6 +2360,12 @@ with the "LODEPNG_COMPILE_" #defines divide this up further in an intermixed way
 -C Code for PNG (file format chunks, adam7, PNG filters, color conversions, ...)
 -The C++ wrapper around all of the above
 */
+
+/* ////////////////////////////////////////////////////////////////////////// */
+/* ////////////////////////////////////////////////////////////////////////// */
+/* // Tools for C, and common code for PNG and Zlib.                       // */
+/* ////////////////////////////////////////////////////////////////////////// */
+/* ////////////////////////////////////////////////////////////////////////// */
 
 /*The malloc, realloc and free functions defined here with "lodepng_" in front
 of the name, so that you can easily change them to others related to your
@@ -3328,39 +2377,59 @@ lodepng source code. Don't forget to remove "static" if you copypaste them
 from here.*/
 
 #ifdef LODEPNG_COMPILE_ALLOCATORS
-static void* lodepng_malloc(size_t size)
-{
+static void* lodepng_malloc(size_t size) {
 #ifdef LODEPNG_MAX_ALLOC
   if(size > LODEPNG_MAX_ALLOC) return 0;
 #endif
   return malloc(size);
 }
 
-static void* lodepng_realloc(void* ptr, size_t new_size)
-{
+static void* lodepng_realloc(void* ptr, size_t new_size) {
 #ifdef LODEPNG_MAX_ALLOC
   if(new_size > LODEPNG_MAX_ALLOC) return 0;
 #endif
   return realloc(ptr, new_size);
 }
 
-static void lodepng_free(void* ptr)
-{
+static void lodepng_free(void* ptr) {
   free(ptr);
 }
 #else /*LODEPNG_COMPILE_ALLOCATORS*/
+/* TODO: support giving additional void* payload to the custom allocators */
 void* lodepng_malloc(size_t size);
 void* lodepng_realloc(void* ptr, size_t new_size);
 void lodepng_free(void* ptr);
 #endif /*LODEPNG_COMPILE_ALLOCATORS*/
 
-/* ////////////////////////////////////////////////////////////////////////// */
-/* ////////////////////////////////////////////////////////////////////////// */
-/* // Tools for C, and common code for PNG and Zlib.                       // */
-/* ////////////////////////////////////////////////////////////////////////// */
-/* ////////////////////////////////////////////////////////////////////////// */
+#if (defined(__GNUC__) && defined(__GNUC_MINOR__) && (__GNUC__ >= 3) && (__GNUC_MINOR__ >= 1)) ||\
+    (defined(_MSC_VER) && (_MSC_VER >= 1400)) || (defined(__WATCOMC__) && (__WATCOMC__ >= 1250))
+#define LODEPNG_RESTRICT __restrict
+#else
+#define LODEPNG_RESTRICT /* not available */
+#endif
+
+/* Replacements for C library functions memcpy and strlen, to support those platforms
+where a full C library is not available. The compiler can recognize them and compile
+to something as fast. */
+
+static void lodepng_memcpy(void* LODEPNG_RESTRICT dst,
+                           const void* LODEPNG_RESTRICT src, size_t size) {
+  size_t i;
+  for(i = 0; i < size; i++) ((char*)dst)[i] = ((const char*)src)[i];
+}
+
+/* does not check memory out of bounds, do not use on untrusted data */
+static size_t lodepng_strlen(const char* a) {
+  const char* orig = a;
+  /* avoid warning about unused function in case of disabled COMPILE... macros */
+  (void)lodepng_strlen;
+  while(*a) a++;
+  return (size_t)(a - orig);
+}
 
 #define LODEPNG_MAX(a, b) (((a) > (b)) ? (a) : (b))
+#define LODEPNG_MIN(a, b) (((a) < (b)) ? (a) : (b))
+#define LODEPNG_ABS(x) ((x) < 0 ? -(x) : (x))
 
 /*
 Often in case of an error a value is assigned to a variable and then it breaks
@@ -3369,8 +2438,7 @@ It makes the error handling code shorter and more readable.
 
 Example: if(!uivector_resizev(&frequencies_ll, 286, 0)) ERROR_BREAK(83);
 */
-#define CERROR_BREAK(errorvar, code)\
-{\
+#define CERROR_BREAK(errorvar, code){\
   errorvar = code;\
   break;\
 }
@@ -3379,22 +2447,19 @@ Example: if(!uivector_resizev(&frequencies_ll, 286, 0)) ERROR_BREAK(83);
 #define ERROR_BREAK(code) CERROR_BREAK(error, code)
 
 /*Set error var to the error code, and return it.*/
-#define CERROR_RETURN_ERROR(errorvar, code)\
-{\
+#define CERROR_RETURN_ERROR(errorvar, code){\
   errorvar = code;\
   return code;\
 }
 
 /*Try the code, if it returns error, also return the error.*/
-#define CERROR_TRY_RETURN(call)\
-{\
+#define CERROR_TRY_RETURN(call){\
   unsigned error = call;\
   if(error) return error;\
 }
 
 /*Set error var to the error code, and return from the void function.*/
-#define CERROR_RETURN(errorvar, code)\
-{\
+#define CERROR_RETURN(errorvar, code){\
   errorvar = code;\
   return;\
 }
@@ -3409,30 +2474,26 @@ About uivector, ucvector and string:
 */
 
 #ifdef LODEPNG_COMPILE_ZLIB
+#ifdef LODEPNG_COMPILE_ENCODER
 /*dynamic vector of unsigned ints*/
-typedef struct uivector
-{
+typedef struct uivector {
   unsigned* data;
   size_t size; /*size in number of unsigned longs*/
   size_t allocsize; /*allocated size in bytes*/
 } uivector;
 
-static void uivector_cleanup(void* p)
-{
+static void uivector_cleanup(void* p) {
   ((uivector*)p)->size = ((uivector*)p)->allocsize = 0;
   lodepng_free(((uivector*)p)->data);
   ((uivector*)p)->data = NULL;
 }
 
 /*returns 1 if success, 0 if failure ==> nothing done*/
-static unsigned uivector_reserve(uivector* p, size_t allocsize)
-{
-  if(allocsize > p->allocsize)
-  {
-    size_t newsize = (allocsize > p->allocsize * 2) ? allocsize : (allocsize * 3 / 2);
+static unsigned uivector_reserve(uivector* p, size_t allocsize) {
+  if(allocsize > p->allocsize) {
+    size_t newsize = (allocsize > p->allocsize * 2u) ? allocsize : ((allocsize * 3u) >> 1u);
     void* data = lodepng_realloc(p->data, newsize);
-    if(data)
-    {
+    if(data) {
       p->allocsize = newsize;
       p->data = (unsigned*)data;
     }
@@ -3442,32 +2503,27 @@ static unsigned uivector_reserve(uivector* p, size_t allocsize)
 }
 
 /*returns 1 if success, 0 if failure ==> nothing done*/
-static unsigned uivector_resize(uivector* p, size_t size)
-{
+static unsigned uivector_resize(uivector* p, size_t size) {
   if(!uivector_reserve(p, size * sizeof(unsigned))) return 0;
   p->size = size;
   return 1; /*success*/
 }
 
 /*resize and give all new elements the value*/
-static unsigned uivector_resizev(uivector* p, size_t size, unsigned value)
-{
+static unsigned uivector_resizev(uivector* p, size_t size, unsigned value) {
   size_t oldsize = p->size, i;
   if(!uivector_resize(p, size)) return 0;
   for(i = oldsize; i < size; ++i) p->data[i] = value;
   return 1;
 }
 
-static void uivector_init(uivector* p)
-{
+static void uivector_init(uivector* p) {
   p->data = NULL;
   p->size = p->allocsize = 0;
 }
 
-#ifdef LODEPNG_COMPILE_ENCODER
 /*returns 1 if success, 0 if failure ==> nothing done*/
-static unsigned uivector_push_back(uivector* p, unsigned c)
-{
+static unsigned uivector_push_back(uivector* p, unsigned c) {
   if(!uivector_resize(p, p->size + 1)) return 0;
   p->data[p->size - 1] = c;
   return 1;
@@ -3478,22 +2534,18 @@ static unsigned uivector_push_back(uivector* p, unsigned c)
 /* /////////////////////////////////////////////////////////////////////////// */
 
 /*dynamic vector of unsigned chars*/
-typedef struct ucvector
-{
+typedef struct ucvector {
   unsigned char* data;
   size_t size; /*used size*/
   size_t allocsize; /*allocated size*/
 } ucvector;
 
 /*returns 1 if success, 0 if failure ==> nothing done*/
-static unsigned ucvector_reserve(ucvector* p, size_t allocsize)
-{
-  if(allocsize > p->allocsize)
-  {
-    size_t newsize = (allocsize > p->allocsize * 2) ? allocsize : (allocsize * 3 / 2);
+static unsigned ucvector_reserve(ucvector* p, size_t allocsize) {
+  if(allocsize > p->allocsize) {
+    size_t newsize = (allocsize > p->allocsize * 2u) ? allocsize : ((allocsize * 3u) >> 1u);
     void* data = lodepng_realloc(p->data, newsize);
-    if(data)
-    {
+    if(data) {
       p->allocsize = newsize;
       p->data = (unsigned char*)data;
     }
@@ -3503,8 +2555,7 @@ static unsigned ucvector_reserve(ucvector* p, size_t allocsize)
 }
 
 /*returns 1 if success, 0 if failure ==> nothing done*/
-static unsigned ucvector_resize(ucvector* p, size_t size)
-{
+static unsigned ucvector_resize(ucvector* p, size_t size) {
   if(!ucvector_reserve(p, size * sizeof(unsigned char))) return 0;
   p->size = size;
   return 1; /*success*/
@@ -3512,15 +2563,13 @@ static unsigned ucvector_resize(ucvector* p, size_t size)
 
 #ifdef LODEPNG_COMPILE_PNG
 
-static void ucvector_cleanup(void* p)
-{
+static void ucvector_cleanup(void* p) {
   ((ucvector*)p)->size = ((ucvector*)p)->allocsize = 0;
   lodepng_free(((ucvector*)p)->data);
   ((ucvector*)p)->data = NULL;
 }
 
-static void ucvector_init(ucvector* p)
-{
+static void ucvector_init(ucvector* p) {
   p->data = NULL;
   p->size = p->allocsize = 0;
 }
@@ -3529,8 +2578,7 @@ static void ucvector_init(ucvector* p)
 #ifdef LODEPNG_COMPILE_ZLIB
 /*you can both convert from vector to buffer&size and vica versa. If you use
 init_buffer to take over a buffer and size, it is not needed to use cleanup*/
-static void ucvector_init_buffer(ucvector* p, unsigned char* buffer, size_t size)
-{
+static void ucvector_init_buffer(ucvector* p, unsigned char* buffer, size_t size) {
   p->data = buffer;
   p->allocsize = p->size = size;
 }
@@ -3538,8 +2586,7 @@ static void ucvector_init_buffer(ucvector* p, unsigned char* buffer, size_t size
 
 #if (defined(LODEPNG_COMPILE_PNG) && defined(LODEPNG_COMPILE_ANCILLARY_CHUNKS)) || defined(LODEPNG_COMPILE_ENCODER)
 /*returns 1 if success, 0 if failure ==> nothing done*/
-static unsigned ucvector_push_back(ucvector* p, unsigned char c)
-{
+static unsigned ucvector_push_back(ucvector* p, unsigned char c) {
   if(!ucvector_resize(p, p->size + 1)) return 0;
   p->data[p->size - 1] = c;
   return 1;
@@ -3551,57 +2598,39 @@ static unsigned ucvector_push_back(ucvector* p, unsigned char c)
 
 #ifdef LODEPNG_COMPILE_PNG
 #ifdef LODEPNG_COMPILE_ANCILLARY_CHUNKS
-/*returns 1 if success, 0 if failure ==> nothing done*/
-static unsigned string_resize(char** out, size_t size)
-{
-  char* data = (char*)lodepng_realloc(*out, size + 1);
-  if(data)
-  {
-    data[size] = 0; /*null termination char*/
-    *out = data;
-  }
-  return data != 0;
-}
 
-/*init a {char*, size_t} pair for use as string*/
-static void string_init(char** out)
-{
-  *out = NULL;
-  string_resize(out, 0);
-}
-
-/*free the above pair again*/
-static void string_cleanup(char** out)
-{
+/*free string pointer and set it to NULL*/
+static void string_cleanup(char** out) {
   lodepng_free(*out);
   *out = NULL;
 }
 
-static void string_set(char** out, const char* in)
-{
-  size_t insize = strlen(in), i;
-  if(string_resize(out, insize))
-  {
-    for(i = 0; i != insize; ++i)
-    {
-      (*out)[i] = in[i];
+/* dynamically allocates a new string with a copy of the null terminated input text */
+static char* alloc_string(const char* in) {
+  size_t insize = lodepng_strlen(in);
+  char* out = (char*)lodepng_malloc(insize + 1);
+  if(out) {
+    size_t i;
+    for(i = 0; i != insize; ++i) {
+      out[i] = in[i];
     }
+    out[i] = 0;
   }
+  return out;
 }
 #endif /*LODEPNG_COMPILE_ANCILLARY_CHUNKS*/
 #endif /*LODEPNG_COMPILE_PNG*/
 
 /* ////////////////////////////////////////////////////////////////////////// */
 
-unsigned lodepng_read32bitInt(const unsigned char* buffer)
-{
-  return (unsigned)((buffer[0] << 24) | (buffer[1] << 16) | (buffer[2] << 8) | buffer[3]);
+static unsigned lodepng_read32bitInt(const unsigned char* buffer) {
+  return (((unsigned)buffer[0] << 24u) | ((unsigned)buffer[1] << 16u) |
+         ((unsigned)buffer[2] << 8u) | (unsigned)buffer[3]);
 }
 
 #if defined(LODEPNG_COMPILE_PNG) || defined(LODEPNG_COMPILE_ENCODER)
 /*buffer must have at least 4 allocated bytes available*/
-static void lodepng_set32bitInt(unsigned char* buffer, unsigned value)
-{
+static void lodepng_set32bitInt(unsigned char* buffer, unsigned value) {
   buffer[0] = (unsigned char)((value >> 24) & 0xff);
   buffer[1] = (unsigned char)((value >> 16) & 0xff);
   buffer[2] = (unsigned char)((value >>  8) & 0xff);
@@ -3610,8 +2639,7 @@ static void lodepng_set32bitInt(unsigned char* buffer, unsigned value)
 #endif /*defined(LODEPNG_COMPILE_PNG) || defined(LODEPNG_COMPILE_ENCODER)*/
 
 #ifdef LODEPNG_COMPILE_ENCODER
-static void lodepng_add32bitInt(ucvector* buffer, unsigned value)
-{
+static void lodepng_add32bitInt(ucvector* buffer, unsigned value) {
   ucvector_resize(buffer, buffer->size + 4); /*todo: give error if resize failed*/
   lodepng_set32bitInt(&buffer->data[buffer->size - 4], value);
 }
@@ -3624,15 +2652,13 @@ static void lodepng_add32bitInt(ucvector* buffer, unsigned value)
 #ifdef LODEPNG_COMPILE_DISK
 
 /* returns negative value on error. This should be pure C compatible, so no fstat. */
-static long lodepng_filesize(const char* filename)
-{
+static long lodepng_filesize(const char* filename) {
   FILE* file;
   long size;
   file = fopen(filename, "rb");
   if(!file) return -1;
 
-  if(fseek(file, 0, SEEK_END) != 0)
-  {
+  if(fseek(file, 0, SEEK_END) != 0) {
     fclose(file);
     return -1;
   }
@@ -3646,8 +2672,7 @@ static long lodepng_filesize(const char* filename)
 }
 
 /* load file into buffer that already has the correct allocated size. Returns error code.*/
-static unsigned lodepng_buffer_file(unsigned char* out, size_t size, const char* filename)
-{
+static unsigned lodepng_buffer_file(unsigned char* out, size_t size, const char* filename) {
   FILE* file;
   size_t readsize;
   file = fopen(filename, "rb");
@@ -3660,8 +2685,7 @@ static unsigned lodepng_buffer_file(unsigned char* out, size_t size, const char*
   return 0;
 }
 
-unsigned lodepng_load_file(unsigned char** out, size_t* outsize, const char* filename)
-{
+unsigned lodepng_load_file(unsigned char** out, size_t* outsize, const char* filename) {
   long size = lodepng_filesize(filename);
   if (size < 0) return 78;
   *outsize = (size_t)size;
@@ -3673,12 +2697,11 @@ unsigned lodepng_load_file(unsigned char** out, size_t* outsize, const char* fil
 }
 
 /*write given buffer to the file, overwriting the file, it doesn't append to it.*/
-unsigned lodepng_save_file(const unsigned char* buffer, size_t buffersize, const char* filename)
-{
+unsigned lodepng_save_file(const unsigned char* buffer, size_t buffersize, const char* filename) {
   FILE* file;
   file = fopen(filename, "wb" );
   if(!file) return 79;
-  fwrite((char*)buffer , 1 , buffersize, file);
+  fwrite(buffer, 1, buffersize, file);
   fclose(file);
   return 0;
 }
@@ -3693,51 +2716,119 @@ unsigned lodepng_save_file(const unsigned char* buffer, size_t buffersize, const
 
 #ifdef LODEPNG_COMPILE_ZLIB
 #ifdef LODEPNG_COMPILE_ENCODER
+
+typedef struct {
+  ucvector* data;
+  size_t bp;
+} LodePNGBitWriter;
+
+void LodePNGBitWriter_init(LodePNGBitWriter* writer, ucvector* data) {
+  writer->data = data;
+  writer->bp = 0;
+}
+
 /*TODO: this ignores potential out of memory errors*/
-#define addBitToStream(/*size_t**/ bitpointer, /*ucvector**/ bitstream, /*unsigned char*/ bit)\
-{\
-  /*add a new byte at the end*/\
-  if(((*bitpointer) & 7) == 0) ucvector_push_back(bitstream, (unsigned char)0);\
-  /*earlier bit of huffman code is in a lesser significant bit of an earlier byte*/\
-  (bitstream->data[bitstream->size - 1]) |= (bit << ((*bitpointer) & 0x7));\
-  ++(*bitpointer);\
+#define WRITEBIT(/*size_t**/ writer, /*unsigned char*/ bit){\
+  /* append new byte */\
+  if(((writer->bp) & 7u) == 0) ucvector_push_back(writer->data, (unsigned char)0);\
+  (writer->data->data[writer->data->size - 1]) |= (bit << ((writer->bp) & 7u));\
+  ++writer->bp;\
 }
 
-static void addBitsToStream(size_t* bitpointer, ucvector* bitstream, unsigned value, size_t nbits)
-{
-  size_t i;
-  for(i = 0; i != nbits; ++i) addBitToStream(bitpointer, bitstream, (unsigned char)((value >> i) & 1));
+/* LSB of value is written first, and LSB of bytes is used first */
+static void writeBits(LodePNGBitWriter* writer, unsigned value, size_t nbits) {
+  if(nbits == 1) { /* compiler should statically compile this case if nbits == 1 */
+    WRITEBIT(writer, value);
+  } else {
+    /* TODO: increase output size nly once here rather than in each WRITEBIT */
+    size_t i;
+    for(i = 0; i != nbits; ++i) {
+      WRITEBIT(writer, (unsigned char)((value >> i) & 1));
+    }
+  }
 }
 
-static void addBitsToStreamReversed(size_t* bitpointer, ucvector* bitstream, unsigned value, size_t nbits)
-{
+/* This one is to use for adding huffman symbol, the value bits are written MSB first */
+static void writeBitsReversed(LodePNGBitWriter* writer, unsigned value, size_t nbits) {
   size_t i;
-  for(i = 0; i != nbits; ++i) addBitToStream(bitpointer, bitstream, (unsigned char)((value >> (nbits - 1 - i)) & 1));
+  for(i = 0; i != nbits; ++i) {
+    /* TODO: increase output size only once here rather than in each WRITEBIT */
+    WRITEBIT(writer, (unsigned char)((value >> (nbits - 1u - i)) & 1u));
+  }
 }
 #endif /*LODEPNG_COMPILE_ENCODER*/
 
 #ifdef LODEPNG_COMPILE_DECODER
 
-#define READBIT(bitpointer, bitstream) ((bitstream[bitpointer >> 3] >> (bitpointer & 0x7)) & (unsigned char)1)
+typedef struct {
+  const unsigned char* data;
+  size_t size; /*size of data in bytes*/
+  size_t bitsize; /*size of data in bits, end of valid bp values, should be 8*size*/
+  size_t bp;
+  unsigned buffer; /*buffer for reading bits. NOTE: 'unsigned' must support at least 32 bits*/
+} LodePNGBitReader;
 
-static unsigned char readBitFromStream(size_t* bitpointer, const unsigned char* bitstream)
-{
-  unsigned char result = (unsigned char)(READBIT(*bitpointer, bitstream));
-  ++(*bitpointer);
-  return result;
+/* data size argument is in bytes */
+void LodePNGBitReader_init(LodePNGBitReader* reader, const unsigned char* data, size_t size) {
+  reader->data = data;
+  reader->size = size;
+  reader->bitsize = size << 3u; /* size in bits */
+  reader->bp = 0;
+  reader->buffer = 0;
 }
 
-static unsigned readBitsFromStream(size_t* bitpointer, const unsigned char* bitstream, size_t nbits)
-{
-  unsigned result = 0, i;
-  for(i = 0; i != nbits; ++i)
-  {
-    result += ((unsigned)READBIT(*bitpointer, bitstream)) << i;
-    ++(*bitpointer);
+/*Ensures the reader can at least read nbits bits in one or more readBits calls.
+Returns 0 if there are enough bits available, or amount of shortage of bits if not.
+The 'nbits' parameter must be <= 17. */
+static unsigned ensureBits(LodePNGBitReader* reader, size_t nbits) {
+  if(nbits == 1) { /*the compiler is intended to perform do this 'if' statically for efficiency*/
+    if(reader->bp >= reader->bitsize) return 1;
+    reader->buffer = (unsigned)reader->data[reader->bp >> 3u] >> (reader->bp & 7u);
+    return 0;
+  } else {
+    size_t start = reader->bp >> 3u;
+    unsigned rem = reader->bitsize - reader->bp;
+    if(rem >= 24) {
+      reader->buffer = (unsigned)(reader->data[start + 0] | (unsigned)((reader->data[start + 1] << 8u)) |
+                       (unsigned)(reader->data[start + 2] << 16u)) >> (reader->bp & 7u);
+      return 0;
+    } else {
+      size_t size = reader->size;
+      reader->buffer = 0;
+      if(start + 0 < size) reader->buffer |= reader->data[start + 0];
+      if(start + 1 < size) reader->buffer |= (unsigned)(reader->data[start + 1] << 8u);
+      if(start + 2 < size) reader->buffer |= (unsigned)(reader->data[start + 2] << 16u);
+      reader->buffer >>= (reader->bp & 7u);
+      return (rem >= nbits) ? 0 : (nbits - rem);
+    }
   }
+}
+
+/* Get bits without advancing the bit pointer. Must have enough bits available with ensureBits */
+static unsigned peekBits(LodePNGBitReader* reader, size_t nbits) {
+  return reader->buffer & ((1u << nbits) - 1u);
+}
+
+/* Must have enough bits available with ensureBits */
+static void advanceBits(LodePNGBitReader* reader, size_t nbits) {
+  reader->buffer >>= nbits;
+  reader->bp += nbits;
+}
+
+/* Must have enough bits available with ensureBits */
+static unsigned readBits(LodePNGBitReader* reader, size_t nbits) {
+  unsigned result = peekBits(reader, nbits);
+  advanceBits(reader, nbits);
   return result;
 }
 #endif /*LODEPNG_COMPILE_DECODER*/
+
+static unsigned reverseBits(unsigned bits, unsigned num) {
+  /*TODO: implement faster lookup table based version when needed*/
+  unsigned i, result = 0;
+  for(i = 0; i < num; i++) result |= ((bits >> (num - i - 1u)) & 1u) << i;
+  return result;
+}
 
 /* ////////////////////////////////////////////////////////////////////////// */
 /* / Deflate - Huffman                                                      / */
@@ -3782,98 +2873,134 @@ static const unsigned CLCL_ORDER[NUM_CODE_LENGTH_CODES]
 /*
 Huffman tree struct, containing multiple representations of the tree
 */
-typedef struct HuffmanTree
-{
-  unsigned* tree2d;
-  unsigned* tree1d;
-  unsigned* lengths; /*the lengths of the codes of the 1d-tree*/
+typedef struct HuffmanTree {
+  unsigned* codes; /*the huffman codes (bit patterns representing the symbols)*/
+  unsigned* lengths; /*the lengths of the huffman codes*/
   unsigned maxbitlen; /*maximum number of bits a single code can get*/
   unsigned numcodes; /*number of symbols in the alphabet = number of codes*/
+  /* for reading only */
+  unsigned* table_len; /*length of symbol from lookup table, or max length if secondary lookup needed*/
+  unsigned* table_value; /*value of symbol from lookup table, or pointer to secondary table if needed*/
 } HuffmanTree;
 
 /*function used for debug purposes to draw the tree in ascii art with C++*/
 /*
-static void HuffmanTree_draw(HuffmanTree* tree)
-{
+static void HuffmanTree_draw(HuffmanTree* tree) {
   std::cout << "tree. length: " << tree->numcodes << " maxbitlen: " << tree->maxbitlen << std::endl;
-  for(size_t i = 0; i != tree->tree1d.size; ++i)
-  {
+  for(size_t i = 0; i != tree->codes.size; ++i) {
     if(tree->lengths.data[i])
-      std::cout << i << " " << tree->tree1d.data[i] << " " << tree->lengths.data[i] << std::endl;
+      std::cout << i << " " << tree->codes.data[i] << " " << tree->lengths.data[i] << std::endl;
   }
   std::cout << std::endl;
 }*/
 
-static void HuffmanTree_init(HuffmanTree* tree)
-{
-  tree->tree2d = 0;
-  tree->tree1d = 0;
+static void HuffmanTree_init(HuffmanTree* tree) {
+  tree->codes = 0;
   tree->lengths = 0;
+  tree->table_len = 0;
+  tree->table_value = 0;
 }
 
-static void HuffmanTree_cleanup(HuffmanTree* tree)
-{
-  lodepng_free(tree->tree2d);
-  lodepng_free(tree->tree1d);
+static void HuffmanTree_cleanup(HuffmanTree* tree) {
+  lodepng_free(tree->codes);
   lodepng_free(tree->lengths);
+  lodepng_free(tree->table_len);
+  lodepng_free(tree->table_value);
 }
 
-/*the tree representation used by the decoder. return value is error*/
-static unsigned HuffmanTree_make2DTree(HuffmanTree* tree)
-{
-  unsigned nodefilled = 0; /*up to which node it is filled*/
-  unsigned treepos = 0; /*position in the tree (1 of the numcodes columns)*/
-  unsigned n, i;
+/* amount of bits for first huffman table lookup, see HuffmanTree_makeTable and huffmanDecodeSymbol.*/
+#define FIRSTBITS 8u
 
-  tree->tree2d = (unsigned*)lodepng_malloc(tree->numcodes * 2 * sizeof(unsigned));
-  if(!tree->tree2d) return 83; /*alloc fail*/
+/* make table for huffman decoding */
+static unsigned HuffmanTree_makeTable(HuffmanTree* tree) {
+  static const unsigned headsize = 1u << FIRSTBITS; /*size of the first table*/
+  static const unsigned mask = (1u << FIRSTBITS) /*headsize*/ - 1u;
+  size_t i, pointer, size; /*total table size*/
+  unsigned* maxlens = (unsigned*)lodepng_malloc(headsize * sizeof(unsigned));
+  if(!maxlens) return 83; /*alloc fail*/
 
-  /*
-  convert tree1d[] to tree2d[][]. In the 2D array, a value of 32767 means
-  uninited, a value >= numcodes is an address to another bit, a value < numcodes
-  is a code. The 2 rows are the 2 possible bit values (0 or 1), there are as
-  many columns as codes - 1.
-  A good huffman tree has N * 2 - 1 nodes, of which N - 1 are internal nodes.
-  Here, the internal nodes are stored (what their 0 and 1 option point to).
-  There is only memory for such good tree currently, if there are more nodes
-  (due to too long length codes), error 55 will happen
-  */
-  for(n = 0; n < tree->numcodes * 2; ++n)
-  {
-    tree->tree2d[n] = 32767; /*32767 here means the tree2d isn't filled there yet*/
+  /* compute maxlens: max total bit length of symbols sharing prefix in the first table*/
+  for(i = 0; i < headsize; ++i) maxlens[i] = 0;
+  for(i = 0; i < tree->numcodes; i++) {
+    unsigned symbol = tree->codes[i];
+    unsigned l = tree->lengths[i];
+    unsigned index;
+    if(l <= FIRSTBITS) continue; /*symbols that fit in first table don't increase secondary table size*/
+    /*get the FIRSTBITS MSBs, the MSBs of the symbol are encoded first. See later comment about the reversing*/
+    index = reverseBits(symbol >> (l - FIRSTBITS), FIRSTBITS);
+    maxlens[index] = LODEPNG_MAX(maxlens[index], l);
   }
+  /* compute total table size: size of first table plus all secondary tables for symbols longer than FIRSTBITS */
+  size = headsize;
+  for(i = 0; i < headsize; ++i) {
+    unsigned l = maxlens[i];
+    if(l > FIRSTBITS) size += (1u << (l - FIRSTBITS));
+  }
+  tree->table_len = (unsigned*)lodepng_malloc(size * sizeof(unsigned));
+  tree->table_value = (unsigned*)lodepng_malloc(size * sizeof(unsigned));
+  if(!tree->table_len || !tree->table_value) {
+    lodepng_free(maxlens);
+    return 83; /*alloc fail*/
+  }
+  /*initialize with an invalid length to indicate unused entries*/
+  for(i = 0; i < size; ++i) tree->table_len[i] = 16;
 
-  for(n = 0; n < tree->numcodes; ++n) /*the codes*/
-  {
-    for(i = 0; i != tree->lengths[n]; ++i) /*the bits for this code*/
-    {
-      unsigned char bit = (unsigned char)((tree->tree1d[n] >> (tree->lengths[n] - i - 1)) & 1);
-      /*oversubscribed, see comment in lodepng_error_text*/
-      if(treepos > 2147483647 || treepos + 2 > tree->numcodes) return 55;
-      if(tree->tree2d[2 * treepos + bit] == 32767) /*not yet filled in*/
-      {
-        if(i + 1 == tree->lengths[n]) /*last bit*/
-        {
-          tree->tree2d[2 * treepos + bit] = n; /*put the current code in it*/
-          treepos = 0;
-        }
-        else
-        {
-          /*put address of the next step in here, first that address has to be found of course
-          (it's just nodefilled + 1)...*/
-          ++nodefilled;
-          /*addresses encoded with numcodes added to it*/
-          tree->tree2d[2 * treepos + bit] = nodefilled + tree->numcodes;
-          treepos = nodefilled;
-        }
+  /*fill in the first table for long symbols: max prefix size and pointer to secondary tables*/
+  pointer = headsize;
+  for(i = 0; i < headsize; ++i) {
+    unsigned l = maxlens[i];
+    if(l <= FIRSTBITS) continue;
+    tree->table_len[i] = l;
+    tree->table_value[i] = pointer;
+    pointer += (1u << (l - FIRSTBITS));
+  }
+  lodepng_free(maxlens);
+
+  /*fill in the first table for short symbols, or secondary table for long symbols*/
+  for(i = 0; i < tree->numcodes; ++i) {
+    unsigned l = tree->lengths[i];
+    unsigned symbol = tree->codes[i]; /*the huffman bit pattern. i itself is the value.*/
+    /*reverse bits, because the huffman bits are given in MSB first order but the bit reader reads LSB first*/
+    unsigned reverse = reverseBits(symbol, l);
+    if(l == 0) {
+      continue;
+    } else if(l <= FIRSTBITS) {
+      /*short symbol, fully in first table, replicated num times if l < FIRSTBITS*/
+      unsigned num = 1u << (FIRSTBITS - l);
+      unsigned j;
+      for(j = 0; j < num; ++j) {
+        /*bit reader will read the l bits of symbol first, the remaining FIRSTBITS - l bits go to the MSB's*/
+        unsigned index = reverse | (j << l);
+        if(tree->table_len[index] != 16) return 55; /*invalid tree: long symbol shares prefix with short symbol*/
+        tree->table_len[index] = l;
+        tree->table_value[index] = i;
       }
-      else treepos = tree->tree2d[2 * treepos + bit] - tree->numcodes;
+    } else {
+      /*long symbol, shares prefix with other long symbols in first lookup table, needs second lookup*/
+      /*the FIRSTBITS MSBs of the symbol are the first table index*/
+      unsigned index = reverse & mask;
+      unsigned maxlen = tree->table_len[index];
+      /*log2 of secondary table length, should be >= l - FIRSTBITS*/
+      unsigned tablelen = maxlen - FIRSTBITS;
+      unsigned start = tree->table_value[index]; /*starting index in secondary table*/
+      unsigned num = 1u << (tablelen - (l - FIRSTBITS)); /*amount of entries of this symbol in secondary table*/
+      unsigned j;
+      if(maxlen < l) return 55; /*invalid tree: long symbol shares prefix with short symbol*/
+      for(j = 0; j < num; ++j) {
+        unsigned reverse2 = reverse >> FIRSTBITS; /* l - FIRSTBITS bits */
+        unsigned index2 = start + (reverse2 | (j << (l - FIRSTBITS)));
+        tree->table_len[index2] = l;
+        tree->table_value[index2] = i;
+      }
     }
   }
 
-  for(n = 0; n < tree->numcodes * 2; ++n)
-  {
-    if(tree->tree2d[n] == 32767) tree->tree2d[n] = 0; /*remove possible remaining 32767's*/
+  /* A good huffman tree has N * 2 - 1 nodes, of which N - 1 are internal nodes.
+  If that is not the case (due to too long length codes), the table will not
+  have been fully used, and this is an error (not all bit combinations can be
+  decoded): an oversubscribed huffman tree, indicated by error 55. */
+  for(i = 0; i < size; ++i) {
+    if(tree->table_len[i] == 16) return 55;
   }
 
   return 0;
@@ -3884,44 +3011,40 @@ Second step for the ...makeFromLengths and ...makeFromFrequencies functions.
 numcodes, lengths and maxbitlen must already be filled in correctly. return
 value is error.
 */
-static unsigned HuffmanTree_makeFromLengths2(HuffmanTree* tree)
-{
-  uivector blcount;
-  uivector nextcode;
+static unsigned HuffmanTree_makeFromLengths2(HuffmanTree* tree) {
+  unsigned* blcount;
+  unsigned* nextcode;
   unsigned error = 0;
   unsigned bits, n;
 
-  uivector_init(&blcount);
-  uivector_init(&nextcode);
+  tree->codes = (unsigned*)lodepng_malloc(tree->numcodes * sizeof(unsigned));
+  blcount = (unsigned*)lodepng_malloc((tree->maxbitlen + 1) * sizeof(unsigned));
+  nextcode = (unsigned*)lodepng_malloc((tree->maxbitlen + 1) * sizeof(unsigned));
+  if(!tree->codes || !blcount || !nextcode) error = 83; /*alloc fail*/
 
-  tree->tree1d = (unsigned*)lodepng_malloc(tree->numcodes * sizeof(unsigned));
-  if(!tree->tree1d) error = 83; /*alloc fail*/
-
-  if(!uivector_resizev(&blcount, tree->maxbitlen + 1, 0)
-  || !uivector_resizev(&nextcode, tree->maxbitlen + 1, 0))
-    error = 83; /*alloc fail*/
-
-  if(!error)
-  {
+  if(!error) {
+    for(n = 0; n != tree->maxbitlen + 1; n++) blcount[n] = nextcode[n] = 0;
     /*step 1: count number of instances of each code length*/
-    for(bits = 0; bits != tree->numcodes; ++bits) ++blcount.data[tree->lengths[bits]];
+    for(bits = 0; bits != tree->numcodes; ++bits) ++blcount[tree->lengths[bits]];
     /*step 2: generate the nextcode values*/
-    for(bits = 1; bits <= tree->maxbitlen; ++bits)
-    {
-      nextcode.data[bits] = (nextcode.data[bits - 1] + blcount.data[bits - 1]) << 1;
+    for(bits = 1; bits <= tree->maxbitlen; ++bits) {
+      nextcode[bits] = (nextcode[bits - 1] + blcount[bits - 1]) << 1;
     }
     /*step 3: generate all the codes*/
-    for(n = 0; n != tree->numcodes; ++n)
-    {
-      if(tree->lengths[n] != 0) tree->tree1d[n] = nextcode.data[tree->lengths[n]]++;
+    for(n = 0; n != tree->numcodes; ++n) {
+      if(tree->lengths[n] != 0) {
+        tree->codes[n] = nextcode[tree->lengths[n]]++;
+        /*remove superfluous bits from the code*/
+        tree->codes[n] &= ((1u << tree->lengths[n]) - 1u);
+      }
     }
   }
 
-  uivector_cleanup(&blcount);
-  uivector_cleanup(&nextcode);
+  lodepng_free(blcount);
+  lodepng_free(nextcode);
 
-  if(!error) return HuffmanTree_make2DTree(tree);
-  else return error;
+  if(!error) error = HuffmanTree_makeTable(tree);
+  return error;
 }
 
 /*
@@ -3930,8 +3053,7 @@ by Deflate. maxbitlen is the maximum bits that a code in the tree can have.
 return value is error.
 */
 static unsigned HuffmanTree_makeFromLengths(HuffmanTree* tree, const unsigned* bitlen,
-                                            size_t numcodes, unsigned maxbitlen)
-{
+                                            size_t numcodes, unsigned maxbitlen) {
   unsigned i;
   tree->lengths = (unsigned*)lodepng_malloc(numcodes * sizeof(unsigned));
   if(!tree->lengths) return 83; /*alloc fail*/
@@ -3947,8 +3069,7 @@ static unsigned HuffmanTree_makeFromLengths(HuffmanTree* tree, const unsigned* b
 Jyrki Katajainen, Alistair Moffat, Andrew Turpin, 1995.*/
 
 /*chain node for boundary package merge*/
-typedef struct BPMNode
-{
+typedef struct BPMNode {
   int weight; /*the sum of all weights in this chain*/
   unsigned index; /*index of this leaf node (called "count" in the paper)*/
   struct BPMNode* tail; /*the next nodes in this chain (null if last)*/
@@ -3956,8 +3077,7 @@ typedef struct BPMNode
 } BPMNode;
 
 /*lists of chains*/
-typedef struct BPMLists
-{
+typedef struct BPMLists {
   /*memory pool*/
   unsigned memsize;
   BPMNode* memory;
@@ -3971,26 +3091,22 @@ typedef struct BPMLists
 } BPMLists;
 
 /*creates a new chain node with the given parameters, from the memory in the lists */
-static BPMNode* bpmnode_create(BPMLists* lists, int weight, unsigned index, BPMNode* tail)
-{
+static BPMNode* bpmnode_create(BPMLists* lists, int weight, unsigned index, BPMNode* tail) {
   unsigned i;
   BPMNode* result;
 
   /*memory full, so garbage collect*/
-  if(lists->nextfree >= lists->numfree)
-  {
+  if(lists->nextfree >= lists->numfree) {
     /*mark only those that are in use*/
     for(i = 0; i != lists->memsize; ++i) lists->memory[i].in_use = 0;
-    for(i = 0; i != lists->listsize; ++i)
-    {
+    for(i = 0; i != lists->listsize; ++i) {
       BPMNode* node;
       for(node = lists->chains0[i]; node != 0; node = node->tail) node->in_use = 1;
       for(node = lists->chains1[i]; node != 0; node = node->tail) node->in_use = 1;
     }
     /*collect those that are free*/
     lists->numfree = 0;
-    for(i = 0; i != lists->memsize; ++i)
-    {
+    for(i = 0; i != lists->memsize; ++i) {
       if(!lists->memory[i].in_use) lists->freelist[lists->numfree++] = &lists->memory[i];
     }
     lists->nextfree = 0;
@@ -4004,58 +3120,48 @@ static BPMNode* bpmnode_create(BPMLists* lists, int weight, unsigned index, BPMN
 }
 
 /*sort the leaves with stable mergesort*/
-static void bpmnode_sort(BPMNode* leaves, size_t num)
-{
+static void bpmnode_sort(BPMNode* leaves, size_t num) {
   BPMNode* mem = (BPMNode*)lodepng_malloc(sizeof(*leaves) * num);
   size_t width, counter = 0;
-  for(width = 1; width < num; width *= 2)
-  {
+  for(width = 1; width < num; width *= 2) {
     BPMNode* a = (counter & 1) ? mem : leaves;
     BPMNode* b = (counter & 1) ? leaves : mem;
     size_t p;
-    for(p = 0; p < num; p += 2 * width)
-    {
+    for(p = 0; p < num; p += 2 * width) {
       size_t q = (p + width > num) ? num : (p + width);
       size_t r = (p + 2 * width > num) ? num : (p + 2 * width);
       size_t i = p, j = q, k;
-      for(k = p; k < r; k++)
-      {
+      for(k = p; k < r; k++) {
         if(i < q && (j >= r || a[i].weight <= a[j].weight)) b[k] = a[i++];
         else b[k] = a[j++];
       }
     }
     counter++;
   }
-  if(counter & 1) memcpy(leaves, mem, sizeof(*leaves) * num);
+  if(counter & 1) lodepng_memcpy(leaves, mem, sizeof(*leaves) * num);
   lodepng_free(mem);
 }
 
 /*Boundary Package Merge step, numpresent is the amount of leaves, and c is the current chain.*/
-static void boundaryPM(BPMLists* lists, BPMNode* leaves, size_t numpresent, int c, int num)
-{
+static void boundaryPM(BPMLists* lists, BPMNode* leaves, size_t numpresent, int c, int num) {
   unsigned lastindex = lists->chains1[c]->index;
 
-  if(c == 0)
-  {
+  if(c == 0) {
     if(lastindex >= numpresent) return;
     lists->chains0[c] = lists->chains1[c];
     lists->chains1[c] = bpmnode_create(lists, leaves[lastindex].weight, lastindex + 1, 0);
-  }
-  else
-  {
+  } else {
     /*sum of the weights of the head nodes of the previous lookahead chains.*/
     int sum = lists->chains0[c - 1]->weight + lists->chains1[c - 1]->weight;
     lists->chains0[c] = lists->chains1[c];
-    if(lastindex < numpresent && sum > leaves[lastindex].weight)
-    {
+    if(lastindex < numpresent && sum > leaves[lastindex].weight) {
       lists->chains1[c] = bpmnode_create(lists, leaves[lastindex].weight, lastindex + 1, lists->chains1[c]->tail);
       return;
     }
     lists->chains1[c] = bpmnode_create(lists, sum, lastindex, lists->chains1[c - 1]);
     /*in the end we are only interested in the chain of the last list, so no
     need to recurse if we're at the last one (this gives measurable speedup)*/
-    if(num + 1 < (int)(2 * numpresent - 2))
-    {
+    if(num + 1 < (int)(2 * numpresent - 2)) {
       boundaryPM(lists, leaves, numpresent, c - 1, num);
       boundaryPM(lists, leaves, numpresent, c - 1, num);
     }
@@ -4063,8 +3169,7 @@ static void boundaryPM(BPMLists* lists, BPMNode* leaves, size_t numpresent, int 
 }
 
 unsigned lodepng_huffman_code_lengths(unsigned* lengths, const unsigned* frequencies,
-                                      size_t numcodes, unsigned maxbitlen)
-{
+                                      size_t numcodes, unsigned maxbitlen) {
   unsigned error = 0;
   unsigned i;
   size_t numpresent = 0; /*number of symbols with non-zero frequency*/
@@ -4076,10 +3181,8 @@ unsigned lodepng_huffman_code_lengths(unsigned* lengths, const unsigned* frequen
   leaves = (BPMNode*)lodepng_malloc(numcodes * sizeof(*leaves));
   if(!leaves) return 83; /*alloc fail*/
 
-  for(i = 0; i != numcodes; ++i)
-  {
-    if(frequencies[i] > 0)
-    {
+  for(i = 0; i != numcodes; ++i) {
+    if(frequencies[i] > 0) {
       leaves[numpresent].weight = (int)frequencies[i];
       leaves[numpresent].index = i;
       ++numpresent;
@@ -4093,17 +3196,12 @@ unsigned lodepng_huffman_code_lengths(unsigned* lengths, const unsigned* frequen
   make these work as well ensure there are at least two symbols. The
   Package-Merge code below also doesn't work correctly if there's only one
   symbol, it'd give it the theoritical 0 bits but in practice zlib wants 1 bit*/
-  if(numpresent == 0)
-  {
+  if(numpresent == 0) {
     lengths[0] = lengths[1] = 1; /*note that for RFC 1951 section 3.2.7, only lengths[0] = 1 is needed*/
-  }
-  else if(numpresent == 1)
-  {
+  } else if(numpresent == 1) {
     lengths[leaves[0].index] = 1;
     lengths[leaves[0].index == 0 ? 1 : 0] = 1;
-  }
-  else
-  {
+  } else {
     BPMLists lists;
     BPMNode* node;
 
@@ -4119,15 +3217,13 @@ unsigned lodepng_huffman_code_lengths(unsigned* lengths, const unsigned* frequen
     lists.chains1 = (BPMNode**)lodepng_malloc(lists.listsize * sizeof(BPMNode*));
     if(!lists.memory || !lists.freelist || !lists.chains0 || !lists.chains1) error = 83; /*alloc fail*/
 
-    if(!error)
-    {
+    if(!error) {
       for(i = 0; i != lists.memsize; ++i) lists.freelist[i] = &lists.memory[i];
 
       bpmnode_create(&lists, leaves[0].weight, 1, 0);
       bpmnode_create(&lists, leaves[1].weight, 2, 0);
 
-      for(i = 0; i != lists.listsize; ++i)
-      {
+      for(i = 0; i != lists.listsize; ++i) {
         lists.chains0[i] = &lists.memory[0];
         lists.chains1[i] = &lists.memory[1];
       }
@@ -4135,8 +3231,7 @@ unsigned lodepng_huffman_code_lengths(unsigned* lengths, const unsigned* frequen
       /*each boundaryPM call adds one chain to the last list, and we need 2 * numpresent - 2 chains.*/
       for(i = 2; i != 2 * numpresent - 2; ++i) boundaryPM(&lists, leaves, numpresent, (int)maxbitlen - 1, (int)i);
 
-      for(node = lists.chains1[maxbitlen - 1]; node; node = node->tail)
-      {
+      for(node = lists.chains1[maxbitlen - 1]; node; node = node->tail) {
         for(i = 0; i != node->index; ++i) ++lengths[leaves[i].index];
       }
     }
@@ -4153,8 +3248,8 @@ unsigned lodepng_huffman_code_lengths(unsigned* lengths, const unsigned* frequen
 
 /*Create the Huffman tree given the symbol frequencies*/
 static unsigned HuffmanTree_makeFromFrequencies(HuffmanTree* tree, const unsigned* frequencies,
-                                                size_t mincodes, size_t numcodes, unsigned maxbitlen)
-{
+                                                size_t mincodes, size_t numcodes, unsigned maxbitlen) {
+  size_t i;
   unsigned error = 0;
   while(!frequencies[numcodes - 1] && numcodes > mincodes) --numcodes; /*trim zeroes*/
   tree->maxbitlen = maxbitlen;
@@ -4162,27 +3257,24 @@ static unsigned HuffmanTree_makeFromFrequencies(HuffmanTree* tree, const unsigne
   tree->lengths = (unsigned*)lodepng_realloc(tree->lengths, numcodes * sizeof(unsigned));
   if(!tree->lengths) return 83; /*alloc fail*/
   /*initialize all lengths to 0*/
-  memset(tree->lengths, 0, numcodes * sizeof(unsigned));
+  for(i = 0; i < numcodes; i++) tree->lengths[i] = 0;
 
   error = lodepng_huffman_code_lengths(tree->lengths, frequencies, numcodes, maxbitlen);
   if(!error) error = HuffmanTree_makeFromLengths2(tree);
   return error;
 }
 
-static unsigned HuffmanTree_getCode(const HuffmanTree* tree, unsigned index)
-{
-  return tree->tree1d[index];
+static unsigned HuffmanTree_getCode(const HuffmanTree* tree, unsigned index) {
+  return tree->codes[index];
 }
 
-static unsigned HuffmanTree_getLength(const HuffmanTree* tree, unsigned index)
-{
+static unsigned HuffmanTree_getLength(const HuffmanTree* tree, unsigned index) {
   return tree->lengths[index];
 }
 #endif /*LODEPNG_COMPILE_ENCODER*/
 
 /*get the literal and length code tree of a deflated block with fixed tree, as per the deflate specification*/
-static unsigned generateFixedLitLenTree(HuffmanTree* tree)
-{
+static unsigned generateFixedLitLenTree(HuffmanTree* tree) {
   unsigned i, error = 0;
   unsigned* bitlen = (unsigned*)lodepng_malloc(NUM_DEFLATE_CODE_SYMBOLS * sizeof(unsigned));
   if(!bitlen) return 83; /*alloc fail*/
@@ -4200,8 +3292,7 @@ static unsigned generateFixedLitLenTree(HuffmanTree* tree)
 }
 
 /*get the distance code tree of a deflated block with fixed tree, as specified in the deflate specification*/
-static unsigned generateFixedDistanceTree(HuffmanTree* tree)
-{
+static unsigned generateFixedDistanceTree(HuffmanTree* tree) {
   unsigned i, error = 0;
   unsigned* bitlen = (unsigned*)lodepng_malloc(NUM_DISTANCE_SYMBOLS * sizeof(unsigned));
   if(!bitlen) return 83; /*alloc fail*/
@@ -4218,25 +3309,22 @@ static unsigned generateFixedDistanceTree(HuffmanTree* tree)
 
 /*
 returns the code, or (unsigned)(-1) if error happened
-inbitlength is the length of the complete buffer, in bits (so its byte length times 8)
 */
-static unsigned huffmanDecodeSymbol(const unsigned char* in, size_t* bp,
-                                    const HuffmanTree* codetree, size_t inbitlength)
-{
-  unsigned treepos = 0, ct;
-  for(;;)
-  {
-    if(*bp >= inbitlength) return (unsigned)(-1); /*error: end of input memory reached without endcode*/
-    /*
-    decode the symbol from the tree. The "readBitFromStream" code is inlined in
-    the expression below because this is the biggest bottleneck while decoding
-    */
-    ct = codetree->tree2d[(treepos << 1) + READBIT(*bp, in)];
-    ++(*bp);
-    if(ct < codetree->numcodes) return ct; /*the symbol is decoded, return it*/
-    else treepos = ct - codetree->numcodes; /*symbol not yet decoded, instead move tree position*/
-
-    if(treepos >= codetree->numcodes) return (unsigned)(-1); /*error: it appeared outside the codetree*/
+static unsigned huffmanDecodeSymbol(LodePNGBitReader* reader, const HuffmanTree* codetree) {
+  unsigned code, l, value;
+  if(ensureBits(reader, 15) > 1) return (unsigned)(-1);
+  code = peekBits(reader, FIRSTBITS);
+  l = codetree->table_len[code];
+  value = codetree->table_value[code];
+  if(l <= FIRSTBITS) {
+    advanceBits(reader, l);
+    return value;
+  } else {
+    unsigned index2;
+    advanceBits(reader, FIRSTBITS);
+    index2 = value + peekBits(reader, l - FIRSTBITS);
+    advanceBits(reader, codetree->table_len[index2] - FIRSTBITS);
+    return codetree->table_value[index2];
   }
 }
 #endif /*LODEPNG_COMPILE_DECODER*/
@@ -4248,8 +3336,7 @@ static unsigned huffmanDecodeSymbol(const unsigned char* in, size_t* bp,
 /* ////////////////////////////////////////////////////////////////////////// */
 
 /*get the tree of a deflated block with fixed tree, as specified in the deflate specification*/
-static void getTreeInflateFixed(HuffmanTree* tree_ll, HuffmanTree* tree_d)
-{
+static void getTreeInflateFixed(HuffmanTree* tree_ll, HuffmanTree* tree_d) {
   /*TODO: check for out of memory errors*/
   generateFixedLitLenTree(tree_ll);
   generateFixedDistanceTree(tree_d);
@@ -4257,12 +3344,10 @@ static void getTreeInflateFixed(HuffmanTree* tree_ll, HuffmanTree* tree_d)
 
 /*get the tree of a deflated block with dynamic tree, the tree itself is also Huffman compressed with a known tree*/
 static unsigned getTreeInflateDynamic(HuffmanTree* tree_ll, HuffmanTree* tree_d,
-                                      const unsigned char* in, size_t* bp, size_t inlength)
-{
+                                      LodePNGBitReader* reader) {
   /*make sure that length values that aren't filled in will be 0, or a wrong tree will be generated*/
   unsigned error = 0;
   unsigned n, HLIT, HDIST, HCLEN, i;
-  size_t inbitlength = inlength * 8;
 
   /*see comments in deflateDynamic for explanation of the context and these variables, it is analogous*/
   unsigned* bitlen_ll = 0; /*lit,len code lengths*/
@@ -4271,30 +3356,29 @@ static unsigned getTreeInflateDynamic(HuffmanTree* tree_ll, HuffmanTree* tree_d,
   unsigned* bitlen_cl = 0;
   HuffmanTree tree_cl; /*the code tree for code length codes (the huffman tree for compressed huffman trees)*/
 
-  if((*bp) + 14 > (inlength << 3)) return 49; /*error: the bit pointer is or will go past the memory*/
+  if(ensureBits(reader, 14)) return 49; /*error: the bit pointer is or will go past the memory*/
 
   /*number of literal/length codes + 257. Unlike the spec, the value 257 is added to it here already*/
-  HLIT =  readBitsFromStream(bp, in, 5) + 257;
+  HLIT =  readBits(reader, 5) + 257;
   /*number of distance codes. Unlike the spec, the value 1 is added to it here already*/
-  HDIST = readBitsFromStream(bp, in, 5) + 1;
+  HDIST = readBits(reader, 5) + 1;
   /*number of code length codes. Unlike the spec, the value 4 is added to it here already*/
-  HCLEN = readBitsFromStream(bp, in, 4) + 4;
+  HCLEN = readBits(reader, 4) + 4;
 
-  if((*bp) + HCLEN * 3 > (inlength << 3)) return 50; /*error: the bit pointer is or will go past the memory*/
+  bitlen_cl = (unsigned*)lodepng_malloc(NUM_CODE_LENGTH_CODES * sizeof(unsigned));
+  if(!bitlen_cl) return 83 /*alloc fail*/;
 
   HuffmanTree_init(&tree_cl);
 
-  while(!error)
-  {
+  while(!error) {
     /*read the code length codes out of 3 * (amount of code length codes) bits*/
-
-    bitlen_cl = (unsigned*)lodepng_malloc(NUM_CODE_LENGTH_CODES * sizeof(unsigned));
-    if(!bitlen_cl) ERROR_BREAK(83 /*alloc fail*/);
-
-    for(i = 0; i != NUM_CODE_LENGTH_CODES; ++i)
-    {
-      if(i < HCLEN) bitlen_cl[CLCL_ORDER[i]] = readBitsFromStream(bp, in, 3);
-      else bitlen_cl[CLCL_ORDER[i]] = 0; /*if not, it must stay 0*/
+    if((reader->bp) + HCLEN * 3 > reader->bitsize) ERROR_BREAK(50); /*error: the bit pointer is or will go past the memory*/
+    for(i = 0; i != HCLEN; ++i) {
+      ensureBits(reader, 3);
+      bitlen_cl[CLCL_ORDER[i]] = readBits(reader, 3);
+    }
+    for(i = HCLEN; i != NUM_CODE_LENGTH_CODES; ++i) {
+      bitlen_cl[CLCL_ORDER[i]] = 0;
     }
 
     error = HuffmanTree_makeFromLengths(&tree_cl, bitlen_cl, NUM_CODE_LENGTH_CODES, 7);
@@ -4309,75 +3393,61 @@ static unsigned getTreeInflateDynamic(HuffmanTree* tree_ll, HuffmanTree* tree_d,
 
     /*i is the current symbol we're reading in the part that contains the code lengths of lit/len and dist codes*/
     i = 0;
-    while(i < HLIT + HDIST)
-    {
-      unsigned code = huffmanDecodeSymbol(in, bp, &tree_cl, inbitlength);
-      if(code <= 15) /*a length code*/
-      {
+    while(i < HLIT + HDIST) {
+      unsigned code = huffmanDecodeSymbol(reader, &tree_cl);
+      if(code <= 15) /*a length code*/ {
         if(i < HLIT) bitlen_ll[i] = code;
         else bitlen_d[i - HLIT] = code;
         ++i;
-      }
-      else if(code == 16) /*repeat previous*/
-      {
+      } else if(code == 16) /*repeat previous*/ {
         unsigned replength = 3; /*read in the 2 bits that indicate repeat length (3-6)*/
         unsigned value; /*set value to the previous code*/
 
         if(i == 0) ERROR_BREAK(54); /*can't repeat previous if i is 0*/
 
-        if((*bp + 2) > inbitlength) ERROR_BREAK(50); /*error, bit pointer jumps past memory*/
-        replength += readBitsFromStream(bp, in, 2);
+        if(ensureBits(reader, 2)) ERROR_BREAK(50); /*error, bit pointer jumps past memory*/
+        replength += readBits(reader, 2);
 
         if(i < HLIT + 1) value = bitlen_ll[i - 1];
         else value = bitlen_d[i - HLIT - 1];
         /*repeat this value in the next lengths*/
-        for(n = 0; n < replength; ++n)
-        {
+        for(n = 0; n < replength; ++n) {
           if(i >= HLIT + HDIST) ERROR_BREAK(13); /*error: i is larger than the amount of codes*/
           if(i < HLIT) bitlen_ll[i] = value;
           else bitlen_d[i - HLIT] = value;
           ++i;
         }
-      }
-      else if(code == 17) /*repeat "0" 3-10 times*/
-      {
+      } else if(code == 17) /*repeat "0" 3-10 times*/ {
         unsigned replength = 3; /*read in the bits that indicate repeat length*/
-        if((*bp + 3) > inbitlength) ERROR_BREAK(50); /*error, bit pointer jumps past memory*/
-        replength += readBitsFromStream(bp, in, 3);
+        if(ensureBits(reader, 3)) ERROR_BREAK(50); /*error, bit pointer jumps past memory*/
+        replength += readBits(reader, 3);
 
         /*repeat this value in the next lengths*/
-        for(n = 0; n < replength; ++n)
-        {
+        for(n = 0; n < replength; ++n) {
           if(i >= HLIT + HDIST) ERROR_BREAK(14); /*error: i is larger than the amount of codes*/
 
           if(i < HLIT) bitlen_ll[i] = 0;
           else bitlen_d[i - HLIT] = 0;
           ++i;
         }
-      }
-      else if(code == 18) /*repeat "0" 11-138 times*/
-      {
+      } else if(code == 18) /*repeat "0" 11-138 times*/ {
         unsigned replength = 11; /*read in the bits that indicate repeat length*/
-        if((*bp + 7) > inbitlength) ERROR_BREAK(50); /*error, bit pointer jumps past memory*/
-        replength += readBitsFromStream(bp, in, 7);
+        if(ensureBits(reader, 7)) ERROR_BREAK(50); /*error, bit pointer jumps past memory*/
+        replength += readBits(reader, 7);
 
         /*repeat this value in the next lengths*/
-        for(n = 0; n < replength; ++n)
-        {
+        for(n = 0; n < replength; ++n) {
           if(i >= HLIT + HDIST) ERROR_BREAK(15); /*error: i is larger than the amount of codes*/
 
           if(i < HLIT) bitlen_ll[i] = 0;
           else bitlen_d[i - HLIT] = 0;
           ++i;
         }
-      }
-      else /*if(code == (unsigned)(-1))*/ /*huffmanDecodeSymbol returns (unsigned)(-1) in case of error*/
-      {
-        if(code == (unsigned)(-1))
-        {
+      } else /*if(code == (unsigned)(-1))*/ /*huffmanDecodeSymbol returns (unsigned)(-1) in case of error*/ {
+        if(code == (unsigned)(-1)) {
           /*return error code 10 or 11 depending on the situation that happened in huffmanDecodeSymbol
           (10=no endcode, 11=wrong jump outside of tree)*/
-          error = (*bp) > inbitlength ? 10 : 11;
+          error = (reader->bp) > reader->bitsize ? 10 : 11;
         }
         else error = 16; /*unexisting code, this can never happen*/
         break;
@@ -4403,55 +3473,47 @@ static unsigned getTreeInflateDynamic(HuffmanTree* tree_ll, HuffmanTree* tree_d,
   return error;
 }
 
-/*inflate a block with dynamic of fixed Huffman tree*/
-static unsigned inflateHuffmanBlock(ucvector* out, const unsigned char* in, size_t* bp,
-                                    size_t* pos, size_t inlength, unsigned btype)
-{
+/*inflate a block with dynamic of fixed Huffman tree. btype must be 1 or 2.*/
+static unsigned inflateHuffmanBlock(ucvector* out, size_t* pos, LodePNGBitReader* reader,
+                                    unsigned btype) {
   unsigned error = 0;
   HuffmanTree tree_ll; /*the huffman tree for literal and length codes*/
   HuffmanTree tree_d; /*the huffman tree for distance codes*/
-  size_t inbitlength = inlength * 8;
 
   HuffmanTree_init(&tree_ll);
   HuffmanTree_init(&tree_d);
 
   if(btype == 1) getTreeInflateFixed(&tree_ll, &tree_d);
-  else if(btype == 2) error = getTreeInflateDynamic(&tree_ll, &tree_d, in, bp, inlength);
+  else /*if(btype == 2)*/ error = getTreeInflateDynamic(&tree_ll, &tree_d, reader);
 
-  while(!error) /*decode all symbols until end reached, breaks at end code*/
-  {
+  while(!error) /*decode all symbols until end reached, breaks at end code*/ {
     /*code_ll is literal, length or end code*/
-    unsigned code_ll = huffmanDecodeSymbol(in, bp, &tree_ll, inbitlength);
-    if(code_ll <= 255) /*literal symbol*/
-    {
+    unsigned code_ll = huffmanDecodeSymbol(reader, &tree_ll);
+    if(code_ll <= 255) /*literal symbol*/ {
       /*ucvector_push_back would do the same, but for some reason the two lines below run 10% faster*/
       if(!ucvector_resize(out, (*pos) + 1)) ERROR_BREAK(83 /*alloc fail*/);
       out->data[*pos] = (unsigned char)code_ll;
       ++(*pos);
-    }
-    else if(code_ll >= FIRST_LENGTH_CODE_INDEX && code_ll <= LAST_LENGTH_CODE_INDEX) /*length code*/
-    {
+    } else if(code_ll >= FIRST_LENGTH_CODE_INDEX && code_ll <= LAST_LENGTH_CODE_INDEX) /*length code*/ {
       unsigned code_d, distance;
       unsigned numextrabits_l, numextrabits_d; /*extra bits for length and distance*/
-      size_t start, forward, backward, length;
+      size_t start, backward, length;
 
       /*part 1: get length base*/
       length = LENGTHBASE[code_ll - FIRST_LENGTH_CODE_INDEX];
 
       /*part 2: get extra bits and add the value of that to length*/
       numextrabits_l = LENGTHEXTRA[code_ll - FIRST_LENGTH_CODE_INDEX];
-      if((*bp + numextrabits_l) > inbitlength) ERROR_BREAK(51); /*error, bit pointer will jump past memory*/
-      length += readBitsFromStream(bp, in, numextrabits_l);
+      if(ensureBits(reader, numextrabits_l)) ERROR_BREAK(51); /*error, bit pointer will jump past memory*/
+      length += readBits(reader, numextrabits_l);
 
       /*part 3: get distance code*/
-      code_d = huffmanDecodeSymbol(in, bp, &tree_d, inbitlength);
-      if(code_d > 29)
-      {
-        if(code_d == (unsigned)(-1)) /*huffmanDecodeSymbol returns (unsigned)(-1) in case of error*/
-        {
+      code_d = huffmanDecodeSymbol(reader, &tree_d);
+      if(code_d > 29) {
+        if(code_d == (unsigned)(-1)) /*huffmanDecodeSymbol returns (unsigned)(-1) in case of error*/ {
           /*return error code 10 or 11 depending on the situation that happened in huffmanDecodeSymbol
           (10=no endcode, 11=wrong jump outside of tree)*/
-          error = (*bp) > inlength * 8 ? 10 : 11;
+          error = (reader->bp > reader->bitsize) ? 10 : 11;
         }
         else error = 18; /*error: invalid distance code (30-31 are never used)*/
         break;
@@ -4460,8 +3522,8 @@ static unsigned inflateHuffmanBlock(ucvector* out, const unsigned char* in, size
 
       /*part 4: get extra bits from distance*/
       numextrabits_d = DISTANCEEXTRA[code_d];
-      if((*bp + numextrabits_d) > inbitlength) ERROR_BREAK(51); /*error, bit pointer will jump past memory*/
-      distance += readBitsFromStream(bp, in, numextrabits_d);
+      if(ensureBits(reader, numextrabits_d)) ERROR_BREAK(51); /*error, bit pointer will jump past memory*/
+      distance += readBits(reader, numextrabits_d);
 
       /*part 5: fill in all the out[n] values based on the length and dist*/
       start = (*pos);
@@ -4470,24 +3532,20 @@ static unsigned inflateHuffmanBlock(ucvector* out, const unsigned char* in, size
 
       if(!ucvector_resize(out, (*pos) + length)) ERROR_BREAK(83 /*alloc fail*/);
       if (distance < length) {
-        for(forward = 0; forward < length; ++forward)
-        {
+        size_t forward;
+        for(forward = 0; forward < length; ++forward) {
           out->data[(*pos)++] = out->data[backward++];
         }
       } else {
-        memcpy(out->data + *pos, out->data + backward, length);
+        lodepng_memcpy(out->data + *pos, out->data + backward, length);
         *pos += length;
       }
-    }
-    else if(code_ll == 256)
-    {
+    } else if(code_ll == 256) {
       break; /*end code, break the loop*/
-    }
-    else /*if(code == (unsigned)(-1))*/ /*huffmanDecodeSymbol returns (unsigned)(-1) in case of error*/
-    {
+    } else /*if(code == (unsigned)(-1))*/ /*huffmanDecodeSymbol returns (unsigned)(-1) in case of error*/ {
       /*return error code 10 or 11 depending on the situation that happened in huffmanDecodeSymbol
       (10=no endcode, 11=wrong jump outside of tree)*/
-      error = ((*bp) > inlength * 8) ? 10 : 11;
+      error = (reader->bp > reader->bitsize) ? 10 : 11;
       break;
     }
   }
@@ -4498,57 +3556,57 @@ static unsigned inflateHuffmanBlock(ucvector* out, const unsigned char* in, size
   return error;
 }
 
-static unsigned inflateNoCompression(ucvector* out, const unsigned char* in, size_t* bp, size_t* pos, size_t inlength)
-{
-  size_t p;
-  unsigned LEN, NLEN, n, error = 0;
+static unsigned inflateNoCompression(ucvector* out, size_t* pos,
+                                     LodePNGBitReader* reader, const LodePNGDecompressSettings* settings) {
+  size_t bytepos;
+  size_t size = reader->size;
+  unsigned LEN, NLEN, error = 0;
 
   /*go to first boundary of byte*/
-  while(((*bp) & 0x7) != 0) ++(*bp);
-  p = (*bp) / 8; /*byte position*/
+  bytepos = (reader->bp + 7u) >> 3u;
 
   /*read LEN (2 bytes) and NLEN (2 bytes)*/
-  if(p + 4 >= inlength) return 52; /*error, bit pointer will jump past memory*/
-  LEN = in[p] + 256u * in[p + 1]; p += 2;
-  NLEN = in[p] + 256u * in[p + 1]; p += 2;
+  if(bytepos + 4 >= size) return 52; /*error, bit pointer will jump past memory*/
+  LEN = (unsigned)reader->data[bytepos] + (unsigned)(reader->data[bytepos + 1] << 8u); bytepos += 2;
+  NLEN = (unsigned)reader->data[bytepos] + (unsigned)(reader->data[bytepos + 1] << 8u); bytepos += 2;
 
   /*check if 16-bit NLEN is really the one's complement of LEN*/
-  if(LEN + NLEN != 65535) return 21; /*error: NLEN is not one's complement of LEN*/
+  if(!settings->ignore_nlen && LEN + NLEN != 65535) {
+    return 21; /*error: NLEN is not one's complement of LEN*/
+  }
 
   if(!ucvector_resize(out, (*pos) + LEN)) return 83; /*alloc fail*/
 
   /*read the literal data: LEN bytes are now stored in the out buffer*/
-  if(p + LEN > inlength) return 23; /*error: reading outside of in buffer*/
-  for(n = 0; n < LEN; ++n) out->data[(*pos)++] = in[p++];
+  if(bytepos + LEN > size) return 23; /*error: reading outside of in buffer*/
 
-  (*bp) = p * 8;
+  lodepng_memcpy(out->data + *pos, reader->data + bytepos, LEN);
+  *pos += LEN;
+  bytepos += LEN;
+
+  reader->bp = bytepos << 3u;
 
   return error;
 }
 
 static unsigned lodepng_inflatev(ucvector* out,
                                  const unsigned char* in, size_t insize,
-                                 const LodePNGDecompressSettings* settings)
-{
-  /*bit pointer in the "in" data, current byte is bp >> 3, current bit is bp & 0x7 (from lsb to msb of the byte)*/
-  size_t bp = 0;
+                                 const LodePNGDecompressSettings* settings) {
   unsigned BFINAL = 0;
   size_t pos = 0; /*byte position in the out buffer*/
   unsigned error = 0;
+  LodePNGBitReader reader;
+  LodePNGBitReader_init(&reader, in, insize);
 
-  (void)settings;
-
-  while(!BFINAL)
-  {
+  while(!BFINAL) {
     unsigned BTYPE;
-    if(bp + 2 >= insize * 8) return 52; /*error, bit pointer will jump past memory*/
-    BFINAL = readBitFromStream(&bp, in);
-    BTYPE = 1u * readBitFromStream(&bp, in);
-    BTYPE += 2u * readBitFromStream(&bp, in);
+    if(ensureBits(&reader, 3)) return 52; /*error, bit pointer will jump past memory*/
+    BFINAL = readBits(&reader, 1);
+    BTYPE = readBits(&reader, 2);
 
     if(BTYPE == 3) return 20; /*error: invalid BTYPE*/
-    else if(BTYPE == 0) error = inflateNoCompression(out, in, &bp, &pos, insize); /*no compression*/
-    else error = inflateHuffmanBlock(out, in, &bp, &pos, insize, BTYPE); /*compression, BTYPE 01 or 10*/
+    else if(BTYPE == 0) error = inflateNoCompression(out, &pos, &reader, settings); /*no compression*/
+    else error = inflateHuffmanBlock(out, &pos, &reader, BTYPE); /*compression, BTYPE 01 or 10*/
 
     if(error) return error;
   }
@@ -4558,8 +3616,7 @@ static unsigned lodepng_inflatev(ucvector* out,
 
 unsigned lodepng_inflate(unsigned char** out, size_t* outsize,
                          const unsigned char* in, size_t insize,
-                         const LodePNGDecompressSettings* settings)
-{
+                         const LodePNGDecompressSettings* settings) {
   unsigned error;
   ucvector v;
   ucvector_init_buffer(&v, *out, *outsize);
@@ -4571,14 +3628,10 @@ unsigned lodepng_inflate(unsigned char** out, size_t* outsize,
 
 static unsigned inflate(unsigned char** out, size_t* outsize,
                         const unsigned char* in, size_t insize,
-                        const LodePNGDecompressSettings* settings)
-{
-  if(settings->custom_inflate)
-  {
+                        const LodePNGDecompressSettings* settings) {
+  if(settings->custom_inflate) {
     return settings->custom_inflate(out, outsize, in, insize, settings);
-  }
-  else
-  {
+  } else {
     return lodepng_inflate(out, outsize, in, insize, settings);
   }
 }
@@ -4593,16 +3646,9 @@ static unsigned inflate(unsigned char** out, size_t* outsize,
 
 static const size_t MAX_SUPPORTED_DEFLATE_LENGTH = 258;
 
-/*bitlen is the size in bits of the code*/
-static void addHuffmanSymbol(size_t* bp, ucvector* compressed, unsigned code, unsigned bitlen)
-{
-  addBitsToStreamReversed(bp, compressed, code, bitlen);
-}
-
 /*search the index in the array, that has the largest value smaller than or equal to the given value,
 given array must be sorted (if no value is smaller, it returns the size of the given array)*/
-static size_t searchCodeIndex(const unsigned* array, size_t array_size, size_t value)
-{
+static size_t searchCodeIndex(const unsigned* array, size_t array_size, size_t value) {
   /*binary search (only small gain over linear). TODO: use CPU log2 instruction for getting symbols instead*/
   size_t left = 1;
   size_t right = array_size - 1;
@@ -4616,8 +3662,7 @@ static size_t searchCodeIndex(const unsigned* array, size_t array_size, size_t v
   return left;
 }
 
-static void addLengthDistance(uivector* values, size_t length, size_t distance)
-{
+static void addLengthDistance(uivector* values, size_t length, size_t distance) {
   /*values in encoded vector are those used by deflate:
   0-255: literal bytes
   256: end
@@ -4640,8 +3685,7 @@ bytes as input because 3 is the minimum match length for deflate*/
 static const unsigned HASH_NUM_VALUES = 65536;
 static const unsigned HASH_BIT_MASK = 65535; /*HASH_NUM_VALUES - 1, but C90 does not like that as initializer*/
 
-typedef struct Hash
-{
+typedef struct Hash {
   int* head; /*hash value to head circular pos - can be outdated if went around window*/
   /*circular pos to prev circular pos*/
   unsigned short* chain;
@@ -4654,8 +3698,7 @@ typedef struct Hash
   unsigned short* zeros; /*length of zeros streak, used as a second hash chain*/
 } Hash;
 
-static unsigned hash_init(Hash* hash, unsigned windowsize)
-{
+static unsigned hash_init(Hash* hash, unsigned windowsize) {
   unsigned i;
   hash->head = (int*)lodepng_malloc(sizeof(int) * HASH_NUM_VALUES);
   hash->val = (int*)lodepng_malloc(sizeof(int) * windowsize);
@@ -4665,8 +3708,7 @@ static unsigned hash_init(Hash* hash, unsigned windowsize)
   hash->headz = (int*)lodepng_malloc(sizeof(int) * (MAX_SUPPORTED_DEFLATE_LENGTH + 1));
   hash->chainz = (unsigned short*)lodepng_malloc(sizeof(unsigned short) * windowsize);
 
-  if(!hash->head || !hash->chain || !hash->val  || !hash->headz|| !hash->chainz || !hash->zeros)
-  {
+  if(!hash->head || !hash->chain || !hash->val  || !hash->headz|| !hash->chainz || !hash->zeros) {
     return 83; /*alloc fail*/
   }
 
@@ -4681,8 +3723,7 @@ static unsigned hash_init(Hash* hash, unsigned windowsize)
   return 0;
 }
 
-static void hash_cleanup(Hash* hash)
-{
+static void hash_cleanup(Hash* hash) {
   lodepng_free(hash->head);
   lodepng_free(hash->val);
   lodepng_free(hash->chain);
@@ -4694,11 +3735,9 @@ static void hash_cleanup(Hash* hash)
 
 
 
-static unsigned getHash(const unsigned char* data, size_t size, size_t pos)
-{
+static unsigned getHash(const unsigned char* data, size_t size, size_t pos) {
   unsigned result = 0;
-  if(pos + 2 < size)
-  {
+  if(pos + 2 < size) {
     /*A simple shift and xor hash is used. Since the data of PNGs is dominated
     by zeroes due to the filters, a better hash does not have a significant
     effect on speed in traversing the chain, and causes more time spend on
@@ -4715,8 +3754,7 @@ static unsigned getHash(const unsigned char* data, size_t size, size_t pos)
   return result & HASH_BIT_MASK;
 }
 
-static unsigned countZeros(const unsigned char* data, size_t size, size_t pos)
-{
+static unsigned countZeros(const unsigned char* data, size_t size, size_t pos) {
   const unsigned char* start = data + pos;
   const unsigned char* end = start + MAX_SUPPORTED_DEFLATE_LENGTH;
   if(end > data + size) end = data + size;
@@ -4727,8 +3765,7 @@ static unsigned countZeros(const unsigned char* data, size_t size, size_t pos)
 }
 
 /*wpos = pos & (windowsize - 1)*/
-static void updateHashChain(Hash* hash, size_t wpos, unsigned hashval, unsigned short numzeros)
-{
+static void updateHashChain(Hash* hash, size_t wpos, unsigned hashval, unsigned short numzeros) {
   hash->val[wpos] = (int)hashval;
   if(hash->head[hashval] != -1) hash->chain[wpos] = hash->head[hashval];
   hash->head[hashval] = (int)wpos;
@@ -4749,12 +3786,11 @@ this hash technique is one out of several ways to speed this up.
 */
 static unsigned encodeLZ77(uivector* out, Hash* hash,
                            const unsigned char* in, size_t inpos, size_t insize, unsigned windowsize,
-                           unsigned minmatch, unsigned nicematch, unsigned lazymatching)
-{
+                           unsigned minmatch, unsigned nicematch, unsigned lazymatching) {
   size_t pos;
   unsigned i, error = 0;
   /*for large window lengths, assume the user wants no compression loss. Otherwise, max hash chain length speedup.*/
-  unsigned maxchainlength = windowsize >= 8192 ? windowsize : windowsize / 8;
+  unsigned maxchainlength = windowsize >= 8192 ? windowsize : windowsize / 8u;
   unsigned maxlazymatch = windowsize >= 8192 ? MAX_SUPPORTED_DEFLATE_LENGTH : 64;
 
   unsigned usezeros = 1; /*not sure if setting it to false for windowsize < 8192 is better or worse*/
@@ -4775,20 +3811,16 @@ static unsigned encodeLZ77(uivector* out, Hash* hash,
 
   if(nicematch > MAX_SUPPORTED_DEFLATE_LENGTH) nicematch = MAX_SUPPORTED_DEFLATE_LENGTH;
 
-  for(pos = inpos; pos < insize; ++pos)
-  {
+  for(pos = inpos; pos < insize; ++pos) {
     size_t wpos = pos & (windowsize - 1); /*position for in 'circular' hash buffers*/
     unsigned chainlength = 0;
 
     hashval = getHash(in, insize, pos);
 
-    if(usezeros && hashval == 0)
-    {
+    if(usezeros && hashval == 0) {
       if(numzeros == 0) numzeros = countZeros(in, insize, pos);
       else if(pos + numzeros > insize || in[pos + numzeros - 1] != 0) --numzeros;
-    }
-    else
-    {
+    } else {
       numzeros = 0;
     }
 
@@ -4804,37 +3836,32 @@ static unsigned encodeLZ77(uivector* out, Hash* hash,
 
     /*search for the longest string*/
     prev_offset = 0;
-    for(;;)
-    {
+    for(;;) {
       if(chainlength++ >= maxchainlength) break;
       current_offset = (unsigned)(hashpos <= wpos ? wpos - hashpos : wpos - hashpos + windowsize);
 
       if(current_offset < prev_offset) break; /*stop when went completely around the circular buffer*/
       prev_offset = current_offset;
-      if(current_offset > 0)
-      {
+      if(current_offset > 0) {
         /*test the next characters*/
         foreptr = &in[pos];
         backptr = &in[pos - current_offset];
 
         /*common case in PNGs is lots of zeros. Quickly skip over them as a speedup*/
-        if(numzeros >= 3)
-        {
+        if(numzeros >= 3) {
           unsigned skip = hash->zeros[hashpos];
           if(skip > numzeros) skip = numzeros;
           backptr += skip;
           foreptr += skip;
         }
 
-        while(foreptr != lastptr && *backptr == *foreptr) /*maximum supported length by deflate is max length*/
-        {
+        while(foreptr != lastptr && *backptr == *foreptr) /*maximum supported length by deflate is max length*/ {
           ++backptr;
           ++foreptr;
         }
         current_length = (unsigned)(foreptr - &in[pos]);
 
-        if(current_length > length)
-        {
+        if(current_length > length) {
           length = current_length; /*the longest length*/
           offset = current_offset; /*the offset that is related to this longest length*/
           /*jump out once a length of max length is found (speed gain). This also jumps
@@ -4845,39 +3872,30 @@ static unsigned encodeLZ77(uivector* out, Hash* hash,
 
       if(hashpos == hash->chain[hashpos]) break;
 
-      if(numzeros >= 3 && length > numzeros)
-      {
+      if(numzeros >= 3 && length > numzeros) {
         hashpos = hash->chainz[hashpos];
         if(hash->zeros[hashpos] != numzeros) break;
-      }
-      else
-      {
+      } else {
         hashpos = hash->chain[hashpos];
         /*outdated hash value, happens if particular value was not encountered in whole last window*/
         if(hash->val[hashpos] != (int)hashval) break;
       }
     }
 
-    if(lazymatching)
-    {
-      if(!lazy && length >= 3 && length <= maxlazymatch && length < MAX_SUPPORTED_DEFLATE_LENGTH)
-      {
+    if(lazymatching) {
+      if(!lazy && length >= 3 && length <= maxlazymatch && length < MAX_SUPPORTED_DEFLATE_LENGTH) {
         lazy = 1;
         lazylength = length;
         lazyoffset = offset;
         continue; /*try the next byte*/
       }
-      if(lazy)
-      {
+      if(lazy) {
         lazy = 0;
         if(pos == 0) ERROR_BREAK(81);
-        if(length > lazylength + 1)
-        {
+        if(length > lazylength + 1) {
           /*push the previous character as literal*/
           if(!uivector_push_back(out, in[pos - 1])) ERROR_BREAK(83 /*alloc fail*/);
-        }
-        else
-        {
+        } else {
           length = lazylength;
           offset = lazyoffset;
           hash->head[hashval] = -1; /*the same hashchain update will be done, this ensures no wrong alteration*/
@@ -4889,31 +3907,22 @@ static unsigned encodeLZ77(uivector* out, Hash* hash,
     if(length >= 3 && offset > windowsize) ERROR_BREAK(86 /*too big (or overflown negative) offset*/);
 
     /*encode it as length/distance pair or literal value*/
-    if(length < 3) /*only lengths of 3 or higher are supported as length/distance pair*/
-    {
+    if(length < 3) /*only lengths of 3 or higher are supported as length/distance pair*/ {
       if(!uivector_push_back(out, in[pos])) ERROR_BREAK(83 /*alloc fail*/);
-    }
-    else if(length < minmatch || (length == 3 && offset > 4096))
-    {
+    } else if(length < minmatch || (length == 3 && offset > 4096)) {
       /*compensate for the fact that longer offsets have more extra bits, a
       length of only 3 may be not worth it then*/
       if(!uivector_push_back(out, in[pos])) ERROR_BREAK(83 /*alloc fail*/);
-    }
-    else
-    {
+    } else {
       addLengthDistance(out, length, offset);
-      for(i = 1; i < length; ++i)
-      {
+      for(i = 1; i < length; ++i) {
         ++pos;
         wpos = pos & (windowsize - 1);
         hashval = getHash(in, insize, pos);
-        if(usezeros && hashval == 0)
-        {
+        if(usezeros && hashval == 0) {
           if(numzeros == 0) numzeros = countZeros(in, insize, pos);
           else if(pos + numzeros > insize || in[pos + numzeros - 1] != 0) --numzeros;
-        }
-        else
-        {
+        } else {
           numzeros = 0;
         }
         updateHashChain(hash, wpos, hashval, numzeros);
@@ -4926,15 +3935,13 @@ static unsigned encodeLZ77(uivector* out, Hash* hash,
 
 /* /////////////////////////////////////////////////////////////////////////// */
 
-static unsigned deflateNoCompression(ucvector* out, const unsigned char* data, size_t datasize)
-{
+static unsigned deflateNoCompression(ucvector* out, const unsigned char* data, size_t datasize) {
   /*non compressed deflate block data: 1 bit BFINAL,2 bits BTYPE,(5 bits): it jumps to start of next byte,
   2 bytes LEN, 2 bytes NLEN, LEN bytes literal DATA*/
 
-  size_t i, j, numdeflateblocks = (datasize + 65534) / 65535;
+  size_t i, j, numdeflateblocks = (datasize + 65534u) / 65535u;
   unsigned datapos = 0;
-  for(i = 0; i != numdeflateblocks; ++i)
-  {
+  for(i = 0; i != numdeflateblocks; ++i) {
     unsigned BFINAL, BTYPE, LEN, NLEN;
     unsigned char firstbyte;
 
@@ -4945,17 +3952,16 @@ static unsigned deflateNoCompression(ucvector* out, const unsigned char* data, s
     ucvector_push_back(out, firstbyte);
 
     LEN = 65535;
-    if(datasize - datapos < 65535) LEN = (unsigned)datasize - datapos;
+    if(datasize - datapos < 65535u) LEN = (unsigned)datasize - datapos;
     NLEN = 65535 - LEN;
 
     ucvector_push_back(out, (unsigned char)(LEN & 255));
-    ucvector_push_back(out, (unsigned char)(LEN >> 8));
+    ucvector_push_back(out, (unsigned char)(LEN >> 8u));
     ucvector_push_back(out, (unsigned char)(NLEN & 255));
-    ucvector_push_back(out, (unsigned char)(NLEN >> 8));
+    ucvector_push_back(out, (unsigned char)(NLEN >> 8u));
 
     /*Decompressed data*/
-    for(j = 0; j < 65535 && datapos < datasize; ++j)
-    {
+    for(j = 0; j < 65535 && datapos < datasize; ++j) {
       ucvector_push_back(out, data[datapos++]);
     }
   }
@@ -4968,16 +3974,13 @@ write the lz77-encoded data, which has lit, len and dist codes, to compressed st
 tree_ll: the tree for lit and len codes.
 tree_d: the tree for distance codes.
 */
-static void writeLZ77data(size_t* bp, ucvector* out, const uivector* lz77_encoded,
-                          const HuffmanTree* tree_ll, const HuffmanTree* tree_d)
-{
+static void writeLZ77data(LodePNGBitWriter* writer, const uivector* lz77_encoded,
+                          const HuffmanTree* tree_ll, const HuffmanTree* tree_d) {
   size_t i = 0;
-  for(i = 0; i != lz77_encoded->size; ++i)
-  {
+  for(i = 0; i != lz77_encoded->size; ++i) {
     unsigned val = lz77_encoded->data[i];
-    addHuffmanSymbol(bp, out, HuffmanTree_getCode(tree_ll, val), HuffmanTree_getLength(tree_ll, val));
-    if(val > 256) /*for a length code, 3 more things have to be added*/
-    {
+    writeBitsReversed(writer, HuffmanTree_getCode(tree_ll, val), HuffmanTree_getLength(tree_ll, val));
+    if(val > 256) /*for a length code, 3 more things have to be added*/ {
       unsigned length_index = val - FIRST_LENGTH_CODE_INDEX;
       unsigned n_length_extra_bits = LENGTHEXTRA[length_index];
       unsigned length_extra_bits = lz77_encoded->data[++i];
@@ -4988,19 +3991,18 @@ static void writeLZ77data(size_t* bp, ucvector* out, const uivector* lz77_encode
       unsigned n_distance_extra_bits = DISTANCEEXTRA[distance_index];
       unsigned distance_extra_bits = lz77_encoded->data[++i];
 
-      addBitsToStream(bp, out, length_extra_bits, n_length_extra_bits);
-      addHuffmanSymbol(bp, out, HuffmanTree_getCode(tree_d, distance_code),
+      writeBits(writer, length_extra_bits, n_length_extra_bits);
+      writeBitsReversed(writer, HuffmanTree_getCode(tree_d, distance_code),
                        HuffmanTree_getLength(tree_d, distance_code));
-      addBitsToStream(bp, out, distance_extra_bits, n_distance_extra_bits);
+      writeBits(writer, distance_extra_bits, n_distance_extra_bits);
     }
   }
 }
 
 /*Deflate for a block of type "dynamic", that is, with freely, optimally, created huffman trees*/
-static unsigned deflateDynamic(ucvector* out, size_t* bp, Hash* hash,
+static unsigned deflateDynamic(LodePNGBitWriter* writer, Hash* hash,
                                const unsigned char* data, size_t datapos, size_t dataend,
-                               const LodePNGCompressSettings* settings, unsigned final)
-{
+                               const LodePNGCompressSettings* settings, unsigned final) {
   unsigned error = 0;
 
   /*
@@ -5054,16 +4056,12 @@ static unsigned deflateDynamic(ucvector* out, size_t* bp, Hash* hash,
 
   /*This while loop never loops due to a break at the end, it is here to
   allow breaking out of it to the cleanup phase on error conditions.*/
-  while(!error)
-  {
-    if(settings->use_lz77)
-    {
+  while(!error) {
+    if(settings->use_lz77) {
       error = encodeLZ77(&lz77_encoded, hash, data, datapos, dataend, settings->windowsize,
                          settings->minmatch, settings->nicematch, settings->lazymatching);
       if(error) break;
-    }
-    else
-    {
+    } else {
       if(!uivector_resize(&lz77_encoded, datasize)) ERROR_BREAK(83 /*alloc fail*/);
       for(i = datapos; i < dataend; ++i) lz77_encoded.data[i - datapos] = data[i]; /*no LZ77, but still will be Huffman compressed*/
     }
@@ -5072,12 +4070,10 @@ static unsigned deflateDynamic(ucvector* out, size_t* bp, Hash* hash,
     if(!uivector_resizev(&frequencies_d, 30, 0)) ERROR_BREAK(83 /*alloc fail*/);
 
     /*Count the frequencies of lit, len and dist codes*/
-    for(i = 0; i != lz77_encoded.size; ++i)
-    {
+    for(i = 0; i != lz77_encoded.size; ++i) {
       unsigned symbol = lz77_encoded.data[i];
       ++frequencies_ll.data[symbol];
-      if(symbol > 256)
-      {
+      if(symbol > 256) {
         unsigned dist = lz77_encoded.data[i + 2];
         ++frequencies_d.data[dist];
         i += 3;
@@ -5100,47 +4096,36 @@ static unsigned deflateDynamic(ucvector* out, size_t* bp, Hash* hash,
 
     /*run-length compress bitlen_ldd into bitlen_lld_e by using repeat codes 16 (copy length 3-6 times),
     17 (3-10 zeroes), 18 (11-138 zeroes)*/
-    for(i = 0; i != (unsigned)bitlen_lld.size; ++i)
-    {
+    for(i = 0; i != (unsigned)bitlen_lld.size; ++i) {
       unsigned j = 0; /*amount of repititions*/
       while(i + j + 1 < (unsigned)bitlen_lld.size && bitlen_lld.data[i + j + 1] == bitlen_lld.data[i]) ++j;
 
-      if(bitlen_lld.data[i] == 0 && j >= 2) /*repeat code for zeroes*/
-      {
+      if(bitlen_lld.data[i] == 0 && j >= 2) /*repeat code for zeroes*/ {
         ++j; /*include the first zero*/
-        if(j <= 10) /*repeat code 17 supports max 10 zeroes*/
-        {
+        if(j <= 10) /*repeat code 17 supports max 10 zeroes*/ {
           uivector_push_back(&bitlen_lld_e, 17);
           uivector_push_back(&bitlen_lld_e, j - 3);
-        }
-        else /*repeat code 18 supports max 138 zeroes*/
-        {
+        } else /*repeat code 18 supports max 138 zeroes*/ {
           if(j > 138) j = 138;
           uivector_push_back(&bitlen_lld_e, 18);
           uivector_push_back(&bitlen_lld_e, j - 11);
         }
         i += (j - 1);
-      }
-      else if(j >= 3) /*repeat code for value other than zero*/
-      {
+      } else if(j >= 3) /*repeat code for value other than zero*/ {
         size_t k;
-        unsigned num = j / 6, rest = j % 6;
+        unsigned num = j / 6u, rest = j % 6u;
         uivector_push_back(&bitlen_lld_e, bitlen_lld.data[i]);
-        for(k = 0; k < num; ++k)
-        {
+        for(k = 0; k < num; ++k) {
           uivector_push_back(&bitlen_lld_e, 16);
           uivector_push_back(&bitlen_lld_e, 6 - 3);
         }
-        if(rest >= 3)
-        {
+        if(rest >= 3) {
           uivector_push_back(&bitlen_lld_e, 16);
           uivector_push_back(&bitlen_lld_e, rest - 3);
         }
         else j -= rest;
         i += j;
-      }
-      else /*too short to benefit from repeat code*/
-      {
+      } else /*too short to benefit from repeat code*/ {
         uivector_push_back(&bitlen_lld_e, bitlen_lld.data[i]);
       }
     }
@@ -5148,8 +4133,7 @@ static unsigned deflateDynamic(ucvector* out, size_t* bp, Hash* hash,
     /*generate tree_cl, the huffmantree of huffmantrees*/
 
     if(!uivector_resizev(&frequencies_cl, NUM_CODE_LENGTH_CODES, 0)) ERROR_BREAK(83 /*alloc fail*/);
-    for(i = 0; i != bitlen_lld_e.size; ++i)
-    {
+    for(i = 0; i != bitlen_lld_e.size; ++i) {
       ++frequencies_cl.data[bitlen_lld_e.data[i]];
       /*after a repeat code come the bits that specify the number of repetitions,
       those don't need to be in the frequencies_cl calculation*/
@@ -5161,13 +4145,11 @@ static unsigned deflateDynamic(ucvector* out, size_t* bp, Hash* hash,
     if(error) break;
 
     if(!uivector_resize(&bitlen_cl, tree_cl.numcodes)) ERROR_BREAK(83 /*alloc fail*/);
-    for(i = 0; i != tree_cl.numcodes; ++i)
-    {
+    for(i = 0; i != tree_cl.numcodes; ++i) {
       /*lenghts of code length tree is in the order as specified by deflate*/
       bitlen_cl.data[i] = HuffmanTree_getLength(&tree_cl, CLCL_ORDER[i]);
     }
-    while(bitlen_cl.data[bitlen_cl.size - 1] == 0 && bitlen_cl.size > 4)
-    {
+    while(bitlen_cl.data[bitlen_cl.size - 1] == 0 && bitlen_cl.size > 4) {
       /*remove zeros at the end, but minimum size must be 4*/
       if(!uivector_resize(&bitlen_cl, bitlen_cl.size - 1)) ERROR_BREAK(83 /*alloc fail*/);
     }
@@ -5188,9 +4170,9 @@ static unsigned deflateDynamic(ucvector* out, size_t* bp, Hash* hash,
     */
 
     /*Write block type*/
-    addBitToStream(bp, out, BFINAL);
-    addBitToStream(bp, out, 0); /*first bit of BTYPE "dynamic"*/
-    addBitToStream(bp, out, 1); /*second bit of BTYPE "dynamic"*/
+    writeBits(writer, BFINAL, 1);
+    writeBits(writer, 0, 1); /*first bit of BTYPE "dynamic"*/
+    writeBits(writer, 1, 1); /*second bit of BTYPE "dynamic"*/
 
     /*write the HLIT, HDIST and HCLEN values*/
     HLIT = (unsigned)(numcodes_ll - 257);
@@ -5198,31 +4180,30 @@ static unsigned deflateDynamic(ucvector* out, size_t* bp, Hash* hash,
     HCLEN = (unsigned)bitlen_cl.size - 4;
     /*trim zeroes for HCLEN. HLIT and HDIST were already trimmed at tree creation*/
     while(!bitlen_cl.data[HCLEN + 4 - 1] && HCLEN > 0) --HCLEN;
-    addBitsToStream(bp, out, HLIT, 5);
-    addBitsToStream(bp, out, HDIST, 5);
-    addBitsToStream(bp, out, HCLEN, 4);
+    writeBits(writer, HLIT, 5);
+    writeBits(writer, HDIST, 5);
+    writeBits(writer, HCLEN, 4);
 
     /*write the code lenghts of the code length alphabet*/
-    for(i = 0; i != HCLEN + 4; ++i) addBitsToStream(bp, out, bitlen_cl.data[i], 3);
+    for(i = 0; i != HCLEN + 4; ++i) writeBits(writer, bitlen_cl.data[i], 3);
 
     /*write the lenghts of the lit/len AND the dist alphabet*/
-    for(i = 0; i != bitlen_lld_e.size; ++i)
-    {
-      addHuffmanSymbol(bp, out, HuffmanTree_getCode(&tree_cl, bitlen_lld_e.data[i]),
+    for(i = 0; i != bitlen_lld_e.size; ++i) {
+      writeBitsReversed(writer, HuffmanTree_getCode(&tree_cl, bitlen_lld_e.data[i]),
                        HuffmanTree_getLength(&tree_cl, bitlen_lld_e.data[i]));
       /*extra bits of repeat codes*/
-      if(bitlen_lld_e.data[i] == 16) addBitsToStream(bp, out, bitlen_lld_e.data[++i], 2);
-      else if(bitlen_lld_e.data[i] == 17) addBitsToStream(bp, out, bitlen_lld_e.data[++i], 3);
-      else if(bitlen_lld_e.data[i] == 18) addBitsToStream(bp, out, bitlen_lld_e.data[++i], 7);
+      if(bitlen_lld_e.data[i] == 16) writeBits(writer, bitlen_lld_e.data[++i], 2);
+      else if(bitlen_lld_e.data[i] == 17) writeBits(writer, bitlen_lld_e.data[++i], 3);
+      else if(bitlen_lld_e.data[i] == 18) writeBits(writer, bitlen_lld_e.data[++i], 7);
     }
 
     /*write the compressed data symbols*/
-    writeLZ77data(bp, out, &lz77_encoded, &tree_ll, &tree_d);
+    writeLZ77data(writer, &lz77_encoded, &tree_ll, &tree_d);
     /*error: the length of the end code 256 must be larger than 0*/
     if(HuffmanTree_getLength(&tree_ll, 256) == 0) ERROR_BREAK(64);
 
     /*write the end code*/
-    addHuffmanSymbol(bp, out, HuffmanTree_getCode(&tree_ll, 256), HuffmanTree_getLength(&tree_ll, 256));
+    writeBitsReversed(writer, HuffmanTree_getCode(&tree_ll, 256), HuffmanTree_getLength(&tree_ll, 256));
 
     break; /*end of error-while*/
   }
@@ -5242,11 +4223,10 @@ static unsigned deflateDynamic(ucvector* out, size_t* bp, Hash* hash,
   return error;
 }
 
-static unsigned deflateFixed(ucvector* out, size_t* bp, Hash* hash,
+static unsigned deflateFixed(LodePNGBitWriter* writer, Hash* hash,
                              const unsigned char* data,
                              size_t datapos, size_t dataend,
-                             const LodePNGCompressSettings* settings, unsigned final)
-{
+                             const LodePNGCompressSettings* settings, unsigned final) {
   HuffmanTree tree_ll; /*tree for literal values and length codes*/
   HuffmanTree tree_d; /*tree for distance codes*/
 
@@ -5260,28 +4240,24 @@ static unsigned deflateFixed(ucvector* out, size_t* bp, Hash* hash,
   generateFixedLitLenTree(&tree_ll);
   generateFixedDistanceTree(&tree_d);
 
-  addBitToStream(bp, out, BFINAL);
-  addBitToStream(bp, out, 1); /*first bit of BTYPE*/
-  addBitToStream(bp, out, 0); /*second bit of BTYPE*/
+  writeBits(writer, BFINAL, 1);
+  writeBits(writer, 1, 1); /*first bit of BTYPE*/
+  writeBits(writer, 0, 1); /*second bit of BTYPE*/
 
-  if(settings->use_lz77) /*LZ77 encoded*/
-  {
+  if(settings->use_lz77) /*LZ77 encoded*/ {
     uivector lz77_encoded;
     uivector_init(&lz77_encoded);
     error = encodeLZ77(&lz77_encoded, hash, data, datapos, dataend, settings->windowsize,
                        settings->minmatch, settings->nicematch, settings->lazymatching);
-    if(!error) writeLZ77data(bp, out, &lz77_encoded, &tree_ll, &tree_d);
+    if(!error) writeLZ77data(writer, &lz77_encoded, &tree_ll, &tree_d);
     uivector_cleanup(&lz77_encoded);
-  }
-  else /*no LZ77, but still will be Huffman compressed*/
-  {
-    for(i = datapos; i < dataend; ++i)
-    {
-      addHuffmanSymbol(bp, out, HuffmanTree_getCode(&tree_ll, data[i]), HuffmanTree_getLength(&tree_ll, data[i]));
+  } else /*no LZ77, but still will be Huffman compressed*/ {
+    for(i = datapos; i < dataend; ++i) {
+      writeBitsReversed(writer, HuffmanTree_getCode(&tree_ll, data[i]), HuffmanTree_getLength(&tree_ll, data[i]));
     }
   }
   /*add END code*/
-  if(!error) addHuffmanSymbol(bp, out, HuffmanTree_getCode(&tree_ll, 256), HuffmanTree_getLength(&tree_ll, 256));
+  if(!error) writeBitsReversed(writer, HuffmanTree_getCode(&tree_ll, 256), HuffmanTree_getLength(&tree_ll, 256));
 
   /*cleanup*/
   HuffmanTree_cleanup(&tree_ll);
@@ -5291,20 +4267,20 @@ static unsigned deflateFixed(ucvector* out, size_t* bp, Hash* hash,
 }
 
 static unsigned lodepng_deflatev(ucvector* out, const unsigned char* in, size_t insize,
-                                 const LodePNGCompressSettings* settings)
-{
+                                 const LodePNGCompressSettings* settings) {
   unsigned error = 0;
   size_t i, blocksize, numdeflateblocks;
-  size_t bp = 0; /*the bit pointer*/
   Hash hash;
+  LodePNGBitWriter writer;
+
+  LodePNGBitWriter_init(&writer, out);
 
   if(settings->btype > 2) return 61;
   else if(settings->btype == 0) return deflateNoCompression(out, in, insize);
   else if(settings->btype == 1) blocksize = insize;
-  else /*if(settings->btype == 2)*/
-  {
+  else /*if(settings->btype == 2)*/ {
     /*on PNGs, deflate blocks of 65-262k seem to give most dense encoding*/
-    blocksize = insize / 8 + 8;
+    blocksize = insize / 8u + 8;
     if(blocksize < 65536) blocksize = 65536;
     if(blocksize > 262144) blocksize = 262144;
   }
@@ -5315,15 +4291,14 @@ static unsigned lodepng_deflatev(ucvector* out, const unsigned char* in, size_t 
   error = hash_init(&hash, settings->windowsize);
   if(error) return error;
 
-  for(i = 0; i != numdeflateblocks && !error; ++i)
-  {
+  for(i = 0; i != numdeflateblocks && !error; ++i) {
     unsigned final = (i == numdeflateblocks - 1);
     size_t start = i * blocksize;
     size_t end = start + blocksize;
     if(end > insize) end = insize;
 
-    if(settings->btype == 1) error = deflateFixed(out, &bp, &hash, in, start, end, settings, final);
-    else if(settings->btype == 2) error = deflateDynamic(out, &bp, &hash, in, start, end, settings, final);
+    if(settings->btype == 1) error = deflateFixed(&writer, &hash, in, start, end, settings, final);
+    else if(settings->btype == 2) error = deflateDynamic(&writer, &hash, in, start, end, settings, final);
   }
 
   hash_cleanup(&hash);
@@ -5333,8 +4308,7 @@ static unsigned lodepng_deflatev(ucvector* out, const unsigned char* in, size_t 
 
 unsigned lodepng_deflate(unsigned char** out, size_t* outsize,
                          const unsigned char* in, size_t insize,
-                         const LodePNGCompressSettings* settings)
-{
+                         const LodePNGCompressSettings* settings) {
   unsigned error;
   ucvector v;
   ucvector_init_buffer(&v, *out, *outsize);
@@ -5346,14 +4320,10 @@ unsigned lodepng_deflate(unsigned char** out, size_t* outsize,
 
 static unsigned deflate(unsigned char** out, size_t* outsize,
                         const unsigned char* in, size_t insize,
-                        const LodePNGCompressSettings* settings)
-{
-  if(settings->custom_deflate)
-  {
+                        const LodePNGCompressSettings* settings) {
+  if(settings->custom_deflate) {
     return settings->custom_deflate(out, outsize, in, insize, settings);
-  }
-  else
-  {
+  } else {
     return lodepng_deflate(out, outsize, in, insize, settings);
   }
 }
@@ -5361,21 +4331,18 @@ static unsigned deflate(unsigned char** out, size_t* outsize,
 #endif /*LODEPNG_COMPILE_DECODER*/
 
 /* ////////////////////////////////////////////////////////////////////////// */
-/* / Adler32                                                                  */
+/* / Adler32                                                                / */
 /* ////////////////////////////////////////////////////////////////////////// */
 
-static unsigned update_adler32(unsigned adler, const unsigned char* data, unsigned len)
-{
+static unsigned update_adler32(unsigned adler, const unsigned char* data, unsigned len) {
   unsigned s1 = adler & 0xffff;
   unsigned s2 = (adler >> 16) & 0xffff;
 
-  while(len > 0)
-  {
+  while(len > 0) {
     /*at least 5552 sums can be done before the sums overflow, saving a lot of module divisions*/
     unsigned amount = len > 5552 ? 5552 : len;
     len -= amount;
-    while(amount > 0)
-    {
+    while(amount > 0) {
       s1 += (*data++);
       s2 += s1;
       --amount;
@@ -5388,8 +4355,7 @@ static unsigned update_adler32(unsigned adler, const unsigned char* data, unsign
 }
 
 /*Return the adler32 of the bytes data[0..len-1]*/
-static unsigned adler32(const unsigned char* data, unsigned len)
-{
+static unsigned adler32(const unsigned char* data, unsigned len) {
   return update_adler32(1L, data, len);
 }
 
@@ -5400,15 +4366,13 @@ static unsigned adler32(const unsigned char* data, unsigned len)
 #ifdef LODEPNG_COMPILE_DECODER
 
 unsigned lodepng_zlib_decompress(unsigned char** out, size_t* outsize, const unsigned char* in,
-                                 size_t insize, const LodePNGDecompressSettings* settings)
-{
+                                 size_t insize, const LodePNGDecompressSettings* settings) {
   unsigned error = 0;
   unsigned CM, CINFO, FDICT;
 
   if(insize < 2) return 53; /*error, size of zlib data too small*/
   /*read information from zlib header*/
-  if((in[0] * 256 + in[1]) % 31 != 0)
-  {
+  if((in[0] * 256 + in[1]) % 31 != 0) {
     /*error: 256 * in[0] + in[1] must be a multiple of 31, the FCHECK value is supposed to be made that way*/
     return 24;
   }
@@ -5419,13 +4383,11 @@ unsigned lodepng_zlib_decompress(unsigned char** out, size_t* outsize, const uns
   FDICT = (in[1] >> 5) & 1;
   /*FLEVEL = (in[1] >> 6) & 3;*/ /*FLEVEL is not used here*/
 
-  if(CM != 8 || CINFO > 7)
-  {
+  if(CM != 8 || CINFO > 7) {
     /*error: only compression method 8: inflate with sliding window of 32k is supported by the PNG spec*/
     return 25;
   }
-  if(FDICT != 0)
-  {
+  if(FDICT != 0) {
     /*error: the specification of PNG says about the zlib stream:
       "The additional flags shall not specify a preset dictionary."*/
     return 26;
@@ -5434,8 +4396,7 @@ unsigned lodepng_zlib_decompress(unsigned char** out, size_t* outsize, const uns
   error = inflate(out, outsize, in + 2, insize - 2, settings);
   if(error) return error;
 
-  if(!settings->ignore_adler32)
-  {
+  if(!settings->ignore_adler32) {
     unsigned ADLER32 = lodepng_read32bitInt(&in[insize - 4]);
     unsigned checksum = adler32(*out, (unsigned)(*outsize));
     if(checksum != ADLER32) return 58; /*error, adler checksum not correct, data must be corrupted*/
@@ -5445,14 +4406,10 @@ unsigned lodepng_zlib_decompress(unsigned char** out, size_t* outsize, const uns
 }
 
 static unsigned zlib_decompress(unsigned char** out, size_t* outsize, const unsigned char* in,
-                                size_t insize, const LodePNGDecompressSettings* settings)
-{
-  if(settings->custom_zlib)
-  {
+                                size_t insize, const LodePNGDecompressSettings* settings) {
+  if(settings->custom_zlib) {
     return settings->custom_zlib(out, outsize, in, insize, settings);
-  }
-  else
-  {
+  } else {
     return lodepng_zlib_decompress(out, outsize, in, insize, settings);
   }
 }
@@ -5462,8 +4419,7 @@ static unsigned zlib_decompress(unsigned char** out, size_t* outsize, const unsi
 #ifdef LODEPNG_COMPILE_ENCODER
 
 unsigned lodepng_zlib_compress(unsigned char** out, size_t* outsize, const unsigned char* in,
-                               size_t insize, const LodePNGCompressSettings* settings)
-{
+                               size_t insize, const LodePNGCompressSettings* settings) {
   /*initially, *out must be NULL and outsize 0, if you just give some random *out
   that's pointing to a non allocated buffer, this'll crash*/
   ucvector outv;
@@ -5488,8 +4444,7 @@ unsigned lodepng_zlib_compress(unsigned char** out, size_t* outsize, const unsig
 
   error = deflate(&deflatedata, &deflatesize, in, insize, settings);
 
-  if(!error)
-  {
+  if(!error) {
     unsigned ADLER32 = adler32(in, (unsigned)insize);
     for(i = 0; i != deflatesize; ++i) ucvector_push_back(&outv, deflatedata[i]);
     lodepng_free(deflatedata);
@@ -5504,14 +4459,10 @@ unsigned lodepng_zlib_compress(unsigned char** out, size_t* outsize, const unsig
 
 /* compress using the default or custom zlib function */
 static unsigned zlib_compress(unsigned char** out, size_t* outsize, const unsigned char* in,
-                              size_t insize, const LodePNGCompressSettings* settings)
-{
-  if(settings->custom_zlib)
-  {
+                              size_t insize, const LodePNGCompressSettings* settings) {
+  if(settings->custom_zlib) {
     return settings->custom_zlib(out, outsize, in, insize, settings);
-  }
-  else
-  {
+  } else {
     return lodepng_zlib_compress(out, outsize, in, insize, settings);
   }
 }
@@ -5522,16 +4473,14 @@ static unsigned zlib_compress(unsigned char** out, size_t* outsize, const unsign
 
 #ifdef LODEPNG_COMPILE_DECODER
 static unsigned zlib_decompress(unsigned char** out, size_t* outsize, const unsigned char* in,
-                                size_t insize, const LodePNGDecompressSettings* settings)
-{
+                                size_t insize, const LodePNGDecompressSettings* settings) {
   if(!settings->custom_zlib) return 87; /*no custom zlib function provided */
   return settings->custom_zlib(out, outsize, in, insize, settings);
 }
 #endif /*LODEPNG_COMPILE_DECODER*/
 #ifdef LODEPNG_COMPILE_ENCODER
 static unsigned zlib_compress(unsigned char** out, size_t* outsize, const unsigned char* in,
-                              size_t insize, const LodePNGCompressSettings* settings)
-{
+                              size_t insize, const LodePNGCompressSettings* settings) {
   if(!settings->custom_zlib) return 87; /*no custom zlib function provided */
   return settings->custom_zlib(out, outsize, in, insize, settings);
 }
@@ -5546,8 +4495,7 @@ static unsigned zlib_compress(unsigned char** out, size_t* outsize, const unsign
 /*this is a good tradeoff between speed and compression ratio*/
 #define DEFAULT_WINDOWSIZE 2048
 
-void lodepng_compress_settings_init(LodePNGCompressSettings* settings)
-{
+void lodepng_compress_settings_init(LodePNGCompressSettings* settings) {
   /*compress with dynamic huffman tree (not in the mathematical sense, just not the predefined one)*/
   settings->btype = 2;
   settings->use_lz77 = 1;
@@ -5568,16 +4516,16 @@ const LodePNGCompressSettings lodepng_default_compress_settings = {2, 1, DEFAULT
 
 #ifdef LODEPNG_COMPILE_DECODER
 
-void lodepng_decompress_settings_init(LodePNGDecompressSettings* settings)
-{
+void lodepng_decompress_settings_init(LodePNGDecompressSettings* settings) {
   settings->ignore_adler32 = 0;
+  settings->ignore_nlen = 0;
 
   settings->custom_zlib = 0;
   settings->custom_inflate = 0;
   settings->custom_context = 0;
 }
 
-const LodePNGDecompressSettings lodepng_default_decompress_settings = {0, 0, 0, 0};
+const LodePNGDecompressSettings lodepng_default_decompress_settings = {0, 0, 0, 0, 0};
 
 #endif /*LODEPNG_COMPILE_DECODER*/
 
@@ -5632,13 +4580,11 @@ static unsigned lodepng_crc32_table[256] = {
 };
 
 /*Return the CRC of the bytes buf[0..len-1].*/
-unsigned lodepng_crc32(const unsigned char* data, size_t length)
-{
+unsigned lodepng_crc32(const unsigned char* data, size_t length) {
   unsigned r = 0xffffffffu;
   size_t i;
-  for(i = 0; i < length; ++i)
-  {
-    r = lodepng_crc32_table[(r ^ data[i]) & 0xff] ^ (r >> 8);
+  for(i = 0; i < length; ++i) {
+    r = lodepng_crc32_table[(r ^ data[i]) & 0xffu] ^ (r >> 8u);
   }
   return r ^ 0xffffffffu;
 }
@@ -5647,43 +4593,29 @@ unsigned lodepng_crc32(const unsigned char* data, size_t length);
 #endif /* !LODEPNG_NO_COMPILE_CRC */
 
 /* ////////////////////////////////////////////////////////////////////////// */
-/* / Reading and writing single bits and bytes from/to stream for LodePNG   / */
+/* / Reading and writing PNG color channel bits                             / */
 /* ////////////////////////////////////////////////////////////////////////// */
 
-static unsigned char readBitFromReversedStream(size_t* bitpointer, const unsigned char* bitstream)
-{
+/* The color channel bits of less-than-8-bit pixels are read with the MSB of bytes first,
+so LodePNGBitWriter and LodePNGBitReader can't be used for those. */
+
+static unsigned char readBitFromReversedStream(size_t* bitpointer, const unsigned char* bitstream) {
   unsigned char result = (unsigned char)((bitstream[(*bitpointer) >> 3] >> (7 - ((*bitpointer) & 0x7))) & 1);
   ++(*bitpointer);
   return result;
 }
 
-static unsigned readBitsFromReversedStream(size_t* bitpointer, const unsigned char* bitstream, size_t nbits)
-{
+static unsigned readBitsFromReversedStream(size_t* bitpointer, const unsigned char* bitstream, size_t nbits) {
   unsigned result = 0;
   size_t i;
-  for(i = 0 ; i < nbits; ++i)
-  {
+  for(i = 0 ; i < nbits; ++i) {
     result <<= 1;
     result |= (unsigned)readBitFromReversedStream(bitpointer, bitstream);
   }
   return result;
 }
 
-#ifdef LODEPNG_COMPILE_DECODER
-static void setBitOfReversedStream0(size_t* bitpointer, unsigned char* bitstream, unsigned char bit)
-{
-  /*the current bit in bitstream must be 0 for this to work*/
-  if(bit)
-  {
-    /*earlier bit of huffman code is in a lesser significant bit of an earlier byte*/
-    bitstream[(*bitpointer) >> 3] |= (bit << (7 - ((*bitpointer) & 0x7)));
-  }
-  ++(*bitpointer);
-}
-#endif /*LODEPNG_COMPILE_DECODER*/
-
-static void setBitOfReversedStream(size_t* bitpointer, unsigned char* bitstream, unsigned char bit)
-{
+static void setBitOfReversedStream(size_t* bitpointer, unsigned char* bitstream, unsigned char bit) {
   /*the current bit in bitstream may be 0 or 1 for this to work*/
   if(bit == 0) bitstream[(*bitpointer) >> 3] &=  (unsigned char)(~(1 << (7 - ((*bitpointer) & 0x7))));
   else         bitstream[(*bitpointer) >> 3] |=  (1 << (7 - ((*bitpointer) & 0x7)));
@@ -5694,51 +4626,42 @@ static void setBitOfReversedStream(size_t* bitpointer, unsigned char* bitstream,
 /* / PNG chunks                                                             / */
 /* ////////////////////////////////////////////////////////////////////////// */
 
-unsigned lodepng_chunk_length(const unsigned char* chunk)
-{
+unsigned lodepng_chunk_length(const unsigned char* chunk) {
   return lodepng_read32bitInt(&chunk[0]);
 }
 
-void lodepng_chunk_type(char type[5], const unsigned char* chunk)
-{
+void lodepng_chunk_type(char type[5], const unsigned char* chunk) {
   unsigned i;
   for(i = 0; i != 4; ++i) type[i] = (char)chunk[4 + i];
   type[4] = 0; /*null termination char*/
 }
 
-unsigned char lodepng_chunk_type_equals(const unsigned char* chunk, const char* type)
-{
-  if(strlen(type) != 4) return 0;
+unsigned char lodepng_chunk_type_equals(const unsigned char* chunk, const char* type) {
+  if(lodepng_strlen(type) != 4) return 0;
   return (chunk[4] == type[0] && chunk[5] == type[1] && chunk[6] == type[2] && chunk[7] == type[3]);
 }
 
-unsigned char lodepng_chunk_ancillary(const unsigned char* chunk)
-{
+unsigned char lodepng_chunk_ancillary(const unsigned char* chunk) {
   return((chunk[4] & 32) != 0);
 }
 
-unsigned char lodepng_chunk_private(const unsigned char* chunk)
-{
+unsigned char lodepng_chunk_private(const unsigned char* chunk) {
   return((chunk[6] & 32) != 0);
 }
 
-unsigned char lodepng_chunk_safetocopy(const unsigned char* chunk)
-{
+unsigned char lodepng_chunk_safetocopy(const unsigned char* chunk) {
   return((chunk[7] & 32) != 0);
 }
 
-unsigned char* lodepng_chunk_data(unsigned char* chunk)
-{
+unsigned char* lodepng_chunk_data(unsigned char* chunk) {
   return &chunk[8];
 }
 
-const unsigned char* lodepng_chunk_data_const(const unsigned char* chunk)
-{
+const unsigned char* lodepng_chunk_data_const(const unsigned char* chunk) {
   return &chunk[8];
 }
 
-unsigned lodepng_chunk_check_crc(const unsigned char* chunk)
-{
+unsigned lodepng_chunk_check_crc(const unsigned char* chunk) {
   unsigned length = lodepng_chunk_length(chunk);
   unsigned CRC = lodepng_read32bitInt(&chunk[length + 8]);
   /*the CRC is taken of the data and the 4 chunk type letters, not the length*/
@@ -5747,27 +4670,51 @@ unsigned lodepng_chunk_check_crc(const unsigned char* chunk)
   else return 0;
 }
 
-void lodepng_chunk_generate_crc(unsigned char* chunk)
-{
+void lodepng_chunk_generate_crc(unsigned char* chunk) {
   unsigned length = lodepng_chunk_length(chunk);
   unsigned CRC = lodepng_crc32(&chunk[4], length + 4);
   lodepng_set32bitInt(chunk + 8 + length, CRC);
 }
 
-unsigned char* lodepng_chunk_next(unsigned char* chunk)
-{
-  unsigned total_chunk_length = lodepng_chunk_length(chunk) + 12;
-  return &chunk[total_chunk_length];
+unsigned char* lodepng_chunk_next(unsigned char* chunk) {
+  if(chunk[0] == 0x89 && chunk[1] == 0x50 && chunk[2] == 0x4e && chunk[3] == 0x47
+    && chunk[4] == 0x0d && chunk[5] == 0x0a && chunk[6] == 0x1a && chunk[7] == 0x0a) {
+    /* Is PNG magic header at start of PNG file. Jump to first actual chunk. */
+    return chunk + 8;
+  } else {
+    unsigned total_chunk_length = lodepng_chunk_length(chunk) + 12;
+    return chunk + total_chunk_length;
+  }
 }
 
-const unsigned char* lodepng_chunk_next_const(const unsigned char* chunk)
-{
-  unsigned total_chunk_length = lodepng_chunk_length(chunk) + 12;
-  return &chunk[total_chunk_length];
+const unsigned char* lodepng_chunk_next_const(const unsigned char* chunk) {
+  if(chunk[0] == 0x89 && chunk[1] == 0x50 && chunk[2] == 0x4e && chunk[3] == 0x47
+    && chunk[4] == 0x0d && chunk[5] == 0x0a && chunk[6] == 0x1a && chunk[7] == 0x0a) {
+    /* Is PNG magic header at start of PNG file. Jump to first actual chunk. */
+    return chunk + 8;
+  } else {
+    unsigned total_chunk_length = lodepng_chunk_length(chunk) + 12;
+    return chunk + total_chunk_length;
+  }
 }
 
-unsigned lodepng_chunk_append(unsigned char** out, size_t* outlength, const unsigned char* chunk)
-{
+unsigned char* lodepng_chunk_find(unsigned char* chunk, const unsigned char* end, const char type[5]) {
+  for(;;) {
+    if(chunk + 12 >= end) return 0;
+    if(lodepng_chunk_type_equals(chunk, type)) return chunk;
+    chunk = lodepng_chunk_next(chunk);
+  }
+}
+
+const unsigned char* lodepng_chunk_find_const(const unsigned char* chunk, const unsigned char* end, const char type[5]) {
+  for(;;) {
+    if(chunk + 12 >= end) return 0;
+    if(lodepng_chunk_type_equals(chunk, type)) return chunk;
+    chunk = lodepng_chunk_next_const(chunk);
+  }
+}
+
+unsigned lodepng_chunk_append(unsigned char** out, size_t* outlength, const unsigned char* chunk) {
   unsigned i;
   unsigned total_chunk_length = lodepng_chunk_length(chunk) + 12;
   unsigned char *chunk_start, *new_buffer;
@@ -5786,8 +4733,7 @@ unsigned lodepng_chunk_append(unsigned char** out, size_t* outlength, const unsi
 }
 
 unsigned lodepng_chunk_create(unsigned char** out, size_t* outlength, unsigned length,
-                              const char* type, const unsigned char* data)
-{
+                              const char* type, const unsigned char* data) {
   unsigned i;
   unsigned char *chunk, *new_buffer;
   size_t new_length = (*outlength) + length + 12;
@@ -5817,47 +4763,42 @@ unsigned lodepng_chunk_create(unsigned char** out, size_t* outlength, unsigned l
 }
 
 /* ////////////////////////////////////////////////////////////////////////// */
-/* / Color types and such                                                   / */
+/* / Color types, channels, bits                                            / */
 /* ////////////////////////////////////////////////////////////////////////// */
 
-/*return type is a LodePNG error code*/
-static unsigned checkColorValidity(LodePNGColorType colortype, unsigned bd) /*bd = bitdepth*/
-{
-  switch(colortype)
-  {
-    case 0: if(!(bd == 1 || bd == 2 || bd == 4 || bd == 8 || bd == 16)) return 37; break; /*grey*/
-    case 2: if(!(                                 bd == 8 || bd == 16)) return 37; break; /*RGB*/
-    case 3: if(!(bd == 1 || bd == 2 || bd == 4 || bd == 8            )) return 37; break; /*palette*/
-    case 4: if(!(                                 bd == 8 || bd == 16)) return 37; break; /*grey + alpha*/
-    case 6: if(!(                                 bd == 8 || bd == 16)) return 37; break; /*RGBA*/
-    default: return 31;
+/*checks if the colortype is valid and the bitdepth bd is allowed for this colortype.
+Return value is a LodePNG error code.*/
+static unsigned checkColorValidity(LodePNGColorType colortype, unsigned bd) {
+  switch(colortype) {
+    case LCT_GREY:       if(!(bd == 1 || bd == 2 || bd == 4 || bd == 8 || bd == 16)) return 37; break;
+    case LCT_RGB:        if(!(                                 bd == 8 || bd == 16)) return 37; break;
+    case LCT_PALETTE:    if(!(bd == 1 || bd == 2 || bd == 4 || bd == 8            )) return 37; break;
+    case LCT_GREY_ALPHA: if(!(                                 bd == 8 || bd == 16)) return 37; break;
+    case LCT_RGBA:       if(!(                                 bd == 8 || bd == 16)) return 37; break;
+    default: return 31; /* invalid color type */
   }
   return 0; /*allowed color type / bits combination*/
 }
 
-static unsigned getNumColorChannels(LodePNGColorType colortype)
-{
-  switch(colortype)
-  {
-    case 0: return 1; /*grey*/
-    case 2: return 3; /*RGB*/
-    case 3: return 1; /*palette*/
-    case 4: return 2; /*grey + alpha*/
-    case 6: return 4; /*RGBA*/
+static unsigned getNumColorChannels(LodePNGColorType colortype) {
+  switch(colortype) {
+    case LCT_GREY: return 1;
+    case LCT_RGB: return 3;
+    case LCT_PALETTE: return 1;
+    case LCT_GREY_ALPHA: return 2;
+    case LCT_RGBA: return 4;
+    default: return 0; /*invalid color type*/
   }
-  return 0; /*unexisting color type*/
 }
 
-static unsigned lodepng_get_bpp_lct(LodePNGColorType colortype, unsigned bitdepth)
-{
+static unsigned lodepng_get_bpp_lct(LodePNGColorType colortype, unsigned bitdepth) {
   /*bits per pixel is amount of channels * bits per channel*/
   return getNumColorChannels(colortype) * bitdepth;
 }
 
 /* ////////////////////////////////////////////////////////////////////////// */
 
-void lodepng_color_mode_init(LodePNGColorMode* info)
-{
+void lodepng_color_mode_init(LodePNGColorMode* info) {
   info->key_defined = 0;
   info->key_r = info->key_g = info->key_b = 0;
   info->colortype = LCT_RGBA;
@@ -5866,18 +4807,15 @@ void lodepng_color_mode_init(LodePNGColorMode* info)
   info->palettesize = 0;
 }
 
-void lodepng_color_mode_cleanup(LodePNGColorMode* info)
-{
+void lodepng_color_mode_cleanup(LodePNGColorMode* info) {
   lodepng_palette_clear(info);
 }
 
-unsigned lodepng_color_mode_copy(LodePNGColorMode* dest, const LodePNGColorMode* source)
-{
+unsigned lodepng_color_mode_copy(LodePNGColorMode* dest, const LodePNGColorMode* source) {
   size_t i;
   lodepng_color_mode_cleanup(dest);
   *dest = *source;
-  if(source->palette)
-  {
+  if(source->palette) {
     dest->palette = (unsigned char*)lodepng_malloc(1024);
     if(!dest->palette && source->palettesize) return 83; /*alloc fail*/
     for(i = 0; i != source->palettesize * 4; ++i) dest->palette[i] = source->palette[i];
@@ -5885,41 +4823,43 @@ unsigned lodepng_color_mode_copy(LodePNGColorMode* dest, const LodePNGColorMode*
   return 0;
 }
 
-static int lodepng_color_mode_equal(const LodePNGColorMode* a, const LodePNGColorMode* b)
-{
+LodePNGColorMode lodepng_color_mode_make(LodePNGColorType colortype, unsigned bitdepth) {
+  LodePNGColorMode result;
+  lodepng_color_mode_init(&result);
+  result.colortype = colortype;
+  result.bitdepth = bitdepth;
+  return result;
+}
+
+static int lodepng_color_mode_equal(const LodePNGColorMode* a, const LodePNGColorMode* b) {
   size_t i;
   if(a->colortype != b->colortype) return 0;
   if(a->bitdepth != b->bitdepth) return 0;
   if(a->key_defined != b->key_defined) return 0;
-  if(a->key_defined)
-  {
+  if(a->key_defined) {
     if(a->key_r != b->key_r) return 0;
     if(a->key_g != b->key_g) return 0;
     if(a->key_b != b->key_b) return 0;
   }
   if(a->palettesize != b->palettesize) return 0;
-  for(i = 0; i != a->palettesize * 4; ++i)
-  {
+  for(i = 0; i != a->palettesize * 4; ++i) {
     if(a->palette[i] != b->palette[i]) return 0;
   }
   return 1;
 }
 
-void lodepng_palette_clear(LodePNGColorMode* info)
-{
+void lodepng_palette_clear(LodePNGColorMode* info) {
   if(info->palette) lodepng_free(info->palette);
   info->palette = 0;
   info->palettesize = 0;
 }
 
 unsigned lodepng_palette_add(LodePNGColorMode* info,
-                             unsigned char r, unsigned char g, unsigned char b, unsigned char a)
-{
+                             unsigned char r, unsigned char g, unsigned char b, unsigned char a) {
   unsigned char* data;
   /*the same resize technique as C++ std::vectors is used, and here it's made so that for a palette with
   the max of 256 colors, it'll have the exact alloc size*/
-  if(!info->palette) /*allocate palette if empty*/
-  {
+  if(!info->palette) /*allocate palette if empty*/ {
     /*room for 256 colors with 4 bytes each*/
     data = (unsigned char*)lodepng_realloc(info->palette, 1024);
     if(!data) return 83; /*alloc fail*/
@@ -5933,58 +4873,48 @@ unsigned lodepng_palette_add(LodePNGColorMode* info,
   return 0;
 }
 
-unsigned lodepng_get_bpp(const LodePNGColorMode* info)
-{
-  /*calculate bits per pixel out of colortype and bitdepth*/
+/*calculate bits per pixel out of colortype and bitdepth*/
+unsigned lodepng_get_bpp(const LodePNGColorMode* info) {
   return lodepng_get_bpp_lct(info->colortype, info->bitdepth);
 }
 
-unsigned lodepng_get_channels(const LodePNGColorMode* info)
-{
+unsigned lodepng_get_channels(const LodePNGColorMode* info) {
   return getNumColorChannels(info->colortype);
 }
 
-unsigned lodepng_is_greyscale_type(const LodePNGColorMode* info)
-{
+unsigned lodepng_is_greyscale_type(const LodePNGColorMode* info) {
   return info->colortype == LCT_GREY || info->colortype == LCT_GREY_ALPHA;
 }
 
-unsigned lodepng_is_alpha_type(const LodePNGColorMode* info)
-{
+unsigned lodepng_is_alpha_type(const LodePNGColorMode* info) {
   return (info->colortype & 4) != 0; /*4 or 6*/
 }
 
-unsigned lodepng_is_palette_type(const LodePNGColorMode* info)
-{
+unsigned lodepng_is_palette_type(const LodePNGColorMode* info) {
   return info->colortype == LCT_PALETTE;
 }
 
-unsigned lodepng_has_palette_alpha(const LodePNGColorMode* info)
-{
+unsigned lodepng_has_palette_alpha(const LodePNGColorMode* info) {
   size_t i;
-  for(i = 0; i != info->palettesize; ++i)
-  {
+  for(i = 0; i != info->palettesize; ++i) {
     if(info->palette[i * 4 + 3] < 255) return 1;
   }
   return 0;
 }
 
-unsigned lodepng_can_have_alpha(const LodePNGColorMode* info)
-{
+unsigned lodepng_can_have_alpha(const LodePNGColorMode* info) {
   return info->key_defined
       || lodepng_is_alpha_type(info)
       || lodepng_has_palette_alpha(info);
 }
 
-size_t lodepng_get_raw_size_lct(unsigned w, unsigned h, LodePNGColorType colortype, unsigned bitdepth)
-{
+static size_t lodepng_get_raw_size_lct(unsigned w, unsigned h, LodePNGColorType colortype, unsigned bitdepth) {
   size_t bpp = lodepng_get_bpp_lct(colortype, bitdepth);
   size_t n = (size_t)w * (size_t)h;
-  return ((n / 8) * bpp) + ((n & 7) * bpp + 7) / 8;
+  return ((n / 8u) * bpp) + ((n & 7u) * bpp + 7u) / 8u;
 }
 
-size_t lodepng_get_raw_size(unsigned w, unsigned h, const LodePNGColorMode* color)
-{
+size_t lodepng_get_raw_size(unsigned w, unsigned h, const LodePNGColorMode* color) {
   return lodepng_get_raw_size_lct(w, h, color->colortype, color->bitdepth);
 }
 
@@ -5995,26 +4925,23 @@ size_t lodepng_get_raw_size(unsigned w, unsigned h, const LodePNGColorMode* colo
 /*in an idat chunk, each scanline is a multiple of 8 bits, unlike the lodepng output buffer,
 and in addition has one extra byte per line: the filter byte. So this gives a larger
 result than lodepng_get_raw_size. */
-static size_t lodepng_get_raw_size_idat(unsigned w, unsigned h, const LodePNGColorMode* color)
-{
+static size_t lodepng_get_raw_size_idat(unsigned w, unsigned h, const LodePNGColorMode* color) {
   size_t bpp = lodepng_get_bpp(color);
   /* + 1 for the filter byte, and possibly plus padding bits per line */
-  size_t line = ((size_t)(w / 8) * bpp) + 1 + ((w & 7) * bpp + 7) / 8;
+  size_t line = ((size_t)(w / 8u) * bpp) + 1u + ((w & 7u) * bpp + 7u) / 8u;
   return (size_t)h * line;
 }
 
 /* Safely check if multiplying two integers will overflow (no undefined
 behavior, compiler removing the code, etc...) and output result. */
-static int lodepng_mulofl(size_t a, size_t b, size_t* result)
-{
+static int lodepng_mulofl(size_t a, size_t b, size_t* result) {
   *result = a * b; /* Unsigned multiplication is well defined and safe in C90 */
   return (a != 0 && *result / a != b);
 }
 
 /* Safely check if adding two integers will overflow (no undefined
 behavior, compiler removing the code, etc...) and output result. */
-static int lodepng_addofl(size_t a, size_t b, size_t* result)
-{
+static int lodepng_addofl(size_t a, size_t b, size_t* result) {
   *result = a + b; /* Unsigned addition is well defined and safe in C90 */
   return *result < a;
 }
@@ -6028,8 +4955,7 @@ you can safely compute in a size_t (but not an unsigned):
 Returns 1 if overflow possible, 0 if not.
 */
 static int lodepng_pixel_overflow(unsigned w, unsigned h,
-                                  const LodePNGColorMode* pngcolor, const LodePNGColorMode* rawcolor)
-{
+                                  const LodePNGColorMode* pngcolor, const LodePNGColorMode* rawcolor) {
   size_t bpp = LODEPNG_MAX(lodepng_get_bpp(pngcolor), lodepng_get_bpp(rawcolor));
   size_t numpixels, total;
   size_t line; /* bytes per line in worst case */
@@ -6037,9 +4963,9 @@ static int lodepng_pixel_overflow(unsigned w, unsigned h,
   if(lodepng_mulofl((size_t)w, (size_t)h, &numpixels)) return 1;
   if(lodepng_mulofl(numpixels, 8, &total)) return 1; /* bit pointer with 8-bit color, or 8 bytes per channel color */
 
-  /* Bytes per scanline with the expression "(w / 8) * bpp) + ((w & 7) * bpp + 7) / 8" */
-  if(lodepng_mulofl((size_t)(w / 8), bpp, &line)) return 1;
-  if(lodepng_addofl(line, ((w & 7) * bpp + 7) / 8, &line)) return 1;
+  /* Bytes per scanline with the expression "(w / 8u) * bpp) + ((w & 7u) * bpp + 7u) / 8u" */
+  if(lodepng_mulofl((size_t)(w / 8u), bpp, &line)) return 1;
+  if(lodepng_addofl(line, ((w & 7u) * bpp + 7u) / 8u, &line)) return 1;
 
   if(lodepng_addofl(line, 5, &line)) return 1; /* 5 bytes overhead per line: 1 filterbyte, 4 for Adam7 worst case */
   if(lodepng_mulofl(line, h, &total)) return 1; /* Total bytes in worst case */
@@ -6051,33 +4977,28 @@ static int lodepng_pixel_overflow(unsigned w, unsigned h,
 
 #ifdef LODEPNG_COMPILE_ANCILLARY_CHUNKS
 
-static void LodePNGUnknownChunks_init(LodePNGInfo* info)
-{
+static void LodePNGUnknownChunks_init(LodePNGInfo* info) {
   unsigned i;
   for(i = 0; i != 3; ++i) info->unknown_chunks_data[i] = 0;
   for(i = 0; i != 3; ++i) info->unknown_chunks_size[i] = 0;
 }
 
-static void LodePNGUnknownChunks_cleanup(LodePNGInfo* info)
-{
+static void LodePNGUnknownChunks_cleanup(LodePNGInfo* info) {
   unsigned i;
   for(i = 0; i != 3; ++i) lodepng_free(info->unknown_chunks_data[i]);
 }
 
-static unsigned LodePNGUnknownChunks_copy(LodePNGInfo* dest, const LodePNGInfo* src)
-{
+static unsigned LodePNGUnknownChunks_copy(LodePNGInfo* dest, const LodePNGInfo* src) {
   unsigned i;
 
   LodePNGUnknownChunks_cleanup(dest);
 
-  for(i = 0; i != 3; ++i)
-  {
+  for(i = 0; i != 3; ++i) {
     size_t j;
     dest->unknown_chunks_size[i] = src->unknown_chunks_size[i];
     dest->unknown_chunks_data[i] = (unsigned char*)lodepng_malloc(src->unknown_chunks_size[i]);
     if(!dest->unknown_chunks_data[i] && dest->unknown_chunks_size[i]) return 83; /*alloc fail*/
-    for(j = 0; j < src->unknown_chunks_size[i]; ++j)
-    {
+    for(j = 0; j < src->unknown_chunks_size[i]; ++j) {
       dest->unknown_chunks_data[i][j] = src->unknown_chunks_data[i][j];
     }
   }
@@ -6087,18 +5008,15 @@ static unsigned LodePNGUnknownChunks_copy(LodePNGInfo* dest, const LodePNGInfo* 
 
 /******************************************************************************/
 
-static void LodePNGText_init(LodePNGInfo* info)
-{
+static void LodePNGText_init(LodePNGInfo* info) {
   info->text_num = 0;
   info->text_keys = NULL;
   info->text_strings = NULL;
 }
 
-static void LodePNGText_cleanup(LodePNGInfo* info)
-{
+static void LodePNGText_cleanup(LodePNGInfo* info) {
   size_t i;
-  for(i = 0; i != info->text_num; ++i)
-  {
+  for(i = 0; i != info->text_num; ++i) {
     string_cleanup(&info->text_keys[i]);
     string_cleanup(&info->text_strings[i]);
   }
@@ -6106,30 +5024,25 @@ static void LodePNGText_cleanup(LodePNGInfo* info)
   lodepng_free(info->text_strings);
 }
 
-static unsigned LodePNGText_copy(LodePNGInfo* dest, const LodePNGInfo* source)
-{
+static unsigned LodePNGText_copy(LodePNGInfo* dest, const LodePNGInfo* source) {
   size_t i = 0;
   dest->text_keys = 0;
   dest->text_strings = 0;
   dest->text_num = 0;
-  for(i = 0; i != source->text_num; ++i)
-  {
+  for(i = 0; i != source->text_num; ++i) {
     CERROR_TRY_RETURN(lodepng_add_text(dest, source->text_keys[i], source->text_strings[i]));
   }
   return 0;
 }
 
-void lodepng_clear_text(LodePNGInfo* info)
-{
+void lodepng_clear_text(LodePNGInfo* info) {
   LodePNGText_cleanup(info);
 }
 
-unsigned lodepng_add_text(LodePNGInfo* info, const char* key, const char* str)
-{
+unsigned lodepng_add_text(LodePNGInfo* info, const char* key, const char* str) {
   char** new_keys = (char**)(lodepng_realloc(info->text_keys, sizeof(char*) * (info->text_num + 1)));
   char** new_strings = (char**)(lodepng_realloc(info->text_strings, sizeof(char*) * (info->text_num + 1)));
-  if(!new_keys || !new_strings)
-  {
+  if(!new_keys || !new_strings) {
     lodepng_free(new_keys);
     lodepng_free(new_strings);
     return 83; /*alloc fail*/
@@ -6139,19 +5052,15 @@ unsigned lodepng_add_text(LodePNGInfo* info, const char* key, const char* str)
   info->text_keys = new_keys;
   info->text_strings = new_strings;
 
-  string_init(&info->text_keys[info->text_num - 1]);
-  string_set(&info->text_keys[info->text_num - 1], key);
-
-  string_init(&info->text_strings[info->text_num - 1]);
-  string_set(&info->text_strings[info->text_num - 1], str);
+  info->text_keys[info->text_num - 1] = alloc_string(key);
+  info->text_strings[info->text_num - 1] = alloc_string(str);
 
   return 0;
 }
 
 /******************************************************************************/
 
-static void LodePNGIText_init(LodePNGInfo* info)
-{
+static void LodePNGIText_init(LodePNGInfo* info) {
   info->itext_num = 0;
   info->itext_keys = NULL;
   info->itext_langtags = NULL;
@@ -6159,11 +5068,9 @@ static void LodePNGIText_init(LodePNGInfo* info)
   info->itext_strings = NULL;
 }
 
-static void LodePNGIText_cleanup(LodePNGInfo* info)
-{
+static void LodePNGIText_cleanup(LodePNGInfo* info) {
   size_t i;
-  for(i = 0; i != info->itext_num; ++i)
-  {
+  for(i = 0; i != info->itext_num; ++i) {
     string_cleanup(&info->itext_keys[i]);
     string_cleanup(&info->itext_langtags[i]);
     string_cleanup(&info->itext_transkeys[i]);
@@ -6175,36 +5082,31 @@ static void LodePNGIText_cleanup(LodePNGInfo* info)
   lodepng_free(info->itext_strings);
 }
 
-static unsigned LodePNGIText_copy(LodePNGInfo* dest, const LodePNGInfo* source)
-{
+static unsigned LodePNGIText_copy(LodePNGInfo* dest, const LodePNGInfo* source) {
   size_t i = 0;
   dest->itext_keys = 0;
   dest->itext_langtags = 0;
   dest->itext_transkeys = 0;
   dest->itext_strings = 0;
   dest->itext_num = 0;
-  for(i = 0; i != source->itext_num; ++i)
-  {
+  for(i = 0; i != source->itext_num; ++i) {
     CERROR_TRY_RETURN(lodepng_add_itext(dest, source->itext_keys[i], source->itext_langtags[i],
                                         source->itext_transkeys[i], source->itext_strings[i]));
   }
   return 0;
 }
 
-void lodepng_clear_itext(LodePNGInfo* info)
-{
+void lodepng_clear_itext(LodePNGInfo* info) {
   LodePNGIText_cleanup(info);
 }
 
 unsigned lodepng_add_itext(LodePNGInfo* info, const char* key, const char* langtag,
-                           const char* transkey, const char* str)
-{
+                           const char* transkey, const char* str) {
   char** new_keys = (char**)(lodepng_realloc(info->itext_keys, sizeof(char*) * (info->itext_num + 1)));
   char** new_langtags = (char**)(lodepng_realloc(info->itext_langtags, sizeof(char*) * (info->itext_num + 1)));
   char** new_transkeys = (char**)(lodepng_realloc(info->itext_transkeys, sizeof(char*) * (info->itext_num + 1)));
   char** new_strings = (char**)(lodepng_realloc(info->itext_strings, sizeof(char*) * (info->itext_num + 1)));
-  if(!new_keys || !new_langtags || !new_transkeys || !new_strings)
-  {
+  if(!new_keys || !new_langtags || !new_transkeys || !new_strings) {
     lodepng_free(new_keys);
     lodepng_free(new_langtags);
     lodepng_free(new_transkeys);
@@ -6218,24 +5120,44 @@ unsigned lodepng_add_itext(LodePNGInfo* info, const char* key, const char* langt
   info->itext_transkeys = new_transkeys;
   info->itext_strings = new_strings;
 
-  string_init(&info->itext_keys[info->itext_num - 1]);
-  string_set(&info->itext_keys[info->itext_num - 1], key);
-
-  string_init(&info->itext_langtags[info->itext_num - 1]);
-  string_set(&info->itext_langtags[info->itext_num - 1], langtag);
-
-  string_init(&info->itext_transkeys[info->itext_num - 1]);
-  string_set(&info->itext_transkeys[info->itext_num - 1], transkey);
-
-  string_init(&info->itext_strings[info->itext_num - 1]);
-  string_set(&info->itext_strings[info->itext_num - 1], str);
+  info->itext_keys[info->itext_num - 1] = alloc_string(key);
+  info->itext_langtags[info->itext_num - 1] = alloc_string(langtag);
+  info->itext_transkeys[info->itext_num - 1] = alloc_string(transkey);
+  info->itext_strings[info->itext_num - 1] = alloc_string(str);
 
   return 0;
 }
+
+/* same as set but does not delete */
+static unsigned lodepng_assign_icc(LodePNGInfo* info, const char* name, const unsigned char* profile, unsigned profile_size) {
+  info->iccp_name = alloc_string(name);
+  info->iccp_profile = (unsigned char*)lodepng_malloc(profile_size);
+
+  if(!info->iccp_name || !info->iccp_profile) return 83; /*alloc fail*/
+
+  lodepng_memcpy(info->iccp_profile, profile, profile_size);
+  info->iccp_profile_size = profile_size;
+
+  return 0; /*ok*/
+}
+
+unsigned lodepng_set_icc(LodePNGInfo* info, const char* name, const unsigned char* profile, unsigned profile_size) {
+  if(info->iccp_name) lodepng_clear_icc(info);
+  info->iccp_defined = 1;
+
+  return lodepng_assign_icc(info, name, profile, profile_size);
+}
+
+void lodepng_clear_icc(LodePNGInfo* info) {
+  string_cleanup(&info->iccp_name);
+  lodepng_free(info->iccp_profile);
+  info->iccp_profile = NULL;
+  info->iccp_profile_size = 0;
+  info->iccp_defined = 0;
+}
 #endif /*LODEPNG_COMPILE_ANCILLARY_CHUNKS*/
 
-void lodepng_info_init(LodePNGInfo* info)
-{
+void lodepng_info_init(LodePNGInfo* info) {
   lodepng_color_mode_init(&info->color);
   info->interlace_method = 0;
   info->compression_method = 0;
@@ -6250,23 +5172,30 @@ void lodepng_info_init(LodePNGInfo* info)
   info->time_defined = 0;
   info->phys_defined = 0;
 
+  info->gama_defined = 0;
+  info->chrm_defined = 0;
+  info->srgb_defined = 0;
+  info->iccp_defined = 0;
+  info->iccp_name = NULL;
+  info->iccp_profile = NULL;
+
   LodePNGUnknownChunks_init(info);
 #endif /*LODEPNG_COMPILE_ANCILLARY_CHUNKS*/
 }
 
-void lodepng_info_cleanup(LodePNGInfo* info)
-{
+void lodepng_info_cleanup(LodePNGInfo* info) {
   lodepng_color_mode_cleanup(&info->color);
 #ifdef LODEPNG_COMPILE_ANCILLARY_CHUNKS
   LodePNGText_cleanup(info);
   LodePNGIText_cleanup(info);
 
+  lodepng_clear_icc(info);
+
   LodePNGUnknownChunks_cleanup(info);
 #endif /*LODEPNG_COMPILE_ANCILLARY_CHUNKS*/
 }
 
-unsigned lodepng_info_copy(LodePNGInfo* dest, const LodePNGInfo* source)
-{
+unsigned lodepng_info_copy(LodePNGInfo* dest, const LodePNGInfo* source) {
   lodepng_info_cleanup(dest);
   *dest = *source;
   lodepng_color_mode_init(&dest->color);
@@ -6275,6 +5204,9 @@ unsigned lodepng_info_copy(LodePNGInfo* dest, const LodePNGInfo* source)
 #ifdef LODEPNG_COMPILE_ANCILLARY_CHUNKS
   CERROR_TRY_RETURN(LodePNGText_copy(dest, source));
   CERROR_TRY_RETURN(LodePNGIText_copy(dest, source));
+  if(source->iccp_defined) {
+    CERROR_TRY_RETURN(lodepng_assign_icc(dest, source->iccp_name, source->iccp_profile, source->iccp_profile_size));
+  }
 
   LodePNGUnknownChunks_init(dest);
   CERROR_TRY_RETURN(LodePNGUnknownChunks_copy(dest, source));
@@ -6282,25 +5214,17 @@ unsigned lodepng_info_copy(LodePNGInfo* dest, const LodePNGInfo* source)
   return 0;
 }
 
-void lodepng_info_swap(LodePNGInfo* a, LodePNGInfo* b)
-{
-  LodePNGInfo temp = *a;
-  *a = *b;
-  *b = temp;
-}
-
 /* ////////////////////////////////////////////////////////////////////////// */
 
 /*index: bitgroup index, bits: bitgroup size(1, 2 or 4), in: bitgroup value, out: octet array to add bits to*/
-static void addColorBits(unsigned char* out, size_t index, unsigned bits, unsigned in)
-{
+static void addColorBits(unsigned char* out, size_t index, unsigned bits, unsigned in) {
   unsigned m = bits == 1 ? 7 : bits == 2 ? 3 : 1; /*8 / bits - 1*/
   /*p = the partial index in the byte, e.g. with 4 palettebits it is 0 for first half or 1 for second half*/
   unsigned p = index & m;
   in &= (1u << bits) - 1u; /*filter out any other bits of the input value*/
   in = in << (bits * (m - p));
-  if(p == 0) out[index * bits / 8] = in;
-  else out[index * bits / 8] |= in;
+  if(p == 0) out[index * bits / 8u] = in;
+  else out[index * bits / 8u] |= in;
 }
 
 typedef struct ColorTree ColorTree;
@@ -6311,26 +5235,21 @@ This is the data structure used to count the number of unique colors and to get 
 index for a color. It's like an octree, but because the alpha channel is used too, each
 node has 16 instead of 8 children.
 */
-struct ColorTree
-{
+struct ColorTree {
   ColorTree* children[16]; /*up to 16 pointers to ColorTree of next level*/
   int index; /*the payload. Only has a meaningful value if this is in the last level*/
 };
 
-static void color_tree_init(ColorTree* tree)
-{
+static void color_tree_init(ColorTree* tree) {
   int i;
   for(i = 0; i != 16; ++i) tree->children[i] = 0;
   tree->index = -1;
 }
 
-static void color_tree_cleanup(ColorTree* tree)
-{
+static void color_tree_cleanup(ColorTree* tree) {
   int i;
-  for(i = 0; i != 16; ++i)
-  {
-    if(tree->children[i])
-    {
+  for(i = 0; i != 16; ++i) {
+    if(tree->children[i]) {
       color_tree_cleanup(tree->children[i]);
       lodepng_free(tree->children[i]);
     }
@@ -6338,11 +5257,9 @@ static void color_tree_cleanup(ColorTree* tree)
 }
 
 /*returns -1 if color not present, its index otherwise*/
-static int color_tree_get(ColorTree* tree, unsigned char r, unsigned char g, unsigned char b, unsigned char a)
-{
+static int color_tree_get(ColorTree* tree, unsigned char r, unsigned char g, unsigned char b, unsigned char a) {
   int bit = 0;
-  for(bit = 0; bit < 8; ++bit)
-  {
+  for(bit = 0; bit < 8; ++bit) {
     int i = 8 * ((r >> bit) & 1) + 4 * ((g >> bit) & 1) + 2 * ((b >> bit) & 1) + 1 * ((a >> bit) & 1);
     if(!tree->children[i]) return -1;
     else tree = tree->children[i];
@@ -6351,8 +5268,7 @@ static int color_tree_get(ColorTree* tree, unsigned char r, unsigned char g, uns
 }
 
 #ifdef LODEPNG_COMPILE_ENCODER
-static int color_tree_has(ColorTree* tree, unsigned char r, unsigned char g, unsigned char b, unsigned char a)
-{
+static int color_tree_has(ColorTree* tree, unsigned char r, unsigned char g, unsigned char b, unsigned char a) {
   return color_tree_get(tree, r, g, b, a) >= 0;
 }
 #endif /*LODEPNG_COMPILE_ENCODER*/
@@ -6360,14 +5276,11 @@ static int color_tree_has(ColorTree* tree, unsigned char r, unsigned char g, uns
 /*color is not allowed to already exist.
 Index should be >= 0 (it's signed to be compatible with using -1 for "doesn't exist")*/
 static void color_tree_add(ColorTree* tree,
-                           unsigned char r, unsigned char g, unsigned char b, unsigned char a, unsigned index)
-{
+                           unsigned char r, unsigned char g, unsigned char b, unsigned char a, unsigned index) {
   int bit;
-  for(bit = 0; bit < 8; ++bit)
-  {
+  for(bit = 0; bit < 8; ++bit) {
     int i = 8 * ((r >> bit) & 1) + 4 * ((g >> bit) & 1) + 2 * ((b >> bit) & 1) + 1 * ((a >> bit) & 1);
-    if(!tree->children[i])
-    {
+    if(!tree->children[i]) {
       tree->children[i] = (ColorTree*)lodepng_malloc(sizeof(ColorTree));
       color_tree_init(tree->children[i]);
     }
@@ -6379,67 +5292,47 @@ static void color_tree_add(ColorTree* tree,
 /*put a pixel, given its RGBA color, into image of any color type*/
 static unsigned rgba8ToPixel(unsigned char* out, size_t i,
                              const LodePNGColorMode* mode, ColorTree* tree /*for palette*/,
-                             unsigned char r, unsigned char g, unsigned char b, unsigned char a)
-{
-  if(mode->colortype == LCT_GREY)
-  {
-    unsigned char grey = r; /*((unsigned short)r + g + b) / 3*/;
-    if(mode->bitdepth == 8) out[i] = grey;
-    else if(mode->bitdepth == 16) out[i * 2 + 0] = out[i * 2 + 1] = grey;
-    else
-    {
-      /*take the most significant bits of grey*/
-      grey = (grey >> (8 - mode->bitdepth)) & ((1 << mode->bitdepth) - 1);
-      addColorBits(out, i, mode->bitdepth, grey);
+                             unsigned char r, unsigned char g, unsigned char b, unsigned char a) {
+  if(mode->colortype == LCT_GREY) {
+    unsigned char gray = r; /*((unsigned short)r + g + b) / 3u;*/
+    if(mode->bitdepth == 8) out[i] = gray;
+    else if(mode->bitdepth == 16) out[i * 2 + 0] = out[i * 2 + 1] = gray;
+    else {
+      /*take the most significant bits of gray*/
+      gray = (gray >> (8 - mode->bitdepth)) & ((1 << mode->bitdepth) - 1);
+      addColorBits(out, i, mode->bitdepth, gray);
     }
-  }
-  else if(mode->colortype == LCT_RGB)
-  {
-    if(mode->bitdepth == 8)
-    {
+  } else if(mode->colortype == LCT_RGB) {
+    if(mode->bitdepth == 8) {
       out[i * 3 + 0] = r;
       out[i * 3 + 1] = g;
       out[i * 3 + 2] = b;
-    }
-    else
-    {
+    } else {
       out[i * 6 + 0] = out[i * 6 + 1] = r;
       out[i * 6 + 2] = out[i * 6 + 3] = g;
       out[i * 6 + 4] = out[i * 6 + 5] = b;
     }
-  }
-  else if(mode->colortype == LCT_PALETTE)
-  {
+  } else if(mode->colortype == LCT_PALETTE) {
     int index = color_tree_get(tree, r, g, b, a);
     if(index < 0) return 82; /*color not in palette*/
     if(mode->bitdepth == 8) out[i] = index;
     else addColorBits(out, i, mode->bitdepth, (unsigned)index);
-  }
-  else if(mode->colortype == LCT_GREY_ALPHA)
-  {
-    unsigned char grey = r; /*((unsigned short)r + g + b) / 3*/;
-    if(mode->bitdepth == 8)
-    {
-      out[i * 2 + 0] = grey;
+  } else if(mode->colortype == LCT_GREY_ALPHA) {
+    unsigned char gray = r; /*((unsigned short)r + g + b) / 3u;*/
+    if(mode->bitdepth == 8) {
+      out[i * 2 + 0] = gray;
       out[i * 2 + 1] = a;
-    }
-    else if(mode->bitdepth == 16)
-    {
-      out[i * 4 + 0] = out[i * 4 + 1] = grey;
+    } else if(mode->bitdepth == 16) {
+      out[i * 4 + 0] = out[i * 4 + 1] = gray;
       out[i * 4 + 2] = out[i * 4 + 3] = a;
     }
-  }
-  else if(mode->colortype == LCT_RGBA)
-  {
-    if(mode->bitdepth == 8)
-    {
+  } else if(mode->colortype == LCT_RGBA) {
+    if(mode->bitdepth == 8) {
       out[i * 4 + 0] = r;
       out[i * 4 + 1] = g;
       out[i * 4 + 2] = b;
       out[i * 4 + 3] = a;
-    }
-    else
-    {
+    } else {
       out[i * 8 + 0] = out[i * 8 + 1] = r;
       out[i * 8 + 2] = out[i * 8 + 3] = g;
       out[i * 8 + 4] = out[i * 8 + 5] = b;
@@ -6453,33 +5346,25 @@ static unsigned rgba8ToPixel(unsigned char* out, size_t i,
 /*put a pixel, given its RGBA16 color, into image of any color 16-bitdepth type*/
 static void rgba16ToPixel(unsigned char* out, size_t i,
                          const LodePNGColorMode* mode,
-                         unsigned short r, unsigned short g, unsigned short b, unsigned short a)
-{
-  if(mode->colortype == LCT_GREY)
-  {
-    unsigned short grey = r; /*((unsigned)r + g + b) / 3*/;
-    out[i * 2 + 0] = (grey >> 8) & 255;
-    out[i * 2 + 1] = grey & 255;
-  }
-  else if(mode->colortype == LCT_RGB)
-  {
+                         unsigned short r, unsigned short g, unsigned short b, unsigned short a) {
+  if(mode->colortype == LCT_GREY) {
+    unsigned short gray = r; /*((unsigned)r + g + b) / 3u;*/
+    out[i * 2 + 0] = (gray >> 8) & 255;
+    out[i * 2 + 1] = gray & 255;
+  } else if(mode->colortype == LCT_RGB) {
     out[i * 6 + 0] = (r >> 8) & 255;
     out[i * 6 + 1] = r & 255;
     out[i * 6 + 2] = (g >> 8) & 255;
     out[i * 6 + 3] = g & 255;
     out[i * 6 + 4] = (b >> 8) & 255;
     out[i * 6 + 5] = b & 255;
-  }
-  else if(mode->colortype == LCT_GREY_ALPHA)
-  {
-    unsigned short grey = r; /*((unsigned)r + g + b) / 3*/;
-    out[i * 4 + 0] = (grey >> 8) & 255;
-    out[i * 4 + 1] = grey & 255;
+  } else if(mode->colortype == LCT_GREY_ALPHA) {
+    unsigned short gray = r; /*((unsigned)r + g + b) / 3u;*/
+    out[i * 4 + 0] = (gray >> 8) & 255;
+    out[i * 4 + 1] = gray & 255;
     out[i * 4 + 2] = (a >> 8) & 255;
     out[i * 4 + 3] = a & 255;
-  }
-  else if(mode->colortype == LCT_RGBA)
-  {
+  } else if(mode->colortype == LCT_RGBA) {
     out[i * 8 + 0] = (r >> 8) & 255;
     out[i * 8 + 1] = r & 255;
     out[i * 8 + 2] = (g >> 8) & 255;
@@ -6495,24 +5380,17 @@ static void rgba16ToPixel(unsigned char* out, size_t i,
 static void getPixelColorRGBA8(unsigned char* r, unsigned char* g,
                                unsigned char* b, unsigned char* a,
                                const unsigned char* in, size_t i,
-                               const LodePNGColorMode* mode)
-{
-  if(mode->colortype == LCT_GREY)
-  {
-    if(mode->bitdepth == 8)
-    {
+                               const LodePNGColorMode* mode) {
+  if(mode->colortype == LCT_GREY) {
+    if(mode->bitdepth == 8) {
       *r = *g = *b = in[i];
       if(mode->key_defined && *r == mode->key_r) *a = 0;
       else *a = 255;
-    }
-    else if(mode->bitdepth == 16)
-    {
+    } else if(mode->bitdepth == 16) {
       *r = *g = *b = in[i * 2 + 0];
       if(mode->key_defined && 256U * in[i * 2 + 0] + in[i * 2 + 1] == mode->key_r) *a = 0;
       else *a = 255;
-    }
-    else
-    {
+    } else {
       unsigned highest = ((1U << mode->bitdepth) - 1U); /*highest possible value for this bit depth*/
       size_t j = i * mode->bitdepth;
       unsigned value = readBitsFromReversedStream(&j, in, mode->bitdepth);
@@ -6520,17 +5398,12 @@ static void getPixelColorRGBA8(unsigned char* r, unsigned char* g,
       if(mode->key_defined && value == mode->key_r) *a = 0;
       else *a = 255;
     }
-  }
-  else if(mode->colortype == LCT_RGB)
-  {
-    if(mode->bitdepth == 8)
-    {
+  } else if(mode->colortype == LCT_RGB) {
+    if(mode->bitdepth == 8) {
       *r = in[i * 3 + 0]; *g = in[i * 3 + 1]; *b = in[i * 3 + 2];
       if(mode->key_defined && *r == mode->key_r && *g == mode->key_g && *b == mode->key_b) *a = 0;
       else *a = 255;
-    }
-    else
-    {
+    } else {
       *r = in[i * 6 + 0];
       *g = in[i * 6 + 2];
       *b = in[i * 6 + 4];
@@ -6539,56 +5412,40 @@ static void getPixelColorRGBA8(unsigned char* r, unsigned char* g,
          && 256U * in[i * 6 + 4] + in[i * 6 + 5] == mode->key_b) *a = 0;
       else *a = 255;
     }
-  }
-  else if(mode->colortype == LCT_PALETTE)
-  {
+  } else if(mode->colortype == LCT_PALETTE) {
     unsigned index;
     if(mode->bitdepth == 8) index = in[i];
-    else
-    {
+    else {
       size_t j = i * mode->bitdepth;
       index = readBitsFromReversedStream(&j, in, mode->bitdepth);
     }
 
-    if(index >= mode->palettesize)
-    {
+    if(index >= mode->palettesize) {
       /*This is an error according to the PNG spec, but common PNG decoders make it black instead.
       Done here too, slightly faster due to no error handling needed.*/
       *r = *g = *b = 0;
       *a = 255;
-    }
-    else
-    {
+    } else {
       *r = mode->palette[index * 4 + 0];
       *g = mode->palette[index * 4 + 1];
       *b = mode->palette[index * 4 + 2];
       *a = mode->palette[index * 4 + 3];
     }
-  }
-  else if(mode->colortype == LCT_GREY_ALPHA)
-  {
-    if(mode->bitdepth == 8)
-    {
+  } else if(mode->colortype == LCT_GREY_ALPHA) {
+    if(mode->bitdepth == 8) {
       *r = *g = *b = in[i * 2 + 0];
       *a = in[i * 2 + 1];
-    }
-    else
-    {
+    } else {
       *r = *g = *b = in[i * 4 + 0];
       *a = in[i * 4 + 2];
     }
-  }
-  else if(mode->colortype == LCT_RGBA)
-  {
-    if(mode->bitdepth == 8)
-    {
+  } else if(mode->colortype == LCT_RGBA) {
+    if(mode->bitdepth == 8) {
       *r = in[i * 4 + 0];
       *g = in[i * 4 + 1];
       *b = in[i * 4 + 2];
       *a = in[i * 4 + 3];
-    }
-    else
-    {
+    } else {
       *r = in[i * 8 + 0];
       *g = in[i * 8 + 2];
       *b = in[i * 8 + 4];
@@ -6604,57 +5461,40 @@ enough memory, if has_alpha is true the output is RGBA. mode has the color mode
 of the input buffer.*/
 static void getPixelColorsRGBA8(unsigned char* buffer, size_t numpixels,
                                 unsigned has_alpha, const unsigned char* in,
-                                const LodePNGColorMode* mode)
-{
+                                const LodePNGColorMode* mode) {
   unsigned num_channels = has_alpha ? 4 : 3;
   size_t i;
-  if(mode->colortype == LCT_GREY)
-  {
-    if(mode->bitdepth == 8)
-    {
-      for(i = 0; i != numpixels; ++i, buffer += num_channels)
-      {
+  if(mode->colortype == LCT_GREY) {
+    if(mode->bitdepth == 8) {
+      for(i = 0; i != numpixels; ++i, buffer += num_channels) {
         buffer[0] = buffer[1] = buffer[2] = in[i];
         if(has_alpha) buffer[3] = mode->key_defined && in[i] == mode->key_r ? 0 : 255;
       }
-    }
-    else if(mode->bitdepth == 16)
-    {
-      for(i = 0; i != numpixels; ++i, buffer += num_channels)
-      {
+    } else if(mode->bitdepth == 16) {
+      for(i = 0; i != numpixels; ++i, buffer += num_channels) {
         buffer[0] = buffer[1] = buffer[2] = in[i * 2];
         if(has_alpha) buffer[3] = mode->key_defined && 256U * in[i * 2 + 0] + in[i * 2 + 1] == mode->key_r ? 0 : 255;
       }
-    }
-    else
-    {
+    } else {
       unsigned highest = ((1U << mode->bitdepth) - 1U); /*highest possible value for this bit depth*/
       size_t j = 0;
-      for(i = 0; i != numpixels; ++i, buffer += num_channels)
-      {
+      for(i = 0; i != numpixels; ++i, buffer += num_channels) {
         unsigned value = readBitsFromReversedStream(&j, in, mode->bitdepth);
         buffer[0] = buffer[1] = buffer[2] = (value * 255) / highest;
         if(has_alpha) buffer[3] = mode->key_defined && value == mode->key_r ? 0 : 255;
       }
     }
-  }
-  else if(mode->colortype == LCT_RGB)
-  {
-    if(mode->bitdepth == 8)
-    {
-      for(i = 0; i != numpixels; ++i, buffer += num_channels)
-      {
+  } else if(mode->colortype == LCT_RGB) {
+    if(mode->bitdepth == 8) {
+      for(i = 0; i != numpixels; ++i, buffer += num_channels) {
         buffer[0] = in[i * 3 + 0];
         buffer[1] = in[i * 3 + 1];
         buffer[2] = in[i * 3 + 2];
         if(has_alpha) buffer[3] = mode->key_defined && buffer[0] == mode->key_r
            && buffer[1]== mode->key_g && buffer[2] == mode->key_b ? 0 : 255;
       }
-    }
-    else
-    {
-      for(i = 0; i != numpixels; ++i, buffer += num_channels)
-      {
+    } else {
+      for(i = 0; i != numpixels; ++i, buffer += num_channels) {
         buffer[0] = in[i * 6 + 0];
         buffer[1] = in[i * 6 + 2];
         buffer[2] = in[i * 6 + 4];
@@ -6664,67 +5504,47 @@ static void getPixelColorsRGBA8(unsigned char* buffer, size_t numpixels,
            && 256U * in[i * 6 + 4] + in[i * 6 + 5] == mode->key_b ? 0 : 255;
       }
     }
-  }
-  else if(mode->colortype == LCT_PALETTE)
-  {
+  } else if(mode->colortype == LCT_PALETTE) {
     unsigned index;
     size_t j = 0;
-    for(i = 0; i != numpixels; ++i, buffer += num_channels)
-    {
+    for(i = 0; i != numpixels; ++i, buffer += num_channels) {
       if(mode->bitdepth == 8) index = in[i];
       else index = readBitsFromReversedStream(&j, in, mode->bitdepth);
 
-      if(index >= mode->palettesize)
-      {
+      if(index >= mode->palettesize) {
         /*This is an error according to the PNG spec, but most PNG decoders make it black instead.
         Done here too, slightly faster due to no error handling needed.*/
         buffer[0] = buffer[1] = buffer[2] = 0;
         if(has_alpha) buffer[3] = 255;
-      }
-      else
-      {
+      } else {
         buffer[0] = mode->palette[index * 4 + 0];
         buffer[1] = mode->palette[index * 4 + 1];
         buffer[2] = mode->palette[index * 4 + 2];
         if(has_alpha) buffer[3] = mode->palette[index * 4 + 3];
       }
     }
-  }
-  else if(mode->colortype == LCT_GREY_ALPHA)
-  {
-    if(mode->bitdepth == 8)
-    {
-      for(i = 0; i != numpixels; ++i, buffer += num_channels)
-      {
+  } else if(mode->colortype == LCT_GREY_ALPHA) {
+    if(mode->bitdepth == 8) {
+      for(i = 0; i != numpixels; ++i, buffer += num_channels) {
         buffer[0] = buffer[1] = buffer[2] = in[i * 2 + 0];
         if(has_alpha) buffer[3] = in[i * 2 + 1];
       }
-    }
-    else
-    {
-      for(i = 0; i != numpixels; ++i, buffer += num_channels)
-      {
+    } else {
+      for(i = 0; i != numpixels; ++i, buffer += num_channels) {
         buffer[0] = buffer[1] = buffer[2] = in[i * 4 + 0];
         if(has_alpha) buffer[3] = in[i * 4 + 2];
       }
     }
-  }
-  else if(mode->colortype == LCT_RGBA)
-  {
-    if(mode->bitdepth == 8)
-    {
-      for(i = 0; i != numpixels; ++i, buffer += num_channels)
-      {
+  } else if(mode->colortype == LCT_RGBA) {
+    if(mode->bitdepth == 8) {
+      for(i = 0; i != numpixels; ++i, buffer += num_channels) {
         buffer[0] = in[i * 4 + 0];
         buffer[1] = in[i * 4 + 1];
         buffer[2] = in[i * 4 + 2];
         if(has_alpha) buffer[3] = in[i * 4 + 3];
       }
-    }
-    else
-    {
-      for(i = 0; i != numpixels; ++i, buffer += num_channels)
-      {
+    } else {
+      for(i = 0; i != numpixels; ++i, buffer += num_channels) {
         buffer[0] = in[i * 8 + 0];
         buffer[1] = in[i * 8 + 2];
         buffer[2] = in[i * 8 + 4];
@@ -6737,16 +5557,12 @@ static void getPixelColorsRGBA8(unsigned char* buffer, size_t numpixels,
 /*Get RGBA16 color of pixel with index i (y * width + x) from the raw image with
 given color type, but the given color type must be 16-bit itself.*/
 static void getPixelColorRGBA16(unsigned short* r, unsigned short* g, unsigned short* b, unsigned short* a,
-                                const unsigned char* in, size_t i, const LodePNGColorMode* mode)
-{
-  if(mode->colortype == LCT_GREY)
-  {
+                                const unsigned char* in, size_t i, const LodePNGColorMode* mode) {
+  if(mode->colortype == LCT_GREY) {
     *r = *g = *b = 256 * in[i * 2 + 0] + in[i * 2 + 1];
     if(mode->key_defined && 256U * in[i * 2 + 0] + in[i * 2 + 1] == mode->key_r) *a = 0;
     else *a = 65535;
-  }
-  else if(mode->colortype == LCT_RGB)
-  {
+  } else if(mode->colortype == LCT_RGB) {
     *r = 256u * in[i * 6 + 0] + in[i * 6 + 1];
     *g = 256u * in[i * 6 + 2] + in[i * 6 + 3];
     *b = 256u * in[i * 6 + 4] + in[i * 6 + 5];
@@ -6755,14 +5571,10 @@ static void getPixelColorRGBA16(unsigned short* r, unsigned short* g, unsigned s
        && 256u * in[i * 6 + 2] + in[i * 6 + 3] == mode->key_g
        && 256u * in[i * 6 + 4] + in[i * 6 + 5] == mode->key_b) *a = 0;
     else *a = 65535;
-  }
-  else if(mode->colortype == LCT_GREY_ALPHA)
-  {
+  } else if(mode->colortype == LCT_GREY_ALPHA) {
     *r = *g = *b = 256u * in[i * 4 + 0] + in[i * 4 + 1];
     *a = 256u * in[i * 4 + 2] + in[i * 4 + 3];
-  }
-  else if(mode->colortype == LCT_RGBA)
-  {
+  } else if(mode->colortype == LCT_RGBA) {
     *r = 256u * in[i * 8 + 0] + in[i * 8 + 1];
     *g = 256u * in[i * 8 + 2] + in[i * 8 + 3];
     *b = 256u * in[i * 8 + 4] + in[i * 8 + 5];
@@ -6772,37 +5584,32 @@ static void getPixelColorRGBA16(unsigned short* r, unsigned short* g, unsigned s
 
 unsigned lodepng_convert(unsigned char* out, const unsigned char* in,
                          const LodePNGColorMode* mode_out, const LodePNGColorMode* mode_in,
-                         unsigned w, unsigned h)
-{
+                         unsigned w, unsigned h) {
   size_t i;
   ColorTree tree;
   size_t numpixels = (size_t)w * (size_t)h;
   unsigned error = 0;
 
-  if(lodepng_color_mode_equal(mode_out, mode_in))
-  {
+  if(lodepng_color_mode_equal(mode_out, mode_in)) {
     size_t numbytes = lodepng_get_raw_size(w, h, mode_in);
     for(i = 0; i != numbytes; ++i) out[i] = in[i];
     return 0;
   }
 
-  if(mode_out->colortype == LCT_PALETTE)
-  {
+  if(mode_out->colortype == LCT_PALETTE) {
     size_t palettesize = mode_out->palettesize;
     const unsigned char* palette = mode_out->palette;
     size_t palsize = (size_t)1u << mode_out->bitdepth;
     /*if the user specified output palette but did not give the values, assume
     they want the values of the input color type (assuming that one is palette).
     Note that we never create a new palette ourselves.*/
-    if(palettesize == 0)
-    {
+    if(palettesize == 0) {
       palettesize = mode_in->palettesize;
       palette = mode_in->palette;
       /*if the input was also palette with same bitdepth, then the color types are also
       equal, so copy literally. This to preserve the exact indices that were in the PNG
       even in case there are duplicate colors in the palette.*/
-      if (mode_in->colortype == LCT_PALETTE && mode_in->bitdepth == mode_out->bitdepth)
-      {
+      if (mode_in->colortype == LCT_PALETTE && mode_in->bitdepth == mode_out->bitdepth) {
         size_t numbytes = lodepng_get_raw_size(w, h, mode_in);
         for(i = 0; i != numbytes; ++i) out[i] = in[i];
         return 0;
@@ -6810,64 +5617,113 @@ unsigned lodepng_convert(unsigned char* out, const unsigned char* in,
     }
     if(palettesize < palsize) palsize = palettesize;
     color_tree_init(&tree);
-    for(i = 0; i != palsize; ++i)
-    {
+    for(i = 0; i != palsize; ++i) {
       const unsigned char* p = &palette[i * 4];
       color_tree_add(&tree, p[0], p[1], p[2], p[3], (unsigned)i);
     }
   }
 
-  if(mode_in->bitdepth == 16 && mode_out->bitdepth == 16)
-  {
-    for(i = 0; i != numpixels; ++i)
-    {
+  if(mode_in->bitdepth == 16 && mode_out->bitdepth == 16) {
+    for(i = 0; i != numpixels; ++i) {
       unsigned short r = 0, g = 0, b = 0, a = 0;
       getPixelColorRGBA16(&r, &g, &b, &a, in, i, mode_in);
       rgba16ToPixel(out, i, mode_out, r, g, b, a);
     }
-  }
-  else if(mode_out->bitdepth == 8 && mode_out->colortype == LCT_RGBA)
-  {
+  } else if(mode_out->bitdepth == 8 && mode_out->colortype == LCT_RGBA) {
     getPixelColorsRGBA8(out, numpixels, 1, in, mode_in);
-  }
-  else if(mode_out->bitdepth == 8 && mode_out->colortype == LCT_RGB)
-  {
+  } else if(mode_out->bitdepth == 8 && mode_out->colortype == LCT_RGB) {
     getPixelColorsRGBA8(out, numpixels, 0, in, mode_in);
-  }
-  else
-  {
+  } else {
     unsigned char r = 0, g = 0, b = 0, a = 0;
-    for(i = 0; i != numpixels; ++i)
-    {
+    for(i = 0; i != numpixels; ++i) {
       getPixelColorRGBA8(&r, &g, &b, &a, in, i, mode_in);
       error = rgba8ToPixel(out, i, mode_out, &tree, r, g, b, a);
       if (error) break;
     }
   }
 
-  if(mode_out->colortype == LCT_PALETTE)
-  {
+  if(mode_out->colortype == LCT_PALETTE) {
     color_tree_cleanup(&tree);
   }
 
   return error;
 }
 
+
+/* Converts a single rgb color without alpha from one type to another, color bits truncated to
+their bitdepth. In case of single channel (gray or palette), only the r channel is used. Slow
+function, do not use to process all pixels of an image. Alpha channel not supported on purpose:
+this is for bKGD, supporting alpha may prevent it from finding a color in the palette, from the
+specification it looks like bKGD should ignore the alpha values of the palette since it can use
+any palette index but doesn't have an alpha channel. Idem with ignoring color key. */
+unsigned lodepng_convert_rgb(
+    unsigned* r_out, unsigned* g_out, unsigned* b_out,
+    unsigned r_in, unsigned g_in, unsigned b_in,
+    const LodePNGColorMode* mode_out, const LodePNGColorMode* mode_in) {
+  unsigned r = 0, g = 0, b = 0;
+  unsigned mul = 65535 / ((1u << mode_in->bitdepth) - 1u); /*65535, 21845, 4369, 257, 1*/
+  unsigned shift = 16 - mode_out->bitdepth;
+
+  if(mode_in->colortype == LCT_GREY || mode_in->colortype == LCT_GREY_ALPHA) {
+    r = g = b = r_in * mul;
+  } else if(mode_in->colortype == LCT_RGB || mode_in->colortype == LCT_RGBA) {
+    r = r_in * mul;
+    g = g_in * mul;
+    b = b_in * mul;
+  } else if(mode_in->colortype == LCT_PALETTE) {
+    if(r_in >= mode_in->palettesize) return 82;
+    r = mode_in->palette[r_in * 4 + 0] * 257u;
+    g = mode_in->palette[r_in * 4 + 1] * 257u;
+    b = mode_in->palette[r_in * 4 + 2] * 257u;
+  } else {
+    return 31;
+  }
+
+  /* now convert to output format */
+  if(mode_out->colortype == LCT_GREY || mode_out->colortype == LCT_GREY_ALPHA) {
+    *r_out = r >> shift ;
+  } else if(mode_out->colortype == LCT_RGB || mode_out->colortype == LCT_RGBA) {
+    *r_out = r >> shift ;
+    *g_out = g >> shift ;
+    *b_out = b >> shift ;
+  } else if(mode_out->colortype == LCT_PALETTE) {
+    unsigned i;
+    /* a 16-bit color cannot be in the palette */
+    if((r >> 8) != (r & 255) || (g >> 8) != (g & 255) || (b >> 8) != (b & 255)) return 82;
+    for(i = 0; i < mode_out->palettesize; i++) {
+      unsigned j = i * 4;
+      if((r >> 8) == mode_out->palette[j + 0] && (g >> 8) == mode_out->palette[j + 1] &&
+          (b >> 8) == mode_out->palette[j + 2]) {
+        *r_out = i;
+        return 0;
+      }
+    }
+    return 82;
+  } else {
+    return 31;
+  }
+
+  return 0;
+}
+
 #ifdef LODEPNG_COMPILE_ENCODER
 
-void lodepng_color_profile_init(LodePNGColorProfile* profile)
-{
-  profile->colored = 0;
-  profile->key = 0;
-  profile->key_r = profile->key_g = profile->key_b = 0;
-  profile->alpha = 0;
-  profile->numcolors = 0;
-  profile->bits = 1;
+void lodepng_color_stats_init(LodePNGColorStats* stats) {
+  /*stats*/
+  stats->colored = 0;
+  stats->key = 0;
+  stats->key_r = stats->key_g = stats->key_b = 0;
+  stats->alpha = 0;
+  stats->numcolors = 0;
+  stats->bits = 1;
+  stats->numpixels = 0;
+  /*settings*/
+  stats->allow_palette = 1;
+  stats->allow_greyscale = 1;
 }
 
 /*function used for debug purposes with C++*/
-/*void printColorProfile(LodePNGColorProfile* p)
-{
+/*void printColorStats(LodePNGColorStats* p) {
   std::cout << "colored: " << (int)p->colored << ", ";
   std::cout << "key: " << (int)p->key << ", ";
   std::cout << "key_r: " << (int)p->key_r << ", ";
@@ -6879,245 +5735,246 @@ void lodepng_color_profile_init(LodePNGColorProfile* profile)
 }*/
 
 /*Returns how many bits needed to represent given value (max 8 bit)*/
-static unsigned getValueRequiredBits(unsigned char value)
-{
+static unsigned getValueRequiredBits(unsigned char value) {
   if(value == 0 || value == 255) return 1;
   /*The scaling of 2-bit and 4-bit values uses multiples of 85 and 17*/
   if(value % 17 == 0) return value % 85 == 0 ? 2 : 4;
   return 8;
 }
 
-/*profile must already have been inited with mode.
-It's ok to set some parameters of profile to done already.*/
-unsigned lodepng_get_color_profile(LodePNGColorProfile* profile,
-                                   const unsigned char* in, unsigned w, unsigned h,
-                                   const LodePNGColorMode* mode)
-{
-  unsigned error = 0;
+/*stats must already have been inited. */
+void lodepng_compute_color_stats(LodePNGColorStats* stats,
+                                 const unsigned char* in, unsigned w, unsigned h,
+                                 const LodePNGColorMode* mode_in) {
   size_t i;
   ColorTree tree;
   size_t numpixels = (size_t)w * (size_t)h;
 
-  unsigned colored_done = lodepng_is_greyscale_type(mode) ? 1 : 0;
-  unsigned alpha_done = lodepng_can_have_alpha(mode) ? 0 : 1;
+  /* mark things as done already if it would be impossible to have a more expensive case */
+  unsigned colored_done = lodepng_is_greyscale_type(mode_in) ? 1 : 0;
+  unsigned alpha_done = lodepng_can_have_alpha(mode_in) ? 0 : 1;
   unsigned numcolors_done = 0;
-  unsigned bpp = lodepng_get_bpp(mode);
-  unsigned bits_done = bpp == 1 ? 1 : 0;
+  unsigned bpp = lodepng_get_bpp(mode_in);
+  unsigned bits_done = (stats->bits == 1 && bpp == 1) ? 1 : 0;
+  unsigned sixteen = 0; /* whether the input image is 16 bit */
   unsigned maxnumcolors = 257;
-  unsigned sixteen = 0;
-  if(bpp <= 8) maxnumcolors = bpp == 1 ? 2 : (bpp == 2 ? 4 : (bpp == 4 ? 16 : 256));
+  if(bpp <= 8) maxnumcolors = LODEPNG_MIN(257, stats->numcolors + (1u << bpp));
+
+  stats->numpixels += numpixels;
+
+  /*if palette not allowed, no need to compute numcolors*/
+  if(!stats->allow_palette) numcolors_done = 1;
 
   color_tree_init(&tree);
 
+  /*If the stats was already filled in from previous data, fill its palette in tree
+  and mark things as done already if we know they are the most expensive case already*/
+  if(stats->alpha) alpha_done = 1;
+  if(stats->colored) colored_done = 1;
+  if(stats->bits == 16) numcolors_done = 1;
+  if(stats->bits >= bpp) bits_done = 1;
+  if(stats->numcolors >= maxnumcolors) numcolors_done = 1;
+
+  if(!numcolors_done) {
+    for(i = 0; i < stats->numcolors; i++) {
+      const unsigned char* color = &stats->palette[i * 4];
+      color_tree_add(&tree, color[0], color[1], color[2], color[3], i);
+    }
+  }
+
   /*Check if the 16-bit input is truly 16-bit*/
-  if(mode->bitdepth == 16)
-  {
+  if(mode_in->bitdepth == 16 && !sixteen) {
     unsigned short r, g, b, a;
-    for(i = 0; i != numpixels; ++i)
-    {
-      getPixelColorRGBA16(&r, &g, &b, &a, in, i, mode);
+    for(i = 0; i != numpixels; ++i) {
+      getPixelColorRGBA16(&r, &g, &b, &a, in, i, mode_in);
       if((r & 255) != ((r >> 8) & 255) || (g & 255) != ((g >> 8) & 255) ||
-         (b & 255) != ((b >> 8) & 255) || (a & 255) != ((a >> 8) & 255)) /*first and second byte differ*/
-      {
+         (b & 255) != ((b >> 8) & 255) || (a & 255) != ((a >> 8) & 255)) /*first and second byte differ*/ {
+        stats->bits = 16;
         sixteen = 1;
+        bits_done = 1;
+        numcolors_done = 1; /*counting colors no longer useful, palette doesn't support 16-bit*/
         break;
       }
     }
   }
 
-  if(sixteen)
-  {
+  if(sixteen) {
     unsigned short r = 0, g = 0, b = 0, a = 0;
-    profile->bits = 16;
-    bits_done = numcolors_done = 1; /*counting colors no longer useful, palette doesn't support 16-bit*/
 
-    for(i = 0; i != numpixels; ++i)
-    {
-      getPixelColorRGBA16(&r, &g, &b, &a, in, i, mode);
+    for(i = 0; i != numpixels; ++i) {
+      getPixelColorRGBA16(&r, &g, &b, &a, in, i, mode_in);
 
-      if(!colored_done && (r != g || r != b))
-      {
-        profile->colored = 1;
+      if(!colored_done && (r != g || r != b)) {
+        stats->colored = 1;
         colored_done = 1;
       }
 
-      if(!alpha_done)
-      {
-        unsigned matchkey = (r == profile->key_r && g == profile->key_g && b == profile->key_b);
-        if(a != 65535 && (a != 0 || (profile->key && !matchkey)))
-        {
-          profile->alpha = 1;
-          profile->key = 0;
+      if(!alpha_done) {
+        unsigned matchkey = (r == stats->key_r && g == stats->key_g && b == stats->key_b);
+        if(a != 65535 && (a != 0 || (stats->key && !matchkey))) {
+          stats->alpha = 1;
+          stats->key = 0;
           alpha_done = 1;
-        }
-        else if(a == 0 && !profile->alpha && !profile->key)
-        {
-          profile->key = 1;
-          profile->key_r = r;
-          profile->key_g = g;
-          profile->key_b = b;
-        }
-        else if(a == 65535 && profile->key && matchkey)
-        {
+        } else if(a == 0 && !stats->alpha && !stats->key) {
+          stats->key = 1;
+          stats->key_r = r;
+          stats->key_g = g;
+          stats->key_b = b;
+        } else if(a == 65535 && stats->key && matchkey) {
           /* Color key cannot be used if an opaque pixel also has that RGB color. */
-          profile->alpha = 1;
-          profile->key = 0;
+          stats->alpha = 1;
+          stats->key = 0;
           alpha_done = 1;
         }
       }
       if(alpha_done && numcolors_done && colored_done && bits_done) break;
     }
 
-    if(profile->key && !profile->alpha)
-    {
-      for(i = 0; i != numpixels; ++i)
-      {
-        getPixelColorRGBA16(&r, &g, &b, &a, in, i, mode);
-        if(a != 0 && r == profile->key_r && g == profile->key_g && b == profile->key_b)
-        {
+    if(stats->key && !stats->alpha) {
+      for(i = 0; i != numpixels; ++i) {
+        getPixelColorRGBA16(&r, &g, &b, &a, in, i, mode_in);
+        if(a != 0 && r == stats->key_r && g == stats->key_g && b == stats->key_b) {
           /* Color key cannot be used if an opaque pixel also has that RGB color. */
-          profile->alpha = 1;
-          profile->key = 0;
+          stats->alpha = 1;
+          stats->key = 0;
           alpha_done = 1;
         }
       }
     }
-  }
-  else /* < 16-bit */
-  {
+  } else /* < 16-bit */ {
     unsigned char r = 0, g = 0, b = 0, a = 0;
-    for(i = 0; i != numpixels; ++i)
-    {
-      getPixelColorRGBA8(&r, &g, &b, &a, in, i, mode);
+    for(i = 0; i != numpixels; ++i) {
+      getPixelColorRGBA8(&r, &g, &b, &a, in, i, mode_in);
 
-      if(!bits_done && profile->bits < 8)
-      {
-        /*only r is checked, < 8 bits is only relevant for greyscale*/
+      if(!bits_done && stats->bits < 8) {
+        /*only r is checked, < 8 bits is only relevant for grayscale*/
         unsigned bits = getValueRequiredBits(r);
-        if(bits > profile->bits) profile->bits = bits;
+        if(bits > stats->bits) stats->bits = bits;
       }
-      bits_done = (profile->bits >= bpp);
+      bits_done = (stats->bits >= bpp);
 
-      if(!colored_done && (r != g || r != b))
-      {
-        profile->colored = 1;
+      if(!colored_done && (r != g || r != b)) {
+        stats->colored = 1;
         colored_done = 1;
-        if(profile->bits < 8) profile->bits = 8; /*PNG has no colored modes with less than 8-bit per channel*/
+        if(stats->bits < 8) stats->bits = 8; /*PNG has no colored modes with less than 8-bit per channel*/
       }
 
-      if(!alpha_done)
-      {
-        unsigned matchkey = (r == profile->key_r && g == profile->key_g && b == profile->key_b);
-        if(a != 255 && (a != 0 || (profile->key && !matchkey)))
-        {
-          profile->alpha = 1;
-          profile->key = 0;
+      if(!alpha_done) {
+        unsigned matchkey = (r == stats->key_r && g == stats->key_g && b == stats->key_b);
+        if(a != 255 && (a != 0 || (stats->key && !matchkey))) {
+          stats->alpha = 1;
+          stats->key = 0;
           alpha_done = 1;
-          if(profile->bits < 8) profile->bits = 8; /*PNG has no alphachannel modes with less than 8-bit per channel*/
-        }
-        else if(a == 0 && !profile->alpha && !profile->key)
-        {
-          profile->key = 1;
-          profile->key_r = r;
-          profile->key_g = g;
-          profile->key_b = b;
-        }
-        else if(a == 255 && profile->key && matchkey)
-        {
+          if(stats->bits < 8) stats->bits = 8; /*PNG has no alphachannel modes with less than 8-bit per channel*/
+        } else if(a == 0 && !stats->alpha && !stats->key) {
+          stats->key = 1;
+          stats->key_r = r;
+          stats->key_g = g;
+          stats->key_b = b;
+        } else if(a == 255 && stats->key && matchkey) {
           /* Color key cannot be used if an opaque pixel also has that RGB color. */
-          profile->alpha = 1;
-          profile->key = 0;
+          stats->alpha = 1;
+          stats->key = 0;
           alpha_done = 1;
-          if(profile->bits < 8) profile->bits = 8; /*PNG has no alphachannel modes with less than 8-bit per channel*/
+          if(stats->bits < 8) stats->bits = 8; /*PNG has no alphachannel modes with less than 8-bit per channel*/
         }
       }
 
-      if(!numcolors_done)
-      {
-        if(!color_tree_has(&tree, r, g, b, a))
-        {
-          color_tree_add(&tree, r, g, b, a, profile->numcolors);
-          if(profile->numcolors < 256)
-          {
-            unsigned char* p = profile->palette;
-            unsigned n = profile->numcolors;
+      if(!numcolors_done) {
+        if(!color_tree_has(&tree, r, g, b, a)) {
+          color_tree_add(&tree, r, g, b, a, stats->numcolors);
+          if(stats->numcolors < 256) {
+            unsigned char* p = stats->palette;
+            unsigned n = stats->numcolors;
             p[n * 4 + 0] = r;
             p[n * 4 + 1] = g;
             p[n * 4 + 2] = b;
             p[n * 4 + 3] = a;
           }
-          ++profile->numcolors;
-          numcolors_done = profile->numcolors >= maxnumcolors;
+          ++stats->numcolors;
+          numcolors_done = stats->numcolors >= maxnumcolors;
         }
       }
 
       if(alpha_done && numcolors_done && colored_done && bits_done) break;
     }
 
-    if(profile->key && !profile->alpha)
-    {
-      for(i = 0; i != numpixels; ++i)
-      {
-        getPixelColorRGBA8(&r, &g, &b, &a, in, i, mode);
-        if(a != 0 && r == profile->key_r && g == profile->key_g && b == profile->key_b)
-        {
+    if(stats->key && !stats->alpha) {
+      for(i = 0; i != numpixels; ++i) {
+        getPixelColorRGBA8(&r, &g, &b, &a, in, i, mode_in);
+        if(a != 0 && r == stats->key_r && g == stats->key_g && b == stats->key_b) {
           /* Color key cannot be used if an opaque pixel also has that RGB color. */
-          profile->alpha = 1;
-          profile->key = 0;
+          stats->alpha = 1;
+          stats->key = 0;
           alpha_done = 1;
-          if(profile->bits < 8) profile->bits = 8; /*PNG has no alphachannel modes with less than 8-bit per channel*/
+          if(stats->bits < 8) stats->bits = 8; /*PNG has no alphachannel modes with less than 8-bit per channel*/
         }
       }
     }
 
-    /*make the profile's key always 16-bit for consistency - repeat each byte twice*/
-    profile->key_r += (profile->key_r << 8);
-    profile->key_g += (profile->key_g << 8);
-    profile->key_b += (profile->key_b << 8);
+    /*make the stats's key always 16-bit for consistency - repeat each byte twice*/
+    stats->key_r += (stats->key_r << 8);
+    stats->key_g += (stats->key_g << 8);
+    stats->key_b += (stats->key_b << 8);
   }
 
   color_tree_cleanup(&tree);
-  return error;
 }
 
-/*Automatically chooses color type that gives smallest amount of bits in the
-output image, e.g. grey if there are only greyscale pixels, palette if there
-are less than 256 colors, ...
-Updates values of mode with a potentially smaller color model. mode_out should
-contain the user chosen color model, but will be overwritten with the new chosen one.*/
-unsigned lodepng_auto_choose_color(LodePNGColorMode* mode_out,
-                                   const unsigned char* image, unsigned w, unsigned h,
-                                   const LodePNGColorMode* mode_in)
-{
-  LodePNGColorProfile prof;
-  unsigned error = 0;
-  unsigned palettebits, palette_ok;
-  size_t i, n;
-  size_t numpixels = (size_t)w * (size_t)h;
+#ifdef LODEPNG_COMPILE_ANCILLARY_CHUNKS
+/*Adds a single color to the color stats. The stats must already have been inited. The color must be given as 16-bit
+(with 2 bytes repeating for 8-bit and 65535 for opaque alpha channel). This function is expensive, do not call it for
+all pixels of an image but only for a few additional values. */
+static void lodepng_color_stats_add(LodePNGColorStats* stats,
+                                    unsigned r, unsigned g, unsigned b, unsigned a) {
+  unsigned char image[8];
+  LodePNGColorMode mode;
+  lodepng_color_mode_init(&mode);
+  image[0] = r >> 8; image[1] = r; image[2] = g >> 8; image[3] = g;
+  image[4] = b >> 8; image[5] = b; image[6] = a >> 8; image[7] = a;
+  mode.bitdepth = 16;
+  mode.colortype = LCT_RGBA;
+  lodepng_compute_color_stats(stats, image, 1, 1, &mode);
+  lodepng_color_mode_cleanup(&mode);
+}
+#endif /*LODEPNG_COMPILE_ANCILLARY_CHUNKS*/
 
-  lodepng_color_profile_init(&prof);
-  error = lodepng_get_color_profile(&prof, image, w, h, mode_in);
-  if(error) return error;
+unsigned auto_choose_color(LodePNGColorMode* mode_out,
+                           const LodePNGColorMode* mode_in,
+                           const LodePNGColorStats* stats) {
+  unsigned error = 0;
+  unsigned palettebits;
+  size_t i, n;
+  size_t numpixels = stats->numpixels;
+  unsigned palette_ok, gray_ok;
+
+  unsigned alpha = stats->alpha;
+  unsigned key = stats->key;
+  unsigned bits = stats->bits;
+
   mode_out->key_defined = 0;
 
-  if(prof.key && numpixels <= 16)
-  {
-    prof.alpha = 1; /*too few pixels to justify tRNS chunk overhead*/
-    prof.key = 0;
-    if(prof.bits < 8) prof.bits = 8; /*PNG has no alphachannel modes with less than 8-bit per channel*/
+  if(key && numpixels <= 16) {
+    alpha = 1; /*too few pixels to justify tRNS chunk overhead*/
+    key = 0;
+    if(bits < 8) bits = 8; /*PNG has no alphachannel modes with less than 8-bit per channel*/
   }
-  n = prof.numcolors;
-  palettebits = n <= 2 ? 1 : (n <= 4 ? 2 : (n <= 16 ? 4 : 8));
-  palette_ok = n <= 256 && prof.bits <= 8;
-  if(numpixels < n * 2) palette_ok = 0; /*don't add palette overhead if image has only a few pixels*/
-  if(!prof.colored && prof.bits <= palettebits) palette_ok = 0; /*grey is less overhead*/
 
-  if(palette_ok)
-  {
-    unsigned char* p = prof.palette;
+  gray_ok = !stats->colored;
+  if(!stats->allow_greyscale) gray_ok = 0;
+  if(!gray_ok && bits < 8) bits = 8;
+
+  n = stats->numcolors;
+  palettebits = n <= 2 ? 1 : (n <= 4 ? 2 : (n <= 16 ? 4 : 8));
+  palette_ok = n <= 256 && bits <= 8 && n != 0; /*n==0 means likely numcolors wasn't computed*/
+  if(numpixels < n * 2) palette_ok = 0; /*don't add palette overhead if image has only a few pixels*/
+  if(gray_ok && bits <= palettebits) palette_ok = 0; /*gray is less overhead*/
+  if(!stats->allow_palette) palette_ok = 0;
+
+  if(palette_ok) {
+    const unsigned char* p = stats->palette;
     lodepng_palette_clear(mode_out); /*remove potential earlier palette*/
-    for(i = 0; i != prof.numcolors; ++i)
-    {
+    for(i = 0; i != stats->numcolors; ++i) {
       error = lodepng_palette_add(mode_out, p[i * 4 + 0], p[i * 4 + 1], p[i * 4 + 2], p[i * 4 + 3]);
       if(error) break;
     }
@@ -7126,25 +5983,20 @@ unsigned lodepng_auto_choose_color(LodePNGColorMode* mode_out,
     mode_out->bitdepth = palettebits;
 
     if(mode_in->colortype == LCT_PALETTE && mode_in->palettesize >= mode_out->palettesize
-        && mode_in->bitdepth == mode_out->bitdepth)
-    {
+        && mode_in->bitdepth == mode_out->bitdepth) {
       /*If input should have same palette colors, keep original to preserve its order and prevent conversion*/
       lodepng_color_mode_cleanup(mode_out);
       lodepng_color_mode_copy(mode_out, mode_in);
     }
-  }
-  else /*8-bit or 16-bit per channel*/
-  {
-    mode_out->bitdepth = prof.bits;
-    mode_out->colortype = prof.alpha ? (prof.colored ? LCT_RGBA : LCT_GREY_ALPHA)
-                                     : (prof.colored ? LCT_RGB : LCT_GREY);
-
-    if(prof.key)
-    {
-      unsigned mask = (1u << mode_out->bitdepth) - 1u; /*profile always uses 16-bit, mask converts it*/
-      mode_out->key_r = prof.key_r & mask;
-      mode_out->key_g = prof.key_g & mask;
-      mode_out->key_b = prof.key_b & mask;
+  } else /*8-bit or 16-bit per channel*/ {
+    mode_out->bitdepth = bits;
+    mode_out->colortype = alpha ? (gray_ok ? LCT_GREY_ALPHA : LCT_RGBA)
+                                : (gray_ok ? LCT_GREY : LCT_RGB);
+    if(key) {
+      unsigned mask = (1u << mode_out->bitdepth) - 1u; /*stats always uses 16-bit, mask converts it*/
+      mode_out->key_r = stats->key_r & mask;
+      mode_out->key_g = stats->key_g & mask;
+      mode_out->key_b = stats->key_b & mask;
       mode_out->key_defined = 1;
     }
   }
@@ -7159,15 +6011,13 @@ Paeth predicter, used by PNG filter type 4
 The parameters are of type short, but should come from unsigned chars, the shorts
 are only needed to make the paeth calculation correct.
 */
-static unsigned char paethPredictor(short a, short b, short c)
-{
-  short pa = abs(b - c);
-  short pb = abs(a - c);
-  short pc = abs(a + b - c - c);
-
-  if(pc < pa && pc < pb) return (unsigned char)c;
-  else if(pb < pa) return (unsigned char)b;
-  else return (unsigned char)a;
+static unsigned char paethPredictor(short a, short b, short c) {
+  short pa = LODEPNG_ABS(b - c);
+  short pb = LODEPNG_ABS(a - c);
+  short pc = LODEPNG_ABS(a + b - c - c);
+  /* return input value associated with smallest of pa, pb, pc (with certain priority if equal) */
+  if(pb < pa) { a = b; pa = pb; }
+  return (pc < pa) ? c : a;
 }
 
 /*shared values used by multiple Adam7 related functions*/
@@ -7193,14 +6043,12 @@ bpp: bits per pixel
  end at a full byte
 */
 static void Adam7_getpassvalues(unsigned passw[7], unsigned passh[7], size_t filter_passstart[8],
-                                size_t padded_passstart[8], size_t passstart[8], unsigned w, unsigned h, unsigned bpp)
-{
+                                size_t padded_passstart[8], size_t passstart[8], unsigned w, unsigned h, unsigned bpp) {
   /*the passstart values have 8 values: the 8th one indicates the byte after the end of the 7th (= last) pass*/
   unsigned i;
 
   /*calculate width and height in pixels of each pass*/
-  for(i = 0; i != 7; ++i)
-  {
+  for(i = 0; i != 7; ++i) {
     passw[i] = (w + ADAM7_DX[i] - ADAM7_IX[i] - 1) / ADAM7_DX[i];
     passh[i] = (h + ADAM7_DY[i] - ADAM7_IY[i] - 1) / ADAM7_DY[i];
     if(passw[i] == 0) passh[i] = 0;
@@ -7208,15 +6056,14 @@ static void Adam7_getpassvalues(unsigned passw[7], unsigned passh[7], size_t fil
   }
 
   filter_passstart[0] = padded_passstart[0] = passstart[0] = 0;
-  for(i = 0; i != 7; ++i)
-  {
+  for(i = 0; i != 7; ++i) {
     /*if passw[i] is 0, it's 0 bytes, not 1 (no filtertype-byte)*/
     filter_passstart[i + 1] = filter_passstart[i]
-                            + ((passw[i] && passh[i]) ? passh[i] * (1 + (passw[i] * bpp + 7) / 8) : 0);
+                            + ((passw[i] && passh[i]) ? passh[i] * (1u + (passw[i] * bpp + 7u) / 8u) : 0);
     /*bits padded if needed to fill full byte at end of each scanline*/
-    padded_passstart[i + 1] = padded_passstart[i] + passh[i] * ((passw[i] * bpp + 7) / 8);
+    padded_passstart[i + 1] = padded_passstart[i] + passh[i] * ((passw[i] * bpp + 7u) / 8u);
     /*only padded at end of reduced image*/
-    passstart[i + 1] = passstart[i] + (passh[i] * passw[i] * bpp + 7) / 8;
+    passstart[i + 1] = passstart[i] + (passh[i] * passw[i] * bpp + 7u) / 8u;
   }
 }
 
@@ -7228,60 +6075,51 @@ static void Adam7_getpassvalues(unsigned passw[7], unsigned passh[7], size_t fil
 
 /*read the information from the header and store it in the LodePNGInfo. return value is error*/
 unsigned lodepng_inspect(unsigned* w, unsigned* h, LodePNGState* state,
-                         const unsigned char* in, size_t insize)
-{
+                         const unsigned char* in, size_t insize) {
+  unsigned width, height;
   LodePNGInfo* info = &state->info_png;
-  if(insize == 0 || in == 0)
-  {
+  if(insize == 0 || in == 0) {
     CERROR_RETURN_ERROR(state->error, 48); /*error: the given data is empty*/
   }
-  if(insize < 33)
-  {
+  if(insize < 33) {
     CERROR_RETURN_ERROR(state->error, 27); /*error: the data length is smaller than the length of a PNG header*/
   }
 
   /*when decoding a new PNG image, make sure all parameters created after previous decoding are reset*/
+  /* TODO: remove this. One should use a new LodePNGState for new sessions */
   lodepng_info_cleanup(info);
   lodepng_info_init(info);
 
   if(in[0] != 137 || in[1] != 80 || in[2] != 78 || in[3] != 71
-     || in[4] != 13 || in[5] != 10 || in[6] != 26 || in[7] != 10)
-  {
+     || in[4] != 13 || in[5] != 10 || in[6] != 26 || in[7] != 10) {
     CERROR_RETURN_ERROR(state->error, 28); /*error: the first 8 bytes are not the correct PNG signature*/
   }
-  if(lodepng_chunk_length(in + 8) != 13)
-  {
+  if(lodepng_chunk_length(in + 8) != 13) {
     CERROR_RETURN_ERROR(state->error, 94); /*error: header size must be 13 bytes*/
   }
-  if(!lodepng_chunk_type_equals(in + 8, "IHDR"))
-  {
+  if(!lodepng_chunk_type_equals(in + 8, "IHDR")) {
     CERROR_RETURN_ERROR(state->error, 29); /*error: it doesn't start with a IHDR chunk!*/
   }
 
   /*read the values given in the header*/
-  *w = lodepng_read32bitInt(&in[16]);
-  *h = lodepng_read32bitInt(&in[20]);
+  width = lodepng_read32bitInt(&in[16]);
+  height = lodepng_read32bitInt(&in[20]);
+  /*TODO: remove the undocumented feature that allows to give null pointers to width or height*/
+  if(w) *w = width;
+  if(h) *h = height;
   info->color.bitdepth = in[24];
   info->color.colortype = (LodePNGColorType)in[25];
   info->compression_method = in[26];
   info->filter_method = in[27];
   info->interlace_method = in[28];
 
-  if(*w == 0 || *h == 0)
-  {
-    CERROR_RETURN_ERROR(state->error, 93);
-  }
+  /*errors returned only after the parsing so other values are still output*/
 
-  if(!state->decoder.ignore_crc)
-  {
-    unsigned CRC = lodepng_read32bitInt(&in[29]);
-    unsigned checksum = lodepng_crc32(&in[12], 17);
-    if(CRC != checksum)
-    {
-      CERROR_RETURN_ERROR(state->error, 57); /*invalid CRC*/
-    }
-  }
-
+  /*error: invalid image size*/
+  if(width == 0 || height == 0) CERROR_RETURN_ERROR(state->error, 93);
+  /*error: invalid colortype or bitdepth combination*/
+  state->error = checkColorValidity(info->color.colortype, info->color.bitdepth);
+  if(state->error) return state->error;
   /*error: only compression method 0 is allowed in the specification*/
   if(info->compression_method != 0) CERROR_RETURN_ERROR(state->error, 32);
   /*error: only filter method 0 is allowed in the specification*/
@@ -7289,13 +6127,19 @@ unsigned lodepng_inspect(unsigned* w, unsigned* h, LodePNGState* state,
   /*error: only interlace methods 0 and 1 exist in the specification*/
   if(info->interlace_method > 1) CERROR_RETURN_ERROR(state->error, 34);
 
-  state->error = checkColorValidity(info->color.colortype, info->color.bitdepth);
+  if(!state->decoder.ignore_crc) {
+    unsigned CRC = lodepng_read32bitInt(&in[29]);
+    unsigned checksum = lodepng_crc32(&in[12], 17);
+    if(CRC != checksum) {
+      CERROR_RETURN_ERROR(state->error, 57); /*invalid CRC*/
+    }
+  }
+
   return state->error;
 }
 
 static unsigned unfilterScanline(unsigned char* recon, const unsigned char* scanline, const unsigned char* precon,
-                                 size_t bytewidth, unsigned char filterType, size_t length)
-{
+                                 size_t bytewidth, unsigned char filterType, size_t length) {
   /*
   For PNG filter method 0
   unfilter a PNG image scanline by scanline. when the pixels are smaller than 1 byte,
@@ -7306,8 +6150,7 @@ static unsigned unfilterScanline(unsigned char* recon, const unsigned char* scan
   */
 
   size_t i;
-  switch(filterType)
-  {
+  switch(filterType) {
     case 0:
       for(i = 0; i != length; ++i) recon[i] = scanline[i];
       break;
@@ -7316,47 +6159,34 @@ static unsigned unfilterScanline(unsigned char* recon, const unsigned char* scan
       for(i = bytewidth; i < length; ++i) recon[i] = scanline[i] + recon[i - bytewidth];
       break;
     case 2:
-      if(precon)
-      {
+      if(precon) {
         for(i = 0; i != length; ++i) recon[i] = scanline[i] + precon[i];
-      }
-      else
-      {
+      } else {
         for(i = 0; i != length; ++i) recon[i] = scanline[i];
       }
       break;
     case 3:
-      if(precon)
-      {
-        for(i = 0; i != bytewidth; ++i) recon[i] = scanline[i] + (precon[i] >> 1);
-        for(i = bytewidth; i < length; ++i) recon[i] = scanline[i] + ((recon[i - bytewidth] + precon[i]) >> 1);
-      }
-      else
-      {
+      if(precon) {
+        for(i = 0; i != bytewidth; ++i) recon[i] = scanline[i] + (precon[i] >> 1u);
+        for(i = bytewidth; i < length; ++i) recon[i] = scanline[i] + ((recon[i - bytewidth] + precon[i]) >> 1u);
+      } else {
         for(i = 0; i != bytewidth; ++i) recon[i] = scanline[i];
-        for(i = bytewidth; i < length; ++i) recon[i] = scanline[i] + (recon[i - bytewidth] >> 1);
+        for(i = bytewidth; i < length; ++i) recon[i] = scanline[i] + (recon[i - bytewidth] >> 1u);
       }
       break;
     case 4:
-      if(precon)
-      {
-        for(i = 0; i != bytewidth; ++i)
-        {
+      if(precon) {
+        for(i = 0; i != bytewidth; ++i) {
           recon[i] = (scanline[i] + precon[i]); /*paethPredictor(0, precon[i], 0) is always precon[i]*/
         }
-        for(i = bytewidth; i < length; ++i)
-        {
+        for(i = bytewidth; i < length; ++i) {
           recon[i] = (scanline[i] + paethPredictor(recon[i - bytewidth], precon[i], precon[i - bytewidth]));
         }
-      }
-      else
-      {
-        for(i = 0; i != bytewidth; ++i)
-        {
+      } else {
+        for(i = 0; i != bytewidth; ++i) {
           recon[i] = scanline[i];
         }
-        for(i = bytewidth; i < length; ++i)
-        {
+        for(i = bytewidth; i < length; ++i) {
           /*paethPredictor(recon[i - bytewidth], 0, 0) is always recon[i - bytewidth]*/
           recon[i] = (scanline[i] + recon[i - bytewidth]);
         }
@@ -7367,8 +6197,7 @@ static unsigned unfilterScanline(unsigned char* recon, const unsigned char* scan
   return 0;
 }
 
-static unsigned unfilter(unsigned char* out, const unsigned char* in, unsigned w, unsigned h, unsigned bpp)
-{
+static unsigned unfilter(unsigned char* out, const unsigned char* in, unsigned w, unsigned h, unsigned bpp) {
   /*
   For PNG filter method 0
   this function unfilters a single image (e.g. without interlacing this is called once, with Adam7 seven times)
@@ -7381,11 +6210,10 @@ static unsigned unfilter(unsigned char* out, const unsigned char* in, unsigned w
   unsigned char* prevline = 0;
 
   /*bytewidth is used for filtering, is 1 when bpp < 8, number of bytes per pixel otherwise*/
-  size_t bytewidth = (bpp + 7) / 8;
-  size_t linebytes = (w * bpp + 7) / 8;
+  size_t bytewidth = (bpp + 7u) / 8u;
+  size_t linebytes = (w * bpp + 7u) / 8u;
 
-  for(y = 0; y < h; ++y)
-  {
+  for(y = 0; y < h; ++y) {
     size_t outindex = linebytes * y;
     size_t inindex = (1 + linebytes) * y; /*the extra filterbyte added to each row*/
     unsigned char filterType = in[inindex];
@@ -7409,50 +6237,39 @@ out must be big enough AND must be 0 everywhere if bpp < 8 in the current implem
 (because that's likely a little bit faster)
 NOTE: comments about padding bits are only relevant if bpp < 8
 */
-static void Adam7_deinterlace(unsigned char* out, const unsigned char* in, unsigned w, unsigned h, unsigned bpp)
-{
+static void Adam7_deinterlace(unsigned char* out, const unsigned char* in, unsigned w, unsigned h, unsigned bpp) {
   unsigned passw[7], passh[7];
   size_t filter_passstart[8], padded_passstart[8], passstart[8];
   unsigned i;
 
   Adam7_getpassvalues(passw, passh, filter_passstart, padded_passstart, passstart, w, h, bpp);
 
-  if(bpp >= 8)
-  {
-    for(i = 0; i != 7; ++i)
-    {
+  if(bpp >= 8) {
+    for(i = 0; i != 7; ++i) {
       unsigned x, y, b;
-      size_t bytewidth = bpp / 8;
+      size_t bytewidth = bpp / 8u;
       for(y = 0; y < passh[i]; ++y)
-      for(x = 0; x < passw[i]; ++x)
-      {
+      for(x = 0; x < passw[i]; ++x) {
         size_t pixelinstart = passstart[i] + (y * passw[i] + x) * bytewidth;
         size_t pixeloutstart = ((ADAM7_IY[i] + y * ADAM7_DY[i]) * w + ADAM7_IX[i] + x * ADAM7_DX[i]) * bytewidth;
-        for(b = 0; b < bytewidth; ++b)
-        {
+        for(b = 0; b < bytewidth; ++b) {
           out[pixeloutstart + b] = in[pixelinstart + b];
         }
       }
     }
-  }
-  else /*bpp < 8: Adam7 with pixels < 8 bit is a bit trickier: with bit pointers*/
-  {
-    for(i = 0; i != 7; ++i)
-    {
+  } else /*bpp < 8: Adam7 with pixels < 8 bit is a bit trickier: with bit pointers*/ {
+    for(i = 0; i != 7; ++i) {
       unsigned x, y, b;
       unsigned ilinebits = bpp * passw[i];
       unsigned olinebits = bpp * w;
       size_t obp, ibp; /*bit pointers (for out and in buffer)*/
       for(y = 0; y < passh[i]; ++y)
-      for(x = 0; x < passw[i]; ++x)
-      {
+      for(x = 0; x < passw[i]; ++x) {
         ibp = (8 * passstart[i]) + (y * ilinebits + x * bpp);
         obp = (ADAM7_IY[i] + y * ADAM7_DY[i]) * olinebits + (ADAM7_IX[i] + x * ADAM7_DX[i]) * bpp;
-        for(b = 0; b < bpp; ++b)
-        {
+        for(b = 0; b < bpp; ++b) {
           unsigned char bit = readBitFromReversedStream(&ibp, in);
-          /*note that this function assumes the out buffer is completely 0, use setBitOfReversedStream otherwise*/
-          setBitOfReversedStream0(&obp, out, bit);
+          setBitOfReversedStream(&obp, out, bit);
         }
       }
     }
@@ -7460,8 +6277,7 @@ static void Adam7_deinterlace(unsigned char* out, const unsigned char* in, unsig
 }
 
 static void removePaddingBits(unsigned char* out, const unsigned char* in,
-                              size_t olinebits, size_t ilinebits, unsigned h)
-{
+                              size_t olinebits, size_t ilinebits, unsigned h) {
   /*
   After filtering there are still padding bits if scanlines have non multiple of 8 bit amounts. They need
   to be removed (except at last scanline of (Adam7-reduced) image) before working with pure image buffers
@@ -7474,11 +6290,9 @@ static void removePaddingBits(unsigned char* out, const unsigned char* in,
   unsigned y;
   size_t diff = ilinebits - olinebits;
   size_t ibp = 0, obp = 0; /*input and output bit pointers*/
-  for(y = 0; y < h; ++y)
-  {
+  for(y = 0; y < h; ++y) {
     size_t x;
-    for(x = 0; x < olinebits; ++x)
-    {
+    for(x = 0; x < olinebits; ++x) {
       unsigned char bit = readBitFromReversedStream(&ibp, in);
       setBitOfReversedStream(&obp, out, bit);
     }
@@ -7490,8 +6304,7 @@ static void removePaddingBits(unsigned char* out, const unsigned char* in,
 the IDAT chunks (with filter index bytes and possible padding bits)
 return value is error*/
 static unsigned postProcessScanlines(unsigned char* out, unsigned char* in,
-                                     unsigned w, unsigned h, const LodePNGInfo* info_png)
-{
+                                     unsigned w, unsigned h, const LodePNGInfo* info_png) {
   /*
   This function converts the filtered-padded-interlaced data into pure 2D image buffer with the PNG's colortype.
   Steps:
@@ -7502,34 +6315,28 @@ static unsigned postProcessScanlines(unsigned char* out, unsigned char* in,
   unsigned bpp = lodepng_get_bpp(&info_png->color);
   if(bpp == 0) return 31; /*error: invalid colortype*/
 
-  if(info_png->interlace_method == 0)
-  {
-    if(bpp < 8 && w * bpp != ((w * bpp + 7) / 8) * 8)
-    {
+  if(info_png->interlace_method == 0) {
+    if(bpp < 8 && w * bpp != ((w * bpp + 7u) / 8u) * 8u) {
       CERROR_TRY_RETURN(unfilter(in, in, w, h, bpp));
-      removePaddingBits(out, in, w * bpp, ((w * bpp + 7) / 8) * 8, h);
+      removePaddingBits(out, in, w * bpp, ((w * bpp + 7u) / 8u) * 8u, h);
     }
     /*we can immediately filter into the out buffer, no other steps needed*/
     else CERROR_TRY_RETURN(unfilter(out, in, w, h, bpp));
-  }
-  else /*interlace_method is 1 (Adam7)*/
-  {
+  } else /*interlace_method is 1 (Adam7)*/ {
     unsigned passw[7], passh[7]; size_t filter_passstart[8], padded_passstart[8], passstart[8];
     unsigned i;
 
     Adam7_getpassvalues(passw, passh, filter_passstart, padded_passstart, passstart, w, h, bpp);
 
-    for(i = 0; i != 7; ++i)
-    {
+    for(i = 0; i != 7; ++i) {
       CERROR_TRY_RETURN(unfilter(&in[padded_passstart[i]], &in[filter_passstart[i]], passw[i], passh[i], bpp));
       /*TODO: possible efficiency improvement: if in this reduced image the bits fit nicely in 1 scanline,
       move bytes instead of bits or move not at all*/
-      if(bpp < 8)
-      {
+      if(bpp < 8) {
         /*remove padding bits in scanlines; after this there still may be padding
         bits between the different reduced images: each reduced image still starts nicely at a byte*/
         removePaddingBits(&in[passstart[i]], &in[padded_passstart[i]], passw[i] * bpp,
-                          ((passw[i] * bpp + 7) / 8) * 8, passh[i]);
+                          ((passw[i] * bpp + 7u) / 8u) * 8u, passh[i]);
       }
     }
 
@@ -7539,21 +6346,18 @@ static unsigned postProcessScanlines(unsigned char* out, unsigned char* in,
   return 0;
 }
 
-static unsigned readChunk_PLTE(LodePNGColorMode* color, const unsigned char* data, size_t chunkLength)
-{
+static unsigned readChunk_PLTE(LodePNGColorMode* color, const unsigned char* data, size_t chunkLength) {
   unsigned pos = 0, i;
   if(color->palette) lodepng_free(color->palette);
-  color->palettesize = chunkLength / 3;
+  color->palettesize = chunkLength / 3u;
   color->palette = (unsigned char*)lodepng_malloc(4 * color->palettesize);
-  if(!color->palette && color->palettesize)
-  {
+  if(!color->palette && color->palettesize) {
     color->palettesize = 0;
     return 83; /*alloc fail*/
   }
   if(color->palettesize > 256) return 38; /*error: palette too big*/
 
-  for(i = 0; i != color->palettesize; ++i)
-  {
+  for(i = 0; i != color->palettesize; ++i) {
     color->palette[4 * i + 0] = data[pos++]; /*R*/
     color->palette[4 * i + 1] = data[pos++]; /*G*/
     color->palette[4 * i + 2] = data[pos++]; /*B*/
@@ -7563,26 +6367,20 @@ static unsigned readChunk_PLTE(LodePNGColorMode* color, const unsigned char* dat
   return 0; /* OK */
 }
 
-static unsigned readChunk_tRNS(LodePNGColorMode* color, const unsigned char* data, size_t chunkLength)
-{
+static unsigned readChunk_tRNS(LodePNGColorMode* color, const unsigned char* data, size_t chunkLength) {
   unsigned i;
-  if(color->colortype == LCT_PALETTE)
-  {
+  if(color->colortype == LCT_PALETTE) {
     /*error: more alpha values given than there are palette entries*/
-    if(chunkLength > color->palettesize) return 38;
+    if(chunkLength > color->palettesize) return 39;
 
     for(i = 0; i != chunkLength; ++i) color->palette[4 * i + 3] = data[i];
-  }
-  else if(color->colortype == LCT_GREY)
-  {
-    /*error: this chunk must be 2 bytes for greyscale image*/
+  } else if(color->colortype == LCT_GREY) {
+    /*error: this chunk must be 2 bytes for grayscale image*/
     if(chunkLength != 2) return 30;
 
     color->key_defined = 1;
     color->key_r = color->key_g = color->key_b = 256u * data[0] + data[1];
-  }
-  else if(color->colortype == LCT_RGB)
-  {
+  } else if(color->colortype == LCT_RGB) {
     /*error: this chunk must be 6 bytes for RGB image*/
     if(chunkLength != 6) return 41;
 
@@ -7599,29 +6397,28 @@ static unsigned readChunk_tRNS(LodePNGColorMode* color, const unsigned char* dat
 
 #ifdef LODEPNG_COMPILE_ANCILLARY_CHUNKS
 /*background color chunk (bKGD)*/
-static unsigned readChunk_bKGD(LodePNGInfo* info, const unsigned char* data, size_t chunkLength)
-{
-  if(info->color.colortype == LCT_PALETTE)
-  {
+static unsigned readChunk_bKGD(LodePNGInfo* info, const unsigned char* data, size_t chunkLength) {
+  if(info->color.colortype == LCT_PALETTE) {
     /*error: this chunk must be 1 byte for indexed color image*/
     if(chunkLength != 1) return 43;
 
+    /*error: invalid palette index, or maybe this chunk appeared before PLTE*/
+    if(data[0] >= info->color.palettesize) return 103;
+
     info->background_defined = 1;
     info->background_r = info->background_g = info->background_b = data[0];
-  }
-  else if(info->color.colortype == LCT_GREY || info->color.colortype == LCT_GREY_ALPHA)
-  {
-    /*error: this chunk must be 2 bytes for greyscale image*/
+  } else if(info->color.colortype == LCT_GREY || info->color.colortype == LCT_GREY_ALPHA) {
+    /*error: this chunk must be 2 bytes for grayscale image*/
     if(chunkLength != 2) return 44;
 
+    /*the values are truncated to bitdepth in the PNG file*/
     info->background_defined = 1;
     info->background_r = info->background_g = info->background_b = 256u * data[0] + data[1];
-  }
-  else if(info->color.colortype == LCT_RGB || info->color.colortype == LCT_RGBA)
-  {
-    /*error: this chunk must be 6 bytes for greyscale image*/
+  } else if(info->color.colortype == LCT_RGB || info->color.colortype == LCT_RGBA) {
+    /*error: this chunk must be 6 bytes for grayscale image*/
     if(chunkLength != 6) return 45;
 
+    /*the values are truncated to bitdepth in the PNG file*/
     info->background_defined = 1;
     info->background_r = 256u * data[0] + data[1];
     info->background_g = 256u * data[2] + data[3];
@@ -7632,14 +6429,12 @@ static unsigned readChunk_bKGD(LodePNGInfo* info, const unsigned char* data, siz
 }
 
 /*text chunk (tEXt)*/
-static unsigned readChunk_tEXt(LodePNGInfo* info, const unsigned char* data, size_t chunkLength)
-{
+static unsigned readChunk_tEXt(LodePNGInfo* info, const unsigned char* data, size_t chunkLength) {
   unsigned error = 0;
   char *key = 0, *str = 0;
   unsigned i;
 
-  while(!error) /*not really a while loop, only used to break on error*/
-  {
+  while(!error) /*not really a while loop, only used to break on error*/ {
     unsigned length, string2_begin;
 
     length = 0;
@@ -7676,8 +6471,7 @@ static unsigned readChunk_tEXt(LodePNGInfo* info, const unsigned char* data, siz
 
 /*compressed text chunk (zTXt)*/
 static unsigned readChunk_zTXt(LodePNGInfo* info, const LodePNGDecompressSettings* zlibsettings,
-                               const unsigned char* data, size_t chunkLength)
-{
+                               const unsigned char* data, size_t chunkLength) {
   unsigned error = 0;
   unsigned i;
 
@@ -7687,8 +6481,7 @@ static unsigned readChunk_zTXt(LodePNGInfo* info, const LodePNGDecompressSetting
 
   ucvector_init(&decoded);
 
-  while(!error) /*not really a while loop, only used to break on error*/
-  {
+  while(!error) /*not really a while loop, only used to break on error*/ {
     for(length = 0; length < chunkLength && data[length] != 0; ++length) ;
     if(length + 2 >= chunkLength) CERROR_BREAK(error, 75); /*no null termination, corrupt?*/
     if(length < 1 || length > 79) CERROR_BREAK(error, 89); /*keyword too short or long*/
@@ -7707,7 +6500,7 @@ static unsigned readChunk_zTXt(LodePNGInfo* info, const LodePNGDecompressSetting
     length = (unsigned)chunkLength - string2_begin;
     /*will fail if zlib error, e.g. if length is too small*/
     error = zlib_decompress(&decoded.data, &decoded.size,
-                            (unsigned char*)(&data[string2_begin]),
+                            &data[string2_begin],
                             length, zlibsettings);
     if(error) break;
     ucvector_push_back(&decoded, 0);
@@ -7725,18 +6518,16 @@ static unsigned readChunk_zTXt(LodePNGInfo* info, const LodePNGDecompressSetting
 
 /*international text chunk (iTXt)*/
 static unsigned readChunk_iTXt(LodePNGInfo* info, const LodePNGDecompressSettings* zlibsettings,
-                               const unsigned char* data, size_t chunkLength)
-{
+                               const unsigned char* data, size_t chunkLength) {
   unsigned error = 0;
   unsigned i;
 
   unsigned length, begin, compressed;
   char *key = 0, *langtag = 0, *transkey = 0;
   ucvector decoded;
-  ucvector_init(&decoded);
+  ucvector_init(&decoded); /* TODO: only use in case of compressed text */
 
-  while(!error) /*not really a while loop, only used to break on error*/
-  {
+  while(!error) /*not really a while loop, only used to break on error*/ {
     /*Quick check if the chunk length isn't too small. Even without check
     it'd still fail with other error checks below if it's too short. This just gives a different error code.*/
     if(chunkLength < 5) CERROR_BREAK(error, 30); /*iTXt chunk too short*/
@@ -7786,18 +6577,15 @@ static unsigned readChunk_iTXt(LodePNGInfo* info, const LodePNGDecompressSetting
 
     length = (unsigned)chunkLength < begin ? 0 : (unsigned)chunkLength - begin;
 
-    if(compressed)
-    {
+    if(compressed) {
       /*will fail if zlib error, e.g. if length is too small*/
       error = zlib_decompress(&decoded.data, &decoded.size,
-                              (unsigned char*)(&data[begin]),
+                              &data[begin],
                               length, zlibsettings);
       if(error) break;
       if(decoded.allocsize < decoded.size) decoded.allocsize = decoded.size;
       ucvector_push_back(&decoded, 0);
-    }
-    else
-    {
+    } else {
       if(!ucvector_resize(&decoded, length + 1)) CERROR_BREAK(error, 83 /*alloc fail*/);
 
       decoded.data[length] = 0;
@@ -7817,8 +6605,7 @@ static unsigned readChunk_iTXt(LodePNGInfo* info, const LodePNGDecompressSetting
   return error;
 }
 
-static unsigned readChunk_tIME(LodePNGInfo* info, const unsigned char* data, size_t chunkLength)
-{
+static unsigned readChunk_tIME(LodePNGInfo* info, const unsigned char* data, size_t chunkLength) {
   if(chunkLength != 7) return 73; /*invalid tIME chunk size*/
 
   info->time_defined = 1;
@@ -7832,8 +6619,7 @@ static unsigned readChunk_tIME(LodePNGInfo* info, const unsigned char* data, siz
   return 0; /* OK */
 }
 
-static unsigned readChunk_pHYs(LodePNGInfo* info, const unsigned char* data, size_t chunkLength)
-{
+static unsigned readChunk_pHYs(LodePNGInfo* info, const unsigned char* data, size_t chunkLength) {
   if(chunkLength != 9) return 74; /*invalid pHYs chunk size*/
 
   info->phys_defined = 1;
@@ -7843,13 +6629,142 @@ static unsigned readChunk_pHYs(LodePNGInfo* info, const unsigned char* data, siz
 
   return 0; /* OK */
 }
+
+static unsigned readChunk_gAMA(LodePNGInfo* info, const unsigned char* data, size_t chunkLength) {
+  if(chunkLength != 4) return 96; /*invalid gAMA chunk size*/
+
+  info->gama_defined = 1;
+  info->gama_gamma = 16777216u * data[0] + 65536u * data[1] + 256u * data[2] + data[3];
+
+  return 0; /* OK */
+}
+
+static unsigned readChunk_cHRM(LodePNGInfo* info, const unsigned char* data, size_t chunkLength) {
+  if(chunkLength != 32) return 97; /*invalid cHRM chunk size*/
+
+  info->chrm_defined = 1;
+  info->chrm_white_x = 16777216u * data[ 0] + 65536u * data[ 1] + 256u * data[ 2] + data[ 3];
+  info->chrm_white_y = 16777216u * data[ 4] + 65536u * data[ 5] + 256u * data[ 6] + data[ 7];
+  info->chrm_red_x   = 16777216u * data[ 8] + 65536u * data[ 9] + 256u * data[10] + data[11];
+  info->chrm_red_y   = 16777216u * data[12] + 65536u * data[13] + 256u * data[14] + data[15];
+  info->chrm_green_x = 16777216u * data[16] + 65536u * data[17] + 256u * data[18] + data[19];
+  info->chrm_green_y = 16777216u * data[20] + 65536u * data[21] + 256u * data[22] + data[23];
+  info->chrm_blue_x  = 16777216u * data[24] + 65536u * data[25] + 256u * data[26] + data[27];
+  info->chrm_blue_y  = 16777216u * data[28] + 65536u * data[29] + 256u * data[30] + data[31];
+
+  return 0; /* OK */
+}
+
+static unsigned readChunk_sRGB(LodePNGInfo* info, const unsigned char* data, size_t chunkLength) {
+  if(chunkLength != 1) return 98; /*invalid sRGB chunk size (this one is never ignored)*/
+
+  info->srgb_defined = 1;
+  info->srgb_intent = data[0];
+
+  return 0; /* OK */
+}
+
+static unsigned readChunk_iCCP(LodePNGInfo* info, const LodePNGDecompressSettings* zlibsettings,
+                               const unsigned char* data, size_t chunkLength) {
+  unsigned error = 0;
+  unsigned i;
+
+  unsigned length, string2_begin;
+  ucvector decoded;
+
+  info->iccp_defined = 1;
+  if(info->iccp_name) lodepng_clear_icc(info);
+
+  for(length = 0; length < chunkLength && data[length] != 0; ++length) ;
+  if(length + 2 >= chunkLength) return 75; /*no null termination, corrupt?*/
+  if(length < 1 || length > 79) return 89; /*keyword too short or long*/
+
+  info->iccp_name = (char*)lodepng_malloc(length + 1);
+  if(!info->iccp_name) return 83; /*alloc fail*/
+
+  info->iccp_name[length] = 0;
+  for(i = 0; i != length; ++i) info->iccp_name[i] = (char)data[i];
+
+  if(data[length + 1] != 0) return 72; /*the 0 byte indicating compression must be 0*/
+
+  string2_begin = length + 2;
+  if(string2_begin > chunkLength) return 75; /*no null termination, corrupt?*/
+
+  length = (unsigned)chunkLength - string2_begin;
+  ucvector_init(&decoded);
+  error = zlib_decompress(&decoded.data, &decoded.size,
+                          &data[string2_begin],
+                          length, zlibsettings);
+  if(!error) {
+    info->iccp_profile_size = decoded.size;
+    info->iccp_profile = (unsigned char*)lodepng_malloc(decoded.size);
+    if(info->iccp_profile) {
+      lodepng_memcpy(info->iccp_profile, decoded.data, decoded.size);
+    } else {
+      error = 83; /* alloc fail */
+    }
+  }
+  ucvector_cleanup(&decoded);
+  return error;
+}
 #endif /*LODEPNG_COMPILE_ANCILLARY_CHUNKS*/
+
+unsigned lodepng_inspect_chunk(LodePNGState* state, size_t pos,
+                               const unsigned char* in, size_t insize) {
+  const unsigned char* chunk = in + pos;
+  unsigned chunkLength;
+  const unsigned char* data;
+  unsigned unhandled = 0;
+  unsigned error = 0;
+
+  if (pos + 4 > insize) return 30;
+  chunkLength = lodepng_chunk_length(chunk);
+  if(chunkLength > 2147483647) return 63;
+  data = lodepng_chunk_data_const(chunk);
+  if(data + chunkLength + 4 > in + insize) return 30;
+
+  if(lodepng_chunk_type_equals(chunk, "PLTE")) {
+    error = readChunk_PLTE(&state->info_png.color, data, chunkLength);
+  } else if(lodepng_chunk_type_equals(chunk, "tRNS")) {
+    error = readChunk_tRNS(&state->info_png.color, data, chunkLength);
+#ifdef LODEPNG_COMPILE_ANCILLARY_CHUNKS
+  } else if(lodepng_chunk_type_equals(chunk, "bKGD")) {
+    error = readChunk_bKGD(&state->info_png, data, chunkLength);
+  } else if(lodepng_chunk_type_equals(chunk, "tEXt")) {
+    error = readChunk_tEXt(&state->info_png, data, chunkLength);
+  } else if(lodepng_chunk_type_equals(chunk, "zTXt")) {
+    error = readChunk_zTXt(&state->info_png, &state->decoder.zlibsettings, data, chunkLength);
+  } else if(lodepng_chunk_type_equals(chunk, "iTXt")) {
+    error = readChunk_iTXt(&state->info_png, &state->decoder.zlibsettings, data, chunkLength);
+  } else if(lodepng_chunk_type_equals(chunk, "tIME")) {
+    error = readChunk_tIME(&state->info_png, data, chunkLength);
+  } else if(lodepng_chunk_type_equals(chunk, "pHYs")) {
+    error = readChunk_pHYs(&state->info_png, data, chunkLength);
+  } else if(lodepng_chunk_type_equals(chunk, "gAMA")) {
+    error = readChunk_gAMA(&state->info_png, data, chunkLength);
+  } else if(lodepng_chunk_type_equals(chunk, "cHRM")) {
+    error = readChunk_cHRM(&state->info_png, data, chunkLength);
+  } else if(lodepng_chunk_type_equals(chunk, "sRGB")) {
+    error = readChunk_sRGB(&state->info_png, data, chunkLength);
+  } else if(lodepng_chunk_type_equals(chunk, "iCCP")) {
+    error = readChunk_iCCP(&state->info_png, &state->decoder.zlibsettings, data, chunkLength);
+#endif /*LODEPNG_COMPILE_ANCILLARY_CHUNKS*/
+  } else {
+    /* unhandled chunk is ok (is not an error) */
+    unhandled = 1;
+  }
+
+  if(!error && !unhandled && !state->decoder.ignore_crc) {
+    if(lodepng_chunk_check_crc(chunk)) return 57; /*invalid CRC*/
+  }
+
+  return error;
+}
 
 /*read a PNG, the result will be in the same color type as the PNG (hence "generic")*/
 static void decodeGeneric(unsigned char** out, unsigned* w, unsigned* h,
                           LodePNGState* state,
-                          const unsigned char* in, size_t insize)
-{
+                          const unsigned char* in, size_t insize) {
   unsigned char IEND = 0;
   const unsigned char* chunk;
   size_t i;
@@ -7864,14 +6779,15 @@ static void decodeGeneric(unsigned char** out, unsigned* w, unsigned* h,
   unsigned critical_pos = 1; /*1 = after IHDR, 2 = after PLTE, 3 = after IDAT*/
 #endif /*LODEPNG_COMPILE_ANCILLARY_CHUNKS*/
 
-  /*provide some proper output values if error will happen*/
+
+  /* safe output values in case error happens */
   *out = 0;
+  *w = *h = 0;
 
   state->error = lodepng_inspect(w, h, state, in, insize); /*reads header and resets other parameters in state->info_png*/
   if(state->error) return;
 
-  if(lodepng_pixel_overflow(*w, *h, &state->info_png.color, &state->info_raw))
-  {
+  if(lodepng_pixel_overflow(*w, *h, &state->info_png.color, &state->info_raw)) {
     CERROR_RETURN(state->error, 92); /*overflow possible due to amount of pixels*/
   }
 
@@ -7880,14 +6796,12 @@ static void decodeGeneric(unsigned char** out, unsigned* w, unsigned* h,
 
   /*loop through the chunks, ignoring unknown chunks and stopping at IEND chunk.
   IDAT data is put at the start of the in buffer*/
-  while(!IEND && !state->error)
-  {
+  while(!IEND && !state->error) {
     unsigned chunkLength;
     const unsigned char* data; /*the data in the chunk*/
 
     /*error: size of the in buffer too small to contain next chunk*/
-    if((size_t)((chunk - in) + 12) > insize || chunk < in)
-    {
+    if((size_t)((chunk - in) + 12) > insize || chunk < in) {
       if(state->decoder.ignore_end) break; /*other errors may still happen though*/
       CERROR_BREAK(state->error, 30);
     }
@@ -7895,22 +6809,21 @@ static void decodeGeneric(unsigned char** out, unsigned* w, unsigned* h,
     /*length of the data of the chunk, excluding the length bytes, chunk type and CRC bytes*/
     chunkLength = lodepng_chunk_length(chunk);
     /*error: chunk length larger than the max PNG chunk size*/
-    if(chunkLength > 2147483647)
-    {
+    if(chunkLength > 2147483647) {
       if(state->decoder.ignore_end) break; /*other errors may still happen though*/
       CERROR_BREAK(state->error, 63);
     }
 
-    if((size_t)((chunk - in) + chunkLength + 12) > insize || (chunk + chunkLength + 12) < in)
-    {
+    if((size_t)((chunk - in) + chunkLength + 12) > insize || (chunk + chunkLength + 12) < in) {
       CERROR_BREAK(state->error, 64); /*error: size of the in buffer too small to contain next chunk*/
     }
 
     data = lodepng_chunk_data_const(chunk);
 
+    unknown = 0;
+
     /*IDAT chunk, containing compressed image data*/
-    if(lodepng_chunk_type_equals(chunk, "IDAT"))
-    {
+    if(lodepng_chunk_type_equals(chunk, "IDAT")) {
       size_t oldsize = idat.size;
       size_t newsize;
       if(lodepng_addofl(oldsize, chunkLength, &newsize)) CERROR_BREAK(state->error, 95);
@@ -7919,84 +6832,73 @@ static void decodeGeneric(unsigned char** out, unsigned* w, unsigned* h,
 #ifdef LODEPNG_COMPILE_ANCILLARY_CHUNKS
       critical_pos = 3;
 #endif /*LODEPNG_COMPILE_ANCILLARY_CHUNKS*/
-    }
-    /*IEND chunk*/
-    else if(lodepng_chunk_type_equals(chunk, "IEND"))
-    {
+    } else if(lodepng_chunk_type_equals(chunk, "IEND")) {
+      /*IEND chunk*/
       IEND = 1;
-    }
-    /*palette chunk (PLTE)*/
-    else if(lodepng_chunk_type_equals(chunk, "PLTE"))
-    {
+    } else if(lodepng_chunk_type_equals(chunk, "PLTE")) {
+      /*palette chunk (PLTE)*/
       state->error = readChunk_PLTE(&state->info_png.color, data, chunkLength);
       if(state->error) break;
 #ifdef LODEPNG_COMPILE_ANCILLARY_CHUNKS
       critical_pos = 2;
 #endif /*LODEPNG_COMPILE_ANCILLARY_CHUNKS*/
-    }
-    /*palette transparency chunk (tRNS)*/
-    else if(lodepng_chunk_type_equals(chunk, "tRNS"))
-    {
+    } else if(lodepng_chunk_type_equals(chunk, "tRNS")) {
+      /*palette transparency chunk (tRNS). Even though this one is an ancillary chunk , it is still compiled
+      in without 'LODEPNG_COMPILE_ANCILLARY_CHUNKS' because it contains essential color information that
+      affects the alpha channel of pixels. */
       state->error = readChunk_tRNS(&state->info_png.color, data, chunkLength);
       if(state->error) break;
-    }
 #ifdef LODEPNG_COMPILE_ANCILLARY_CHUNKS
-    /*background color chunk (bKGD)*/
-    else if(lodepng_chunk_type_equals(chunk, "bKGD"))
-    {
+      /*background color chunk (bKGD)*/
+    } else if(lodepng_chunk_type_equals(chunk, "bKGD")) {
       state->error = readChunk_bKGD(&state->info_png, data, chunkLength);
       if(state->error) break;
-    }
-    /*text chunk (tEXt)*/
-    else if(lodepng_chunk_type_equals(chunk, "tEXt"))
-    {
-      if(state->decoder.read_text_chunks)
-      {
+    } else if(lodepng_chunk_type_equals(chunk, "tEXt")) {
+      /*text chunk (tEXt)*/
+      if(state->decoder.read_text_chunks) {
         state->error = readChunk_tEXt(&state->info_png, data, chunkLength);
         if(state->error) break;
       }
-    }
-    /*compressed text chunk (zTXt)*/
-    else if(lodepng_chunk_type_equals(chunk, "zTXt"))
-    {
-      if(state->decoder.read_text_chunks)
-      {
+    } else if(lodepng_chunk_type_equals(chunk, "zTXt")) {
+      /*compressed text chunk (zTXt)*/
+      if(state->decoder.read_text_chunks) {
         state->error = readChunk_zTXt(&state->info_png, &state->decoder.zlibsettings, data, chunkLength);
         if(state->error) break;
       }
-    }
-    /*international text chunk (iTXt)*/
-    else if(lodepng_chunk_type_equals(chunk, "iTXt"))
-    {
-      if(state->decoder.read_text_chunks)
-      {
+    } else if(lodepng_chunk_type_equals(chunk, "iTXt")) {
+      /*international text chunk (iTXt)*/
+      if(state->decoder.read_text_chunks) {
         state->error = readChunk_iTXt(&state->info_png, &state->decoder.zlibsettings, data, chunkLength);
         if(state->error) break;
       }
-    }
-    else if(lodepng_chunk_type_equals(chunk, "tIME"))
-    {
+    } else if(lodepng_chunk_type_equals(chunk, "tIME")) {
       state->error = readChunk_tIME(&state->info_png, data, chunkLength);
       if(state->error) break;
-    }
-    else if(lodepng_chunk_type_equals(chunk, "pHYs"))
-    {
+    } else if(lodepng_chunk_type_equals(chunk, "pHYs")) {
       state->error = readChunk_pHYs(&state->info_png, data, chunkLength);
       if(state->error) break;
-    }
+    } else if(lodepng_chunk_type_equals(chunk, "gAMA")) {
+      state->error = readChunk_gAMA(&state->info_png, data, chunkLength);
+      if(state->error) break;
+    } else if(lodepng_chunk_type_equals(chunk, "cHRM")) {
+      state->error = readChunk_cHRM(&state->info_png, data, chunkLength);
+      if(state->error) break;
+    } else if(lodepng_chunk_type_equals(chunk, "sRGB")) {
+      state->error = readChunk_sRGB(&state->info_png, data, chunkLength);
+      if(state->error) break;
+    } else if(lodepng_chunk_type_equals(chunk, "iCCP")) {
+      state->error = readChunk_iCCP(&state->info_png, &state->decoder.zlibsettings, data, chunkLength);
+      if(state->error) break;
 #endif /*LODEPNG_COMPILE_ANCILLARY_CHUNKS*/
-    else /*it's not an implemented chunk type, so ignore it: skip over the data*/
-    {
+    } else /*it's not an implemented chunk type, so ignore it: skip over the data*/ {
       /*error: unknown critical chunk (5th bit of first byte of chunk type is 0)*/
-      if(!state->decoder.ignore_critical && !lodepng_chunk_ancillary(chunk))
-      {
+      if(!state->decoder.ignore_critical && !lodepng_chunk_ancillary(chunk)) {
         CERROR_BREAK(state->error, 69);
       }
 
       unknown = 1;
 #ifdef LODEPNG_COMPILE_ANCILLARY_CHUNKS
-      if(state->decoder.remember_unknown_chunks)
-      {
+      if(state->decoder.remember_unknown_chunks) {
         state->error = lodepng_chunk_append(&state->info_png.unknown_chunks_data[critical_pos - 1],
                                             &state->info_png.unknown_chunks_size[critical_pos - 1], chunk);
         if(state->error) break;
@@ -8004,8 +6906,7 @@ static void decodeGeneric(unsigned char** out, unsigned* w, unsigned* h,
 #endif /*LODEPNG_COMPILE_ANCILLARY_CHUNKS*/
     }
 
-    if(!state->decoder.ignore_crc && !unknown) /*check CRC if wanted, only on known chunk types*/
-    {
+    if(!state->decoder.ignore_crc && !unknown) /*check CRC if wanted, only on known chunk types*/ {
       if(lodepng_chunk_check_crc(chunk)) CERROR_BREAK(state->error, 57); /*invalid CRC*/
     }
 
@@ -8015,12 +6916,9 @@ static void decodeGeneric(unsigned char** out, unsigned* w, unsigned* h,
   ucvector_init(&scanlines);
   /*predict output size, to allocate exact size for output buffer to avoid more dynamic allocation.
   If the decompressed size does not match the prediction, the image must be corrupt.*/
-  if(state->info_png.interlace_method == 0)
-  {
+  if(state->info_png.interlace_method == 0) {
     predict = lodepng_get_raw_size_idat(*w, *h, &state->info_png.color);
-  }
-  else
-  {
+  } else {
     /*Adam-7 interlaced: predicted size is the sum of the 7 sub-images sizes*/
     const LodePNGColorMode* color = &state->info_png.color;
     predict = 0;
@@ -8033,22 +6931,19 @@ static void decodeGeneric(unsigned char** out, unsigned* w, unsigned* h,
     predict += lodepng_get_raw_size_idat((*w + 0), (*h + 0) >> 1, color);
   }
   if(!state->error && !ucvector_reserve(&scanlines, predict)) state->error = 83; /*alloc fail*/
-  if(!state->error)
-  {
+  if(!state->error) {
     state->error = zlib_decompress(&scanlines.data, &scanlines.size, idat.data,
                                    idat.size, &state->decoder.zlibsettings);
     if(!state->error && scanlines.size != predict) state->error = 91; /*decompressed size doesn't match prediction*/
   }
   ucvector_cleanup(&idat);
 
-  if(!state->error)
-  {
+  if(!state->error) {
     outsize = lodepng_get_raw_size(*w, *h, &state->info_png.color);
     *out = (unsigned char*)lodepng_malloc(outsize);
     if(!*out) state->error = 83; /*alloc fail*/
   }
-  if(!state->error)
-  {
+  if(!state->error) {
     for(i = 0; i < outsize; i++) (*out)[i] = 0;
     state->error = postProcessScanlines(*out, scanlines.data, *w, *h, &state->info_png);
   }
@@ -8057,40 +6952,33 @@ static void decodeGeneric(unsigned char** out, unsigned* w, unsigned* h,
 
 unsigned lodepng_decode(unsigned char** out, unsigned* w, unsigned* h,
                         LodePNGState* state,
-                        const unsigned char* in, size_t insize)
-{
+                        const unsigned char* in, size_t insize) {
   *out = 0;
   decodeGeneric(out, w, h, state, in, insize);
   if(state->error) return state->error;
-  if(!state->decoder.color_convert || lodepng_color_mode_equal(&state->info_raw, &state->info_png.color))
-  {
+  if(!state->decoder.color_convert || lodepng_color_mode_equal(&state->info_raw, &state->info_png.color)) {
     /*same color type, no copying or converting of data needed*/
     /*store the info_png color settings on the info_raw so that the info_raw still reflects what colortype
     the raw image has to the end user*/
-    if(!state->decoder.color_convert)
-    {
+    if(!state->decoder.color_convert) {
       state->error = lodepng_color_mode_copy(&state->info_raw, &state->info_png.color);
       if(state->error) return state->error;
     }
-  }
-  else
-  {
+  } else {
     /*color conversion needed; sort of copy of the data*/
     unsigned char* data = *out;
     size_t outsize;
 
     /*TODO: check if this works according to the statement in the documentation: "The converter can convert
-    from greyscale input color type, to 8-bit greyscale or greyscale with alpha"*/
+    from grayscale input color type, to 8-bit grayscale or grayscale with alpha"*/
     if(!(state->info_raw.colortype == LCT_RGB || state->info_raw.colortype == LCT_RGBA)
-       && !(state->info_raw.bitdepth == 8))
-    {
+       && !(state->info_raw.bitdepth == 8)) {
       return 56; /*unsupported color mode conversion*/
     }
 
     outsize = lodepng_get_raw_size(*w, *h, &state->info_raw);
     *out = (unsigned char*)lodepng_malloc(outsize);
-    if(!(*out))
-    {
+    if(!(*out)) {
       state->error = 83; /*alloc fail*/
     }
     else state->error = lodepng_convert(*out, data, &state->info_raw,
@@ -8101,8 +6989,7 @@ unsigned lodepng_decode(unsigned char** out, unsigned* w, unsigned* h,
 }
 
 unsigned lodepng_decode_memory(unsigned char** out, unsigned* w, unsigned* h, const unsigned char* in,
-                               size_t insize, LodePNGColorType colortype, unsigned bitdepth)
-{
+                               size_t insize, LodePNGColorType colortype, unsigned bitdepth) {
   unsigned error;
   LodePNGState state;
   lodepng_state_init(&state);
@@ -8113,42 +7000,39 @@ unsigned lodepng_decode_memory(unsigned char** out, unsigned* w, unsigned* h, co
   return error;
 }
 
-unsigned lodepng_decode32(unsigned char** out, unsigned* w, unsigned* h, const unsigned char* in, size_t insize)
-{
+unsigned lodepng_decode32(unsigned char** out, unsigned* w, unsigned* h, const unsigned char* in, size_t insize) {
   return lodepng_decode_memory(out, w, h, in, insize, LCT_RGBA, 8);
 }
 
-unsigned lodepng_decode24(unsigned char** out, unsigned* w, unsigned* h, const unsigned char* in, size_t insize)
-{
+unsigned lodepng_decode24(unsigned char** out, unsigned* w, unsigned* h, const unsigned char* in, size_t insize) {
   return lodepng_decode_memory(out, w, h, in, insize, LCT_RGB, 8);
 }
 
 #ifdef LODEPNG_COMPILE_DISK
 unsigned lodepng_decode_file(unsigned char** out, unsigned* w, unsigned* h, const char* filename,
-                             LodePNGColorType colortype, unsigned bitdepth)
-{
+                             LodePNGColorType colortype, unsigned bitdepth) {
   unsigned char* buffer = 0;
   size_t buffersize;
   unsigned error;
+  /* safe output values in case error happens */
+  *out = 0;
+  *w = *h = 0;
   error = lodepng_load_file(&buffer, &buffersize, filename);
   if(!error) error = lodepng_decode_memory(out, w, h, buffer, buffersize, colortype, bitdepth);
   lodepng_free(buffer);
   return error;
 }
 
-unsigned lodepng_decode32_file(unsigned char** out, unsigned* w, unsigned* h, const char* filename)
-{
+unsigned lodepng_decode32_file(unsigned char** out, unsigned* w, unsigned* h, const char* filename) {
   return lodepng_decode_file(out, w, h, filename, LCT_RGBA, 8);
 }
 
-unsigned lodepng_decode24_file(unsigned char** out, unsigned* w, unsigned* h, const char* filename)
-{
+unsigned lodepng_decode24_file(unsigned char** out, unsigned* w, unsigned* h, const char* filename) {
   return lodepng_decode_file(out, w, h, filename, LCT_RGB, 8);
 }
 #endif /*LODEPNG_COMPILE_DISK*/
 
-void lodepng_decoder_settings_init(LodePNGDecoderSettings* settings)
-{
+void lodepng_decoder_settings_init(LodePNGDecoderSettings* settings) {
   settings->color_convert = 1;
 #ifdef LODEPNG_COMPILE_ANCILLARY_CHUNKS
   settings->read_text_chunks = 1;
@@ -8164,8 +7048,7 @@ void lodepng_decoder_settings_init(LodePNGDecoderSettings* settings)
 
 #if defined(LODEPNG_COMPILE_DECODER) || defined(LODEPNG_COMPILE_ENCODER)
 
-void lodepng_state_init(LodePNGState* state)
-{
+void lodepng_state_init(LodePNGState* state) {
 #ifdef LODEPNG_COMPILE_DECODER
   lodepng_decoder_settings_init(&state->decoder);
 #endif /*LODEPNG_COMPILE_DECODER*/
@@ -8177,14 +7060,12 @@ void lodepng_state_init(LodePNGState* state)
   state->error = 1;
 }
 
-void lodepng_state_cleanup(LodePNGState* state)
-{
+void lodepng_state_cleanup(LodePNGState* state) {
   lodepng_color_mode_cleanup(&state->info_raw);
   lodepng_info_cleanup(&state->info_png);
 }
 
-void lodepng_state_copy(LodePNGState* dest, const LodePNGState* source)
-{
+void lodepng_state_copy(LodePNGState* dest, const LodePNGState* source) {
   lodepng_state_cleanup(dest);
   *dest = *source;
   lodepng_color_mode_init(&dest->info_raw);
@@ -8202,15 +7083,13 @@ void lodepng_state_copy(LodePNGState* dest, const LodePNGState* source)
 /* ////////////////////////////////////////////////////////////////////////// */
 
 /*chunkName must be string of 4 characters*/
-static unsigned addChunk(ucvector* out, const char* chunkName, const unsigned char* data, size_t length)
-{
+static unsigned addChunk(ucvector* out, const char* chunkName, const unsigned char* data, size_t length) {
   CERROR_TRY_RETURN(lodepng_chunk_create(&out->data, &out->size, (unsigned)length, chunkName, data));
   out->allocsize = out->size; /*fix the allocsize again*/
   return 0;
 }
 
-static void writeSignature(ucvector* out)
-{
+static void writeSignature(ucvector* out) {
   /*8 bytes PNG signature, aka the magic bytes*/
   ucvector_push_back(out, 137);
   ucvector_push_back(out, 80);
@@ -8223,8 +7102,7 @@ static void writeSignature(ucvector* out)
 }
 
 static unsigned addChunk_IHDR(ucvector* out, unsigned w, unsigned h,
-                              LodePNGColorType colortype, unsigned bitdepth, unsigned interlace_method)
-{
+                              LodePNGColorType colortype, unsigned bitdepth, unsigned interlace_method) {
   unsigned error = 0;
   ucvector header;
   ucvector_init(&header);
@@ -8243,14 +7121,12 @@ static unsigned addChunk_IHDR(ucvector* out, unsigned w, unsigned h,
   return error;
 }
 
-static unsigned addChunk_PLTE(ucvector* out, const LodePNGColorMode* info)
-{
+static unsigned addChunk_PLTE(ucvector* out, const LodePNGColorMode* info) {
   unsigned error = 0;
   size_t i;
   ucvector PLTE;
   ucvector_init(&PLTE);
-  for(i = 0; i != info->palettesize * 4; ++i)
-  {
+  for(i = 0; i != info->palettesize * 4; ++i) {
     /*add all channels except alpha channel*/
     if(i % 4 != 3) ucvector_push_back(&PLTE, info->palette[i]);
   }
@@ -8260,36 +7136,27 @@ static unsigned addChunk_PLTE(ucvector* out, const LodePNGColorMode* info)
   return error;
 }
 
-static unsigned addChunk_tRNS(ucvector* out, const LodePNGColorMode* info)
-{
+static unsigned addChunk_tRNS(ucvector* out, const LodePNGColorMode* info) {
   unsigned error = 0;
   size_t i;
   ucvector tRNS;
   ucvector_init(&tRNS);
-  if(info->colortype == LCT_PALETTE)
-  {
+  if(info->colortype == LCT_PALETTE) {
     size_t amount = info->palettesize;
     /*the tail of palette values that all have 255 as alpha, does not have to be encoded*/
-    for(i = info->palettesize; i != 0; --i)
-    {
+    for(i = info->palettesize; i != 0; --i) {
       if(info->palette[4 * (i - 1) + 3] == 255) --amount;
       else break;
     }
     /*add only alpha channel*/
     for(i = 0; i != amount; ++i) ucvector_push_back(&tRNS, info->palette[4 * i + 3]);
-  }
-  else if(info->colortype == LCT_GREY)
-  {
-    if(info->key_defined)
-    {
+  } else if(info->colortype == LCT_GREY) {
+    if(info->key_defined) {
       ucvector_push_back(&tRNS, (unsigned char)(info->key_r >> 8));
       ucvector_push_back(&tRNS, (unsigned char)(info->key_r & 255));
     }
-  }
-  else if(info->colortype == LCT_RGB)
-  {
-    if(info->key_defined)
-    {
+  } else if(info->colortype == LCT_RGB) {
+    if(info->key_defined) {
       ucvector_push_back(&tRNS, (unsigned char)(info->key_r >> 8));
       ucvector_push_back(&tRNS, (unsigned char)(info->key_r & 255));
       ucvector_push_back(&tRNS, (unsigned char)(info->key_g >> 8));
@@ -8306,8 +7173,7 @@ static unsigned addChunk_tRNS(ucvector* out, const LodePNGColorMode* info)
 }
 
 static unsigned addChunk_IDAT(ucvector* out, const unsigned char* data, size_t datasize,
-                              LodePNGCompressSettings* zlibsettings)
-{
+                              LodePNGCompressSettings* zlibsettings) {
   ucvector zlibdata;
   unsigned error = 0;
 
@@ -8320,8 +7186,7 @@ static unsigned addChunk_IDAT(ucvector* out, const unsigned char* data, size_t d
   return error;
 }
 
-static unsigned addChunk_IEND(ucvector* out)
-{
+static unsigned addChunk_IEND(ucvector* out) {
   unsigned error = 0;
   error = addChunk(out, "IEND", 0, 0);
   return error;
@@ -8329,8 +7194,7 @@ static unsigned addChunk_IEND(ucvector* out)
 
 #ifdef LODEPNG_COMPILE_ANCILLARY_CHUNKS
 
-static unsigned addChunk_tEXt(ucvector* out, const char* keyword, const char* textstring)
-{
+static unsigned addChunk_tEXt(ucvector* out, const char* keyword, const char* textstring) {
   unsigned error = 0;
   size_t i;
   ucvector text;
@@ -8346,11 +7210,10 @@ static unsigned addChunk_tEXt(ucvector* out, const char* keyword, const char* te
 }
 
 static unsigned addChunk_zTXt(ucvector* out, const char* keyword, const char* textstring,
-                              LodePNGCompressSettings* zlibsettings)
-{
+                              LodePNGCompressSettings* zlibsettings) {
   unsigned error = 0;
   ucvector data, compressed;
-  size_t i, textsize = strlen(textstring);
+  size_t i, textsize = lodepng_strlen(textstring);
 
   ucvector_init(&data);
   ucvector_init(&compressed);
@@ -8360,9 +7223,8 @@ static unsigned addChunk_zTXt(ucvector* out, const char* keyword, const char* te
   ucvector_push_back(&data, 0); /*compression method: 0*/
 
   error = zlib_compress(&compressed.data, &compressed.size,
-                        (unsigned char*)textstring, textsize, zlibsettings);
-  if(!error)
-  {
+                        (const unsigned char*)textstring, textsize, zlibsettings);
+  if(!error) {
     for(i = 0; i != compressed.size; ++i) ucvector_push_back(&data, compressed.data[i]);
     error = addChunk(out, "zTXt", data.data, data.size);
   }
@@ -8373,11 +7235,10 @@ static unsigned addChunk_zTXt(ucvector* out, const char* keyword, const char* te
 }
 
 static unsigned addChunk_iTXt(ucvector* out, unsigned compressed, const char* keyword, const char* langtag,
-                              const char* transkey, const char* textstring, LodePNGCompressSettings* zlibsettings)
-{
+                              const char* transkey, const char* textstring, LodePNGCompressSettings* zlibsettings) {
   unsigned error = 0;
   ucvector data;
-  size_t i, textsize = strlen(textstring);
+  size_t i, textsize = lodepng_strlen(textstring);
 
   ucvector_init(&data);
 
@@ -8391,20 +7252,16 @@ static unsigned addChunk_iTXt(ucvector* out, unsigned compressed, const char* ke
   for(i = 0; transkey[i] != 0; ++i) ucvector_push_back(&data, (unsigned char)transkey[i]);
   ucvector_push_back(&data, 0); /*null termination char*/
 
-  if(compressed)
-  {
+  if(compressed) {
     ucvector compressed_data;
     ucvector_init(&compressed_data);
     error = zlib_compress(&compressed_data.data, &compressed_data.size,
-                          (unsigned char*)textstring, textsize, zlibsettings);
-    if(!error)
-    {
+                          (const unsigned char*)textstring, textsize, zlibsettings);
+    if(!error) {
       for(i = 0; i != compressed_data.size; ++i) ucvector_push_back(&data, compressed_data.data[i]);
     }
     ucvector_cleanup(&compressed_data);
-  }
-  else /*not compressed*/
-  {
+  } else /*not compressed*/ {
     for(i = 0; textstring[i] != 0; ++i) ucvector_push_back(&data, (unsigned char)textstring[i]);
   }
 
@@ -8413,27 +7270,21 @@ static unsigned addChunk_iTXt(ucvector* out, unsigned compressed, const char* ke
   return error;
 }
 
-static unsigned addChunk_bKGD(ucvector* out, const LodePNGInfo* info)
-{
+static unsigned addChunk_bKGD(ucvector* out, const LodePNGInfo* info) {
   unsigned error = 0;
   ucvector bKGD;
   ucvector_init(&bKGD);
-  if(info->color.colortype == LCT_GREY || info->color.colortype == LCT_GREY_ALPHA)
-  {
+  if(info->color.colortype == LCT_GREY || info->color.colortype == LCT_GREY_ALPHA) {
     ucvector_push_back(&bKGD, (unsigned char)(info->background_r >> 8));
     ucvector_push_back(&bKGD, (unsigned char)(info->background_r & 255));
-  }
-  else if(info->color.colortype == LCT_RGB || info->color.colortype == LCT_RGBA)
-  {
+  } else if(info->color.colortype == LCT_RGB || info->color.colortype == LCT_RGBA) {
     ucvector_push_back(&bKGD, (unsigned char)(info->background_r >> 8));
     ucvector_push_back(&bKGD, (unsigned char)(info->background_r & 255));
     ucvector_push_back(&bKGD, (unsigned char)(info->background_g >> 8));
     ucvector_push_back(&bKGD, (unsigned char)(info->background_g & 255));
     ucvector_push_back(&bKGD, (unsigned char)(info->background_b >> 8));
     ucvector_push_back(&bKGD, (unsigned char)(info->background_b & 255));
-  }
-  else if(info->color.colortype == LCT_PALETTE)
-  {
+  } else if(info->color.colortype == LCT_PALETTE) {
     ucvector_push_back(&bKGD, (unsigned char)(info->background_r & 255)); /*palette index*/
   }
 
@@ -8443,8 +7294,7 @@ static unsigned addChunk_bKGD(ucvector* out, const LodePNGInfo* info)
   return error;
 }
 
-static unsigned addChunk_tIME(ucvector* out, const LodePNGTime* time)
-{
+static unsigned addChunk_tIME(ucvector* out, const LodePNGTime* time) {
   unsigned error = 0;
   unsigned char* data = (unsigned char*)lodepng_malloc(7);
   if(!data) return 83; /*alloc fail*/
@@ -8460,8 +7310,7 @@ static unsigned addChunk_tIME(ucvector* out, const LodePNGTime* time)
   return error;
 }
 
-static unsigned addChunk_pHYs(ucvector* out, const LodePNGInfo* info)
-{
+static unsigned addChunk_pHYs(ucvector* out, const LodePNGInfo* info) {
   unsigned error = 0;
   ucvector data;
   ucvector_init(&data);
@@ -8476,14 +7325,74 @@ static unsigned addChunk_pHYs(ucvector* out, const LodePNGInfo* info)
   return error;
 }
 
+static unsigned addChunk_gAMA(ucvector* out, const LodePNGInfo* info) {
+  unsigned error = 0;
+  ucvector data;
+  ucvector_init(&data);
+
+  lodepng_add32bitInt(&data, info->gama_gamma);
+
+  error = addChunk(out, "gAMA", data.data, data.size);
+  ucvector_cleanup(&data);
+
+  return error;
+}
+
+static unsigned addChunk_cHRM(ucvector* out, const LodePNGInfo* info) {
+  unsigned error = 0;
+  ucvector data;
+  ucvector_init(&data);
+
+  lodepng_add32bitInt(&data, info->chrm_white_x);
+  lodepng_add32bitInt(&data, info->chrm_white_y);
+  lodepng_add32bitInt(&data, info->chrm_red_x);
+  lodepng_add32bitInt(&data, info->chrm_red_y);
+  lodepng_add32bitInt(&data, info->chrm_green_x);
+  lodepng_add32bitInt(&data, info->chrm_green_y);
+  lodepng_add32bitInt(&data, info->chrm_blue_x);
+  lodepng_add32bitInt(&data, info->chrm_blue_y);
+
+  error = addChunk(out, "cHRM", data.data, data.size);
+  ucvector_cleanup(&data);
+
+  return error;
+}
+
+static unsigned addChunk_sRGB(ucvector* out, const LodePNGInfo* info) {
+  unsigned char data = info->srgb_intent;
+  return addChunk(out, "sRGB", &data, 1);
+}
+
+static unsigned addChunk_iCCP(ucvector* out, const LodePNGInfo* info, LodePNGCompressSettings* zlibsettings) {
+  unsigned error = 0;
+  ucvector data, compressed;
+  size_t i;
+
+  ucvector_init(&data);
+  ucvector_init(&compressed);
+  for(i = 0; info->iccp_name[i] != 0; ++i) ucvector_push_back(&data, (unsigned char)info->iccp_name[i]);
+  if(i < 1 || i > 79) return 89; /*error: invalid keyword size*/
+  ucvector_push_back(&data, 0); /*0 termination char*/
+  ucvector_push_back(&data, 0); /*compression method: 0*/
+
+  error = zlib_compress(&compressed.data, &compressed.size,
+                        info->iccp_profile, info->iccp_profile_size, zlibsettings);
+  if(!error) {
+    for(i = 0; i != compressed.size; ++i) ucvector_push_back(&data, compressed.data[i]);
+    error = addChunk(out, "iCCP", data.data, data.size);
+  }
+
+  ucvector_cleanup(&compressed);
+  ucvector_cleanup(&data);
+  return error;
+}
+
 #endif /*LODEPNG_COMPILE_ANCILLARY_CHUNKS*/
 
 static void filterScanline(unsigned char* out, const unsigned char* scanline, const unsigned char* prevline,
-                           size_t length, size_t bytewidth, unsigned char filterType)
-{
+                           size_t length, size_t bytewidth, unsigned char filterType) {
   size_t i;
-  switch(filterType)
-  {
+  switch(filterType) {
     case 0: /*None*/
       for(i = 0; i != length; ++i) out[i] = scanline[i];
       break;
@@ -8492,39 +7401,29 @@ static void filterScanline(unsigned char* out, const unsigned char* scanline, co
       for(i = bytewidth; i < length; ++i) out[i] = scanline[i] - scanline[i - bytewidth];
       break;
     case 2: /*Up*/
-      if(prevline)
-      {
+      if(prevline) {
         for(i = 0; i != length; ++i) out[i] = scanline[i] - prevline[i];
-      }
-      else
-      {
+      } else {
         for(i = 0; i != length; ++i) out[i] = scanline[i];
       }
       break;
     case 3: /*Average*/
-      if(prevline)
-      {
+      if(prevline) {
         for(i = 0; i != bytewidth; ++i) out[i] = scanline[i] - (prevline[i] >> 1);
         for(i = bytewidth; i < length; ++i) out[i] = scanline[i] - ((scanline[i - bytewidth] + prevline[i]) >> 1);
-      }
-      else
-      {
+      } else {
         for(i = 0; i != bytewidth; ++i) out[i] = scanline[i];
         for(i = bytewidth; i < length; ++i) out[i] = scanline[i] - (scanline[i - bytewidth] >> 1);
       }
       break;
     case 4: /*Paeth*/
-      if(prevline)
-      {
+      if(prevline) {
         /*paethPredictor(0, prevline[i], 0) is always prevline[i]*/
         for(i = 0; i != bytewidth; ++i) out[i] = (scanline[i] - prevline[i]);
-        for(i = bytewidth; i < length; ++i)
-        {
+        for(i = bytewidth; i < length; ++i) {
           out[i] = (scanline[i] - paethPredictor(scanline[i - bytewidth], prevline[i], prevline[i - bytewidth]));
         }
-      }
-      else
-      {
+      } else {
         for(i = 0; i != bytewidth; ++i) out[i] = scanline[i];
         /*paethPredictor(scanline[i - bytewidth], 0, 0) is always scanline[i - bytewidth]*/
         for(i = bytewidth; i < length; ++i) out[i] = (scanline[i] - scanline[i - bytewidth]);
@@ -8534,9 +7433,9 @@ static void filterScanline(unsigned char* out, const unsigned char* scanline, co
   }
 }
 
+/* TODO: remove the usage of float */
 /* log2 approximation. A slight bit faster than std::log. */
-static float flog2(float f)
-{
+static float flog2(float f) {
   float result = 0;
   while(f > 32) { result += 4; f /= 16; }
   while(f > 2) { ++result; f /= 2; }
@@ -8544,19 +7443,18 @@ static float flog2(float f)
 }
 
 static unsigned filter(unsigned char* out, const unsigned char* in, unsigned w, unsigned h,
-                       const LodePNGColorMode* info, const LodePNGEncoderSettings* settings)
-{
+                       const LodePNGColorMode* info, const LodePNGEncoderSettings* settings) {
   /*
   For PNG filter method 0
-  out must be a buffer with as size: h + (w * h * bpp + 7) / 8, because there are
+  out must be a buffer with as size: h + (w * h * bpp + 7u) / 8u, because there are
   the scanlines with 1 extra byte per scanline
   */
 
   unsigned bpp = lodepng_get_bpp(info);
   /*the width of a scanline in bytes, not including the filter type*/
-  size_t linebytes = (w * bpp + 7) / 8;
+  size_t linebytes = (w * bpp + 7u) / 8u;
   /*bytewidth is used for filtering, is 1 when bpp < 8, number of bytes per pixel otherwise*/
-  size_t bytewidth = (bpp + 7) / 8;
+  size_t bytewidth = (bpp + 7u) / 8u;
   const unsigned char* prevline = 0;
   unsigned x, y;
   unsigned error = 0;
@@ -8580,50 +7478,39 @@ static unsigned filter(unsigned char* out, const unsigned char* in, unsigned w, 
 
   if(bpp == 0) return 31; /*error: invalid color type*/
 
-  if(strategy == LFS_ZERO)
-  {
-    for(y = 0; y != h; ++y)
-    {
+  if(strategy >= LFS_ZERO && strategy <= LFS_FOUR) {
+    unsigned char type = (unsigned char)strategy;
+    for(y = 0; y != h; ++y) {
       size_t outindex = (1 + linebytes) * y; /*the extra filterbyte added to each row*/
       size_t inindex = linebytes * y;
-      out[outindex] = 0; /*filter type byte*/
-      filterScanline(&out[outindex + 1], &in[inindex], prevline, linebytes, bytewidth, 0);
+      out[outindex] = type; /*filter type byte*/
+      filterScanline(&out[outindex + 1], &in[inindex], prevline, linebytes, bytewidth, type);
       prevline = &in[inindex];
     }
-  }
-  else if(strategy == LFS_MINSUM)
-  {
+  } else if(strategy == LFS_MINSUM) {
     /*adaptive filtering*/
     size_t sum[5];
     unsigned char* attempt[5]; /*five filtering attempts, one for each filter type*/
     size_t smallest = 0;
     unsigned char type, bestType = 0;
 
-    for(type = 0; type != 5; ++type)
-    {
+    for(type = 0; type != 5; ++type) {
       attempt[type] = (unsigned char*)lodepng_malloc(linebytes);
       if(!attempt[type]) return 83; /*alloc fail*/
     }
 
-    if(!error)
-    {
-      for(y = 0; y != h; ++y)
-      {
+    if(!error) {
+      for(y = 0; y != h; ++y) {
         /*try the 5 filter types*/
-        for(type = 0; type != 5; ++type)
-        {
+        for(type = 0; type != 5; ++type) {
           filterScanline(attempt[type], &in[y * linebytes], prevline, linebytes, bytewidth, type);
 
           /*calculate the sum of the result*/
           sum[type] = 0;
-          if(type == 0)
-          {
+          if(type == 0) {
             for(x = 0; x != linebytes; ++x) sum[type] += (unsigned char)(attempt[type][x]);
-          }
-          else
-          {
-            for(x = 0; x != linebytes; ++x)
-            {
+          } else {
+            for(x = 0; x != linebytes; ++x) {
               /*For differences, each byte should be treated as signed, values above 127 are negative
               (converted to signed char). Filtertype 0 isn't a difference though, so use unsigned there.
               This means filtertype 0 is almost never chosen, but that is justified.*/
@@ -8633,8 +7520,7 @@ static unsigned filter(unsigned char* out, const unsigned char* in, unsigned w, 
           }
 
           /*check if this is smallest sum (or if type == 0 it's the first case so always store the values)*/
-          if(type == 0 || sum[type] < smallest)
-          {
+          if(type == 0 || sum[type] < smallest) {
             bestType = type;
             smallest = sum[type];
           }
@@ -8649,39 +7535,32 @@ static unsigned filter(unsigned char* out, const unsigned char* in, unsigned w, 
     }
 
     for(type = 0; type != 5; ++type) lodepng_free(attempt[type]);
-  }
-  else if(strategy == LFS_ENTROPY)
-  {
+  } else if(strategy == LFS_ENTROPY) {
     float sum[5];
     unsigned char* attempt[5]; /*five filtering attempts, one for each filter type*/
     float smallest = 0;
     unsigned type, bestType = 0;
     unsigned count[256];
 
-    for(type = 0; type != 5; ++type)
-    {
+    for(type = 0; type != 5; ++type) {
       attempt[type] = (unsigned char*)lodepng_malloc(linebytes);
       if(!attempt[type]) return 83; /*alloc fail*/
     }
 
-    for(y = 0; y != h; ++y)
-    {
+    for(y = 0; y != h; ++y) {
       /*try the 5 filter types*/
-      for(type = 0; type != 5; ++type)
-      {
+      for(type = 0; type != 5; ++type) {
         filterScanline(attempt[type], &in[y * linebytes], prevline, linebytes, bytewidth, type);
         for(x = 0; x != 256; ++x) count[x] = 0;
         for(x = 0; x != linebytes; ++x) ++count[attempt[type][x]];
         ++count[type]; /*the filter type itself is part of the scanline*/
         sum[type] = 0;
-        for(x = 0; x != 256; ++x)
-        {
+        for(x = 0; x != 256; ++x) {
           float p = count[x] / (float)(linebytes + 1);
           sum[type] += count[x] == 0 ? 0 : flog2(1 / p) * p;
         }
         /*check if this is smallest sum (or if type == 0 it's the first case so always store the values)*/
-        if(type == 0 || sum[type] < smallest)
-        {
+        if(type == 0 || sum[type] < smallest) {
           bestType = type;
           smallest = sum[type];
         }
@@ -8695,11 +7574,8 @@ static unsigned filter(unsigned char* out, const unsigned char* in, unsigned w, 
     }
 
     for(type = 0; type != 5; ++type) lodepng_free(attempt[type]);
-  }
-  else if(strategy == LFS_PREDEFINED)
-  {
-    for(y = 0; y != h; ++y)
-    {
+  } else if(strategy == LFS_PREDEFINED) {
+    for(y = 0; y != h; ++y) {
       size_t outindex = (1 + linebytes) * y; /*the extra filterbyte added to each row*/
       size_t inindex = linebytes * y;
       unsigned char type = settings->predefined_filters[y];
@@ -8707,9 +7583,7 @@ static unsigned filter(unsigned char* out, const unsigned char* in, unsigned w, 
       filterScanline(&out[outindex + 1], &in[inindex], prevline, linebytes, bytewidth, type);
       prevline = &in[inindex];
     }
-  }
-  else if(strategy == LFS_BRUTE_FORCE)
-  {
+  } else if(strategy == LFS_BRUTE_FORCE) {
     /*brute force filter chooser.
     deflate the scanline after every filter attempt to see which one deflates best.
     This is very slow and gives only slightly smaller, sometimes even larger, result*/
@@ -8728,15 +7602,12 @@ static unsigned filter(unsigned char* out, const unsigned char* in, unsigned w, 
     images only, so disable it*/
     zlibsettings.custom_zlib = 0;
     zlibsettings.custom_deflate = 0;
-    for(type = 0; type != 5; ++type)
-    {
+    for(type = 0; type != 5; ++type) {
       attempt[type] = (unsigned char*)lodepng_malloc(linebytes);
       if(!attempt[type]) return 83; /*alloc fail*/
     }
-    for(y = 0; y != h; ++y) /*try the 5 filter types*/
-    {
-      for(type = 0; type != 5; ++type)
-      {
+    for(y = 0; y != h; ++y) /*try the 5 filter types*/ {
+      for(type = 0; type != 5; ++type) {
         unsigned testsize = (unsigned)linebytes;
         /*if(testsize > 8) testsize /= 8;*/ /*it already works good enough by testing a part of the row*/
 
@@ -8746,8 +7617,7 @@ static unsigned filter(unsigned char* out, const unsigned char* in, unsigned w, 
         zlib_compress(&dummy, &size[type], attempt[type], testsize, &zlibsettings);
         lodepng_free(dummy);
         /*check if this is smallest size (or if type == 0 it's the first case so always store the values)*/
-        if(type == 0 || size[type] < smallest)
-        {
+        if(type == 0 || size[type] < smallest) {
           bestType = type;
           smallest = size[type];
         }
@@ -8764,18 +7634,15 @@ static unsigned filter(unsigned char* out, const unsigned char* in, unsigned w, 
 }
 
 static void addPaddingBits(unsigned char* out, const unsigned char* in,
-                           size_t olinebits, size_t ilinebits, unsigned h)
-{
+                           size_t olinebits, size_t ilinebits, unsigned h) {
   /*The opposite of the removePaddingBits function
   olinebits must be >= ilinebits*/
   unsigned y;
   size_t diff = olinebits - ilinebits;
   size_t obp = 0, ibp = 0; /*bit pointers*/
-  for(y = 0; y != h; ++y)
-  {
+  for(y = 0; y != h; ++y) {
     size_t x;
-    for(x = 0; x < ilinebits; ++x)
-    {
+    for(x = 0; x < ilinebits; ++x) {
       unsigned char bit = readBitFromReversedStream(&ibp, in);
       setBitOfReversedStream(&obp, out, bit);
     }
@@ -8796,47 +7663,37 @@ in has the following size in bits: w * h * bpp.
 out is possibly bigger due to padding bits between reduced images
 NOTE: comments about padding bits are only relevant if bpp < 8
 */
-static void Adam7_interlace(unsigned char* out, const unsigned char* in, unsigned w, unsigned h, unsigned bpp)
-{
+static void Adam7_interlace(unsigned char* out, const unsigned char* in, unsigned w, unsigned h, unsigned bpp) {
   unsigned passw[7], passh[7];
   size_t filter_passstart[8], padded_passstart[8], passstart[8];
   unsigned i;
 
   Adam7_getpassvalues(passw, passh, filter_passstart, padded_passstart, passstart, w, h, bpp);
 
-  if(bpp >= 8)
-  {
-    for(i = 0; i != 7; ++i)
-    {
+  if(bpp >= 8) {
+    for(i = 0; i != 7; ++i) {
       unsigned x, y, b;
-      size_t bytewidth = bpp / 8;
+      size_t bytewidth = bpp / 8u;
       for(y = 0; y < passh[i]; ++y)
-      for(x = 0; x < passw[i]; ++x)
-      {
+      for(x = 0; x < passw[i]; ++x) {
         size_t pixelinstart = ((ADAM7_IY[i] + y * ADAM7_DY[i]) * w + ADAM7_IX[i] + x * ADAM7_DX[i]) * bytewidth;
         size_t pixeloutstart = passstart[i] + (y * passw[i] + x) * bytewidth;
-        for(b = 0; b < bytewidth; ++b)
-        {
+        for(b = 0; b < bytewidth; ++b) {
           out[pixeloutstart + b] = in[pixelinstart + b];
         }
       }
     }
-  }
-  else /*bpp < 8: Adam7 with pixels < 8 bit is a bit trickier: with bit pointers*/
-  {
-    for(i = 0; i != 7; ++i)
-    {
+  } else /*bpp < 8: Adam7 with pixels < 8 bit is a bit trickier: with bit pointers*/ {
+    for(i = 0; i != 7; ++i) {
       unsigned x, y, b;
       unsigned ilinebits = bpp * passw[i];
       unsigned olinebits = bpp * w;
       size_t obp, ibp; /*bit pointers (for out and in buffer)*/
       for(y = 0; y < passh[i]; ++y)
-      for(x = 0; x < passw[i]; ++x)
-      {
+      for(x = 0; x < passw[i]; ++x) {
         ibp = (ADAM7_IY[i] + y * ADAM7_DY[i]) * olinebits + (ADAM7_IX[i] + x * ADAM7_DX[i]) * bpp;
         obp = (8 * passstart[i]) + (y * ilinebits + x * bpp);
-        for(b = 0; b < bpp; ++b)
-        {
+        for(b = 0; b < bpp; ++b) {
           unsigned char bit = readBitFromReversedStream(&ibp, in);
           setBitOfReversedStream(&obp, out, bit);
         }
@@ -8849,8 +7706,7 @@ static void Adam7_interlace(unsigned char* out, const unsigned char* in, unsigne
 return value is error**/
 static unsigned preProcessScanlines(unsigned char** out, size_t* outsize, const unsigned char* in,
                                     unsigned w, unsigned h,
-                                    const LodePNGInfo* info_png, const LodePNGEncoderSettings* settings)
-{
+                                    const LodePNGInfo* info_png, const LodePNGEncoderSettings* settings) {
   /*
   This function converts the pure 2D image with the PNG's colortype, into filtered-padded-interlaced data. Steps:
   *) if no Adam7: 1) add padding bits (= posible extra bits per scanline if bpp < 8) 2) filter
@@ -8859,35 +7715,27 @@ static unsigned preProcessScanlines(unsigned char** out, size_t* outsize, const 
   unsigned bpp = lodepng_get_bpp(&info_png->color);
   unsigned error = 0;
 
-  if(info_png->interlace_method == 0)
-  {
-    *outsize = h + (h * ((w * bpp + 7) / 8)); /*image size plus an extra byte per scanline + possible padding bits*/
+  if(info_png->interlace_method == 0) {
+    *outsize = h + (h * ((w * bpp + 7u) / 8u)); /*image size plus an extra byte per scanline + possible padding bits*/
     *out = (unsigned char*)lodepng_malloc(*outsize);
     if(!(*out) && (*outsize)) error = 83; /*alloc fail*/
 
-    if(!error)
-    {
+    if(!error) {
       /*non multiple of 8 bits per scanline, padding bits needed per scanline*/
-      if(bpp < 8 && w * bpp != ((w * bpp + 7) / 8) * 8)
-      {
-        unsigned char* padded = (unsigned char*)lodepng_malloc(h * ((w * bpp + 7) / 8));
+      if(bpp < 8 && w * bpp != ((w * bpp + 7u) / 8u) * 8u) {
+        unsigned char* padded = (unsigned char*)lodepng_malloc(h * ((w * bpp + 7u) / 8u));
         if(!padded) error = 83; /*alloc fail*/
-        if(!error)
-        {
-          addPaddingBits(padded, in, ((w * bpp + 7) / 8) * 8, w * bpp, h);
+        if(!error) {
+          addPaddingBits(padded, in, ((w * bpp + 7u) / 8u) * 8u, w * bpp, h);
           error = filter(*out, padded, w, h, &info_png->color, settings);
         }
         lodepng_free(padded);
-      }
-      else
-      {
+      } else {
         /*we can immediately filter into the out buffer, no other steps needed*/
         error = filter(*out, in, w, h, &info_png->color, settings);
       }
     }
-  }
-  else /*interlace_method is 1 (Adam7)*/
-  {
+  } else /*interlace_method is 1 (Adam7)*/ {
     unsigned passw[7], passh[7];
     size_t filter_passstart[8], padded_passstart[8], passstart[8];
     unsigned char* adam7;
@@ -8901,25 +7749,20 @@ static unsigned preProcessScanlines(unsigned char** out, size_t* outsize, const 
     adam7 = (unsigned char*)lodepng_malloc(passstart[7]);
     if(!adam7 && passstart[7]) error = 83; /*alloc fail*/
 
-    if(!error)
-    {
+    if(!error) {
       unsigned i;
 
       Adam7_interlace(adam7, in, w, h, bpp);
-      for(i = 0; i != 7; ++i)
-      {
-        if(bpp < 8)
-        {
+      for(i = 0; i != 7; ++i) {
+        if(bpp < 8) {
           unsigned char* padded = (unsigned char*)lodepng_malloc(padded_passstart[i + 1] - padded_passstart[i]);
           if(!padded) ERROR_BREAK(83); /*alloc fail*/
           addPaddingBits(padded, &adam7[passstart[i]],
-                         ((passw[i] * bpp + 7) / 8) * 8, passw[i] * bpp, passh[i]);
+                         ((passw[i] * bpp + 7u) / 8u) * 8u, passw[i] * bpp, passh[i]);
           error = filter(&(*out)[filter_passstart[i]], padded,
                          passw[i], passh[i], &info_png->color, settings);
           lodepng_free(padded);
-        }
-        else
-        {
+        } else {
           error = filter(&(*out)[filter_passstart[i]], &adam7[padded_passstart[i]],
                          passw[i], passh[i], &info_png->color, settings);
         }
@@ -8940,15 +7783,12 @@ returns 0 if the palette is opaque,
 returns 1 if the palette has a single color with alpha 0 ==> color key
 returns 2 if the palette is semi-translucent.
 */
-static unsigned getPaletteTranslucency(const unsigned char* palette, size_t palettesize)
-{
+static unsigned getPaletteTranslucency(const unsigned char* palette, size_t palettesize) {
   size_t i;
   unsigned key = 0;
   unsigned r = 0, g = 0, b = 0; /*the value of the color with alpha 0, so long as color keying is possible*/
-  for(i = 0; i != palettesize; ++i)
-  {
-    if(!key && palette[4 * i + 3] == 0)
-    {
+  for(i = 0; i != palettesize; ++i) {
+    if(!key && palette[4 * i + 3] == 0) {
       r = palette[4 * i + 0]; g = palette[4 * i + 1]; b = palette[4 * i + 2];
       key = 1;
       i = (size_t)(-1); /*restart from beginning, to detect earlier opaque colors with key's value*/
@@ -8961,27 +7801,48 @@ static unsigned getPaletteTranslucency(const unsigned char* palette, size_t pale
 }
 
 #ifdef LODEPNG_COMPILE_ANCILLARY_CHUNKS
-static unsigned addUnknownChunks(ucvector* out, unsigned char* data, size_t datasize)
-{
+static unsigned addUnknownChunks(ucvector* out, unsigned char* data, size_t datasize) {
   unsigned char* inchunk = data;
-  while((size_t)(inchunk - data) < datasize)
-  {
+  while((size_t)(inchunk - data) < datasize) {
     CERROR_TRY_RETURN(lodepng_chunk_append(&out->data, &out->size, inchunk));
     out->allocsize = out->size; /*fix the allocsize again*/
     inchunk = lodepng_chunk_next(inchunk);
   }
   return 0;
 }
+
+static unsigned isGrayICCProfile(const unsigned char* profile, unsigned size) {
+  /*
+  It is a gray profile if bytes 16-19 are "GRAY", rgb profile if bytes 16-19
+  are "RGB ". We do not perform any full parsing of the ICC profile here, other
+  than check those 4 bytes to grayscale profile. Other than that, validity of
+  the profile is not checked. This is needed only because the PNG specification
+  requires using a non-gray color model if there is an ICC profile with "RGB "
+  (sadly limiting compression opportunities if the input data is grayscale RGB
+  data), and requires using a gray color model if it is "GRAY".
+  */
+  if(size < 20) return 0;
+  return profile[16] == 'G' &&  profile[17] == 'R' &&  profile[18] == 'A' &&  profile[19] == 'Y';
+}
+
+static unsigned isRGBICCProfile(const unsigned char* profile, unsigned size) {
+  /* See comment in isGrayICCProfile*/
+  if(size < 20) return 0;
+  return profile[16] == 'R' &&  profile[17] == 'G' &&  profile[18] == 'B' &&  profile[19] == ' ';
+}
 #endif /*LODEPNG_COMPILE_ANCILLARY_CHUNKS*/
 
 unsigned lodepng_encode(unsigned char** out, size_t* outsize,
                         const unsigned char* image, unsigned w, unsigned h,
-                        LodePNGState* state)
-{
-  LodePNGInfo info;
-  ucvector outv;
+                        LodePNGState* state) {
   unsigned char* data = 0; /*uncompressed version of the IDAT chunk data*/
   size_t datasize = 0;
+  ucvector outv;
+  LodePNGInfo info;
+  const LodePNGInfo* info_png = &state->info_png;
+
+  ucvector_init(&outv);
+  lodepng_info_init(&info);
 
   /*provide some proper output values if error will happen*/
   *out = 0;
@@ -8989,54 +7850,98 @@ unsigned lodepng_encode(unsigned char** out, size_t* outsize,
   state->error = 0;
 
   /*check input values validity*/
-  if((state->info_png.color.colortype == LCT_PALETTE || state->encoder.force_palette)
-      && (state->info_png.color.palettesize == 0 || state->info_png.color.palettesize > 256))
-  {
-    CERROR_RETURN_ERROR(state->error, 68); /*invalid palette size, it is only allowed to be 1-256*/
+  if((info_png->color.colortype == LCT_PALETTE || state->encoder.force_palette)
+      && (info_png->color.palettesize == 0 || info_png->color.palettesize > 256)) {
+    state->error = 68; /*invalid palette size, it is only allowed to be 1-256*/
+    goto cleanup;
   }
-  if(state->encoder.zlibsettings.btype > 2)
-  {
-    CERROR_RETURN_ERROR(state->error, 61); /*error: unexisting btype*/
+  if(state->encoder.zlibsettings.btype > 2) {
+    state->error = 61; /*error: unexisting btype*/
+    goto cleanup;
   }
-  if(state->info_png.interlace_method > 1)
-  {
-    CERROR_RETURN_ERROR(state->error, 71); /*error: unexisting interlace mode*/
+  if(info_png->interlace_method > 1) {
+    state->error = 71; /*error: unexisting interlace mode*/
+    goto cleanup;
   }
-  state->error = checkColorValidity(state->info_png.color.colortype, state->info_png.color.bitdepth);
-  if(state->error) return state->error; /*error: unexisting color type given*/
+  state->error = checkColorValidity(info_png->color.colortype, info_png->color.bitdepth);
+  if(state->error) goto cleanup; /*error: unexisting color type given*/
   state->error = checkColorValidity(state->info_raw.colortype, state->info_raw.bitdepth);
-  if(state->error) return state->error; /*error: unexisting color type given*/
+  if(state->error) goto cleanup; /*error: unexisting color type given*/
 
   /* color convert and compute scanline filter types */
-  lodepng_info_init(&info);
   lodepng_info_copy(&info, &state->info_png);
-  if(state->encoder.auto_convert)
-  {
-    state->error = lodepng_auto_choose_color(&info.color, image, w, h, &state->info_raw);
-  }
-  if (!state->error)
-  {
-    if(!lodepng_color_mode_equal(&state->info_raw, &info.color))
-    {
-      unsigned char* converted;
-      size_t size = ((size_t)w * (size_t)h * (size_t)lodepng_get_bpp(&info.color) + 7) / 8;
-
-      converted = (unsigned char*)lodepng_malloc(size);
-      if(!converted && size) state->error = 83; /*alloc fail*/
-      if(!state->error)
-      {
-        state->error = lodepng_convert(converted, image, &info.color, &state->info_raw, w, h);
-      }
-      if(!state->error) preProcessScanlines(&data, &datasize, converted, w, h, &info, &state->encoder);
-      lodepng_free(converted);
+  if(state->encoder.auto_convert) {
+    LodePNGColorStats stats;
+    lodepng_color_stats_init(&stats);
+#ifdef LODEPNG_COMPILE_ANCILLARY_CHUNKS
+    if(info_png->iccp_defined &&
+        isGrayICCProfile(info_png->iccp_profile, info_png->iccp_profile_size)) {
+      /*the PNG specification does not allow to use palette with a GRAY ICC profile, even
+      if the palette has only gray colors, so disallow it.*/
+      stats.allow_palette = 0;
     }
-    else preProcessScanlines(&data, &datasize, image, w, h, &info, &state->encoder);
+    if(info_png->iccp_defined &&
+        isRGBICCProfile(info_png->iccp_profile, info_png->iccp_profile_size)) {
+      /*the PNG specification does not allow to use grayscale color with RGB ICC profile, so disallow gray.*/
+      stats.allow_greyscale = 0;
+    }
+#endif /* LODEPNG_COMPILE_ANCILLARY_CHUNKS */
+    lodepng_compute_color_stats(&stats, image, w, h, &state->info_raw);
+#ifdef LODEPNG_COMPILE_ANCILLARY_CHUNKS
+    if(info_png->background_defined) {
+      /*the background chunk's color must be taken into account as well*/
+      unsigned r = 0, g = 0, b = 0;
+      LodePNGColorMode mode16 = lodepng_color_mode_make(LCT_RGB, 16);
+      lodepng_convert_rgb(&r, &g, &b, info_png->background_r, info_png->background_g, info_png->background_b, &mode16, &info_png->color);
+      lodepng_color_stats_add(&stats, r, g, b, 65535);
+    }
+#endif /* LODEPNG_COMPILE_ANCILLARY_CHUNKS */
+    state->error = auto_choose_color(&info.color, &state->info_raw, &stats);
+    if(state->error) goto cleanup;
+#ifdef LODEPNG_COMPILE_ANCILLARY_CHUNKS
+    /*also convert the background chunk*/
+    if(info_png->background_defined) {
+      if(lodepng_convert_rgb(&info.background_r, &info.background_g, &info.background_b,
+          info_png->background_r, info_png->background_g, info_png->background_b, &info.color, &info_png->color)) {
+        state->error = 104;
+        goto cleanup;
+      }
+    }
+#endif /* LODEPNG_COMPILE_ANCILLARY_CHUNKS */
   }
+#ifdef LODEPNG_COMPILE_ANCILLARY_CHUNKS
+  if(info_png->iccp_defined) {
+    unsigned gray_icc = isGrayICCProfile(info_png->iccp_profile, info_png->iccp_profile_size);
+    unsigned rgb_icc = isRGBICCProfile(info_png->iccp_profile, info_png->iccp_profile_size);
+    unsigned gray_png = info.color.colortype == LCT_GREY || info.color.colortype == LCT_GREY_ALPHA;
+    if(!gray_icc && !rgb_icc) {
+      state->error = 100; /* Disallowed profile color type for PNG */
+      goto cleanup;
+    }
+    if(gray_icc != gray_png) {
+      /*Not allowed to use RGB/RGBA/palette with GRAY ICC profile or vice versa,
+      or in case of auto_convert, it wasn't possible to find appropriate model*/
+      state->error = state->encoder.auto_convert ? 102 : 101;
+      goto cleanup;
+    }
+  }
+#endif /*LODEPNG_COMPILE_ANCILLARY_CHUNKS*/
+  if(!lodepng_color_mode_equal(&state->info_raw, &info.color)) {
+    unsigned char* converted;
+    size_t size = ((size_t)w * (size_t)h * (size_t)lodepng_get_bpp(&info.color) + 7u) / 8u;
 
-  /* output all PNG chunks */
-  ucvector_init(&outv);
-  while(!state->error) /*while only executed once, to break on error*/
-  {
+    converted = (unsigned char*)lodepng_malloc(size);
+    if(!converted && size) state->error = 83; /*alloc fail*/
+    if(!state->error) {
+      state->error = lodepng_convert(converted, image, &info.color, &state->info_raw, w, h);
+    }
+    if(!state->error) preProcessScanlines(&data, &datasize, converted, w, h, &info, &state->encoder);
+    lodepng_free(converted);
+    if(state->error) goto cleanup;
+  }
+  else preProcessScanlines(&data, &datasize, image, w, h, &info, &state->encoder);
+
+  /* output all PNG chunks */ {
 #ifdef LODEPNG_COMPILE_ANCILLARY_CHUNKS
     size_t i;
 #endif /*LODEPNG_COMPILE_ANCILLARY_CHUNKS*/
@@ -9046,100 +7951,92 @@ unsigned lodepng_encode(unsigned char** out, size_t* outsize,
     addChunk_IHDR(&outv, w, h, info.color.colortype, info.color.bitdepth, info.interlace_method);
 #ifdef LODEPNG_COMPILE_ANCILLARY_CHUNKS
     /*unknown chunks between IHDR and PLTE*/
-    if(info.unknown_chunks_data[0])
-    {
+    if(info.unknown_chunks_data[0]) {
       state->error = addUnknownChunks(&outv, info.unknown_chunks_data[0], info.unknown_chunks_size[0]);
-      if(state->error) break;
+      if(state->error) goto cleanup;
     }
+    /*color profile chunks must come before PLTE */
+    if(info.iccp_defined) addChunk_iCCP(&outv, &info, &state->encoder.zlibsettings);
+    if(info.srgb_defined) addChunk_sRGB(&outv, &info);
+    if(info.gama_defined) addChunk_gAMA(&outv, &info);
+    if(info.chrm_defined) addChunk_cHRM(&outv, &info);
 #endif /*LODEPNG_COMPILE_ANCILLARY_CHUNKS*/
     /*PLTE*/
-    if(info.color.colortype == LCT_PALETTE)
-    {
+    if(info.color.colortype == LCT_PALETTE) {
       addChunk_PLTE(&outv, &info.color);
     }
-    if(state->encoder.force_palette && (info.color.colortype == LCT_RGB || info.color.colortype == LCT_RGBA))
-    {
+    if(state->encoder.force_palette && (info.color.colortype == LCT_RGB || info.color.colortype == LCT_RGBA)) {
       addChunk_PLTE(&outv, &info.color);
     }
     /*tRNS*/
-    if(info.color.colortype == LCT_PALETTE && getPaletteTranslucency(info.color.palette, info.color.palettesize) != 0)
-    {
+    if(info.color.colortype == LCT_PALETTE && getPaletteTranslucency(info.color.palette, info.color.palettesize) != 0) {
       addChunk_tRNS(&outv, &info.color);
     }
-    if((info.color.colortype == LCT_GREY || info.color.colortype == LCT_RGB) && info.color.key_defined)
-    {
+    if((info.color.colortype == LCT_GREY || info.color.colortype == LCT_RGB) && info.color.key_defined) {
       addChunk_tRNS(&outv, &info.color);
     }
 #ifdef LODEPNG_COMPILE_ANCILLARY_CHUNKS
     /*bKGD (must come between PLTE and the IDAt chunks*/
-    if(info.background_defined) addChunk_bKGD(&outv, &info);
+    if(info.background_defined) {
+      state->error = addChunk_bKGD(&outv, &info);
+      if(state->error) goto cleanup;
+    }
     /*pHYs (must come before the IDAT chunks)*/
     if(info.phys_defined) addChunk_pHYs(&outv, &info);
 
     /*unknown chunks between PLTE and IDAT*/
-    if(info.unknown_chunks_data[1])
-    {
+    if(info.unknown_chunks_data[1]) {
       state->error = addUnknownChunks(&outv, info.unknown_chunks_data[1], info.unknown_chunks_size[1]);
-      if(state->error) break;
+      if(state->error) goto cleanup;
     }
 #endif /*LODEPNG_COMPILE_ANCILLARY_CHUNKS*/
     /*IDAT (multiple IDAT chunks must be consecutive)*/
     state->error = addChunk_IDAT(&outv, data, datasize, &state->encoder.zlibsettings);
-    if(state->error) break;
+    if(state->error) goto cleanup;
 #ifdef LODEPNG_COMPILE_ANCILLARY_CHUNKS
     /*tIME*/
     if(info.time_defined) addChunk_tIME(&outv, &info.time);
     /*tEXt and/or zTXt*/
-    for(i = 0; i != info.text_num; ++i)
-    {
-      if(strlen(info.text_keys[i]) > 79)
-      {
+    for(i = 0; i != info.text_num; ++i) {
+      if(lodepng_strlen(info.text_keys[i]) > 79) {
         state->error = 66; /*text chunk too large*/
-        break;
+        goto cleanup;
       }
-      if(strlen(info.text_keys[i]) < 1)
-      {
+      if(lodepng_strlen(info.text_keys[i]) < 1) {
         state->error = 67; /*text chunk too small*/
-        break;
+        goto cleanup;
       }
-      if(state->encoder.text_compression)
-      {
+      if(state->encoder.text_compression) {
         addChunk_zTXt(&outv, info.text_keys[i], info.text_strings[i], &state->encoder.zlibsettings);
-      }
-      else
-      {
+      } else {
         addChunk_tEXt(&outv, info.text_keys[i], info.text_strings[i]);
       }
     }
     /*LodePNG version id in text chunk*/
-    if(state->encoder.add_id)
-    {
-      unsigned alread_added_id_text = 0;
-      for(i = 0; i != info.text_num; ++i)
-      {
-        if(!strcmp(info.text_keys[i], "LodePNG"))
-        {
-          alread_added_id_text = 1;
+    if(state->encoder.add_id) {
+      unsigned already_added_id_text = 0;
+      for(i = 0; i != info.text_num; ++i) {
+        const char* k = info.text_keys[i];
+        /* Could use strcmp, but we're not calling or reimplementing this C library function for this use only */
+        if(k[0] == 'L' && k[1] == 'o' && k[2] == 'd' && k[3] == 'e' &&
+           k[4] == 'P' && k[5] == 'N' && k[6] == 'G' && k[7] == '\0') {
+          already_added_id_text = 1;
           break;
         }
       }
-      if(alread_added_id_text == 0)
-      {
+      if(already_added_id_text == 0) {
         addChunk_tEXt(&outv, "LodePNG", LODEPNG_VERSION_STRING); /*it's shorter as tEXt than as zTXt chunk*/
       }
     }
     /*iTXt*/
-    for(i = 0; i != info.itext_num; ++i)
-    {
-      if(strlen(info.itext_keys[i]) > 79)
-      {
+    for(i = 0; i != info.itext_num; ++i) {
+      if(lodepng_strlen(info.itext_keys[i]) > 79) {
         state->error = 66; /*text chunk too large*/
-        break;
+        goto cleanup;
       }
-      if(strlen(info.itext_keys[i]) < 1)
-      {
+      if(lodepng_strlen(info.itext_keys[i]) < 1) {
         state->error = 67; /*text chunk too small*/
-        break;
+        goto cleanup;
       }
       addChunk_iTXt(&outv, state->encoder.text_compression,
                     info.itext_keys[i], info.itext_langtags[i], info.itext_transkeys[i], info.itext_strings[i],
@@ -9147,19 +8044,18 @@ unsigned lodepng_encode(unsigned char** out, size_t* outsize,
     }
 
     /*unknown chunks between IDAT and IEND*/
-    if(info.unknown_chunks_data[2])
-    {
+    if(info.unknown_chunks_data[2]) {
       state->error = addUnknownChunks(&outv, info.unknown_chunks_data[2], info.unknown_chunks_size[2]);
-      if(state->error) break;
+      if(state->error) goto cleanup;
     }
 #endif /*LODEPNG_COMPILE_ANCILLARY_CHUNKS*/
     addChunk_IEND(&outv);
-
-    break; /*this isn't really a while loop; no error happened so break out now!*/
   }
 
+cleanup:
   lodepng_info_cleanup(&info);
   lodepng_free(data);
+
   /*instead of cleaning the vector up, give it to the output*/
   *out = outv.data;
   *outsize = outv.size;
@@ -9168,8 +8064,7 @@ unsigned lodepng_encode(unsigned char** out, size_t* outsize,
 }
 
 unsigned lodepng_encode_memory(unsigned char** out, size_t* outsize, const unsigned char* image,
-                               unsigned w, unsigned h, LodePNGColorType colortype, unsigned bitdepth)
-{
+                               unsigned w, unsigned h, LodePNGColorType colortype, unsigned bitdepth) {
   unsigned error;
   LodePNGState state;
   lodepng_state_init(&state);
@@ -9183,20 +8078,17 @@ unsigned lodepng_encode_memory(unsigned char** out, size_t* outsize, const unsig
   return error;
 }
 
-unsigned lodepng_encode32(unsigned char** out, size_t* outsize, const unsigned char* image, unsigned w, unsigned h)
-{
+unsigned lodepng_encode32(unsigned char** out, size_t* outsize, const unsigned char* image, unsigned w, unsigned h) {
   return lodepng_encode_memory(out, outsize, image, w, h, LCT_RGBA, 8);
 }
 
-unsigned lodepng_encode24(unsigned char** out, size_t* outsize, const unsigned char* image, unsigned w, unsigned h)
-{
+unsigned lodepng_encode24(unsigned char** out, size_t* outsize, const unsigned char* image, unsigned w, unsigned h) {
   return lodepng_encode_memory(out, outsize, image, w, h, LCT_RGB, 8);
 }
 
 #ifdef LODEPNG_COMPILE_DISK
 unsigned lodepng_encode_file(const char* filename, const unsigned char* image, unsigned w, unsigned h,
-                             LodePNGColorType colortype, unsigned bitdepth)
-{
+                             LodePNGColorType colortype, unsigned bitdepth) {
   unsigned char* buffer;
   size_t buffersize;
   unsigned error = lodepng_encode_memory(&buffer, &buffersize, image, w, h, colortype, bitdepth);
@@ -9205,19 +8097,16 @@ unsigned lodepng_encode_file(const char* filename, const unsigned char* image, u
   return error;
 }
 
-unsigned lodepng_encode32_file(const char* filename, const unsigned char* image, unsigned w, unsigned h)
-{
+unsigned lodepng_encode32_file(const char* filename, const unsigned char* image, unsigned w, unsigned h) {
   return lodepng_encode_file(filename, image, w, h, LCT_RGBA, 8);
 }
 
-unsigned lodepng_encode24_file(const char* filename, const unsigned char* image, unsigned w, unsigned h)
-{
+unsigned lodepng_encode24_file(const char* filename, const unsigned char* image, unsigned w, unsigned h) {
   return lodepng_encode_file(filename, image, w, h, LCT_RGB, 8);
 }
 #endif /*LODEPNG_COMPILE_DISK*/
 
-void lodepng_encoder_settings_init(LodePNGEncoderSettings* settings)
-{
+void lodepng_encoder_settings_init(LodePNGEncoderSettings* settings) {
   lodepng_compress_settings_init(&settings->zlibsettings);
   settings->filter_palette_zero = 1;
   settings->filter_strategy = LFS_MINSUM;
@@ -9238,10 +8127,8 @@ void lodepng_encoder_settings_init(LodePNGEncoderSettings* settings)
 This returns the description of a numerical error code in English. This is also
 the documentation of all the error codes.
 */
-const char* lodepng_error_text(unsigned code)
-{
-  switch(code)
-  {
+const char* lodepng_error_text(unsigned code) {
+  switch(code) {
     case 0: return "no error, everything went ok";
     case 1: return "nothing done yet"; /*the Encoder/Decoder has done nothing yet, error checking makes no sense yet*/
     case 10: return "end of input memory reached without huffman end code"; /*while huffman decoding*/
@@ -9255,10 +8142,11 @@ const char* lodepng_error_text(unsigned code)
     case 19: return "end of out buffer memory reached while inflating";
     case 20: return "invalid deflate block BTYPE encountered while decoding";
     case 21: return "NLEN is not ones complement of LEN in a deflate block";
-     /*end of out buffer memory reached while inflating:
-     This can happen if the inflated deflate data is longer than the amount of bytes required to fill up
-     all the pixels of the image, given the color depth and image dimensions. Something that doesn't
-     happen in a normal, well encoded, PNG image.*/
+
+    /*end of out buffer memory reached while inflating:
+    This can happen if the inflated deflate data is longer than the amount of bytes required to fill up
+    all the pixels of the image, given the color depth and image dimensions. Something that doesn't
+    happen in a normal, well encoded, PNG image.*/
     case 22: return "end of out buffer memory reached while inflating";
     case 23: return "end of in buffer memory reached while inflating";
     case 24: return "invalid FCHECK in zlib header";
@@ -9277,12 +8165,12 @@ const char* lodepng_error_text(unsigned code)
     case 36: return "illegal PNG filter type encountered";
     case 37: return "illegal bit depth for this color type given";
     case 38: return "the palette is too big"; /*more than 256 colors*/
-    case 39: return "more palette alpha values given in tRNS chunk than there are colors in the palette";
-    case 40: return "tRNS chunk has wrong size for greyscale image";
+    case 39: return "tRNS chunk before PLTE or has more entries than palette size";
+    case 40: return "tRNS chunk has wrong size for grayscale image";
     case 41: return "tRNS chunk has wrong size for RGB image";
     case 42: return "tRNS chunk appeared while it was not allowed for this color type";
     case 43: return "bKGD chunk has wrong size for palette image";
-    case 44: return "bKGD chunk has wrong size for greyscale image";
+    case 44: return "bKGD chunk has wrong size for grayscale image";
     case 45: return "bKGD chunk has wrong size for RGB image";
     case 48: return "empty input buffer given to decoder. Maybe caused by non-existing file?";
     case 49: return "jumped past memory while generating dynamic huffman tree";
@@ -9301,9 +8189,10 @@ const char* lodepng_error_text(unsigned code)
     case 59: return "requested color conversion not supported";
     case 60: return "invalid window size given in the settings of the encoder (must be 0-32768)";
     case 61: return "invalid BTYPE given in the settings of the encoder (only 0, 1 and 2 are allowed)";
-    /*LodePNG leaves the choice of RGB to greyscale conversion formula to the user.*/
-    case 62: return "conversion from color to greyscale not supported";
-    case 63: return "length of a chunk too long, max allowed for PNG is 2147483647 bytes per chunk"; /*(2^31-1)*/
+    /*LodePNG leaves the choice of RGB to grayscale conversion formula to the user.*/
+    case 62: return "conversion from color to grayscale not supported";
+    /*(2^31-1)*/
+    case 63: return "length of a chunk too long, max allowed for PNG is 2147483647 bytes per chunk";
     /*this would result in the inability of a deflated block to ever contain an end code. It must be at least 1.*/
     case 64: return "the length of the END symbol 256 in the Huffman tree is 0";
     case 66: return "the length of a text chunk keyword given to the encoder is longer than the maximum of 79 bytes";
@@ -9322,7 +8211,7 @@ const char* lodepng_error_text(unsigned code)
     case 79: return "failed to open file for writing";
     case 80: return "tried creating a tree of 0 symbols";
     case 81: return "lazy matching at pos 0 is impossible";
-    case 82: return "color conversion to palette requested while a color isn't in palette";
+    case 82: return "color conversion to palette requested while a color isn't in palette, or index out of bounds";
     case 83: return "memory allocation failed";
     case 84: return "given image too small to contain all pixels to be encoded";
     case 86: return "impossible offset in lz77 encoding (internal bug)";
@@ -9336,6 +8225,15 @@ const char* lodepng_error_text(unsigned code)
     case 93: return "zero width or height is invalid";
     case 94: return "header chunk must have a size of 13 bytes";
     case 95: return "integer overflow with combined idat chunk size";
+    case 96: return "invalid gAMA chunk size";
+    case 97: return "invalid cHRM chunk size";
+    case 98: return "invalid sRGB chunk size";
+    case 99: return "invalid sRGB rendering intent";
+    case 100: return "invalid ICC profile color type, the PNG specification only allows RGB or GRAY";
+    case 101: return "PNG specification does not allow RGB ICC profile on gray color types and vice versa";
+    case 102: return "not allowed to set grayscale ICC profile with colored pixels by PNG specification";
+    case 103: return "invalid palette index in bKGD chunk. Maybe it came before PLTE chunk?";
+    case 104: return "invalid bKGD color while encoding (e.g. palette index out of range)";
   }
   return "unknown error code";
 }
@@ -9348,12 +8246,10 @@ const char* lodepng_error_text(unsigned code)
 /* ////////////////////////////////////////////////////////////////////////// */
 
 #ifdef LODEPNG_COMPILE_CPP
-namespace lodepng
-{
+namespace lodepng {
 
 #ifdef LODEPNG_COMPILE_DISK
-unsigned load_file(std::vector<unsigned char>& buffer, const std::string& filename)
-{
+unsigned load_file(std::vector<unsigned char>& buffer, const std::string& filename) {
   long size = lodepng_filesize(filename.c_str());
   if(size < 0) return 78;
   buffer.resize((size_t)size);
@@ -9361,8 +8257,7 @@ unsigned load_file(std::vector<unsigned char>& buffer, const std::string& filena
 }
 
 /*write given buffer to the file, overwriting the file, it doesn't append to it.*/
-unsigned save_file(const std::vector<unsigned char>& buffer, const std::string& filename)
-{
+unsigned save_file(const std::vector<unsigned char>& buffer, const std::string& filename) {
   return lodepng_save_file(buffer.empty() ? 0 : &buffer[0], buffer.size(), filename.c_str());
 }
 #endif /* LODEPNG_COMPILE_DISK */
@@ -9370,13 +8265,11 @@ unsigned save_file(const std::vector<unsigned char>& buffer, const std::string& 
 #ifdef LODEPNG_COMPILE_ZLIB
 #ifdef LODEPNG_COMPILE_DECODER
 unsigned decompress(std::vector<unsigned char>& out, const unsigned char* in, size_t insize,
-                    const LodePNGDecompressSettings& settings)
-{
+                    const LodePNGDecompressSettings& settings) {
   unsigned char* buffer = 0;
   size_t buffersize = 0;
   unsigned error = zlib_decompress(&buffer, &buffersize, in, insize, &settings);
-  if(buffer)
-  {
+  if(buffer) {
     out.insert(out.end(), &buffer[0], &buffer[buffersize]);
     lodepng_free(buffer);
   }
@@ -9384,21 +8277,18 @@ unsigned decompress(std::vector<unsigned char>& out, const unsigned char* in, si
 }
 
 unsigned decompress(std::vector<unsigned char>& out, const std::vector<unsigned char>& in,
-                    const LodePNGDecompressSettings& settings)
-{
+                    const LodePNGDecompressSettings& settings) {
   return decompress(out, in.empty() ? 0 : &in[0], in.size(), settings);
 }
 #endif /* LODEPNG_COMPILE_DECODER */
 
 #ifdef LODEPNG_COMPILE_ENCODER
 unsigned compress(std::vector<unsigned char>& out, const unsigned char* in, size_t insize,
-                  const LodePNGCompressSettings& settings)
-{
+                  const LodePNGCompressSettings& settings) {
   unsigned char* buffer = 0;
   size_t buffersize = 0;
   unsigned error = zlib_compress(&buffer, &buffersize, in, insize, &settings);
-  if(buffer)
-  {
+  if(buffer) {
     out.insert(out.end(), &buffer[0], &buffer[buffersize]);
     lodepng_free(buffer);
   }
@@ -9406,8 +8296,7 @@ unsigned compress(std::vector<unsigned char>& out, const unsigned char* in, size
 }
 
 unsigned compress(std::vector<unsigned char>& out, const std::vector<unsigned char>& in,
-                  const LodePNGCompressSettings& settings)
-{
+                  const LodePNGCompressSettings& settings) {
   return compress(out, in.empty() ? 0 : &in[0], in.size(), settings);
 }
 #endif /* LODEPNG_COMPILE_ENCODER */
@@ -9416,24 +8305,20 @@ unsigned compress(std::vector<unsigned char>& out, const std::vector<unsigned ch
 
 #ifdef LODEPNG_COMPILE_PNG
 
-State::State()
-{
+State::State() {
   lodepng_state_init(this);
 }
 
-State::State(const State& other)
-{
+State::State(const State& other) {
   lodepng_state_init(this);
   lodepng_state_copy(this, &other);
 }
 
-State::~State()
-{
+State::~State() {
   lodepng_state_cleanup(this);
 }
 
-State& State::operator=(const State& other)
-{
+State& State::operator=(const State& other) {
   lodepng_state_copy(this, &other);
   return *this;
 }
@@ -9441,12 +8326,10 @@ State& State::operator=(const State& other)
 #ifdef LODEPNG_COMPILE_DECODER
 
 unsigned decode(std::vector<unsigned char>& out, unsigned& w, unsigned& h, const unsigned char* in,
-                size_t insize, LodePNGColorType colortype, unsigned bitdepth)
-{
+                size_t insize, LodePNGColorType colortype, unsigned bitdepth) {
   unsigned char* buffer;
   unsigned error = lodepng_decode_memory(&buffer, &w, &h, in, insize, colortype, bitdepth);
-  if(buffer && !error)
-  {
+  if(buffer && !error) {
     State state;
     state.info_raw.colortype = colortype;
     state.info_raw.bitdepth = bitdepth;
@@ -9458,19 +8341,16 @@ unsigned decode(std::vector<unsigned char>& out, unsigned& w, unsigned& h, const
 }
 
 unsigned decode(std::vector<unsigned char>& out, unsigned& w, unsigned& h,
-                const std::vector<unsigned char>& in, LodePNGColorType colortype, unsigned bitdepth)
-{
+                const std::vector<unsigned char>& in, LodePNGColorType colortype, unsigned bitdepth) {
   return decode(out, w, h, in.empty() ? 0 : &in[0], (unsigned)in.size(), colortype, bitdepth);
 }
 
 unsigned decode(std::vector<unsigned char>& out, unsigned& w, unsigned& h,
                 State& state,
-                const unsigned char* in, size_t insize)
-{
+                const unsigned char* in, size_t insize) {
   unsigned char* buffer = NULL;
   unsigned error = lodepng_decode(&buffer, &w, &h, &state, in, insize);
-  if(buffer && !error)
-  {
+  if(buffer && !error) {
     size_t buffersize = lodepng_get_raw_size(w, h, &state.info_raw);
     out.insert(out.end(), &buffer[0], &buffer[buffersize]);
   }
@@ -9480,16 +8360,16 @@ unsigned decode(std::vector<unsigned char>& out, unsigned& w, unsigned& h,
 
 unsigned decode(std::vector<unsigned char>& out, unsigned& w, unsigned& h,
                 State& state,
-                const std::vector<unsigned char>& in)
-{
+                const std::vector<unsigned char>& in) {
   return decode(out, w, h, state, in.empty() ? 0 : &in[0], in.size());
 }
 
 #ifdef LODEPNG_COMPILE_DISK
 unsigned decode(std::vector<unsigned char>& out, unsigned& w, unsigned& h, const std::string& filename,
-                LodePNGColorType colortype, unsigned bitdepth)
-{
+                LodePNGColorType colortype, unsigned bitdepth) {
   std::vector<unsigned char> buffer;
+  /* safe output values in case error happens */
+  w = h = 0;
   unsigned error = load_file(buffer, filename);
   if(error) return error;
   return decode(out, w, h, buffer, colortype, bitdepth);
@@ -9499,13 +8379,11 @@ unsigned decode(std::vector<unsigned char>& out, unsigned& w, unsigned& h, const
 
 #ifdef LODEPNG_COMPILE_ENCODER
 unsigned encode(std::vector<unsigned char>& out, const unsigned char* in, unsigned w, unsigned h,
-                LodePNGColorType colortype, unsigned bitdepth)
-{
+                LodePNGColorType colortype, unsigned bitdepth) {
   unsigned char* buffer;
   size_t buffersize;
   unsigned error = lodepng_encode_memory(&buffer, &buffersize, in, w, h, colortype, bitdepth);
-  if(buffer)
-  {
+  if(buffer) {
     out.insert(out.end(), &buffer[0], &buffer[buffersize]);
     lodepng_free(buffer);
   }
@@ -9514,21 +8392,18 @@ unsigned encode(std::vector<unsigned char>& out, const unsigned char* in, unsign
 
 unsigned encode(std::vector<unsigned char>& out,
                 const std::vector<unsigned char>& in, unsigned w, unsigned h,
-                LodePNGColorType colortype, unsigned bitdepth)
-{
+                LodePNGColorType colortype, unsigned bitdepth) {
   if(lodepng_get_raw_size_lct(w, h, colortype, bitdepth) > in.size()) return 84;
   return encode(out, in.empty() ? 0 : &in[0], w, h, colortype, bitdepth);
 }
 
 unsigned encode(std::vector<unsigned char>& out,
                 const unsigned char* in, unsigned w, unsigned h,
-                State& state)
-{
+                State& state) {
   unsigned char* buffer;
   size_t buffersize;
   unsigned error = lodepng_encode(&buffer, &buffersize, in, w, h, &state);
-  if(buffer)
-  {
+  if(buffer) {
     out.insert(out.end(), &buffer[0], &buffer[buffersize]);
     lodepng_free(buffer);
   }
@@ -9537,8 +8412,7 @@ unsigned encode(std::vector<unsigned char>& out,
 
 unsigned encode(std::vector<unsigned char>& out,
                 const std::vector<unsigned char>& in, unsigned w, unsigned h,
-                State& state)
-{
+                State& state) {
   if(lodepng_get_raw_size(w, h, &state.info_raw) > in.size()) return 84;
   return encode(out, in.empty() ? 0 : &in[0], w, h, state);
 }
@@ -9546,8 +8420,7 @@ unsigned encode(std::vector<unsigned char>& out,
 #ifdef LODEPNG_COMPILE_DISK
 unsigned encode(const std::string& filename,
                 const unsigned char* in, unsigned w, unsigned h,
-                LodePNGColorType colortype, unsigned bitdepth)
-{
+                LodePNGColorType colortype, unsigned bitdepth) {
   std::vector<unsigned char> buffer;
   unsigned error = encode(buffer, in, w, h, colortype, bitdepth);
   if(!error) error = save_file(buffer, filename);
@@ -9556,8 +8429,7 @@ unsigned encode(const std::string& filename,
 
 unsigned encode(const std::string& filename,
                 const std::vector<unsigned char>& in, unsigned w, unsigned h,
-                LodePNGColorType colortype, unsigned bitdepth)
-{
+                LodePNGColorType colortype, unsigned bitdepth) {
   if(lodepng_get_raw_size_lct(w, h, colortype, bitdepth) > in.size()) return 84;
   return encode(filename, in.empty() ? 0 : &in[0], w, h, colortype, bitdepth);
 }
@@ -9567,14 +8439,6 @@ unsigned encode(const std::string& filename,
 } /* namespace lodepng */
 #endif /*LODEPNG_COMPILE_CPP*/
 
-/* inclusão David Sena */
-#define STB_TRUETYPE_IMPLEMENTATION
-
-#define STBTT_RGB_MODE /* alteracao para escrever 3 cores */
-#define STBTT_RASTERIZER_VERSION 2
-
-
-
 #define STBTT_ifloor(x)   ((int) xm_floor(x))
 #define STBTT_iceil(x)    (xm_ceil(x))
 #define STBTT_sqrt(x)      xm_sqrt(x)
@@ -9583,305 +8447,306 @@ unsigned encode(const std::string& filename,
 #define STBTT_cos(x)       xm_cos(x)
 #define STBTT_acos(x)      xm_acos(x)
 #define STBTT_fabs(x)      xm_fabs(x)
+#define STBTT_RGB_MODE
+#define STB_TRUETYPE_IMPLEMENTATION
+#define STBTT_RASTERIZER_VERSION 2
 
+// stb_truetype.h - v1.22 - public domain
+// authored from 2009-2019 by Sean Barrett / RAD Game Tools
+//
+//   This library processes TrueType files:
+//        parse files
+//        extract glyph metrics
+//        extract glyph shapes
+//        render glyphs to one-channel bitmaps with antialiasing (box filter)
+//        render glyphs to one-channel SDF bitmaps (signed-distance field/function)
+//
+//   Todo:
+//        non-MS cmaps
+//        crashproof on bad data
+//        hinting? (no longer patented)
+//        cleartype-style AA?
+//        optimize: use simple memory allocator for intermediates
+//        optimize: build edge-list directly from curves
+//        optimize: rasterize directly from curves?
+//
+// ADDITIONAL CONTRIBUTORS
+//
+//   Mikko Mononen: compound shape support, more cmap formats
+//   Tor Andersson: kerning, subpixel rendering
+//   Dougall Johnson: OpenType / Type 2 font handling
+//   Daniel Ribeiro Maciel: basic GPOS-based kerning
+//
+//   Misc other:
+//       Ryan Gordon
+//       Simon Glass
+//       github:IntellectualKitty
+//       Imanol Celaya
+//       Daniel Ribeiro Maciel
+//
+//   Bug/warning reports/fixes:
+//       "Zer" on mollyrocket       Fabian "ryg" Giesen
+//       Cass Everitt               Martins Mozeiko
+//       stoiko (Haemimont Games)   Cap Petschulat
+//       Brian Hook                 Omar Cornut
+//       Walter van Niftrik         github:aloucks
+//       David Gow                  Peter LaValle
+//       David Given                Sergey Popov
+//       Ivan-Assen Ivanov          Giumo X. Clanjor
+//       Anthony Pesch              Higor Euripedes
+//       Johan Duparc               Thomas Fields
+//       Hou Qiming                 Derek Vinyard
+//       Rob Loach                  Cort Stratton
+//       Kenney Phillis Jr.         github:oyvindjam
+//       Brian Costabile            github:vassvik
+//       Ken Voskuil (kaesve)       Ryan Griege
+//       
+// VERSION HISTORY
+//
+//   1.22 (2019-08-11) minimize missing-glyph duplication; fix kerning if both 'GPOS' and 'kern' are defined 
+//   1.21 (2019-02-25) fix warning
+//   1.20 (2019-02-07) PackFontRange skips missing codepoints; GetScaleFontVMetrics()
+//   1.19 (2018-02-11) GPOS kerning, STBTT_fmod
+//   1.18 (2018-01-29) add missing function
+//   1.17 (2017-07-23) make more arguments const; doc fix
+//   1.16 (2017-07-12) SDF support
+//   1.15 (2017-03-03) make more arguments const
+//   1.14 (2017-01-16) num-fonts-in-TTC function
+//   1.13 (2017-01-02) support OpenType fonts, certain Apple fonts
+//   1.12 (2016-10-25) suppress warnings about casting away const with -Wcast-qual
+//   1.11 (2016-04-02) fix unused-variable warning
+//   1.10 (2016-04-02) user-defined fabs(); rare memory leak; remove duplicate typedef
+//   1.09 (2016-01-16) warning fix; avoid crash on outofmem; use allocation userdata properly
+//   1.08 (2015-09-13) document stbtt_Rasterize(); fixes for vertical & horizontal edges
+//   1.07 (2015-08-01) allow PackFontRanges to accept arrays of sparse codepoints;
+//                     variant PackFontRanges to pack and render in separate phases;
+//                     fix stbtt_GetFontOFfsetForIndex (never worked for non-0 input?);
+//                     fixed an assert() bug in the new rasterizer
+//                     replace assert() with STBTT_assert() in new rasterizer
+//
+//   Full history can be found at the end of this file.
+//
+// LICENSE
+//
+//   See end of file for license information.
+//
+// USAGE
+//
+//   Include this file in whatever places need to refer to it. In ONE C/C++
+//   file, write:
+//      #define STB_TRUETYPE_IMPLEMENTATION
+//   before the #include of this file. This expands out the actual
+//   implementation into that C/C++ file.
+//
+//   To make the implementation private to the file that generates the implementation,
+//      #define STBTT_STATIC
+//
+//   Simple 3D API (don't ship this, but it's fine for tools and quick start)
+//           stbtt_BakeFontBitmap()               -- bake a font to a bitmap for use as texture
+//           stbtt_GetBakedQuad()                 -- compute quad to draw for a given char
+//
+//   Improved 3D API (more shippable):
+//           #include "stb_rect_pack.h"           -- optional, but you really want it
+//           stbtt_PackBegin()
+//           stbtt_PackSetOversampling()          -- for improved quality on small fonts
+//           stbtt_PackFontRanges()               -- pack and renders
+//           stbtt_PackEnd()
+//           stbtt_GetPackedQuad()
+//
+//   "Load" a font file from a memory buffer (you have to keep the buffer loaded)
+//           stbtt_InitFont()
+//           stbtt_GetFontOffsetForIndex()        -- indexing for TTC font collections
+//           stbtt_GetNumberOfFonts()             -- number of fonts for TTC font collections
+//
+//   Render a unicode codepoint to a bitmap
+//           stbtt_GetCodepointBitmap()           -- allocates and returns a bitmap
+//           stbtt_MakeCodepointBitmap()          -- renders into bitmap you provide
+//           stbtt_GetCodepointBitmapBox()        -- how big the bitmap must be
+//
+//   Character advance/positioning
+//           stbtt_GetCodepointHMetrics()
+//           stbtt_GetFontVMetrics()
+//           stbtt_GetFontVMetricsOS2()
+//           stbtt_GetCodepointKernAdvance()
+//
+//   Starting with version 1.06, the rasterizer was replaced with a new,
+//   faster and generally-more-precise rasterizer. The new rasterizer more
+//   accurately measures pixel coverage for anti-aliasing, except in the case
+//   where multiple shapes overlap, in which case it overestimates the AA pixel
+//   coverage. Thus, anti-aliasing of intersecting shapes may look wrong. If
+//   this turns out to be a problem, you can re-enable the old rasterizer with
+//        #define STBTT_RASTERIZER_VERSION 1
+//   which will incur about a 15% speed hit.
+//
+// ADDITIONAL DOCUMENTATION
+//
+//   Immediately after this block comment are a series of sample programs.
+//
+//   After the sample programs is the "header file" section. This section
+//   includes documentation for each API function.
+//
+//   Some important concepts to understand to use this library:
+//
+//      Codepoint
+//         Characters are defined by unicode codepoints, e.g. 65 is
+//         uppercase A, 231 is lowercase c with a cedilla, 0x7e30 is
+//         the hiragana for "ma".
+//
+//      Glyph
+//         A visual character shape (every codepoint is rendered as
+//         some glyph)
+//
+//      Glyph index
+//         A font-specific integer ID representing a glyph
+//
+//      Baseline
+//         Glyph shapes are defined relative to a baseline, which is the
+//         bottom of uppercase characters. Characters extend both above
+//         and below the baseline.
+//
+//      Current Point
+//         As you draw text to the screen, you keep track of a "current point"
+//         which is the origin of each character. The current point's vertical
+//         position is the baseline. Even "baked fonts" use this model.
+//
+//      Vertical Font Metrics
+//         The vertical qualities of the font, used to vertically position
+//         and space the characters. See docs for stbtt_GetFontVMetrics.
+//
+//      Font Size in Pixels or Points
+//         The preferred interface for specifying font sizes in stb_truetype
+//         is to specify how tall the font's vertical extent should be in pixels.
+//         If that sounds good enough, skip the next paragraph.
+//
+//         Most font APIs instead use "points", which are a common typographic
+//         measurement for describing font size, defined as 72 points per inch.
+//         stb_truetype provides a point API for compatibility. However, true
+//         "per inch" conventions don't make much sense on computer displays
+//         since different monitors have different number of pixels per
+//         inch. For example, Windows traditionally uses a convention that
+//         there are 96 pixels per inch, thus making 'inch' measurements have
+//         nothing to do with inches, and thus effectively defining a point to
+//         be 1.333 pixels. Additionally, the TrueType font data provides
+//         an explicit scale factor to scale a given font's glyphs to points,
+//         but the author has observed that this scale factor is often wrong
+//         for non-commercial fonts, thus making fonts scaled in points
+//         according to the TrueType spec incoherently sized in practice.
+//
+// DETAILED USAGE:
+//
+//  Scale:
+//    Select how high you want the font to be, in points or pixels.
+//    Call ScaleForPixelHeight or ScaleForMappingEmToPixels to compute
+//    a scale factor SF that will be used by all other functions.
+//
+//  Baseline:
+//    You need to select a y-coordinate that is the baseline of where
+//    your text will appear. Call GetFontBoundingBox to get the baseline-relative
+//    bounding box for all characters. SF*-y0 will be the distance in pixels
+//    that the worst-case character could extend above the baseline, so if
+//    you want the top edge of characters to appear at the top of the
+//    screen where y=0, then you would set the baseline to SF*-y0.
+//
+//  Current point:
+//    Set the current point where the first character will appear. The
+//    first character could extend left of the current point; this is font
+//    dependent. You can either choose a current point that is the leftmost
+//    point and hope, or add some padding, or check the bounding box or
+//    left-side-bearing of the first character to be displayed and set
+//    the current point based on that.
+//
+//  Displaying a character:
+//    Compute the bounding box of the character. It will contain signed values
+//    relative to <current_point, baseline>. I.e. if it returns x0,y0,x1,y1,
+//    then the character should be displayed in the rectangle from
+//    <current_point+SF*x0, baseline+SF*y0> to <current_point+SF*x1,baseline+SF*y1).
+//
+//  Advancing for the next character:
+//    Call GlyphHMetrics, and compute 'current_point += SF * advance'.
+// 
+//
+// ADVANCED USAGE
+//
+//   Quality:
+//
+//    - Use the functions with Subpixel at the end to allow your characters
+//      to have subpixel positioning. Since the font is anti-aliased, not
+//      hinted, this is very import for quality. (This is not possible with
+//      baked fonts.)
+//
+//    - Kerning is now supported, and if you're supporting subpixel rendering
+//      then kerning is worth using to give your text a polished look.
+//
+//   Performance:
+//
+//    - Convert Unicode codepoints to glyph indexes and operate on the glyphs;
+//      if you don't do this, stb_truetype is forced to do the conversion on
+//      every call.
+//
+//    - There are a lot of memory allocations. We should modify it to take
+//      a temp buffer and allocate from the temp buffer (without freeing),
+//      should help performance a lot.
+//
+// NOTES
+//
+//   The system uses the raw data found in the .ttf file without changing it
+//   and without building auxiliary data structures. This is a bit inefficient
+//   on little-endian systems (the data is big-endian), but assuming you're
+//   caching the bitmaps or glyph shapes this shouldn't be a big deal.
+//
+//   It appears to be very hard to programmatically determine what font a
+//   given file is in a general way. I provide an API for this, but I don't
+//   recommend it.
+//
+//
+// PERFORMANCE MEASUREMENTS FOR 1.06:
+//
+//                      32-bit     64-bit
+//   Previous release:  8.83 s     7.68 s
+//   Pool allocations:  7.72 s     6.34 s
+//   Inline sort     :  6.54 s     5.65 s
+//   New rasterizer  :  5.63 s     5.00 s
 
-/* stb_truetype.h - v1.19 - public domain */
-/* authored from 2009-2016 by Sean Barrett / RAD Game Tools */
-/* This library processes TrueType files: */
-/* parse files */
-/* extract glyph metrics */
-/* extract glyph shapes */
-/* render glyphs to one-channel bitmaps with antialiasing (box filter) */
-/* render glyphs to one-channel SDF bitmaps (signed-distance field/function) */
-/* Todo: */
-/* non-MS cmaps */
-/* crashproof on bad data */
-/* hinting? (no longer patented) */
-/* cleartype-style AA? */
-/* optimize: use simple memory allocator for intermediates */
-/* optimize: build edge-list directly from curves */
-/* optimize: rasterize directly from curves? */
-/* ADDITIONAL CONTRIBUTORS */
-/* Mikko Mononen: compound shape support, more cmap formats */
-/* Tor Andersson: kerning, subpixel rendering */
-/* Dougall Johnson: OpenType / Type 2 font handling */
-/* Daniel Ribeiro Maciel: basic GPOS-based kerning */
-/* Misc other: */
-/* Ryan Gordon */
-/* Simon Glass */
-/* github:IntellectualKitty */
-/* Imanol Celaya */
-/* Daniel Ribeiro Maciel */
-/* Bug/warning reports/fixes: */
-/* "Zer" on mollyrocket       Fabian "ryg" Giesen */
-/* Cass Everitt               Martins Mozeiko */
-/* stoiko (Haemimont Games)   Cap Petschulat */
-/* Brian Hook                 Omar Cornut */
-/* Walter van Niftrik         github:aloucks */
-/* David Gow                  Peter LaValle */
-/* David Given                Sergey Popov */
-/* Ivan-Assen Ivanov          Giumo X. Clanjor */
-/* Anthony Pesch              Higor Euripedes */
-/* Johan Duparc               Thomas Fields */
-/* Hou Qiming                 Derek Vinyard */
-/* Rob Loach                  Cort Stratton */
-/* Kenney Phillis Jr.         github:oyvindjam */
-/* Brian Costabile            github:vassvik */
-/* VERSION HISTORY */
-/* 1.19 (2018-02-11) GPOS kerning, STBTT_fmod */
-/* 1.18 (2018-01-29) add missing function */
-/* 1.17 (2017-07-23) make more arguments const; doc fix */
-/* 1.16 (2017-07-12) SDF support */
-/* 1.15 (2017-03-03) make more arguments const */
-/* 1.14 (2017-01-16) num-fonts-in-TTC function */
-/* 1.13 (2017-01-02) support OpenType fonts, certain Apple fonts */
-/* 1.12 (2016-10-25) suppress warnings about casting away const with -Wcast-qual */
-/* 1.11 (2016-04-02) fix unused-variable warning */
-/* 1.10 (2016-04-02) user-defined fabs(); rare memory leak; remove duplicate typedef */
-/* 1.09 (2016-01-16) warning fix; avoid crash on outofmem; use allocation userdata properly */
-/* 1.08 (2015-09-13) document stbtt_Rasterize(); fixes for vertical & horizontal edges */
-/* 1.07 (2015-08-01) allow PackFontRanges to accept arrays of sparse codepoints; */
-/* variant PackFontRanges to pack and render in separate phases; */
-/* fix stbtt_GetFontOFfsetForIndex (never worked for non-0 input?); */
-/* fixed an assert() bug in the new rasterizer */
-/* replace assert() with STBTT_assert() in new rasterizer */
-/*  */
-/* Full history can be found at the end of this file. */
-/*  */
-/* LICENSE */
-/*  */
-/* See end of file for license information. */
-/*  */
-/* USAGE */
-/*  */
-/* Include this file in whatever places neeed to refer to it. In ONE C/C++ */
-/* file, write: */
-/* #define STB_TRUETYPE_IMPLEMENTATION */
-/* before the #include of this file. This expands out the actual */
-/* implementation into that C/C++ file. */
-/*  */
-/* To make the implementation private to the file that generates the implementation, */
-/* #define STBTT_STATIC */
-/*  */
-/* Simple 3D API (don't ship this, but it's fine for tools and quick start) */
-/* stbtt_BakeFontBitmap()               -- bake a font to a bitmap for use as texture */
-/* stbtt_GetBakedQuad()                 -- compute quad to draw for a given char */
-/*  */
-/* Improved 3D API (more shippable): */
-/* #include "stb_rect_pack.h"           -- optional, but you really want it */
-/* stbtt_PackBegin() */
-/* stbtt_PackSetOversampling()          -- for improved quality on small fonts */
-/* stbtt_PackFontRanges()               -- pack and renders */
-/* stbtt_PackEnd() */
-/* stbtt_GetPackedQuad() */
-/*  */
-/* "Load" a font file from a memory buffer (you have to keep the buffer loaded) */
-/* stbtt_InitFont() */
-/* stbtt_GetFontOffsetForIndex()        -- indexing for TTC font collections */
-/* stbtt_GetNumberOfFonts()             -- number of fonts for TTC font collections */
-/*  */
-/* Render a unicode codepoint to a bitmap */
-/* stbtt_GetCodepointBitmap()           -- allocates and returns a bitmap */
-/* stbtt_MakeCodepointBitmap()          -- renders into bitmap you provide */
-/* stbtt_GetCodepointBitmapBox()        -- how big the bitmap must be */
-/*  */
-/* Character advance/positioning */
-/* stbtt_GetCodepointHMetrics() */
-/* stbtt_GetFontVMetrics() */
-/* stbtt_GetFontVMetricsOS2() */
-/* stbtt_GetCodepointKernAdvance() */
-/*  */
-/* Starting with version 1.06, the rasterizer was replaced with a new, */
-/* faster and generally-more-precise rasterizer. The new rasterizer more */
-/* accurately measures pixel coverage for anti-aliasing, except in the case */
-/* where multiple shapes overlap, in which case it overestimates the AA pixel */
-/* coverage. Thus, anti-aliasing of intersecting shapes may look wrong. If */
-/* this turns out to be a problem, you can re-enable the old rasterizer with */
-/* #define STBTT_RASTERIZER_VERSION 1 */
-/* which will incur about a 15% speed hit. */
-/*  */
-/* ADDITIONAL DOCUMENTATION */
-/*  */
-/* Immediately after this block comment are a series of sample programs. */
-/*  */
-/* After the sample programs is the "header file" section. This section */
-/* includes documentation for each API function. */
-/*  */
-/* Some important concepts to understand to use this library: */
-/*  */
-/* Codepoint */
-/* Characters are defined by unicode codepoints, e.g. 65 is */
-/* uppercase A, 231 is lowercase c with a cedilla, 0x7e30 is */
-/* the hiragana for "ma". */
-/*  */
-/* Glyph */
-/* A visual character shape (every codepoint is rendered as */
-/* some glyph) */
-/*  */
-/* Glyph index */
-/* A font-specific integer ID representing a glyph */
-/*  */
-/* Baseline */
-/* Glyph shapes are defined relative to a baseline, which is the */
-/* bottom of uppercase characters. Characters extend both above */
-/* and below the baseline. */
-/*  */
-/* Current Point */
-/* As you draw text to the screen, you keep track of a "current point" */
-/* which is the origin of each character. The current point's vertical */
-/* position is the baseline. Even "baked fonts" use this model. */
-/*  */
-/* Vertical Font Metrics */
-/* The vertical qualities of the font, used to vertically position */
-/* and space the characters. See docs for stbtt_GetFontVMetrics. */
-/*  */
-/* Font Size in Pixels or Points */
-/* The preferred interface for specifying font sizes in stb_truetype */
-/* is to specify how tall the font's vertical extent should be in pixels. */
-/* If that sounds good enough, skip the next paragraph. */
-/*  */
-/* Most font APIs instead use "points", which are a common typographic */
-/* measurement for describing font size, defined as 72 points per inch. */
-/* stb_truetype provides a point API for compatibility. However, true */
-/* "per inch" conventions don't make much sense on computer displays */
-/* since different monitors have different number of pixels per */
-/* inch. For example, Windows traditionally uses a convention that */
-/* there are 96 pixels per inch, thus making 'inch' measurements have */
-/* nothing to do with inches, and thus effectively defining a point to */
-/* be 1.333 pixels. Additionally, the TrueType font data provides */
-/* an explicit scale factor to scale a given font's glyphs to points, */
-/* but the author has observed that this scale factor is often wrong */
-/* for non-commercial fonts, thus making fonts scaled in points */
-/* according to the TrueType spec incoherently sized in practice. */
-/*  */
-/* DETAILED USAGE: */
-/*  */
-/* Scale: */
-/* Select how high you want the font to be, in points or pixels. */
-/* Call ScaleForPixelHeight or ScaleForMappingEmToPixels to compute */
-/* a scale factor SF that will be used by all other functions. */
-/*  */
-/* Baseline: */
-/* You need to select a y-coordinate that is the baseline of where */
-/* your text will appear. Call GetFontBoundingBox to get the baseline-relative */
-/* bounding box for all characters. SF*-y0 will be the distance in pixels */
-/* that the worst-case character could extend above the baseline, so if */
-/* you want the top edge of characters to appear at the top of the */
-/* screen where y=0, then you would set the baseline to SF*-y0. */
-/*  */
-/* Current point: */
-/* Set the current point where the first character will appear. The */
-/* first character could extend left of the current point; this is font */
-/* dependent. You can either choose a current point that is the leftmost */
-/* point and hope, or add some padding, or check the bounding box or */
-/* left-side-bearing of the first character to be displayed and set */
-/* the current point based on that. */
-/*  */
-/* Displaying a character: */
-/* Compute the bounding box of the character. It will contain signed values */
-/* relative to <current_point, baseline>. I.e. if it returns x0,y0,x1,y1, */
-/* then the character should be displayed in the rectangle from */
-/* <current_point+SF*x0, baseline+SF*y0> to <current_point+SF*x1,baseline+SF*y1). */
-/*  */
-/* Advancing for the next character: */
-/* Call GlyphHMetrics, and compute 'current_point += SF * advance'. */
-/*  */
-/*  */
-/* ADVANCED USAGE */
-/*  */
-/* Quality: */
-/*  */
-/* - Use the functions with Subpixel at the end to allow your characters */
-/* to have subpixel positioning. Since the font is anti-aliased, not */
-/* hinted, this is very import for quality. (This is not possible with */
-/* baked fonts.) */
-/*  */
-/* - Kerning is now supported, and if you're supporting subpixel rendering */
-/* then kerning is worth using to give your text a polished look. */
-/*  */
-/* Performance: */
-/*  */
-/* - Convert Unicode codepoints to glyph indexes and operate on the glyphs; */
-/* if you don't do this, stb_truetype is forced to do the conversion on */
-/* every call. */
-/*  */
-/* - There are a lot of memory allocations. We should modify it to take */
-/* a temp buffer and allocate from the temp buffer (without freeing), */
-/* should help performance a lot. */
-/*  */
-/* NOTES */
-/*  */
-/* The system uses the raw data found in the .ttf file without changing it */
-/* and without building auxiliary data structures. This is a bit inefficient */
-/* on little-endian systems (the data is big-endian), but assuming you're */
-/* caching the bitmaps or glyph shapes this shouldn't be a big deal. */
-/*  */
-/* It appears to be very hard to programmatically determine what font a */
-/* given file is in a general way. I provide an API for this, but I don't */
-/* recommend it. */
-/*  */
-/*  */
-/* SOURCE STATISTICS (based on v0.6c, 2050 LOC) */
-/*  */
-/* Documentation & header file        520 LOC  \___ 660 LOC documentation */
-/* Sample code                        140 LOC  / */
-/* Truetype parsing                   620 LOC  ---- 620 LOC TrueType */
-/* Software rasterization             240 LOC  \                           . */
-/* Curve tesselation                  120 LOC   \__ 550 LOC Bitmap creation */
-/* Bitmap management                  100 LOC   / */
-/* Baked bitmap interface              70 LOC  / */
-/* Font name matching & access        150 LOC  ---- 150 */
-/* C runtime library abstraction       60 LOC  ----  60 */
-/*  */
-/*  */
-/* PERFORMANCE MEASUREMENTS FOR 1.06: */
-/*  */
-/* 32-bit     64-bit */
-/* Previous release:  8.83 s     7.68 s */
-/* Pool allocations:  7.72 s     6.34 s */
-/* Inline sort     :  6.54 s     5.65 s */
-/* New rasterizer  :  5.63 s     5.00 s */
-
-/* //////////////////////////////////////////////////////////////////////////// */
-/* //////////////////////////////////////////////////////////////////////////// */
-/* // */
-/* //  SAMPLE PROGRAMS */
-/* // */
-/*  */
-/* Incomplete text-in-3d-api example, which draws quads properly aligned to be lossless */
-/*  */
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+////
+////  SAMPLE PROGRAMS
+////
+//
+//  Incomplete text-in-3d-api example, which draws quads properly aligned to be lossless
+//
 #if 0
-#define STB_TRUETYPE_IMPLEMENTATION  /* force following include to generate implementation */
+#define STB_TRUETYPE_IMPLEMENTATION  // force following include to generate implementation
 #include "stb_truetype.h"
 
 unsigned char ttf_buffer[1<<20];
 unsigned char temp_bitmap[512*512];
 
-stbtt_bakedchar cdata[96]; /* ASCII 32..126 is 95 glyphs */
+stbtt_bakedchar cdata[96]; // ASCII 32..126 is 95 glyphs
 GLuint ftex;
 
 void my_stbtt_initfont(void)
 {
    fread(ttf_buffer, 1, 1<<20, fopen("c:/windows/fonts/times.ttf", "rb"));
-   stbtt_BakeFontBitmap(ttf_buffer,0, 32.0, temp_bitmap,512,512, 32,96, cdata); /* no guarantee this fits! */
-   /* can free ttf_buffer at this point */
+   stbtt_BakeFontBitmap(ttf_buffer,0, 32.0, temp_bitmap,512,512, 32,96, cdata); // no guarantee this fits!
+   // can free ttf_buffer at this point
    glGenTextures(1, &ftex);
    glBindTexture(GL_TEXTURE_2D, ftex);
    glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, 512,512, 0, GL_ALPHA, GL_UNSIGNED_BYTE, temp_bitmap);
-   /* can free temp_bitmap at this point */
+   // can free temp_bitmap at this point
    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 }
 
 void my_stbtt_print(float x, float y, char *text)
 {
-   /* assume orthographic projection with units = screen pixels, origin at top left */
+   // assume orthographic projection with units = screen pixels, origin at top left
    glEnable(GL_TEXTURE_2D);
    glBindTexture(GL_TEXTURE_2D, ftex);
    glBegin(GL_QUADS);
    while (*text) {
       if (*text >= 32 && *text < 128) {
          stbtt_aligned_quad q;
-         stbtt_GetBakedQuad(cdata, 512,512, *text-32, &x,&y,&q,1);/* 1=opengl & d3d10+,0=d3d9 */
+         stbtt_GetBakedQuad(cdata, 512,512, *text-32, &x,&y,&q,1);//1=opengl & d3d10+,0=d3d9
          glTexCoord2f(q.s0,q.t1); glVertex2f(q.x0,q.y0);
          glTexCoord2f(q.s1,q.t1); glVertex2f(q.x1,q.y0);
          glTexCoord2f(q.s1,q.t0); glVertex2f(q.x1,q.y1);
@@ -9892,15 +8757,15 @@ void my_stbtt_print(float x, float y, char *text)
    glEnd();
 }
 #endif
-/*  */
-/*  */
-/* //////////////////////////////////////////////////////////////////////////// */
-/*  */
-/* Complete program (this compiles): get a single bitmap, print as ASCII art */
-/*  */
+//
+//
+//////////////////////////////////////////////////////////////////////////////
+//
+// Complete program (this compiles): get a single bitmap, print as ASCII art
+//
 #if 0
 #include <stdio.h>
-#define STB_TRUETYPE_IMPLEMENTATION  /* force following include to generate implementation */
+#define STB_TRUETYPE_IMPLEMENTATION  // force following include to generate implementation
 #include "stb_truetype.h"
 
 char ttf_buffer[1<<25];
@@ -9923,25 +8788,25 @@ int main(int argc, char **argv)
    }
    return 0;
 }
-#endif
-/*  */
-/* Output: */
-/*  */
-/* .ii. */
-/* @@@@@@. */
-/* V@Mio@@o */
-/* :i.  V@V */
-/* :oM@@M */
-/* :@@@MM@M */
-/* @@o  o@M */
-/* :@@.  M@M */
-/* @@@o@@@@ */
-/* :M@@V:@@. */
-/*  */
-/* //////////////////////////////////////////////////////////////////////////// */
-/*  */
-/* Complete program: print "Hello World!" banner, with bugs */
-/*  */
+#endif 
+//
+// Output:
+//
+//     .ii.
+//    @@@@@@.
+//   V@Mio@@o
+//   :i.  V@V
+//     :oM@@M
+//   :@@@MM@M
+//   @@o  o@M
+//  :@@.  M@M
+//   @@@o@@@@
+//   :M@@V:@@.
+//  
+//////////////////////////////////////////////////////////////////////////////
+// 
+// Complete program: print "Hello World!" banner, with bugs
+//
 #if 0
 char buffer[24<<20];
 unsigned char screen[20][79];
@@ -9950,8 +8815,8 @@ int main(int arg, char **argv)
 {
    stbtt_fontinfo font;
    int i,j,ascent,baseline,ch=0;
-   float scale, xpos=2; /* leave a little padding in case the character extends left */
-   char *text = "Heljo World!"; /* intentionally misspelled to show 'lj' brokenness */
+   float scale, xpos=2; // leave a little padding in case the character extends left
+   char *text = "Heljo World!"; // intentionally misspelled to show 'lj' brokenness
 
    fread(buffer, 1, 1000000, fopen("c:/windows/fonts/arialbd.ttf", "rb"));
    stbtt_InitFont(&font, buffer, 0);
@@ -9966,10 +8831,10 @@ int main(int arg, char **argv)
       stbtt_GetCodepointHMetrics(&font, text[ch], &advance, &lsb);
       stbtt_GetCodepointBitmapBoxSubpixel(&font, text[ch], scale,scale,x_shift,0, &x0,&y0,&x1,&y1);
       stbtt_MakeCodepointBitmapSubpixel(&font, &screen[baseline + y0][(int) xpos + x0], x1-x0,y1-y0, 79, scale,scale,x_shift,0, text[ch]);
-      /* note that this stomps the old data, so where character boxes overlap (e.g. 'lj') it's wrong */
-      /* because this API is really for baking character bitmaps into textures. if you want to render */
-      /* a sequence of characters, you really need to render each bitmap to a temp buffer, then */
-      /* "alpha blend" that into the working buffer */
+      // note that this stomps the old data, so where character boxes overlap (e.g. 'lj') it's wrong
+      // because this API is really for baking character bitmaps into textures. if you want to render
+      // a sequence of characters, you really need to render each bitmap to a temp buffer, then
+      // "alpha blend" that into the working buffer
       xpos += (advance * scale);
       if (text[ch+1])
          xpos += scale*stbtt_GetCodepointKernAdvance(&font, text[ch],text[ch+1]);
@@ -9987,17 +8852,17 @@ int main(int arg, char **argv)
 #endif
 
 
-/* //////////////////////////////////////////////////////////////////////////// */
-/* //////////////////////////////////////////////////////////////////////////// */
-/* // */
-/* //   INTEGRATION WITH YOUR CODEBASE */
-/* // */
-/* //   The following sections allow you to supply alternate definitions */
-/* //   of C library functions used by stb_truetype, e.g. if you don't */
-/* //   link with the C runtime library. */
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+////
+////   INTEGRATION WITH YOUR CODEBASE
+////
+////   The following sections allow you to supply alternate definitions
+////   of C library functions used by stb_truetype, e.g. if you don't
+////   link with the C runtime library.
 
 #ifdef STB_TRUETYPE_IMPLEMENTATION
-   /* #define your own (u)stbtt_int8/16/32 before including to override this */
+   // #define your own (u)stbtt_int8/16/32 before including to override this
    #ifndef stbtt_uint8
    typedef unsigned char   stbtt_uint8;
    typedef signed   char   stbtt_int8;
@@ -10010,7 +8875,7 @@ int main(int arg, char **argv)
    typedef char stbtt__check_size32[sizeof(stbtt_int32)==4 ? 1 : -1];
    typedef char stbtt__check_size16[sizeof(stbtt_int16)==2 ? 1 : -1];
 
-   /* e.g. #define your own STBTT_ifloor/STBTT_iceil() to avoid math.h */
+   // e.g. #define your own STBTT_ifloor/STBTT_iceil() to avoid math.h
    #ifndef STBTT_ifloor
    #include <math.h>
    #define STBTT_ifloor(x)   ((int) floor(x))
@@ -10039,7 +8904,7 @@ int main(int arg, char **argv)
    #define STBTT_fabs(x)      fabs(x)
    #endif
 
-   /* #define your own functions "STBTT_malloc" / "STBTT_free" to avoid malloc.h */
+   // #define your own functions "STBTT_malloc" / "STBTT_free" to avoid malloc.h
    #ifndef STBTT_malloc
    #include <stdlib.h>
    #define STBTT_malloc(x,u)  ((void)(u),malloc(x))
@@ -10063,12 +8928,12 @@ int main(int arg, char **argv)
    #endif
 #endif
 
-/* ///////////////////////////////////////////////////////////////////////////// */
-/* ///////////////////////////////////////////////////////////////////////////// */
-/* // */
-/* //   INTERFACE */
-/* // */
-/* // */
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+////
+////   INTERFACE
+////
+////
 
 #ifndef __STB_INCLUDE_STB_TRUETYPE_H__
 #define __STB_INCLUDE_STB_TRUETYPE_H__
@@ -10083,72 +8948,72 @@ int main(int arg, char **argv)
 extern "C" {
 #endif
 
-/* private structure */
-#if 0
+// private structure
 typedef struct
 {
    unsigned char *data;
    int cursor;
    int size;
 } stbtt__buf;
-#endif
 
-/* //////////////////////////////////////////////////////////////////////////// */
-/*  */
-/* TEXTURE BAKING API */
-/*  */
-/* If you use this API, you only have to call two functions ever. */
-/*  */
+//////////////////////////////////////////////////////////////////////////////
+//
+// TEXTURE BAKING API
+//
+// If you use this API, you only have to call two functions ever.
+//
 
 typedef struct
 {
-   unsigned short x0,y0,x1,y1; /* coordinates of bbox in bitmap */
+   unsigned short x0,y0,x1,y1; // coordinates of bbox in bitmap
    float xoff,yoff,xadvance;
 } stbtt_bakedchar;
 
-STBTT_DEF int stbtt_BakeFontBitmap(const unsigned char *data, int offset,  /* font location (use offset=0 for plain .ttf) */
-                                float pixel_height,                     /* height of font in pixels */
-                                unsigned char *pixels, int pw, int ph,  /* bitmap to be filled in */
-                                int first_char, int num_chars,          /* characters to bake */
-                                stbtt_bakedchar *chardata);             /* you allocate this, it's num_chars long */
-/* if return is positive, the first unused row of the bitmap */
-/* if return is negative, returns the negative of the number of characters that fit */
-/* if return is 0, no characters fit and no rows were used */
-/* This uses a very crappy packing. */
+STBTT_DEF int stbtt_BakeFontBitmap(const unsigned char *data, int offset,  // font location (use offset=0 for plain .ttf)
+                                float pixel_height,                     // height of font in pixels
+                                unsigned char *pixels, int pw, int ph,  // bitmap to be filled in
+                                int first_char, int num_chars,          // characters to bake
+                                stbtt_bakedchar *chardata);             // you allocate this, it's num_chars long
+// if return is positive, the first unused row of the bitmap
+// if return is negative, returns the negative of the number of characters that fit
+// if return is 0, no characters fit and no rows were used
+// This uses a very crappy packing.
 
 typedef struct
 {
-   float x0,y0,s0,t0; /* top-left */
-   float x1,y1,s1,t1; /* bottom-right */
+   float x0,y0,s0,t0; // top-left
+   float x1,y1,s1,t1; // bottom-right
 } stbtt_aligned_quad;
 
-STBTT_DEF void stbtt_GetBakedQuad(const stbtt_bakedchar *chardata, int pw, int ph,  /* same data as above */
-                               int char_index,             /* character to display */
-                               float *xpos, float *ypos,   /* pointers to current position in screen pixel space */
-                               stbtt_aligned_quad *q,      /* output: quad to draw */
-                               int opengl_fillrule);       /* true if opengl fill rule; false if DX9 or earlier */
-/* Call GetBakedQuad with char_index = 'character - first_char', and it */
-/* creates the quad you need to draw and advances the current position. */
-/*  */
-/* The coordinate system used assumes y increases downwards. */
-/*  */
-/* Characters will extend both above and below the current position; */
-/* see discussion of "BASELINE" above. */
-/*  */
-/* It's inefficient; you might want to c&p it and optimize it. */
+STBTT_DEF void stbtt_GetBakedQuad(const stbtt_bakedchar *chardata, int pw, int ph,  // same data as above
+                               int char_index,             // character to display
+                               float *xpos, float *ypos,   // pointers to current position in screen pixel space
+                               stbtt_aligned_quad *q,      // output: quad to draw
+                               int opengl_fillrule);       // true if opengl fill rule; false if DX9 or earlier
+// Call GetBakedQuad with char_index = 'character - first_char', and it
+// creates the quad you need to draw and advances the current position.
+//
+// The coordinate system used assumes y increases downwards.
+//
+// Characters will extend both above and below the current position;
+// see discussion of "BASELINE" above.
+//
+// It's inefficient; you might want to c&p it and optimize it.
+
+STBTT_DEF void stbtt_GetScaledFontVMetrics(const unsigned char *fontdata, int index, float size, float *ascent, float *descent, float *lineGap);
+// Query the font vertical metrics without having to create a font first.
 
 
-
-/* //////////////////////////////////////////////////////////////////////////// */
-/*  */
-/* NEW TEXTURE BAKING API */
-/*  */
-/* This provides options for packing multiple fonts into one atlas, not */
-/* perfectly but better than nothing. */
+//////////////////////////////////////////////////////////////////////////////
+//
+// NEW TEXTURE BAKING API
+//
+// This provides options for packing multiple fonts into one atlas, not
+// perfectly but better than nothing.
 
 typedef struct
 {
-   unsigned short x0,y0,x1,y1; /* coordinates of bbox in bitmap */
+   unsigned short x0,y0,x1,y1; // coordinates of bbox in bitmap
    float xoff,yoff,xadvance;
    float xoff2,yoff2;
 } stbtt_packedchar;
@@ -10160,89 +9025,95 @@ typedef struct stbrp_rect stbrp_rect;
 #endif
 
 STBTT_DEF int  stbtt_PackBegin(stbtt_pack_context *spc, unsigned char *pixels, int width, int height, int stride_in_bytes, int padding, void *alloc_context);
-/* Initializes a packing context stored in the passed-in stbtt_pack_context. */
-/* Future calls using this context will pack characters into the bitmap passed */
-/* in here: a 1-channel bitmap that is width * height. stride_in_bytes is */
-/* the distance from one row to the next (or 0 to mean they are packed tightly */
-/* together). "padding" is the amount of padding to leave between each */
-/* character (normally you want '1' for bitmaps you'll use as textures with */
-/* bilinear filtering). */
-/*  */
-/* Returns 0 on failure, 1 on success. */
+// Initializes a packing context stored in the passed-in stbtt_pack_context.
+// Future calls using this context will pack characters into the bitmap passed
+// in here: a 1-channel bitmap that is width * height. stride_in_bytes is
+// the distance from one row to the next (or 0 to mean they are packed tightly
+// together). "padding" is the amount of padding to leave between each
+// character (normally you want '1' for bitmaps you'll use as textures with
+// bilinear filtering).
+//
+// Returns 0 on failure, 1 on success.
 
 STBTT_DEF void stbtt_PackEnd  (stbtt_pack_context *spc);
-/* Cleans up the packing context and frees all memory. */
+// Cleans up the packing context and frees all memory.
 
 #define STBTT_POINT_SIZE(x)   (-(x))
 
 STBTT_DEF int  stbtt_PackFontRange(stbtt_pack_context *spc, const unsigned char *fontdata, int font_index, float font_size,
                                 int first_unicode_char_in_range, int num_chars_in_range, stbtt_packedchar *chardata_for_range);
-/* Creates character bitmaps from the font_index'th font found in fontdata (use */
-/* font_index=0 if you don't know what that is). It creates num_chars_in_range */
-/* bitmaps for characters with unicode values starting at first_unicode_char_in_range */
-/* and increasing. Data for how to render them is stored in chardata_for_range; */
-/* pass these to stbtt_GetPackedQuad to get back renderable quads. */
-/*  */
-/* font_size is the full height of the character from ascender to descender, */
-/* as computed by stbtt_ScaleForPixelHeight. To use a point size as computed */
-/* by stbtt_ScaleForMappingEmToPixels, wrap the point size in STBTT_POINT_SIZE() */
-/* and pass that result as 'font_size': */
-/* ...,                  20 , ... // font max minus min y is 20 pixels tall */
-/* ..., STBTT_POINT_SIZE(20), ... // 'M' is 20 pixels tall */
+// Creates character bitmaps from the font_index'th font found in fontdata (use
+// font_index=0 if you don't know what that is). It creates num_chars_in_range
+// bitmaps for characters with unicode values starting at first_unicode_char_in_range
+// and increasing. Data for how to render them is stored in chardata_for_range;
+// pass these to stbtt_GetPackedQuad to get back renderable quads.
+//
+// font_size is the full height of the character from ascender to descender,
+// as computed by stbtt_ScaleForPixelHeight. To use a point size as computed
+// by stbtt_ScaleForMappingEmToPixels, wrap the point size in STBTT_POINT_SIZE()
+// and pass that result as 'font_size':
+//       ...,                  20 , ... // font max minus min y is 20 pixels tall
+//       ..., STBTT_POINT_SIZE(20), ... // 'M' is 20 pixels tall
 
 typedef struct
 {
    float font_size;
-   int first_unicode_codepoint_in_range;  /* if non-zero, then the chars are continuous, and this is the first codepoint */
-   int *array_of_unicode_codepoints;       /* if non-zero, then this is an array of unicode codepoints */
+   int first_unicode_codepoint_in_range;  // if non-zero, then the chars are continuous, and this is the first codepoint
+   int *array_of_unicode_codepoints;       // if non-zero, then this is an array of unicode codepoints
    int num_chars;
-   stbtt_packedchar *chardata_for_range; /* output */
-   unsigned char h_oversample, v_oversample; /* don't set these, they're used internally */
+   stbtt_packedchar *chardata_for_range; // output
+   unsigned char h_oversample, v_oversample; // don't set these, they're used internally
 } stbtt_pack_range;
 
 STBTT_DEF int  stbtt_PackFontRanges(stbtt_pack_context *spc, const unsigned char *fontdata, int font_index, stbtt_pack_range *ranges, int num_ranges);
-/* Creates character bitmaps from multiple ranges of characters stored in */
-/* ranges. This will usually create a better-packed bitmap than multiple */
-/* calls to stbtt_PackFontRange. Note that you can call this multiple */
-/* times within a single PackBegin/PackEnd. */
+// Creates character bitmaps from multiple ranges of characters stored in
+// ranges. This will usually create a better-packed bitmap than multiple
+// calls to stbtt_PackFontRange. Note that you can call this multiple
+// times within a single PackBegin/PackEnd.
 
 STBTT_DEF void stbtt_PackSetOversampling(stbtt_pack_context *spc, unsigned int h_oversample, unsigned int v_oversample);
-/* Oversampling a font increases the quality by allowing higher-quality subpixel */
-/* positioning, and is especially valuable at smaller text sizes. */
-/*  */
-/* This function sets the amount of oversampling for all following calls to */
-/* stbtt_PackFontRange(s) or stbtt_PackFontRangesGatherRects for a given */
-/* pack context. The default (no oversampling) is achieved by h_oversample=1 */
-/* and v_oversample=1. The total number of pixels required is */
-/* h_oversample*v_oversample larger than the default; for example, 2x2 */
-/* oversampling requires 4x the storage of 1x1. For best results, render */
-/* oversampled textures with bilinear filtering. Look at the readme in */
-/* stb/tests/oversample for information about oversampled fonts */
-/*  */
-/* To use with PackFontRangesGather etc., you must set it before calls */
-/* call to PackFontRangesGatherRects. */
+// Oversampling a font increases the quality by allowing higher-quality subpixel
+// positioning, and is especially valuable at smaller text sizes.
+//
+// This function sets the amount of oversampling for all following calls to
+// stbtt_PackFontRange(s) or stbtt_PackFontRangesGatherRects for a given
+// pack context. The default (no oversampling) is achieved by h_oversample=1
+// and v_oversample=1. The total number of pixels required is
+// h_oversample*v_oversample larger than the default; for example, 2x2
+// oversampling requires 4x the storage of 1x1. For best results, render
+// oversampled textures with bilinear filtering. Look at the readme in
+// stb/tests/oversample for information about oversampled fonts
+//
+// To use with PackFontRangesGather etc., you must set it before calls
+// call to PackFontRangesGatherRects.
 
-STBTT_DEF void stbtt_GetPackedQuad(const stbtt_packedchar *chardata, int pw, int ph,  /* same data as above */
-                               int char_index,             /* character to display */
-                               float *xpos, float *ypos,   /* pointers to current position in screen pixel space */
-                               stbtt_aligned_quad *q,      /* output: quad to draw */
+STBTT_DEF void stbtt_PackSetSkipMissingCodepoints(stbtt_pack_context *spc, int skip);
+// If skip != 0, this tells stb_truetype to skip any codepoints for which
+// there is no corresponding glyph. If skip=0, which is the default, then
+// codepoints without a glyph recived the font's "missing character" glyph,
+// typically an empty box by convention.
+
+STBTT_DEF void stbtt_GetPackedQuad(const stbtt_packedchar *chardata, int pw, int ph,  // same data as above
+                               int char_index,             // character to display
+                               float *xpos, float *ypos,   // pointers to current position in screen pixel space
+                               stbtt_aligned_quad *q,      // output: quad to draw
                                int align_to_integer);
 
 STBTT_DEF int  stbtt_PackFontRangesGatherRects(stbtt_pack_context *spc, const stbtt_fontinfo *info, stbtt_pack_range *ranges, int num_ranges, stbrp_rect *rects);
 STBTT_DEF void stbtt_PackFontRangesPackRects(stbtt_pack_context *spc, stbrp_rect *rects, int num_rects);
 STBTT_DEF int  stbtt_PackFontRangesRenderIntoRects(stbtt_pack_context *spc, const stbtt_fontinfo *info, stbtt_pack_range *ranges, int num_ranges, stbrp_rect *rects);
-/* Calling these functions in sequence is roughly equivalent to calling */
-/* stbtt_PackFontRanges(). If you more control over the packing of multiple */
-/* fonts, or if you want to pack custom data into a font texture, take a look */
-/* at the source to of stbtt_PackFontRanges() and create a custom version */
-/* using these functions, e.g. call GatherRects multiple times, */
-/* building up a single array of rects, then call PackRects once, */
-/* then call RenderIntoRects repeatedly. This may result in a */
-/* better packing than calling PackFontRanges multiple times */
-/* (or it may not). */
+// Calling these functions in sequence is roughly equivalent to calling
+// stbtt_PackFontRanges(). If you more control over the packing of multiple
+// fonts, or if you want to pack custom data into a font texture, take a look
+// at the source to of stbtt_PackFontRanges() and create a custom version 
+// using these functions, e.g. call GatherRects multiple times,
+// building up a single array of rects, then call PackRects once,
+// then call RenderIntoRects repeatedly. This may result in a
+// better packing than calling PackFontRanges multiple times
+// (or it may not).
 
-/* this is an opaque structure that you shouldn't mess with which holds */
-/* all the context needed from PackBegin to PackEnd. */
+// this is an opaque structure that you shouldn't mess with which holds
+// all the context needed from PackBegin to PackEnd.
 struct stbtt_pack_context {
    void *user_allocator_context;
    void *pack_info;
@@ -10250,133 +9121,133 @@ struct stbtt_pack_context {
    int   height;
    int   stride_in_bytes;
    int   padding;
+   int   skip_missing;
    unsigned int   h_oversample, v_oversample;
    unsigned char *pixels;
    void  *nodes;
 };
 
-/* //////////////////////////////////////////////////////////////////////////// */
-/*  */
-/* FONT LOADING */
-/*  */
-/*  */
+//////////////////////////////////////////////////////////////////////////////
+//
+// FONT LOADING
+//
+//
 
 STBTT_DEF int stbtt_GetNumberOfFonts(const unsigned char *data);
-/* This function will determine the number of fonts in a font file.  TrueType */
-/* collection (.ttc) files may contain multiple fonts, while TrueType font */
-/* (.ttf) files only contain one font. The number of fonts can be used for */
-/* indexing with the previous function where the index is between zero and one */
-/* less than the total fonts. If an error occurs, -1 is returned. */
+// This function will determine the number of fonts in a font file.  TrueType
+// collection (.ttc) files may contain multiple fonts, while TrueType font
+// (.ttf) files only contain one font. The number of fonts can be used for
+// indexing with the previous function where the index is between zero and one
+// less than the total fonts. If an error occurs, -1 is returned.
 
 STBTT_DEF int stbtt_GetFontOffsetForIndex(const unsigned char *data, int index);
-/* Each .ttf/.ttc file may have more than one font. Each font has a sequential */
-/* index number starting from 0. Call this function to get the font offset for */
-/* a given index; it returns -1 if the index is out of range. A regular .ttf */
-/* file will only define one font and it always be at offset 0, so it will */
-/* return '0' for index 0, and -1 for all other indices. */
+// Each .ttf/.ttc file may have more than one font. Each font has a sequential
+// index number starting from 0. Call this function to get the font offset for
+// a given index; it returns -1 if the index is out of range. A regular .ttf
+// file will only define one font and it always be at offset 0, so it will
+// return '0' for index 0, and -1 for all other indices.
 
-/* The following structure is defined publically so you can declare one on */
-/* the stack or as a global or etc, but you should treat it as opaque. */
-#if 0
+// The following structure is defined publicly so you can declare one on
+// the stack or as a global or etc, but you should treat it as opaque.
 struct stbtt_fontinfo
 {
    void           * userdata;
-   unsigned char  * data;              /* pointer to .ttf file */
-   int              fontstart;         /* offset of start of font */
+   unsigned char  * data;              // pointer to .ttf file
+   int              fontstart;         // offset of start of font
 
-   int numGlyphs;                     /* number of glyphs, needed for range checking */
+   int numGlyphs;                     // number of glyphs, needed for range checking
 
-   int loca,head,glyf,hhea,hmtx,kern,gpos; /* table locations as offset from start of .ttf */
-   int index_map;                     /* a cmap mapping for our chosen character encoding */
-   int indexToLocFormat;              /* format needed to map from glyph index to glyph */
+   int loca,head,glyf,hhea,hmtx,kern,gpos; // table locations as offset from start of .ttf
+   int index_map;                     // a cmap mapping for our chosen character encoding
+   int indexToLocFormat;              // format needed to map from glyph index to glyph
 
-   stbtt__buf cff;                    /* cff font data */
-   stbtt__buf charstrings;            /* the charstring index */
-   stbtt__buf gsubrs;                 /* global charstring subroutines index */
-   stbtt__buf subrs;                  /* private charstring subroutines index */
-   stbtt__buf fontdicts;              /* array of font dicts */
-   stbtt__buf fdselect;               /* map from glyph to fontdict */
+   stbtt__buf cff;                    // cff font data
+   stbtt__buf charstrings;            // the charstring index
+   stbtt__buf gsubrs;                 // global charstring subroutines index
+   stbtt__buf subrs;                  // private charstring subroutines index
+   stbtt__buf fontdicts;              // array of font dicts
+   stbtt__buf fdselect;               // map from glyph to fontdict
 };
-#endif
 
 STBTT_DEF int stbtt_InitFont(stbtt_fontinfo *info, const unsigned char *data, int offset);
-/* Given an offset into the file that defines a font, this function builds */
-/* the necessary cached info for the rest of the system. You must allocate */
-/* the stbtt_fontinfo yourself, and stbtt_InitFont will fill it out. You don't */
-/* need to do anything special to free it, because the contents are pure */
-/* value data with no additional data structures. Returns 0 on failure. */
+// Given an offset into the file that defines a font, this function builds
+// the necessary cached info for the rest of the system. You must allocate
+// the stbtt_fontinfo yourself, and stbtt_InitFont will fill it out. You don't
+// need to do anything special to free it, because the contents are pure
+// value data with no additional data structures. Returns 0 on failure.
 
 
-/* //////////////////////////////////////////////////////////////////////////// */
-/*  */
-/* CHARACTER TO GLYPH-INDEX CONVERSIOn */
+//////////////////////////////////////////////////////////////////////////////
+//
+// CHARACTER TO GLYPH-INDEX CONVERSIOn
 
 STBTT_DEF int stbtt_FindGlyphIndex(const stbtt_fontinfo *info, int unicode_codepoint);
-/* If you're going to perform multiple operations on the same character */
-/* and you want a speed-up, call this function with the character you're */
-/* going to process, then use glyph-based functions instead of the */
-/* codepoint-based functions. */
+// If you're going to perform multiple operations on the same character
+// and you want a speed-up, call this function with the character you're
+// going to process, then use glyph-based functions instead of the
+// codepoint-based functions.
+// Returns 0 if the character codepoint is not defined in the font.
 
 
-/* //////////////////////////////////////////////////////////////////////////// */
-/*  */
-/* CHARACTER PROPERTIES */
-/*  */
+//////////////////////////////////////////////////////////////////////////////
+//
+// CHARACTER PROPERTIES
+//
 
 STBTT_DEF float stbtt_ScaleForPixelHeight(const stbtt_fontinfo *info, float pixels);
-/* computes a scale factor to produce a font whose "height" is 'pixels' tall. */
-/* Height is measured as the distance from the highest ascender to the lowest */
-/* descender; in other words, it's equivalent to calling stbtt_GetFontVMetrics */
-/* and computing: */
-/* scale = pixels / (ascent - descent) */
-/* so if you prefer to measure height by the ascent only, use a similar calculation. */
+// computes a scale factor to produce a font whose "height" is 'pixels' tall.
+// Height is measured as the distance from the highest ascender to the lowest
+// descender; in other words, it's equivalent to calling stbtt_GetFontVMetrics
+// and computing:
+//       scale = pixels / (ascent - descent)
+// so if you prefer to measure height by the ascent only, use a similar calculation.
 
 STBTT_DEF float stbtt_ScaleForMappingEmToPixels(const stbtt_fontinfo *info, float pixels);
-/* computes a scale factor to produce a font whose EM size is mapped to */
-/* 'pixels' tall. This is probably what traditional APIs compute, but */
-/* I'm not positive. */
+// computes a scale factor to produce a font whose EM size is mapped to
+// 'pixels' tall. This is probably what traditional APIs compute, but
+// I'm not positive.
 
 STBTT_DEF void stbtt_GetFontVMetrics(const stbtt_fontinfo *info, int *ascent, int *descent, int *lineGap);
-/* ascent is the coordinate above the baseline the font extends; descent */
-/* is the coordinate below the baseline the font extends (i.e. it is typically negative) */
-/* lineGap is the spacing between one row's descent and the next row's ascent... */
-/* so you should advance the vertical position by "*ascent - *descent + *lineGap" */
-/* these are expressed in unscaled coordinates, so you must multiply by */
-/* the scale factor for a given size */
+// ascent is the coordinate above the baseline the font extends; descent
+// is the coordinate below the baseline the font extends (i.e. it is typically negative)
+// lineGap is the spacing between one row's descent and the next row's ascent...
+// so you should advance the vertical position by "*ascent - *descent + *lineGap"
+//   these are expressed in unscaled coordinates, so you must multiply by
+//   the scale factor for a given size
 
 STBTT_DEF int  stbtt_GetFontVMetricsOS2(const stbtt_fontinfo *info, int *typoAscent, int *typoDescent, int *typoLineGap);
-/* analogous to GetFontVMetrics, but returns the "typographic" values from the OS/2 */
-/* table (specific to MS/Windows TTF files). */
-/*  */
-/* Returns 1 on success (table present), 0 on failure. */
+// analogous to GetFontVMetrics, but returns the "typographic" values from the OS/2
+// table (specific to MS/Windows TTF files).
+//
+// Returns 1 on success (table present), 0 on failure.
 
 STBTT_DEF void stbtt_GetFontBoundingBox(const stbtt_fontinfo *info, int *x0, int *y0, int *x1, int *y1);
-/* the bounding box around all possible characters */
+// the bounding box around all possible characters
 
 STBTT_DEF void stbtt_GetCodepointHMetrics(const stbtt_fontinfo *info, int codepoint, int *advanceWidth, int *leftSideBearing);
-/* leftSideBearing is the offset from the current horizontal position to the left edge of the character */
-/* advanceWidth is the offset from the current horizontal position to the next horizontal position */
-/* these are expressed in unscaled coordinates */
+// leftSideBearing is the offset from the current horizontal position to the left edge of the character
+// advanceWidth is the offset from the current horizontal position to the next horizontal position
+//   these are expressed in unscaled coordinates
 
 STBTT_DEF int  stbtt_GetCodepointKernAdvance(const stbtt_fontinfo *info, int ch1, int ch2);
-/* an additional amount to add to the 'advance' value between ch1 and ch2 */
+// an additional amount to add to the 'advance' value between ch1 and ch2
 
 STBTT_DEF int stbtt_GetCodepointBox(const stbtt_fontinfo *info, int codepoint, int *x0, int *y0, int *x1, int *y1);
-/* Gets the bounding box of the visible part of the glyph, in unscaled coordinates */
+// Gets the bounding box of the visible part of the glyph, in unscaled coordinates
 
 STBTT_DEF void stbtt_GetGlyphHMetrics(const stbtt_fontinfo *info, int glyph_index, int *advanceWidth, int *leftSideBearing);
 STBTT_DEF int  stbtt_GetGlyphKernAdvance(const stbtt_fontinfo *info, int glyph1, int glyph2);
 STBTT_DEF int  stbtt_GetGlyphBox(const stbtt_fontinfo *info, int glyph_index, int *x0, int *y0, int *x1, int *y1);
-/* as above, but takes one or more glyph indices for greater efficiency */
+// as above, but takes one or more glyph indices for greater efficiency
 
 
-/* //////////////////////////////////////////////////////////////////////////// */
-/*  */
-/* GLYPH SHAPES (you probably don't need these, but they have to go before */
-/* the bitmaps for C declaration-order reasons) */
-/*  */
+//////////////////////////////////////////////////////////////////////////////
+//
+// GLYPH SHAPES (you probably don't need these, but they have to go before
+// the bitmaps for C declaration-order reasons)
+//
 
-#ifndef STBTT_vmove /* you can predefine these to use different values (but why?) */
+#ifndef STBTT_vmove // you can predefine these to use different values (but why?)
    enum {
       STBTT_vmove=1,
       STBTT_vline,
@@ -10385,9 +9256,9 @@ STBTT_DEF int  stbtt_GetGlyphBox(const stbtt_fontinfo *info, int glyph_index, in
    };
 #endif
 
-#ifndef stbtt_vertex /* you can predefine this to use different values */
-                   /* (we share this with other code at RAD) */
-   #define stbtt_vertex_type short /* can't use stbtt_int16 because that's not visible in the header file */
+#ifndef stbtt_vertex // you can predefine this to use different values
+                   // (we share this with other code at RAD)
+   #define stbtt_vertex_type short // can't use stbtt_int16 because that's not visible in the header file
    typedef struct
    {
       stbtt_vertex_type x,y,cx,cy,cx1,cy1;
@@ -10396,71 +9267,71 @@ STBTT_DEF int  stbtt_GetGlyphBox(const stbtt_fontinfo *info, int glyph_index, in
 #endif
 
 STBTT_DEF int stbtt_IsGlyphEmpty(const stbtt_fontinfo *info, int glyph_index);
-/* returns non-zero if nothing is drawn for this glyph */
+// returns non-zero if nothing is drawn for this glyph
 
 STBTT_DEF int stbtt_GetCodepointShape(const stbtt_fontinfo *info, int unicode_codepoint, stbtt_vertex **vertices);
 STBTT_DEF int stbtt_GetGlyphShape(const stbtt_fontinfo *info, int glyph_index, stbtt_vertex **vertices);
-/* returns # of vertices and fills *vertices with the pointer to them */
-/* these are expressed in "unscaled" coordinates */
-/*  */
-/* The shape is a series of countours. Each one starts with */
-/* a STBTT_moveto, then consists of a series of mixed */
-/* STBTT_lineto and STBTT_curveto segments. A lineto */
-/* draws a line from previous endpoint to its x,y; a curveto */
-/* draws a quadratic bezier from previous endpoint to */
-/* its x,y, using cx,cy as the bezier control point. */
+// returns # of vertices and fills *vertices with the pointer to them
+//   these are expressed in "unscaled" coordinates
+//
+// The shape is a series of contours. Each one starts with
+// a STBTT_moveto, then consists of a series of mixed
+// STBTT_lineto and STBTT_curveto segments. A lineto
+// draws a line from previous endpoint to its x,y; a curveto
+// draws a quadratic bezier from previous endpoint to
+// its x,y, using cx,cy as the bezier control point.
 
 STBTT_DEF void stbtt_FreeShape(const stbtt_fontinfo *info, stbtt_vertex *vertices);
-/* frees the data allocated above */
+// frees the data allocated above
 
-/* //////////////////////////////////////////////////////////////////////////// */
-/*  */
-/* BITMAP RENDERING */
-/*  */
+//////////////////////////////////////////////////////////////////////////////
+//
+// BITMAP RENDERING
+//
 
 STBTT_DEF void stbtt_FreeBitmap(unsigned char *bitmap, void *userdata);
-/* frees the bitmap allocated below */
+// frees the bitmap allocated below
 
 STBTT_DEF unsigned char *stbtt_GetCodepointBitmap(const stbtt_fontinfo *info, float scale_x, float scale_y, int codepoint, int *width, int *height, int *xoff, int *yoff);
-/* allocates a large-enough single-channel 8bpp bitmap and renders the */
-/* specified character/glyph at the specified scale into it, with */
-/* antialiasing. 0 is no coverage (transparent), 255 is fully covered (opaque). */
-/* *width & *height are filled out with the width & height of the bitmap, */
-/* which is stored left-to-right, top-to-bottom. */
-/*  */
-/* xoff/yoff are the offset it pixel space from the glyph origin to the top-left of the bitmap */
+// allocates a large-enough single-channel 8bpp bitmap and renders the
+// specified character/glyph at the specified scale into it, with
+// antialiasing. 0 is no coverage (transparent), 255 is fully covered (opaque).
+// *width & *height are filled out with the width & height of the bitmap,
+// which is stored left-to-right, top-to-bottom.
+//
+// xoff/yoff are the offset it pixel space from the glyph origin to the top-left of the bitmap
 
 STBTT_DEF unsigned char *stbtt_GetCodepointBitmapSubpixel(const stbtt_fontinfo *info, float scale_x, float scale_y, float shift_x, float shift_y, int codepoint, int *width, int *height, int *xoff, int *yoff);
-/* the same as stbtt_GetCodepoitnBitmap, but you can specify a subpixel */
-/* shift for the character */
+// the same as stbtt_GetCodepoitnBitmap, but you can specify a subpixel
+// shift for the character
 
 STBTT_DEF void stbtt_MakeCodepointBitmap(const stbtt_fontinfo *info, unsigned char *output, int out_w, int out_h, int out_stride, float scale_x, float scale_y, int codepoint);
-/* the same as stbtt_GetCodepointBitmap, but you pass in storage for the bitmap */
-/* in the form of 'output', with row spacing of 'out_stride' bytes. the bitmap */
-/* is clipped to out_w/out_h bytes. Call stbtt_GetCodepointBitmapBox to get the */
-/* width and height and positioning info for it first. */
+// the same as stbtt_GetCodepointBitmap, but you pass in storage for the bitmap
+// in the form of 'output', with row spacing of 'out_stride' bytes. the bitmap
+// is clipped to out_w/out_h bytes. Call stbtt_GetCodepointBitmapBox to get the
+// width and height and positioning info for it first.
 
 STBTT_DEF void stbtt_MakeCodepointBitmapSubpixel(const stbtt_fontinfo *info, unsigned char *output, int out_w, int out_h, int out_stride, float scale_x, float scale_y, float shift_x, float shift_y, int codepoint);
-/* same as stbtt_MakeCodepointBitmap, but you can specify a subpixel */
-/* shift for the character */
+// same as stbtt_MakeCodepointBitmap, but you can specify a subpixel
+// shift for the character
 
 STBTT_DEF void stbtt_MakeCodepointBitmapSubpixelPrefilter(const stbtt_fontinfo *info, unsigned char *output, int out_w, int out_h, int out_stride, float scale_x, float scale_y, float shift_x, float shift_y, int oversample_x, int oversample_y, float *sub_x, float *sub_y, int codepoint);
-/* same as stbtt_MakeCodepointBitmapSubpixel, but prefiltering */
-/* is performed (see stbtt_PackSetOversampling) */
+// same as stbtt_MakeCodepointBitmapSubpixel, but prefiltering
+// is performed (see stbtt_PackSetOversampling)
 
 STBTT_DEF void stbtt_GetCodepointBitmapBox(const stbtt_fontinfo *font, int codepoint, float scale_x, float scale_y, int *ix0, int *iy0, int *ix1, int *iy1);
-/* get the bbox of the bitmap centered around the glyph origin; so the */
-/* bitmap width is ix1-ix0, height is iy1-iy0, and location to place */
-/* the bitmap top left is (leftSideBearing*scale,iy0). */
-/* (Note that the bitmap uses y-increases-down, but the shape uses */
-/* y-increases-up, so CodepointBitmapBox and CodepointBox are inverted.) */
+// get the bbox of the bitmap centered around the glyph origin; so the
+// bitmap width is ix1-ix0, height is iy1-iy0, and location to place
+// the bitmap top left is (leftSideBearing*scale,iy0).
+// (Note that the bitmap uses y-increases-down, but the shape uses
+// y-increases-up, so CodepointBitmapBox and CodepointBox are inverted.)
 
 STBTT_DEF void stbtt_GetCodepointBitmapBoxSubpixel(const stbtt_fontinfo *font, int codepoint, float scale_x, float scale_y, float shift_x, float shift_y, int *ix0, int *iy0, int *ix1, int *iy1);
-/* same as stbtt_GetCodepointBitmapBox, but you can specify a subpixel */
-/* shift for the character */
+// same as stbtt_GetCodepointBitmapBox, but you can specify a subpixel
+// shift for the character
 
-/* the following functions are equivalent to the above functions, but operate */
-/* on glyph indices instead of Unicode codepoints (for efficiency) */
+// the following functions are equivalent to the above functions, but operate
+// on glyph indices instead of Unicode codepoints (for efficiency)
 STBTT_DEF unsigned char *stbtt_GetGlyphBitmap(const stbtt_fontinfo *info, float scale_x, float scale_y, int glyph, int *width, int *height, int *xoff, int *yoff);
 STBTT_DEF unsigned char *stbtt_GetGlyphBitmapSubpixel(const stbtt_fontinfo *info, float scale_x, float scale_y, float shift_x, float shift_y, int glyph, int *width, int *height, int *xoff, int *yoff);
 STBTT_DEF void stbtt_MakeGlyphBitmap(const stbtt_fontinfo *info, unsigned char *output, int out_w, int out_h, int out_stride, float scale_x, float scale_y, int glyph);
@@ -10470,135 +9341,135 @@ STBTT_DEF void stbtt_GetGlyphBitmapBox(const stbtt_fontinfo *font, int glyph, fl
 STBTT_DEF void stbtt_GetGlyphBitmapBoxSubpixel(const stbtt_fontinfo *font, int glyph, float scale_x, float scale_y,float shift_x, float shift_y, int *ix0, int *iy0, int *ix1, int *iy1);
 
 
-/* @TODO: don't expose this structure */
+// @TODO: don't expose this structure
 typedef struct
 {
    int w,h,stride;
    unsigned char *pixels;
 } stbtt__bitmap;
 
-/* rasterize a shape with quadratic beziers into a bitmap */
-STBTT_DEF void stbtt_Rasterize(stbtt__bitmap *result,        /* 1-channel bitmap to draw into */
-                               float flatness_in_pixels,     /* allowable error of curve in pixels */
-                               stbtt_vertex *vertices,       /* array of vertices defining shape */
-                               int num_verts,                /* number of vertices in above array */
-                               float scale_x, float scale_y, /* scale applied to input vertices */
-                               float shift_x, float shift_y, /* translation applied to input vertices */
-                               int x_off, int y_off,         /* another translation applied to input */
-                               int invert,                   /* if non-zero, vertically flip shape */
-                               void *userdata);              /* context for to STBTT_MALLOC */
+// rasterize a shape with quadratic beziers into a bitmap
+STBTT_DEF void stbtt_Rasterize(stbtt__bitmap *result,        // 1-channel bitmap to draw into
+                               float flatness_in_pixels,     // allowable error of curve in pixels
+                               stbtt_vertex *vertices,       // array of vertices defining shape
+                               int num_verts,                // number of vertices in above array
+                               float scale_x, float scale_y, // scale applied to input vertices
+                               float shift_x, float shift_y, // translation applied to input vertices
+                               int x_off, int y_off,         // another translation applied to input
+                               int invert,                   // if non-zero, vertically flip shape
+                               void *userdata);              // context for to STBTT_MALLOC
 
-/* //////////////////////////////////////////////////////////////////////////// */
-/*  */
-/* Signed Distance Function (or Field) rendering */
+//////////////////////////////////////////////////////////////////////////////
+//
+// Signed Distance Function (or Field) rendering
 
 STBTT_DEF void stbtt_FreeSDF(unsigned char *bitmap, void *userdata);
-/* frees the SDF bitmap allocated below */
+// frees the SDF bitmap allocated below
 
 STBTT_DEF unsigned char * stbtt_GetGlyphSDF(const stbtt_fontinfo *info, float scale, int glyph, int padding, unsigned char onedge_value, float pixel_dist_scale, int *width, int *height, int *xoff, int *yoff);
 STBTT_DEF unsigned char * stbtt_GetCodepointSDF(const stbtt_fontinfo *info, float scale, int codepoint, int padding, unsigned char onedge_value, float pixel_dist_scale, int *width, int *height, int *xoff, int *yoff);
-/* These functions compute a discretized SDF field for a single character, suitable for storing */
-/* in a single-channel texture, sampling with bilinear filtering, and testing against */
-/* larger than some threshhold to produce scalable fonts. */
-/* info              --  the font */
-/* scale             --  controls the size of the resulting SDF bitmap, same as it would be creating a regular bitmap */
-/* glyph/codepoint   --  the character to generate the SDF for */
-/* padding           --  extra "pixels" around the character which are filled with the distance to the character (not 0), */
-/* which allows effects like bit outlines */
-/* onedge_value      --  value 0-255 to test the SDF against to reconstruct the character (i.e. the isocontour of the character) */
-/* pixel_dist_scale  --  what value the SDF should increase by when moving one SDF "pixel" away from the edge (on the 0..255 scale) */
-/* if positive, > onedge_value is inside; if negative, < onedge_value is inside */
-/* width,height      --  output height & width of the SDF bitmap (including padding) */
-/* xoff,yoff         --  output origin of the character */
-/* return value      --  a 2D array of bytes 0..255, width*height in size */
-/*  */
-/* pixel_dist_scale & onedge_value are a scale & bias that allows you to make */
-/* optimal use of the limited 0..255 for your application, trading off precision */
-/* and special effects. SDF values outside the range 0..255 are clamped to 0..255. */
-/*  */
-/* Example: */
-/* scale = stbtt_ScaleForPixelHeight(22) */
-/* padding = 5 */
-/* onedge_value = 180 */
-/* pixel_dist_scale = 180/5.0 = 36.0 */
-/*  */
-/* This will create an SDF bitmap in which the character is about 22 pixels */
-/* high but the whole bitmap is about 22+5+5=32 pixels high. To produce a filled */
-/* shape, sample the SDF at each pixel and fill the pixel if the SDF value */
-/* is greater than or equal to 180/255. (You'll actually want to antialias, */
-/* which is beyond the scope of this example.) Additionally, you can compute */
-/* offset outlines (e.g. to stroke the character border inside & outside, */
-/* or only outside). For example, to fill outside the character up to 3 SDF */
-/* pixels, you would compare against (180-36.0*3)/255 = 72/255. The above */
-/* choice of variables maps a range from 5 pixels outside the shape to */
-/* 2 pixels inside the shape to 0..255; this is intended primarily for apply */
-/* outside effects only (the interior range is needed to allow proper */
-/* antialiasing of the font at *smaller* sizes) */
-/*  */
-/* The function computes the SDF analytically at each SDF pixel, not by e.g. */
-/* building a higher-res bitmap and approximating it. In theory the quality */
-/* should be as high as possible for an SDF of this size & representation, but */
-/* unclear if this is true in practice (perhaps building a higher-res bitmap */
-/* and computing from that can allow drop-out prevention). */
-/*  */
-/* The algorithm has not been optimized at all, so expect it to be slow */
-/* if computing lots of characters or very large sizes. */
+// These functions compute a discretized SDF field for a single character, suitable for storing
+// in a single-channel texture, sampling with bilinear filtering, and testing against
+// larger than some threshold to produce scalable fonts.
+//        info              --  the font
+//        scale             --  controls the size of the resulting SDF bitmap, same as it would be creating a regular bitmap
+//        glyph/codepoint   --  the character to generate the SDF for
+//        padding           --  extra "pixels" around the character which are filled with the distance to the character (not 0),
+//                                 which allows effects like bit outlines
+//        onedge_value      --  value 0-255 to test the SDF against to reconstruct the character (i.e. the isocontour of the character)
+//        pixel_dist_scale  --  what value the SDF should increase by when moving one SDF "pixel" away from the edge (on the 0..255 scale)
+//                                 if positive, > onedge_value is inside; if negative, < onedge_value is inside
+//        width,height      --  output height & width of the SDF bitmap (including padding)
+//        xoff,yoff         --  output origin of the character
+//        return value      --  a 2D array of bytes 0..255, width*height in size
+//
+// pixel_dist_scale & onedge_value are a scale & bias that allows you to make
+// optimal use of the limited 0..255 for your application, trading off precision
+// and special effects. SDF values outside the range 0..255 are clamped to 0..255.
+//
+// Example:
+//      scale = stbtt_ScaleForPixelHeight(22)
+//      padding = 5
+//      onedge_value = 180
+//      pixel_dist_scale = 180/5.0 = 36.0
+//
+//      This will create an SDF bitmap in which the character is about 22 pixels
+//      high but the whole bitmap is about 22+5+5=32 pixels high. To produce a filled
+//      shape, sample the SDF at each pixel and fill the pixel if the SDF value
+//      is greater than or equal to 180/255. (You'll actually want to antialias,
+//      which is beyond the scope of this example.) Additionally, you can compute
+//      offset outlines (e.g. to stroke the character border inside & outside,
+//      or only outside). For example, to fill outside the character up to 3 SDF
+//      pixels, you would compare against (180-36.0*3)/255 = 72/255. The above
+//      choice of variables maps a range from 5 pixels outside the shape to
+//      2 pixels inside the shape to 0..255; this is intended primarily for apply
+//      outside effects only (the interior range is needed to allow proper
+//      antialiasing of the font at *smaller* sizes)
+//
+// The function computes the SDF analytically at each SDF pixel, not by e.g.
+// building a higher-res bitmap and approximating it. In theory the quality
+// should be as high as possible for an SDF of this size & representation, but
+// unclear if this is true in practice (perhaps building a higher-res bitmap
+// and computing from that can allow drop-out prevention).
+//
+// The algorithm has not been optimized at all, so expect it to be slow
+// if computing lots of characters or very large sizes. 
 
 
 
-/* //////////////////////////////////////////////////////////////////////////// */
-/*  */
-/* Finding the right font... */
-/*  */
-/* You should really just solve this offline, keep your own tables */
-/* of what font is what, and don't try to get it out of the .ttf file. */
-/* That's because getting it out of the .ttf file is really hard, because */
-/* the names in the file can appear in many possible encodings, in many */
-/* possible languages, and e.g. if you need a case-insensitive comparison, */
-/* the details of that depend on the encoding & language in a complex way */
-/* (actually underspecified in truetype, but also gigantic). */
-/*  */
-/* But you can use the provided functions in two possible ways: */
-/* stbtt_FindMatchingFont() will use *case-sensitive* comparisons on */
-/* unicode-encoded names to try to find the font you want; */
-/* you can run this before calling stbtt_InitFont() */
-/*  */
-/* stbtt_GetFontNameString() lets you get any of the various strings */
-/* from the file yourself and do your own comparisons on them. */
-/* You have to have called stbtt_InitFont() first. */
+//////////////////////////////////////////////////////////////////////////////
+//
+// Finding the right font...
+//
+// You should really just solve this offline, keep your own tables
+// of what font is what, and don't try to get it out of the .ttf file.
+// That's because getting it out of the .ttf file is really hard, because
+// the names in the file can appear in many possible encodings, in many
+// possible languages, and e.g. if you need a case-insensitive comparison,
+// the details of that depend on the encoding & language in a complex way
+// (actually underspecified in truetype, but also gigantic).
+//
+// But you can use the provided functions in two possible ways:
+//     stbtt_FindMatchingFont() will use *case-sensitive* comparisons on
+//             unicode-encoded names to try to find the font you want;
+//             you can run this before calling stbtt_InitFont()
+//
+//     stbtt_GetFontNameString() lets you get any of the various strings
+//             from the file yourself and do your own comparisons on them.
+//             You have to have called stbtt_InitFont() first.
 
 
 STBTT_DEF int stbtt_FindMatchingFont(const unsigned char *fontdata, const char *name, int flags);
-/* returns the offset (not index) of the font that matches, or -1 if none */
-/* if you use STBTT_MACSTYLE_DONTCARE, use a font name like "Arial Bold". */
-/* if you use any other flag, use a font name like "Arial"; this checks */
-/* the 'macStyle' header field; i don't know if fonts set this consistently */
+// returns the offset (not index) of the font that matches, or -1 if none
+//   if you use STBTT_MACSTYLE_DONTCARE, use a font name like "Arial Bold".
+//   if you use any other flag, use a font name like "Arial"; this checks
+//     the 'macStyle' header field; i don't know if fonts set this consistently
 #define STBTT_MACSTYLE_DONTCARE     0
 #define STBTT_MACSTYLE_BOLD         1
 #define STBTT_MACSTYLE_ITALIC       2
 #define STBTT_MACSTYLE_UNDERSCORE   4
-#define STBTT_MACSTYLE_NONE         8   /* <= not same as 0, this makes us check the bitfield is 0 */
+#define STBTT_MACSTYLE_NONE         8   // <= not same as 0, this makes us check the bitfield is 0
 
 STBTT_DEF int stbtt_CompareUTF8toUTF16_bigendian(const char *s1, int len1, const char *s2, int len2);
-/* returns 1/0 whether the first string interpreted as utf8 is identical to */
-/* the second string interpreted as big-endian utf16... useful for strings from next func */
+// returns 1/0 whether the first string interpreted as utf8 is identical to
+// the second string interpreted as big-endian utf16... useful for strings from next func
 
 STBTT_DEF const char *stbtt_GetFontNameString(const stbtt_fontinfo *font, int *length, int platformID, int encodingID, int languageID, int nameID);
-/* returns the string (which may be big-endian double byte, e.g. for unicode) */
-/* and puts the length in bytes in *length. */
-/*  */
-/* some of the values for the IDs are below; for more see the truetype spec: */
-/* http://developer.apple.com/textfonts/TTRefMan/RM06/Chap6name.html */
-/* http://www.microsoft.com/typography/otspec/name.htm */
+// returns the string (which may be big-endian double byte, e.g. for unicode)
+// and puts the length in bytes in *length.
+//
+// some of the values for the IDs are below; for more see the truetype spec:
+//     http://developer.apple.com/textfonts/TTRefMan/RM06/Chap6name.html
+//     http://www.microsoft.com/typography/otspec/name.htm
 
-enum { /* platformID */
+enum { // platformID
    STBTT_PLATFORM_ID_UNICODE   =0,
    STBTT_PLATFORM_ID_MAC       =1,
    STBTT_PLATFORM_ID_ISO       =2,
    STBTT_PLATFORM_ID_MICROSOFT =3
 };
 
-enum { /* encodingID for STBTT_PLATFORM_ID_UNICODE */
+enum { // encodingID for STBTT_PLATFORM_ID_UNICODE
    STBTT_UNICODE_EID_UNICODE_1_0    =0,
    STBTT_UNICODE_EID_UNICODE_1_1    =1,
    STBTT_UNICODE_EID_ISO_10646      =2,
@@ -10606,22 +9477,22 @@ enum { /* encodingID for STBTT_PLATFORM_ID_UNICODE */
    STBTT_UNICODE_EID_UNICODE_2_0_FULL=4
 };
 
-enum { /* encodingID for STBTT_PLATFORM_ID_MICROSOFT */
+enum { // encodingID for STBTT_PLATFORM_ID_MICROSOFT
    STBTT_MS_EID_SYMBOL        =0,
    STBTT_MS_EID_UNICODE_BMP   =1,
    STBTT_MS_EID_SHIFTJIS      =2,
    STBTT_MS_EID_UNICODE_FULL  =10
 };
 
-enum { /* encodingID for STBTT_PLATFORM_ID_MAC; same as Script Manager codes */
+enum { // encodingID for STBTT_PLATFORM_ID_MAC; same as Script Manager codes
    STBTT_MAC_EID_ROMAN        =0,   STBTT_MAC_EID_ARABIC       =4,
    STBTT_MAC_EID_JAPANESE     =1,   STBTT_MAC_EID_HEBREW       =5,
    STBTT_MAC_EID_CHINESE_TRAD =2,   STBTT_MAC_EID_GREEK        =6,
    STBTT_MAC_EID_KOREAN       =3,   STBTT_MAC_EID_RUSSIAN      =7
 };
 
-enum { /* languageID for STBTT_PLATFORM_ID_MICROSOFT; same as LCID... */
-       /* problematic because there are e.g. 16 english LCIDs and 16 arabic LCIDs */
+enum { // languageID for STBTT_PLATFORM_ID_MICROSOFT; same as LCID...
+       // problematic because there are e.g. 16 english LCIDs and 16 arabic LCIDs
    STBTT_MS_LANG_ENGLISH     =0x0409,   STBTT_MS_LANG_ITALIAN     =0x0410,
    STBTT_MS_LANG_CHINESE     =0x0804,   STBTT_MS_LANG_JAPANESE    =0x0411,
    STBTT_MS_LANG_DUTCH       =0x0413,   STBTT_MS_LANG_KOREAN      =0x0412,
@@ -10630,7 +9501,7 @@ enum { /* languageID for STBTT_PLATFORM_ID_MICROSOFT; same as LCID... */
    STBTT_MS_LANG_HEBREW      =0x040d,   STBTT_MS_LANG_SWEDISH     =0x041D
 };
 
-enum { /* languageID for STBTT_PLATFORM_ID_MAC */
+enum { // languageID for STBTT_PLATFORM_ID_MAC
    STBTT_MAC_LANG_ENGLISH      =0 ,   STBTT_MAC_LANG_JAPANESE     =11,
    STBTT_MAC_LANG_ARABIC       =12,   STBTT_MAC_LANG_KOREAN       =23,
    STBTT_MAC_LANG_DUTCH        =4 ,   STBTT_MAC_LANG_RUSSIAN      =32,
@@ -10644,14 +9515,14 @@ enum { /* languageID for STBTT_PLATFORM_ID_MAC */
 }
 #endif
 
-#endif /* __STB_INCLUDE_STB_TRUETYPE_H__ */
+#endif // __STB_INCLUDE_STB_TRUETYPE_H__
 
-/* ///////////////////////////////////////////////////////////////////////////// */
-/* ///////////////////////////////////////////////////////////////////////////// */
-/* // */
-/* //   IMPLEMENTATION */
-/* // */
-/* // */
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+////
+////   IMPLEMENTATION
+////
+////
 
 #ifdef STB_TRUETYPE_IMPLEMENTATION
 
@@ -10675,10 +9546,10 @@ typedef int stbtt__test_oversample_pow2[(STBTT_MAX_OVERSAMPLE & (STBTT_MAX_OVERS
 #define STBTT__NOTUSED(v)  (void)sizeof(v)
 #endif
 
-/* //////////////////////////////////////////////////////////////////////// */
-/*  */
-/* stbtt__buf helpers to parse data from file */
-/*  */
+//////////////////////////////////////////////////////////////////////////
+//
+// stbtt__buf helpers to parse data from file
+//
 
 static stbtt_uint8 stbtt__buf_get8(stbtt__buf *b)
 {
@@ -10821,13 +9692,13 @@ static stbtt__buf stbtt__cff_index_get(stbtt__buf b, int i)
    return stbtt__buf_range(&b, 2+(count+1)*offsize+start, end - start);
 }
 
-/* //////////////////////////////////////////////////////////////////////// */
-/*  */
-/* accessors to parse data from file */
-/*  */
+//////////////////////////////////////////////////////////////////////////
+//
+// accessors to parse data from file
+//
 
-/* on platforms that don't allow misaligned reads, if we want to allow */
-/* truetype fonts that aren't padded to alignment, define ALLOW_UNALIGNED_TRUETYPE */
+// on platforms that don't allow misaligned reads, if we want to allow
+// truetype fonts that aren't padded to alignment, define ALLOW_UNALIGNED_TRUETYPE
 
 #define ttBYTE(p)     (* (stbtt_uint8 *) (p))
 #define ttCHAR(p)     (* (stbtt_int8 *) (p))
@@ -10843,16 +9714,16 @@ static stbtt_int32 ttLONG(stbtt_uint8 *p)    { return (p[0]<<24) + (p[1]<<16) + 
 
 static int stbtt__isfont(stbtt_uint8 *font)
 {
-   /* check the version number */
-   if (stbtt_tag4(font, '1',0,0,0))  return 1; /* TrueType 1 */
-   if (stbtt_tag(font, "typ1"))   return 1; /* TrueType with type 1 font -- we don't support this! */
-   if (stbtt_tag(font, "OTTO"))   return 1; /* OpenType with CFF */
-   if (stbtt_tag4(font, 0,1,0,0)) return 1; /* OpenType 1.0 */
-   if (stbtt_tag(font, "true"))   return 1; /* Apple specification for TrueType fonts */
+   // check the version number
+   if (stbtt_tag4(font, '1',0,0,0))  return 1; // TrueType 1
+   if (stbtt_tag(font, "typ1"))   return 1; // TrueType with type 1 font -- we don't support this!
+   if (stbtt_tag(font, "OTTO"))   return 1; // OpenType with CFF
+   if (stbtt_tag4(font, 0,1,0,0)) return 1; // OpenType 1.0
+   if (stbtt_tag(font, "true"))   return 1; // Apple specification for TrueType fonts
    return 0;
 }
 
-/* @OPTIMIZE: binary search */
+// @OPTIMIZE: binary search
 static stbtt_uint32 stbtt__find_table(stbtt_uint8 *data, stbtt_uint32 fontstart, const char *tag)
 {
    stbtt_int32 num_tables = ttUSHORT(data+fontstart+4);
@@ -10868,13 +9739,13 @@ static stbtt_uint32 stbtt__find_table(stbtt_uint8 *data, stbtt_uint32 fontstart,
 
 static int stbtt_GetFontOffsetForIndex_internal(unsigned char *font_collection, int index)
 {
-   /* if it's just a font, there's only one valid index */
+   // if it's just a font, there's only one valid index
    if (stbtt__isfont(font_collection))
       return index == 0 ? 0 : -1;
 
-   /* check if it's a TTC */
+   // check if it's a TTC
    if (stbtt_tag(font_collection, "ttcf")) {
-      /* version 1? */
+      // version 1?
       if (ttULONG(font_collection+4) == 0x00010000 || ttULONG(font_collection+4) == 0x00020000) {
          stbtt_int32 n = ttLONG(font_collection+8);
          if (index >= n)
@@ -10887,13 +9758,13 @@ static int stbtt_GetFontOffsetForIndex_internal(unsigned char *font_collection, 
 
 static int stbtt_GetNumberOfFonts_internal(unsigned char *font_collection)
 {
-   /* if it's just a font, there's only one valid font */
+   // if it's just a font, there's only one valid font
    if (stbtt__isfont(font_collection))
       return 1;
 
-   /* check if it's a TTC */
+   // check if it's a TTC
    if (stbtt_tag(font_collection, "ttcf")) {
-      /* version 1? */
+      // version 1?
       if (ttULONG(font_collection+4) == 0x00010000 || ttULONG(font_collection+4) == 0x00020000) {
          return ttLONG(font_collection+8);
       }
@@ -10923,22 +9794,22 @@ static int stbtt_InitFont_internal(stbtt_fontinfo *info, unsigned char *data, in
    info->fontstart = fontstart;
    info->cff = stbtt__new_buf(NULL, 0);
 
-   cmap = stbtt__find_table(data, fontstart, "cmap");       /* required */
-   info->loca = stbtt__find_table(data, fontstart, "loca"); /* required */
-   info->head = stbtt__find_table(data, fontstart, "head"); /* required */
-   info->glyf = stbtt__find_table(data, fontstart, "glyf"); /* required */
-   info->hhea = stbtt__find_table(data, fontstart, "hhea"); /* required */
-   info->hmtx = stbtt__find_table(data, fontstart, "hmtx"); /* required */
-   info->kern = stbtt__find_table(data, fontstart, "kern"); /* not required */
-   info->gpos = stbtt__find_table(data, fontstart, "GPOS"); /* not required */
+   cmap = stbtt__find_table(data, fontstart, "cmap");       // required
+   info->loca = stbtt__find_table(data, fontstart, "loca"); // required
+   info->head = stbtt__find_table(data, fontstart, "head"); // required
+   info->glyf = stbtt__find_table(data, fontstart, "glyf"); // required
+   info->hhea = stbtt__find_table(data, fontstart, "hhea"); // required
+   info->hmtx = stbtt__find_table(data, fontstart, "hmtx"); // required
+   info->kern = stbtt__find_table(data, fontstart, "kern"); // not required
+   info->gpos = stbtt__find_table(data, fontstart, "GPOS"); // not required
 
    if (!cmap || !info->head || !info->hhea || !info->hmtx)
       return 0;
    if (info->glyf) {
-      /* required for truetype */
+      // required for truetype
       if (!info->loca) return 0;
    } else {
-      /* initialization for CFF / Type2 fonts (OTF) */
+      // initialization for CFF / Type2 fonts (OTF)
       stbtt__buf b, topdict, topdictidx;
       stbtt_uint32 cstype = 2, charstrings = 0, fdarrayoff = 0, fdselectoff = 0;
       stbtt_uint32 cff;
@@ -10949,20 +9820,20 @@ static int stbtt_InitFont_internal(stbtt_fontinfo *info, unsigned char *data, in
       info->fontdicts = stbtt__new_buf(NULL, 0);
       info->fdselect = stbtt__new_buf(NULL, 0);
 
-      /* @TODO this should use size from table (not 512MB) */
+      // @TODO this should use size from table (not 512MB)
       info->cff = stbtt__new_buf(data+cff, 512*1024*1024);
       b = info->cff;
 
-      /* read the header */
+      // read the header
       stbtt__buf_skip(&b, 2);
-      stbtt__buf_seek(&b, stbtt__buf_get8(&b)); /* hdrsize */
+      stbtt__buf_seek(&b, stbtt__buf_get8(&b)); // hdrsize
 
-      /* @TODO the name INDEX could list multiple fonts, */
-      /* but we just use the first one. */
-      stbtt__cff_get_index(&b);  /* name INDEX */
+      // @TODO the name INDEX could list multiple fonts,
+      // but we just use the first one.
+      stbtt__cff_get_index(&b);  // name INDEX
       topdictidx = stbtt__cff_get_index(&b);
       topdict = stbtt__cff_index_get(topdictidx, 0);
-      stbtt__cff_get_index(&b);  /* string INDEX */
+      stbtt__cff_get_index(&b);  // string INDEX
       info->gsubrs = stbtt__cff_get_index(&b);
 
       stbtt__dict_get_ints(&topdict, 17, 1, &charstrings);
@@ -10971,12 +9842,12 @@ static int stbtt_InitFont_internal(stbtt_fontinfo *info, unsigned char *data, in
       stbtt__dict_get_ints(&topdict, 0x100 | 37, 1, &fdselectoff);
       info->subrs = stbtt__get_subrs(b, topdict);
 
-      /* we only support Type 2 charstrings */
+      // we only support Type 2 charstrings
       if (cstype != 2) return 0;
       if (charstrings == 0) return 0;
 
       if (fdarrayoff) {
-         /* looks like a CID font */
+         // looks like a CID font
          if (!fdselectoff) return 0;
          stbtt__buf_seek(&b, fdarrayoff);
          info->fontdicts = stbtt__cff_get_index(&b);
@@ -10993,27 +9864,27 @@ static int stbtt_InitFont_internal(stbtt_fontinfo *info, unsigned char *data, in
    else
       info->numGlyphs = 0xffff;
 
-   /* find a cmap encoding table we understand *now* to avoid searching */
-   /* later. (todo: could make this installable) */
-   /* the same regardless of glyph. */
+   // find a cmap encoding table we understand *now* to avoid searching
+   // later. (todo: could make this installable)
+   // the same regardless of glyph.
    numTables = ttUSHORT(data + cmap + 2);
    info->index_map = 0;
    for (i=0; i < numTables; ++i) {
       stbtt_uint32 encoding_record = cmap + 4 + 8 * i;
-      /* find an encoding we understand: */
+      // find an encoding we understand:
       switch(ttUSHORT(data+encoding_record)) {
          case STBTT_PLATFORM_ID_MICROSOFT:
             switch (ttUSHORT(data+encoding_record+2)) {
                case STBTT_MS_EID_UNICODE_BMP:
                case STBTT_MS_EID_UNICODE_FULL:
-                  /* MS/Unicode */
+                  // MS/Unicode
                   info->index_map = cmap + ttULONG(data+encoding_record+4);
                   break;
             }
             break;
         case STBTT_PLATFORM_ID_UNICODE:
-            /* Mac/iOS has these */
-            /* all the encodingIDs are unicode, so we don't bother to check it */
+            // Mac/iOS has these
+            // all the encodingIDs are unicode, so we don't bother to check it
             info->index_map = cmap + ttULONG(data+encoding_record+4);
             break;
       }
@@ -11031,7 +9902,7 @@ STBTT_DEF int stbtt_FindGlyphIndex(const stbtt_fontinfo *info, int unicode_codep
    stbtt_uint32 index_map = info->index_map;
 
    stbtt_uint16 format = ttUSHORT(data + index_map + 0);
-   if (format == 0) { /* apple byte encoding */
+   if (format == 0) { // apple byte encoding
       stbtt_int32 bytes = ttUSHORT(data + index_map + 2);
       if (unicode_codepoint < bytes-6)
          return ttBYTE(data + index_map + 6 + unicode_codepoint);
@@ -11043,27 +9914,27 @@ STBTT_DEF int stbtt_FindGlyphIndex(const stbtt_fontinfo *info, int unicode_codep
          return ttUSHORT(data + index_map + 10 + (unicode_codepoint - first)*2);
       return 0;
    } else if (format == 2) {
-      STBTT_assert(0); /* @TODO: high-byte mapping for japanese/chinese/korean */
+      STBTT_assert(0); // @TODO: high-byte mapping for japanese/chinese/korean
       return 0;
-   } else if (format == 4) { /* standard mapping for windows fonts: binary search collection of ranges */
+   } else if (format == 4) { // standard mapping for windows fonts: binary search collection of ranges
       stbtt_uint16 segcount = ttUSHORT(data+index_map+6) >> 1;
       stbtt_uint16 searchRange = ttUSHORT(data+index_map+8) >> 1;
       stbtt_uint16 entrySelector = ttUSHORT(data+index_map+10);
       stbtt_uint16 rangeShift = ttUSHORT(data+index_map+12) >> 1;
 
-      /* do a binary search of the segments */
+      // do a binary search of the segments
       stbtt_uint32 endCount = index_map + 14;
       stbtt_uint32 search = endCount;
 
       if (unicode_codepoint > 0xffff)
          return 0;
 
-      /* they lie from endCount .. endCount + segCount */
-      /* but searchRange is the nearest power of two, so... */
+      // they lie from endCount .. endCount + segCount
+      // but searchRange is the nearest power of two, so...
       if (unicode_codepoint >= ttUSHORT(data + search + rangeShift*2))
          search += rangeShift*2;
 
-      /* now decrement to bias correctly to find smallest */
+      // now decrement to bias correctly to find smallest
       search -= 2;
       while (entrySelector) {
          stbtt_uint16 end;
@@ -11094,9 +9965,9 @@ STBTT_DEF int stbtt_FindGlyphIndex(const stbtt_fontinfo *info, int unicode_codep
       stbtt_uint32 ngroups = ttULONG(data+index_map+12);
       stbtt_int32 low,high;
       low = 0; high = (stbtt_int32)ngroups;
-      /* Binary search the right group. */
+      // Binary search the right group.
       while (low < high) {
-         stbtt_int32 mid = low + ((high-low) >> 1); /* rounds down, so low <= mid < high */
+         stbtt_int32 mid = low + ((high-low) >> 1); // rounds down, so low <= mid < high
          stbtt_uint32 start_char = ttULONG(data+index_map+16+mid*12);
          stbtt_uint32 end_char = ttULONG(data+index_map+16+mid*12+4);
          if ((stbtt_uint32) unicode_codepoint < start_char)
@@ -11107,13 +9978,13 @@ STBTT_DEF int stbtt_FindGlyphIndex(const stbtt_fontinfo *info, int unicode_codep
             stbtt_uint32 start_glyph = ttULONG(data+index_map+16+mid*12+8);
             if (format == 12)
                return start_glyph + unicode_codepoint-start_char;
-            else /* format == 13 */
+            else // format == 13
                return start_glyph;
          }
       }
-      return 0; /* not found */
+      return 0; // not found
    }
-   /* @TODO */
+   // @TODO
    STBTT_assert(0);
    return 0;
 }
@@ -11138,8 +10009,8 @@ static int stbtt__GetGlyfOffset(const stbtt_fontinfo *info, int glyph_index)
 
    STBTT_assert(!info->cff.size);
 
-   if (glyph_index >= info->numGlyphs) return -1; /* glyph index out of range */
-   if (info->indexToLocFormat >= 2)    return -1; /* unknown index->glyph map format */
+   if (glyph_index >= info->numGlyphs) return -1; // glyph index out of range
+   if (info->indexToLocFormat >= 2)    return -1; // unknown index->glyph map format
 
    if (info->indexToLocFormat == 0) {
       g1 = info->glyf + ttUSHORT(info->data + info->loca + glyph_index * 2) * 2;
@@ -11149,7 +10020,7 @@ static int stbtt__GetGlyfOffset(const stbtt_fontinfo *info, int glyph_index)
       g2 = info->glyf + ttULONG (info->data + info->loca + glyph_index * 4 + 4);
    }
 
-   return g1==g2 ? -1 : g1; /* if length is 0, return -1 */
+   return g1==g2 ? -1 : g1; // if length is 0, return -1
 }
 
 static int stbtt__GetGlyphInfoT2(const stbtt_fontinfo *info, int glyph_index, int *x0, int *y0, int *x1, int *y1);
@@ -11229,7 +10100,7 @@ static int stbtt__GetGlyphShapeTT(const stbtt_fontinfo *info, int glyph_index, s
 
       n = 1+ttUSHORT(endPtsOfContours + numberOfContours*2-2);
 
-      m = n + 2*numberOfContours;  /* a loose bound on how many vertices we might need */
+      m = n + 2*numberOfContours;  // a loose bound on how many vertices we might need
       vertices = (stbtt_vertex *) STBTT_malloc(m * sizeof(vertices[0]), info->userdata);
       if (vertices == 0)
          return 0;
@@ -11237,13 +10108,13 @@ static int stbtt__GetGlyphShapeTT(const stbtt_fontinfo *info, int glyph_index, s
       next_move = 0;
       flagcount=0;
 
-      /* in first pass, we load uninterpreted data into the allocated array */
-      /* above, shifted to the end of the array so we won't overwrite it when */
-      /* we create our final data starting from the front */
+      // in first pass, we load uninterpreted data into the allocated array
+      // above, shifted to the end of the array so we won't overwrite it when
+      // we create our final data starting from the front
 
-      off = m - n; /* starting offset for uninterpreted data, regardless of how m ends up being calculated */
+      off = m - n; // starting offset for uninterpreted data, regardless of how m ends up being calculated
 
-      /* first load flags */
+      // first load flags
 
       for (i=0; i < n; ++i) {
          if (flagcount == 0) {
@@ -11255,13 +10126,13 @@ static int stbtt__GetGlyphShapeTT(const stbtt_fontinfo *info, int glyph_index, s
          vertices[off+i].type = flags;
       }
 
-      /* now load x coordinates */
+      // now load x coordinates
       x=0;
       for (i=0; i < n; ++i) {
          flags = vertices[off+i].type;
          if (flags & 2) {
             stbtt_int16 dx = *points++;
-            x += (flags & 16) ? dx : -dx; /* ??? */
+            x += (flags & 16) ? dx : -dx; // ???
          } else {
             if (!(flags & 16)) {
                x = x + (stbtt_int16) (points[0]*256 + points[1]);
@@ -11271,13 +10142,13 @@ static int stbtt__GetGlyphShapeTT(const stbtt_fontinfo *info, int glyph_index, s
          vertices[off+i].x = (stbtt_int16) x;
       }
 
-      /* now load y coordinates */
+      // now load y coordinates
       y=0;
       for (i=0; i < n; ++i) {
          flags = vertices[off+i].type;
          if (flags & 4) {
             stbtt_int16 dy = *points++;
-            y += (flags & 32) ? dy : -dy; /* ??? */
+            y += (flags & 32) ? dy : -dy; // ???
          } else {
             if (!(flags & 32)) {
                y = y + (stbtt_int16) (points[0]*256 + points[1]);
@@ -11287,7 +10158,7 @@ static int stbtt__GetGlyphShapeTT(const stbtt_fontinfo *info, int glyph_index, s
          vertices[off+i].y = (stbtt_int16) y;
       }
 
-      /* now convert them to our format */
+      // now convert them to our format
       num_vertices=0;
       sx = sy = cx = cy = scx = scy = 0;
       for (i=0; i < n; ++i) {
@@ -11299,22 +10170,22 @@ static int stbtt__GetGlyphShapeTT(const stbtt_fontinfo *info, int glyph_index, s
             if (i != 0)
                num_vertices = stbtt__close_shape(vertices, num_vertices, was_off, start_off, sx,sy,scx,scy,cx,cy);
 
-            /* now start the new one */
+            // now start the new one               
             start_off = !(flags & 1);
             if (start_off) {
-               /* if we start off with an off-curve point, then when we need to find a point on the curve */
-               /* where we can start, and we need to save some state for when we wraparound. */
+               // if we start off with an off-curve point, then when we need to find a point on the curve
+               // where we can start, and we need to save some state for when we wraparound.
                scx = x;
                scy = y;
                if (!(vertices[off+i+1].type & 1)) {
-                  /* next point is also a curve point, so interpolate an on-point curve */
+                  // next point is also a curve point, so interpolate an on-point curve
                   sx = (x + (stbtt_int32) vertices[off+i+1].x) >> 1;
                   sy = (y + (stbtt_int32) vertices[off+i+1].y) >> 1;
                } else {
-                  /* otherwise just use the next point as our start point */
+                  // otherwise just use the next point as our start point
                   sx = (stbtt_int32) vertices[off+i+1].x;
                   sy = (stbtt_int32) vertices[off+i+1].y;
-                  ++i; /* we're using point i+1 as the starting point, so skip it */
+                  ++i; // we're using point i+1 as the starting point, so skip it
                }
             } else {
                sx = x;
@@ -11325,8 +10196,8 @@ static int stbtt__GetGlyphShapeTT(const stbtt_fontinfo *info, int glyph_index, s
             next_move = 1 + ttUSHORT(endPtsOfContours+j*2);
             ++j;
          } else {
-            if (!(flags & 1)) { /* if it's a curve */
-               if (was_off) /* two off-curve control points in a row means interpolate an on-curve midpoint */
+            if (!(flags & 1)) { // if it's a curve
+               if (was_off) // two off-curve control points in a row means interpolate an on-curve midpoint
                   stbtt_setvertex(&vertices[num_vertices++], STBTT_vcurve, (cx+x)>>1, (cy+y)>>1, cx, cy);
                cx = x;
                cy = y;
@@ -11342,7 +10213,7 @@ static int stbtt__GetGlyphShapeTT(const stbtt_fontinfo *info, int glyph_index, s
       }
       num_vertices = stbtt__close_shape(vertices, num_vertices, was_off, start_off, sx,sy,scx,scy,cx,cy);
    } else if (numberOfContours == -1) {
-      /* Compound shapes. */
+      // Compound shapes.
       int more = 1;
       stbtt_uint8 *comp = data + g + 10;
       num_vertices = 0;
@@ -11352,12 +10223,12 @@ static int stbtt__GetGlyphShapeTT(const stbtt_fontinfo *info, int glyph_index, s
          int comp_num_verts = 0, i;
          stbtt_vertex *comp_verts = 0, *tmp = 0;
          float mtx[6] = {1,0,0,1,0,0}, m, n;
-
+         
          flags = ttSHORT(comp); comp+=2;
          gidx = ttSHORT(comp); comp+=2;
 
-         if (flags & 2) { /* X_V2d values */
-            if (flags & 1) { /* shorts */
+         if (flags & 2) { // XY values
+            if (flags & 1) { // shorts
                mtx[4] = ttSHORT(comp); comp+=2;
                mtx[5] = ttSHORT(comp); comp+=2;
             } else {
@@ -11366,31 +10237,31 @@ static int stbtt__GetGlyphShapeTT(const stbtt_fontinfo *info, int glyph_index, s
             }
          }
          else {
-            /* @TODO handle matching point */
+            // @TODO handle matching point
             STBTT_assert(0);
          }
-         if (flags & (1<<3)) { /* WE_HAVE_A_SCALE */
+         if (flags & (1<<3)) { // WE_HAVE_A_SCALE
             mtx[0] = mtx[3] = ttSHORT(comp)/16384.0f; comp+=2;
             mtx[1] = mtx[2] = 0;
-         } else if (flags & (1<<6)) { /* WE_HAVE_AN_X_AND_YSCALE */
+         } else if (flags & (1<<6)) { // WE_HAVE_AN_X_AND_YSCALE
             mtx[0] = ttSHORT(comp)/16384.0f; comp+=2;
             mtx[1] = mtx[2] = 0;
             mtx[3] = ttSHORT(comp)/16384.0f; comp+=2;
-         } else if (flags & (1<<7)) { /* WE_HAVE_A_TWO_BY_TWO */
+         } else if (flags & (1<<7)) { // WE_HAVE_A_TWO_BY_TWO
             mtx[0] = ttSHORT(comp)/16384.0f; comp+=2;
             mtx[1] = ttSHORT(comp)/16384.0f; comp+=2;
             mtx[2] = ttSHORT(comp)/16384.0f; comp+=2;
             mtx[3] = ttSHORT(comp)/16384.0f; comp+=2;
          }
-
-         /* Find transformation scales. */
+         
+         // Find transformation scales.
          m = (float) STBTT_sqrt(mtx[0]*mtx[0] + mtx[1]*mtx[1]);
          n = (float) STBTT_sqrt(mtx[2]*mtx[2] + mtx[3]*mtx[3]);
 
-         /* Get indexed glyph. */
+         // Get indexed glyph.
          comp_num_verts = stbtt_GetGlyphShape(info, gidx, &comp_verts);
          if (comp_num_verts > 0) {
-            /* Transform vertices. */
+            // Transform vertices.
             for (i = 0; i < comp_num_verts; ++i) {
                stbtt_vertex* v = &comp_verts[i];
                stbtt_vertex_type x,y;
@@ -11401,7 +10272,7 @@ static int stbtt__GetGlyphShapeTT(const stbtt_fontinfo *info, int glyph_index, s
                v->cx = (stbtt_vertex_type)(m * (mtx[0]*x + mtx[2]*y + mtx[4]));
                v->cy = (stbtt_vertex_type)(n * (mtx[1]*x + mtx[3]*y + mtx[5]));
             }
-            /* Append vertices. */
+            // Append vertices.
             tmp = (stbtt_vertex*)STBTT_malloc((num_vertices+comp_num_verts)*sizeof(stbtt_vertex), info->userdata);
             if (!tmp) {
                if (vertices) STBTT_free(vertices, info->userdata);
@@ -11415,14 +10286,14 @@ static int stbtt__GetGlyphShapeTT(const stbtt_fontinfo *info, int glyph_index, s
             STBTT_free(comp_verts, info->userdata);
             num_vertices += comp_num_verts;
          }
-         /* More components ? */
+         // More components ?
          more = flags & (1<<5);
       }
    } else if (numberOfContours < 0) {
-      /* @TODO other compound variations? */
+      // @TODO other compound variations?
       STBTT_assert(0);
    } else {
-      /* numberOfCounters == 0, do nothing */
+      // numberOfCounters == 0, do nothing
    }
 
    *pvertices = vertices;
@@ -11522,7 +10393,7 @@ static stbtt__buf stbtt__cid_get_glyph_subrs(const stbtt_fontinfo *info, int gly
    stbtt__buf_seek(&fdselect, 0);
    fmt = stbtt__buf_get8(&fdselect);
    if (fmt == 0) {
-      /* untested */
+      // untested
       stbtt__buf_skip(&fdselect, glyph_index);
       fdselector = stbtt__buf_get8(&fdselect);
    } else if (fmt == 3) {
@@ -11552,58 +10423,58 @@ static int stbtt__run_charstring(const stbtt_fontinfo *info, int glyph_index, st
 
 #define STBTT__CSERR(s) (0)
 
-   /* this currently ignores the initial width value, which isn't needed if we have hmtx */
+   // this currently ignores the initial width value, which isn't needed if we have hmtx
    b = stbtt__cff_index_get(info->charstrings, glyph_index);
    while (b.cursor < b.size) {
       i = 0;
       clear_stack = 1;
       b0 = stbtt__buf_get8(&b);
       switch (b0) {
-      /* @TODO implement hinting */
-      case 0x13: /* hintmask */
-      case 0x14: /* cntrmask */
+      // @TODO implement hinting
+      case 0x13: // hintmask
+      case 0x14: // cntrmask
          if (in_header)
-            maskbits += (sp / 2); /* implicit "vstem" */
+            maskbits += (sp / 2); // implicit "vstem"
          in_header = 0;
          stbtt__buf_skip(&b, (maskbits + 7) / 8);
          break;
 
-      case 0x01: /* hstem */
-      case 0x03: /* vstem */
-      case 0x12: /* hstemhm */
-      case 0x17: /* vstemhm */
+      case 0x01: // hstem
+      case 0x03: // vstem
+      case 0x12: // hstemhm
+      case 0x17: // vstemhm
          maskbits += (sp / 2);
          break;
 
-      case 0x15: /* rmoveto */
+      case 0x15: // rmoveto
          in_header = 0;
          if (sp < 2) return STBTT__CSERR("rmoveto stack");
          stbtt__csctx_rmove_to(c, s[sp-2], s[sp-1]);
          break;
-      case 0x04: /* vmoveto */
+      case 0x04: // vmoveto
          in_header = 0;
          if (sp < 1) return STBTT__CSERR("vmoveto stack");
          stbtt__csctx_rmove_to(c, 0, s[sp-1]);
          break;
-      case 0x16: /* hmoveto */
+      case 0x16: // hmoveto
          in_header = 0;
          if (sp < 1) return STBTT__CSERR("hmoveto stack");
          stbtt__csctx_rmove_to(c, s[sp-1], 0);
          break;
 
-      case 0x05: /* rlineto */
+      case 0x05: // rlineto
          if (sp < 2) return STBTT__CSERR("rlineto stack");
          for (; i + 1 < sp; i += 2)
             stbtt__csctx_rline_to(c, s[i], s[i+1]);
          break;
 
-      /* hlineto/vlineto and vhcurveto/hvcurveto alternate horizontal and vertical */
-      /* starting from a different place. */
+      // hlineto/vlineto and vhcurveto/hvcurveto alternate horizontal and vertical
+      // starting from a different place.
 
-      case 0x07: /* vlineto */
+      case 0x07: // vlineto
          if (sp < 1) return STBTT__CSERR("vlineto stack");
          goto vlineto;
-      case 0x06: /* hlineto */
+      case 0x06: // hlineto
          if (sp < 1) return STBTT__CSERR("hlineto stack");
          for (;;) {
             if (i >= sp) break;
@@ -11616,10 +10487,10 @@ static int stbtt__run_charstring(const stbtt_fontinfo *info, int glyph_index, st
          }
          break;
 
-      case 0x1F: /* hvcurveto */
+      case 0x1F: // hvcurveto
          if (sp < 4) return STBTT__CSERR("hvcurveto stack");
          goto hvcurveto;
-      case 0x1E: /* vhcurveto */
+      case 0x1E: // vhcurveto
          if (sp < 4) return STBTT__CSERR("vhcurveto stack");
          for (;;) {
             if (i + 3 >= sp) break;
@@ -11632,13 +10503,13 @@ static int stbtt__run_charstring(const stbtt_fontinfo *info, int glyph_index, st
          }
          break;
 
-      case 0x08: /* rrcurveto */
+      case 0x08: // rrcurveto
          if (sp < 6) return STBTT__CSERR("rcurveline stack");
          for (; i + 5 < sp; i += 6)
             stbtt__csctx_rccurve_to(c, s[i], s[i+1], s[i+2], s[i+3], s[i+4], s[i+5]);
          break;
 
-      case 0x18: /* rcurveline */
+      case 0x18: // rcurveline
          if (sp < 8) return STBTT__CSERR("rcurveline stack");
          for (; i + 5 < sp - 2; i += 6)
             stbtt__csctx_rccurve_to(c, s[i], s[i+1], s[i+2], s[i+3], s[i+4], s[i+5]);
@@ -11646,7 +10517,7 @@ static int stbtt__run_charstring(const stbtt_fontinfo *info, int glyph_index, st
          stbtt__csctx_rline_to(c, s[i], s[i+1]);
          break;
 
-      case 0x19: /* rlinecurve */
+      case 0x19: // rlinecurve
          if (sp < 8) return STBTT__CSERR("rlinecurve stack");
          for (; i + 1 < sp - 6; i += 2)
             stbtt__csctx_rline_to(c, s[i], s[i+1]);
@@ -11654,8 +10525,8 @@ static int stbtt__run_charstring(const stbtt_fontinfo *info, int glyph_index, st
          stbtt__csctx_rccurve_to(c, s[i], s[i+1], s[i+2], s[i+3], s[i+4], s[i+5]);
          break;
 
-      case 0x1A: /* vvcurveto */
-      case 0x1B: /* hhcurveto */
+      case 0x1A: // vvcurveto
+      case 0x1B: // hhcurveto
          if (sp < 4) return STBTT__CSERR("(vv|hh)curveto stack");
          f = 0.0;
          if (sp & 1) { f = s[i]; i++; }
@@ -11668,14 +10539,14 @@ static int stbtt__run_charstring(const stbtt_fontinfo *info, int glyph_index, st
          }
          break;
 
-      case 0x0A: /* callsubr */
+      case 0x0A: // callsubr
          if (!has_subrs) {
             if (info->fdselect.size)
                subrs = stbtt__cid_get_glyph_subrs(info, glyph_index);
             has_subrs = 1;
          }
-         /* fallthrough */
-      case 0x1D: /* callgsubr */
+         // fallthrough
+      case 0x1D: // callgsubr
          if (sp < 1) return STBTT__CSERR("call(g|)subr stack");
          v = (int) s[--sp];
          if (subr_stack_height >= 10) return STBTT__CSERR("recursion limit");
@@ -11686,24 +10557,24 @@ static int stbtt__run_charstring(const stbtt_fontinfo *info, int glyph_index, st
          clear_stack = 0;
          break;
 
-      case 0x0B: /* return */
+      case 0x0B: // return
          if (subr_stack_height <= 0) return STBTT__CSERR("return outside subr");
          b = subr_stack[--subr_stack_height];
          clear_stack = 0;
          break;
 
-      case 0x0E: /* endchar */
+      case 0x0E: // endchar
          stbtt__csctx_close_shape(c);
          return 1;
 
-      case 0x0C: { /* two-byte escape */
+      case 0x0C: { // two-byte escape
          float dx1, dx2, dx3, dx4, dx5, dx6, dy1, dy2, dy3, dy4, dy5, dy6;
          float dx, dy;
          int b1 = stbtt__buf_get8(&b);
          switch (b1) {
-         /* @TODO These "flex" implementations ignore the flex-depth and resolution, */
-         /* and always draw beziers. */
-         case 0x22: /* hflex */
+         // @TODO These "flex" implementations ignore the flex-depth and resolution,
+         // and always draw beziers.
+         case 0x22: // hflex
             if (sp < 7) return STBTT__CSERR("hflex stack");
             dx1 = s[0];
             dx2 = s[1];
@@ -11716,7 +10587,7 @@ static int stbtt__run_charstring(const stbtt_fontinfo *info, int glyph_index, st
             stbtt__csctx_rccurve_to(c, dx4, 0, dx5, -dy2, dx6, 0);
             break;
 
-         case 0x23: /* flex */
+         case 0x23: // flex
             if (sp < 13) return STBTT__CSERR("flex stack");
             dx1 = s[0];
             dy1 = s[1];
@@ -11730,12 +10601,12 @@ static int stbtt__run_charstring(const stbtt_fontinfo *info, int glyph_index, st
             dy5 = s[9];
             dx6 = s[10];
             dy6 = s[11];
-            /* fd is s[12] */
+            //fd is s[12]
             stbtt__csctx_rccurve_to(c, dx1, dy1, dx2, dy2, dx3, dy3);
             stbtt__csctx_rccurve_to(c, dx4, dy4, dx5, dy5, dx6, dy6);
             break;
 
-         case 0x24: /* hflex1 */
+         case 0x24: // hflex1
             if (sp < 9) return STBTT__CSERR("hflex1 stack");
             dx1 = s[0];
             dy1 = s[1];
@@ -11750,7 +10621,7 @@ static int stbtt__run_charstring(const stbtt_fontinfo *info, int glyph_index, st
             stbtt__csctx_rccurve_to(c, dx4, 0, dx5, dy5, dx6, -(dy1+dy2+dy5));
             break;
 
-         case 0x25: /* flex1 */
+         case 0x25: // flex1
             if (sp < 11) return STBTT__CSERR("flex1 stack");
             dx1 = s[0];
             dy1 = s[1];
@@ -11782,7 +10653,7 @@ static int stbtt__run_charstring(const stbtt_fontinfo *info, int glyph_index, st
          if (b0 != 255 && b0 != 28 && (b0 < 32 || b0 > 254))
             return STBTT__CSERR("reserved operator");
 
-         /* push immediate */
+         // push immediate
          if (b0 == 255) {
             f = (float)(stbtt_int32)stbtt__buf_get32(&b) / 0x10000;
          } else {
@@ -11803,7 +10674,7 @@ static int stbtt__run_charstring(const stbtt_fontinfo *info, int glyph_index, st
 
 static int stbtt__GetGlyphShapeT2(const stbtt_fontinfo *info, int glyph_index, stbtt_vertex **pvertices)
 {
-   /* runs the charstring twice, once to count and once to output (to avoid realloc) */
+   // runs the charstring twice, once to count and once to output (to avoid realloc)
    stbtt__csctx count_ctx = STBTT__CSCTX_INIT(1);
    stbtt__csctx output_ctx = STBTT__CSCTX_INIT(0);
    if (stbtt__run_charstring(info, glyph_index, &count_ctx)) {
@@ -11855,12 +10726,12 @@ static int  stbtt__GetGlyphKernInfoAdvance(const stbtt_fontinfo *info, int glyph
    stbtt_uint32 needle, straw;
    int l, r, m;
 
-   /* we only look at the first table. it must be 'horizontal' and format 0. */
+   // we only look at the first table. it must be 'horizontal' and format 0.
    if (!info->kern)
       return 0;
-   if (ttUSHORT(data+2) < 1) /* number of tables, need at least 1 */
+   if (ttUSHORT(data+2) < 1) // number of tables, need at least 1
       return 0;
-   if (ttUSHORT(data+8) != 1) /* horizontal flag must be set in format */
+   if (ttUSHORT(data+8) != 1) // horizontal flag must be set in format
       return 0;
 
    l = 0;
@@ -11868,7 +10739,7 @@ static int  stbtt__GetGlyphKernInfoAdvance(const stbtt_fontinfo *info, int glyph
    needle = glyph1 << 16 | glyph2;
    while (l <= r) {
       m = (l + r) >> 1;
-      straw = ttULONG(data+18+(m*6)); /* note: unaligned read */
+      straw = ttULONG(data+18+(m*6)); // note: unaligned read
       if (needle < straw)
          r = m - 1;
       else if (needle > straw)
@@ -11886,7 +10757,7 @@ static stbtt_int32  stbtt__GetCoverageIndex(stbtt_uint8 *coverageTable, int glyp
         case 1: {
             stbtt_uint16 glyphCount = ttUSHORT(coverageTable + 2);
 
-            /* Binary search. */
+            // Binary search.
             stbtt_int32 l=0, r=glyphCount-1, m;
             int straw, needle=glyph;
             while (l <= r) {
@@ -11909,7 +10780,7 @@ static stbtt_int32  stbtt__GetCoverageIndex(stbtt_uint8 *coverageTable, int glyp
             stbtt_uint16 rangeCount = ttUSHORT(coverageTable + 2);
             stbtt_uint8 *rangeArray = coverageTable + 4;
 
-            /* Binary search. */
+            // Binary search.
             stbtt_int32 l=0, r=rangeCount-1, m;
             int strawStart, strawEnd, needle=glyph;
             while (l <= r) {
@@ -11930,7 +10801,7 @@ static stbtt_int32  stbtt__GetCoverageIndex(stbtt_uint8 *coverageTable, int glyp
         } break;
 
         default: {
-            /* There are no other cases. */
+            // There are no other cases.
             STBTT_assert(0);
         } break;
     }
@@ -11958,7 +10829,7 @@ static stbtt_int32  stbtt__GetGlyphClass(stbtt_uint8 *classDefTable, int glyph)
             stbtt_uint16 classRangeCount = ttUSHORT(classDefTable + 2);
             stbtt_uint8 *classRangeRecords = classDefTable + 4;
 
-            /* Binary search. */
+            // Binary search.
             stbtt_int32 l=0, r=classRangeCount-1, m;
             int strawStart, strawEnd, needle=glyph;
             while (l <= r) {
@@ -11979,7 +10850,7 @@ static stbtt_int32  stbtt__GetGlyphClass(stbtt_uint8 *classDefTable, int glyph)
         } break;
 
         default: {
-            /* There are no other cases. */
+            // There are no other cases.
             STBTT_assert(0);
         } break;
     }
@@ -11987,7 +10858,7 @@ static stbtt_int32  stbtt__GetGlyphClass(stbtt_uint8 *classDefTable, int glyph)
     return -1;
 }
 
-/* Define to STBTT_assert(x) if you want to break on unimplemented formats. */
+// Define to STBTT_assert(x) if you want to break on unimplemented formats.
 #define STBTT_GPOS_TODO_assert(x)
 
 static stbtt_int32  stbtt__GetGlyphGPOSInfoAdvance(const stbtt_fontinfo *info, int glyph1, int glyph2)
@@ -12002,8 +10873,8 @@ static stbtt_int32  stbtt__GetGlyphGPOSInfoAdvance(const stbtt_fontinfo *info, i
 
     data = info->data + info->gpos;
 
-    if (ttUSHORT(data+0) != 1) return 0; /* Major version 1 */
-    if (ttUSHORT(data+2) != 0) return 0; /* Minor version 0 */
+    if (ttUSHORT(data+0) != 1) return 0; // Major version 1
+    if (ttUSHORT(data+2) != 0) return 0; // Minor version 0
 
     lookupListOffset = ttUSHORT(data+8);
     lookupList = data + lookupListOffset;
@@ -12017,7 +10888,7 @@ static stbtt_int32  stbtt__GetGlyphGPOSInfoAdvance(const stbtt_fontinfo *info, i
         stbtt_uint16 subTableCount = ttUSHORT(lookupTable + 4);
         stbtt_uint8 *subTableOffsets = lookupTable + 6;
         switch(lookupType) {
-            case 2: { /* Pair Adjustment Positioning Subtable */
+            case 2: { // Pair Adjustment Positioning Subtable
                 stbtt_int32 sti;
                 for (sti=0; sti<subTableCount; sti++) {
                     stbtt_uint16 subtableOffset = ttUSHORT(subTableOffsets + 2 * sti);
@@ -12039,19 +10910,20 @@ static stbtt_int32  stbtt__GetGlyphGPOSInfoAdvance(const stbtt_fontinfo *info, i
                             stbtt_uint8 *pairValueTable = table + pairPosOffset;
                             stbtt_uint16 pairValueCount = ttUSHORT(pairValueTable);
                             stbtt_uint8 *pairValueArray = pairValueTable + 2;
-                            /* TODO: Support more formats. */
+                            // TODO: Support more formats.
                             STBTT_GPOS_TODO_assert(valueFormat1 == 4);
                             if (valueFormat1 != 4) return 0;
                             STBTT_GPOS_TODO_assert(valueFormat2 == 0);
                             if (valueFormat2 != 0) return 0;
 
                             STBTT_assert(coverageIndex < pairSetCount);
+                            STBTT__NOTUSED(pairSetCount);
 
                             needle=glyph2;
                             r=pairValueCount-1;
                             l=0;
 
-                            /* Binary search. */
+                            // Binary search.
                             while (l <= r) {
                                 stbtt_uint16 secondGlyph;
                                 stbtt_uint8 *pairValue;
@@ -12084,7 +10956,7 @@ static stbtt_int32  stbtt__GetGlyphGPOSInfoAdvance(const stbtt_fontinfo *info, i
                             STBTT_assert(glyph1class < class1Count);
                             STBTT_assert(glyph2class < class2Count);
 
-                            /* TODO: Support more formats. */
+                            // TODO: Support more formats.
                             STBTT_GPOS_TODO_assert(valueFormat1 == 4);
                             if (valueFormat1 != 4) return 0;
                             STBTT_GPOS_TODO_assert(valueFormat2 == 0);
@@ -12099,7 +10971,7 @@ static stbtt_int32  stbtt__GetGlyphGPOSInfoAdvance(const stbtt_fontinfo *info, i
                         } break;
 
                         default: {
-                            /* There are no other cases. */
+                            // There are no other cases.
                             STBTT_assert(0);
                             break;
                         };
@@ -12109,7 +10981,7 @@ static stbtt_int32  stbtt__GetGlyphGPOSInfoAdvance(const stbtt_fontinfo *info, i
             };
 
             default:
-                /* TODO: Implement other stuff. */
+                // TODO: Implement other stuff.
                 break;
         }
     }
@@ -12123,8 +10995,7 @@ STBTT_DEF int  stbtt_GetGlyphKernAdvance(const stbtt_fontinfo *info, int g1, int
 
    if (info->gpos)
       xAdvance += stbtt__GetGlyphGPOSInfoAdvance(info, g1, g2);
-
-   if (info->kern)
+   else if (info->kern)
       xAdvance += stbtt__GetGlyphKernInfoAdvance(info, g1, g2);
 
    return xAdvance;
@@ -12132,7 +11003,7 @@ STBTT_DEF int  stbtt_GetGlyphKernAdvance(const stbtt_fontinfo *info, int g1, int
 
 STBTT_DEF int  stbtt_GetCodepointKernAdvance(const stbtt_fontinfo *info, int ch1, int ch2)
 {
-   if (!info->kern && !info->gpos) /* if no kerning table, don't waste time looking up both codepoint->glyphs */
+   if (!info->kern && !info->gpos) // if no kerning table, don't waste time looking up both codepoint->glyphs
       return 0;
    return stbtt_GetGlyphKernAdvance(info, stbtt_FindGlyphIndex(info,ch1), stbtt_FindGlyphIndex(info,ch2));
 }
@@ -12185,22 +11056,22 @@ STBTT_DEF void stbtt_FreeShape(const stbtt_fontinfo *info, stbtt_vertex *v)
    STBTT_free(v, info->userdata);
 }
 
-/* //////////////////////////////////////////////////////////////////////////// */
-/*  */
-/* antialiasing software rasterizer */
-/*  */
+//////////////////////////////////////////////////////////////////////////////
+//
+// antialiasing software rasterizer
+//
 
 STBTT_DEF void stbtt_GetGlyphBitmapBoxSubpixel(const stbtt_fontinfo *font, int glyph, float scale_x, float scale_y,float shift_x, float shift_y, int *ix0, int *iy0, int *ix1, int *iy1)
 {
-   int x0=0,y0=0,x1,y1; /* =0 suppresses compiler warning */
+   int x0=0,y0=0,x1,y1; // =0 suppresses compiler warning
    if (!stbtt_GetGlyphBox(font, glyph, &x0,&y0,&x1,&y1)) {
-      /* e.g. space character */
+      // e.g. space character
       if (ix0) *ix0 = 0;
       if (iy0) *iy0 = 0;
       if (ix1) *ix1 = 0;
       if (iy1) *iy1 = 0;
    } else {
-      /* move to integral bboxes (treating pixels as little squares, what pixels get touched)? */
+      // move to integral bboxes (treating pixels as little squares, what pixels get touched)?
       if (ix0) *ix0 = STBTT_ifloor( x0 * scale_x + shift_x);
       if (iy0) *iy0 = STBTT_ifloor(-y1 * scale_y + shift_y);
       if (ix1) *ix1 = STBTT_iceil ( x1 * scale_x + shift_x);
@@ -12223,9 +11094,9 @@ STBTT_DEF void stbtt_GetCodepointBitmapBox(const stbtt_fontinfo *font, int codep
    stbtt_GetCodepointBitmapBoxSubpixel(font, codepoint, scale_x, scale_y,0.0f,0.0f, ix0,iy0,ix1,iy1);
 }
 
-/* //////////////////////////////////////////////////////////////////////////// */
-/*  */
-/* Rasterizer */
+//////////////////////////////////////////////////////////////////////////////
+//
+//  Rasterizer
 
 typedef struct stbtt__hheap_chunk
 {
@@ -12310,14 +11181,14 @@ static stbtt__active_edge *stbtt__new_active(stbtt__hheap *hh, stbtt__edge *e, i
    float dxdy = (e->x1 - e->x0) / (e->y1 - e->y0);
    STBTT_assert(z != NULL);
    if (!z) return z;
-
-   /* round dx down to avoid overshooting */
+   
+   // round dx down to avoid overshooting
    if (dxdy < 0)
       z->dx = -STBTT_ifloor(STBTT_FIX * -dxdy);
    else
       z->dx = STBTT_ifloor(STBTT_FIX * dxdy);
 
-   z->x = STBTT_ifloor(STBTT_FIX * e->x0 + z->dx * (start_point - e->y0)); /* use z->dx so when we offset later it's by the same amount */
+   z->x = STBTT_ifloor(STBTT_FIX * e->x0 + z->dx * (start_point - e->y0)); // use z->dx so when we offset later it's by the same amount
    z->x -= off_x * STBTT_FIX;
 
    z->ey = e->y1;
@@ -12331,7 +11202,7 @@ static stbtt__active_edge *stbtt__new_active(stbtt__hheap *hh, stbtt__edge *e, i
    stbtt__active_edge *z = (stbtt__active_edge *) stbtt__hheap_alloc(hh, sizeof(*z), userdata);
    float dxdy = (e->x1 - e->x0) / (e->y1 - e->y0);
    STBTT_assert(z != NULL);
-   /* STBTT_assert(e->y0 <= start_point); */
+   //STBTT_assert(e->y0 <= start_point);
    if (!z) return z;
    z->fdx = dxdy;
    z->fdy = dxdy != 0.0f ? (1.0f/dxdy) : 0.0f;
@@ -12348,47 +11219,47 @@ static stbtt__active_edge *stbtt__new_active(stbtt__hheap *hh, stbtt__edge *e, i
 #endif
 
 #if STBTT_RASTERIZER_VERSION == 1
-/* note: this routine clips fills that extend off the edges... ideally this */
-/* wouldn't happen, but it could happen if the truetype glyph bounding boxes */
-/* are wrong, or if the user supplies a too-small bitmap */
+// note: this routine clips fills that extend off the edges... ideally this
+// wouldn't happen, but it could happen if the truetype glyph bounding boxes
+// are wrong, or if the user supplies a too-small bitmap
 static void stbtt__fill_active_edges(unsigned char *scanline, int len, stbtt__active_edge *e, int max_weight)
 {
-   /* non-zero winding fill */
+   // non-zero winding fill
    int x0=0, w=0;
 
    while (e) {
       if (w == 0) {
-         /* if we're currently at zero, we need to record the edge start point */
+         // if we're currently at zero, we need to record the edge start point
          x0 = e->x; w += e->direction;
       } else {
          int x1 = e->x; w += e->direction;
-         /* if we went to zero, we need to draw */
+         // if we went to zero, we need to draw
          if (w == 0) {
             int i = x0 >> STBTT_FIXSHIFT;
             int j = x1 >> STBTT_FIXSHIFT;
 
             if (i < len && j >= 0) {
                if (i == j) {
-                  /* x0,x1 are the same pixel, so compute combined coverage */
+                  // x0,x1 are the same pixel, so compute combined coverage
                   scanline[i] = scanline[i] + (stbtt_uint8) ((x1 - x0) * max_weight >> STBTT_FIXSHIFT);
                } else {
-                  if (i >= 0) /* add antialiasing for x0 */
+                  if (i >= 0) // add antialiasing for x0
                      scanline[i] = scanline[i] + (stbtt_uint8) (((STBTT_FIX - (x0 & STBTT_FIXMASK)) * max_weight) >> STBTT_FIXSHIFT);
                   else
-                     i = -1; /* clip */
+                     i = -1; // clip
 
-                  if (j < len) /* add antialiasing for x1 */
+                  if (j < len) // add antialiasing for x1
                      scanline[j] = scanline[j] + (stbtt_uint8) (((x1 & STBTT_FIXMASK) * max_weight) >> STBTT_FIXSHIFT);
                   else
-                     j = len; /* clip */
+                     j = len; // clip
 
-                  for (++i; i < j; ++i) /* fill pixels between x0 and x1 */
+                  for (++i; i < j; ++i) // fill pixels between x0 and x1
                      scanline[i] = scanline[i] + (stbtt_uint8) max_weight;
                }
             }
          }
       }
-
+      
       e = e->next;
    }
 }
@@ -12398,8 +11269,8 @@ static void stbtt__rasterize_sorted_edges(stbtt__bitmap *result, stbtt__edge *e,
    stbtt__hheap hh = { 0, 0, 0 };
    stbtt__active_edge *active = NULL;
    int y,j=0;
-   int max_weight = (255 / vsubsample);  /* weight per vertical scanline */
-   int s; /* vertical subsample index */
+   int max_weight = (255 / vsubsample);  // weight per vertical scanline
+   int s; // vertical subsample index
    unsigned char scanline_data[512], *scanline;
 
    if (result->w > 512)
@@ -12413,26 +11284,26 @@ static void stbtt__rasterize_sorted_edges(stbtt__bitmap *result, stbtt__edge *e,
    while (j < result->h) {
       STBTT_memset(scanline, 0, result->w);
       for (s=0; s < vsubsample; ++s) {
-         /* find center of pixel for this scanline */
+         // find center of pixel for this scanline
          float scan_y = y + 0.5f;
          stbtt__active_edge **step = &active;
 
-         /* update all active edges; */
-         /* remove all active edges that terminate before the center of this scanline */
+         // update all active edges;
+         // remove all active edges that terminate before the center of this scanline
          while (*step) {
             stbtt__active_edge * z = *step;
             if (z->ey <= scan_y) {
-               *step = z->next; /* delete from list */
+               *step = z->next; // delete from list
                STBTT_assert(z->direction);
                z->direction = 0;
                stbtt__hheap_free(&hh, z);
             } else {
-               z->x += z->dx; /* advance to position for current scanline */
-               step = &((*step)->next); /* advance through list */
+               z->x += z->dx; // advance to position for current scanline
+               step = &((*step)->next); // advance through list
             }
          }
 
-         /* resort the list if needed */
+         // resort the list if needed
          for(;;) {
             int changed=0;
             step = &active;
@@ -12451,24 +11322,24 @@ static void stbtt__rasterize_sorted_edges(stbtt__bitmap *result, stbtt__edge *e,
             if (!changed) break;
          }
 
-         /* insert all edges that start before the center of this scanline -- omit ones that also end on this scanline */
+         // insert all edges that start before the center of this scanline -- omit ones that also end on this scanline
          while (e->y0 <= scan_y) {
             if (e->y1 > scan_y) {
                stbtt__active_edge *z = stbtt__new_active(&hh, e, off_x, scan_y, userdata);
                if (z != NULL) {
-                  /* find insertion point */
+                  // find insertion point
                   if (active == NULL)
                      active = z;
                   else if (z->x < active->x) {
-                     /* insert at front */
+                     // insert at front
                      z->next = active;
                      active = z;
                   } else {
-                     /* find thing to insert AFTER */
+                     // find thing to insert AFTER
                      stbtt__active_edge *p = active;
                      while (p->next && p->next->x < z->x)
                         p = p->next;
-                     /* at this point, p->next->x is NOT < z->x */
+                     // at this point, p->next->x is NOT < z->x
                      z->next = p->next;
                      p->next = z;
                   }
@@ -12477,7 +11348,7 @@ static void stbtt__rasterize_sorted_edges(stbtt__bitmap *result, stbtt__edge *e,
             ++e;
          }
 
-         /* now process all active edges in XOR fashion */
+         // now process all active edges in XOR fashion
          if (active)
             stbtt__fill_active_edges(scanline, result->w, active, max_weight);
 
@@ -12495,8 +11366,8 @@ static void stbtt__rasterize_sorted_edges(stbtt__bitmap *result, stbtt__edge *e,
 
 #elif STBTT_RASTERIZER_VERSION == 2
 
-/* the edge passed in here does not cross the vertical line at x or the vertical line at x+1 */
-/* (i.e. it has already been clipped to those) */
+// the edge passed in here does not cross the vertical line at x or the vertical line at x+1
+// (i.e. it has already been clipped to those)
 static void stbtt__handle_clipped_edge(float *scanline, int x, stbtt__active_edge *e, float x0, float y0, float x1, float y1)
 {
    if (y0 == y1) return;
@@ -12530,7 +11401,7 @@ static void stbtt__handle_clipped_edge(float *scanline, int x, stbtt__active_edg
       ;
    else {
       STBTT_assert(x0 >= x && x0 <= x+1 && x1 >= x && x1 <= x+1);
-      scanline[x] += e->direction * (y1-y0) * (1-((x0-x)+(x1-x))/2); /* coverage = 1 - average x position */
+      scanline[x] += e->direction * (y1-y0) * (1-((x0-x)+(x1-x))/2); // coverage = 1 - average x position
    }
 }
 
@@ -12539,9 +11410,9 @@ static void stbtt__fill_active_edges_new(float *scanline, float *scanline_fill, 
    float y_bottom = y_top+1;
 
    while (e) {
-      /* brute force every pixel */
+      // brute force every pixel
 
-      /* compute intersection points with top & bottom */
+      // compute intersection points with top & bottom
       STBTT_assert(e->ey >= y_top);
 
       if (e->fdx == 0) {
@@ -12563,9 +11434,9 @@ static void stbtt__fill_active_edges_new(float *scanline, float *scanline_fill, 
          float dy = e->fdy;
          STBTT_assert(e->sy <= y_bottom && e->ey >= y_top);
 
-         /* compute endpoints of line segment clipped to this scanline (if the */
-         /* line segment starts on this scanline. x0 is the intersection of the */
-         /* line with y_top, but that may be off the line segment. */
+         // compute endpoints of line segment clipped to this scanline (if the
+         // line segment starts on this scanline. x0 is the intersection of the
+         // line with y_top, but that may be off the line segment.
          if (e->sy > y_top) {
             x_top = x0 + dx * (e->sy - y_top);
             sy0 = e->sy;
@@ -12582,22 +11453,22 @@ static void stbtt__fill_active_edges_new(float *scanline, float *scanline_fill, 
          }
 
          if (x_top >= 0 && x_bottom >= 0 && x_top < len && x_bottom < len) {
-            /* from here on, we don't have to range check x values */
+            // from here on, we don't have to range check x values
 
             if ((int) x_top == (int) x_bottom) {
                float height;
-               /* simple case, only spans one pixel */
+               // simple case, only spans one pixel
                int x = (int) x_top;
                height = sy1 - sy0;
                STBTT_assert(x >= 0 && x < len);
                scanline[x] += e->direction * (1-((x_top - x) + (x_bottom-x))/2)  * height;
-               scanline_fill[x] += e->direction * height; /* everything right of this pixel is filled */
+               scanline_fill[x] += e->direction * height; // everything right of this pixel is filled
             } else {
                int x,x1,x2;
                float y_crossing, step, sign, area;
-               /* covers 2+ pixels */
+               // covers 2+ pixels
                if (x_top > x_bottom) {
-                  /* flip scanline vertically; signed area is the same */
+                  // flip scanline vertically; signed area is the same
                   float t;
                   sy0 = y_bottom - (sy0 - y_top);
                   sy1 = y_bottom - (sy1 - y_top);
@@ -12610,13 +11481,13 @@ static void stbtt__fill_active_edges_new(float *scanline, float *scanline_fill, 
 
                x1 = (int) x_top;
                x2 = (int) x_bottom;
-               /* compute intersection with y axis at x1+1 */
+               // compute intersection with y axis at x1+1
                y_crossing = (x1+1 - x0) * dy + y_top;
 
                sign = e->direction;
-               /* area of the rectangle covered from y0..y_crossing */
+               // area of the rectangle covered from y0..y_crossing
                area = sign * (y_crossing-sy0);
-               /* area of the triangle (x_top,y0), (x+1,y0), (x+1,y_crossing) */
+               // area of the triangle (x_top,y0), (x+1,y0), (x+1,y_crossing)
                scanline[x1] += area * (1-((x_top - x1)+(x1+1-x1))/2);
 
                step = sign * dy;
@@ -12633,59 +11504,59 @@ static void stbtt__fill_active_edges_new(float *scanline, float *scanline_fill, 
                scanline_fill[x2] += sign * (sy1-sy0);
             }
          } else {
-            /* if edge goes outside of box we're drawing, we require */
-            /* clipping logic. since this does not match the intended use */
-            /* of this library, we use a different, very slow brute */
-            /* force implementation */
+            // if edge goes outside of box we're drawing, we require
+            // clipping logic. since this does not match the intended use
+            // of this library, we use a different, very slow brute
+            // force implementation
             int x;
             for (x=0; x < len; ++x) {
-               /* cases: */
-               /*  */
-               /* there can be up to two intersections with the pixel. any intersection */
-               /* with left or right edges can be handled by splitting into two (or three) */
-               /* regions. intersections with top & bottom do not necessitate case-wise logic. */
-               /*  */
-               /* the old way of doing this found the intersections with the left & right edges, */
-               /* then used some simple logic to produce up to three segments in sorted order */
-               /* from top-to-bottom. however, this had a problem: if an x edge was epsilon */
-               /* across the x border, then the corresponding y position might not be distinct */
-               /* from the other y segment, and it might ignored as an empty segment. to avoid */
-               /* that, we need to explicitly produce segments based on x positions. */
+               // cases:
+               //
+               // there can be up to two intersections with the pixel. any intersection
+               // with left or right edges can be handled by splitting into two (or three)
+               // regions. intersections with top & bottom do not necessitate case-wise logic.
+               //
+               // the old way of doing this found the intersections with the left & right edges,
+               // then used some simple logic to produce up to three segments in sorted order
+               // from top-to-bottom. however, this had a problem: if an x edge was epsilon
+               // across the x border, then the corresponding y position might not be distinct
+               // from the other y segment, and it might ignored as an empty segment. to avoid
+               // that, we need to explicitly produce segments based on x positions.
 
-               /* rename variables to clearly-defined pairs */
+               // rename variables to clearly-defined pairs
                float y0 = y_top;
                float x1 = (float) (x);
                float x2 = (float) (x+1);
                float x3 = xb;
                float y3 = y_bottom;
 
-               /* x = e->x + e->dx * (y-y_top) */
-               /* (y-y_top) = (x - e->x) / e->dx */
-               /* y = (x - e->x) / e->dx + y_top */
+               // x = e->x + e->dx * (y-y_top)
+               // (y-y_top) = (x - e->x) / e->dx
+               // y = (x - e->x) / e->dx + y_top
                float y1 = (x - x0) / dx + y_top;
                float y2 = (x+1 - x0) / dx + y_top;
 
-               if (x0 < x1 && x3 > x2) {         /* three segments descending down-right */
+               if (x0 < x1 && x3 > x2) {         // three segments descending down-right
                   stbtt__handle_clipped_edge(scanline,x,e, x0,y0, x1,y1);
                   stbtt__handle_clipped_edge(scanline,x,e, x1,y1, x2,y2);
                   stbtt__handle_clipped_edge(scanline,x,e, x2,y2, x3,y3);
-               } else if (x3 < x1 && x0 > x2) {  /* three segments descending down-left */
+               } else if (x3 < x1 && x0 > x2) {  // three segments descending down-left
                   stbtt__handle_clipped_edge(scanline,x,e, x0,y0, x2,y2);
                   stbtt__handle_clipped_edge(scanline,x,e, x2,y2, x1,y1);
                   stbtt__handle_clipped_edge(scanline,x,e, x1,y1, x3,y3);
-               } else if (x0 < x1 && x3 > x1) {  /* two segments across x, down-right */
+               } else if (x0 < x1 && x3 > x1) {  // two segments across x, down-right
                   stbtt__handle_clipped_edge(scanline,x,e, x0,y0, x1,y1);
                   stbtt__handle_clipped_edge(scanline,x,e, x1,y1, x3,y3);
-               } else if (x3 < x1 && x0 > x1) {  /* two segments across x, down-left */
+               } else if (x3 < x1 && x0 > x1) {  // two segments across x, down-left
                   stbtt__handle_clipped_edge(scanline,x,e, x0,y0, x1,y1);
                   stbtt__handle_clipped_edge(scanline,x,e, x1,y1, x3,y3);
-               } else if (x0 < x2 && x3 > x2) {  /* two segments across x+1, down-right */
+               } else if (x0 < x2 && x3 > x2) {  // two segments across x+1, down-right
                   stbtt__handle_clipped_edge(scanline,x,e, x0,y0, x2,y2);
                   stbtt__handle_clipped_edge(scanline,x,e, x2,y2, x3,y3);
-               } else if (x3 < x2 && x0 > x2) {  /* two segments across x+1, down-left */
+               } else if (x3 < x2 && x0 > x2) {  // two segments across x+1, down-left
                   stbtt__handle_clipped_edge(scanline,x,e, x0,y0, x2,y2);
                   stbtt__handle_clipped_edge(scanline,x,e, x2,y2, x3,y3);
-               } else {  /* one segment */
+               } else {  // one segment
                   stbtt__handle_clipped_edge(scanline,x,e, x0,y0, x3,y3);
                }
             }
@@ -12695,7 +11566,7 @@ static void stbtt__fill_active_edges_new(float *scanline, float *scanline_fill, 
    }
 }
 
-/* directly AA rasterize edges w/o supersampling */
+// directly AA rasterize edges w/o supersampling
 static void stbtt__rasterize_sorted_edges(stbtt__bitmap *result, stbtt__edge *e, int n, int vsubsample, int off_x, int off_y, void *userdata)
 {
    stbtt__hheap hh = { 0, 0, 0 };
@@ -12716,7 +11587,7 @@ static void stbtt__rasterize_sorted_edges(stbtt__bitmap *result, stbtt__edge *e,
    e[n].y0 = (float) (off_y + result->h) + 1;
 
    while (j < result->h) {
-      /* find center of pixel for this scanline */
+      // find center of pixel for this scanline
       float scan_y_top    = y + 0.0f;
       float scan_y_bottom = y + 1.0f;
       stbtt__active_edge **step = &active;
@@ -12724,27 +11595,33 @@ static void stbtt__rasterize_sorted_edges(stbtt__bitmap *result, stbtt__edge *e,
       STBTT_memset(scanline , 0, result->w*sizeof(scanline[0]));
       STBTT_memset(scanline2, 0, (result->w+1)*sizeof(scanline[0]));
 
-      /* update all active edges; */
-      /* remove all active edges that terminate before the top of this scanline */
+      // update all active edges;
+      // remove all active edges that terminate before the top of this scanline
       while (*step) {
          stbtt__active_edge * z = *step;
          if (z->ey <= scan_y_top) {
-            *step = z->next; /* delete from list */
+            *step = z->next; // delete from list
             STBTT_assert(z->direction);
             z->direction = 0;
             stbtt__hheap_free(&hh, z);
          } else {
-            step = &((*step)->next); /* advance through list */
+            step = &((*step)->next); // advance through list
          }
       }
 
-      /* insert all edges that start before the bottom of this scanline */
+      // insert all edges that start before the bottom of this scanline
       while (e->y0 <= scan_y_bottom) {
          if (e->y0 != e->y1) {
             stbtt__active_edge *z = stbtt__new_active(&hh, e, off_x, scan_y_top, userdata);
             if (z != NULL) {
-               STBTT_assert(z->ey >= scan_y_top);
-               /* insert at front */
+               if (j == 0 && off_y != 0) {
+                  if (z->ey < scan_y_top) {
+                     // this can happen due to subpixel positioning and some kind of fp rounding error i think
+                     z->ey = scan_y_top;
+                  }
+               }
+               STBTT_assert(z->ey >= scan_y_top); // if we get really unlucky a tiny bit of an edge can be out of bounds
+               // insert at front
                z->next = active;
                active = z;
             }
@@ -12752,7 +11629,7 @@ static void stbtt__rasterize_sorted_edges(stbtt__bitmap *result, stbtt__edge *e,
          ++e;
       }
 
-      /* now process all active edges */
+      // now process all active edges
       if (active)
          stbtt__fill_active_edges_new(scanline, scanline2+1, result->w, active, scan_y_top);
 
@@ -12767,6 +11644,7 @@ static void stbtt__rasterize_sorted_edges(stbtt__bitmap *result, stbtt__edge *e,
             m = (int) k;
             if (m > 255) m = 255;
 
+            /* David Sena */
 #ifndef STBTT_RGB_MODE
             result->pixels[j*result->stride + i] = (unsigned char) m;
 #else
@@ -12778,12 +11656,12 @@ static void stbtt__rasterize_sorted_edges(stbtt__bitmap *result, stbtt__edge *e,
 #endif
          }
       }
-      /* advance all the edges */
+      // advance all the edges
       step = &active;
       while (*step) {
          stbtt__active_edge *z = *step;
-         z->fx += z->fdx; /* advance to position for current scanline */
-         step = &((*step)->next); /* advance through list */
+         z->fx += z->fdx; // advance to position for current scanline
+         step = &((*step)->next); // advance through list
       }
 
       ++y;
@@ -12821,7 +11699,7 @@ static void stbtt__sort_edges_ins_sort(stbtt__edge *p, int n)
 
 static void stbtt__sort_edges_quicksort(stbtt__edge *p, int n)
 {
-   /* threshhold for transitioning to insertion sort */
+   /* threshold for transitioning to insertion sort */
    while (n > 12) {
       stbtt__edge t;
       int c01,c12,c,m,i,j;
@@ -12904,14 +11782,14 @@ static void stbtt__rasterize(stbtt__bitmap *result, stbtt__point *pts, int *wcou
 #else
    #error "Unrecognized value of STBTT_RASTERIZER_VERSION"
 #endif
-   /* vsubsample should divide 255 evenly; otherwise we won't reach full opacity */
+   // vsubsample should divide 255 evenly; otherwise we won't reach full opacity
 
-   /* now we have to blow out the windings into explicit edge lists */
+   // now we have to blow out the windings into explicit edge lists
    n = 0;
    for (i=0; i < windings; ++i)
       n += wcount[i];
 
-   e = (stbtt__edge *) STBTT_malloc(sizeof(*e) * (n+1), userdata); /* add an extra one as a sentinel */
+   e = (stbtt__edge *) STBTT_malloc(sizeof(*e) * (n+1), userdata); // add an extra one as a sentinel
    if (e == 0) return;
    n = 0;
 
@@ -12922,10 +11800,10 @@ static void stbtt__rasterize(stbtt__bitmap *result, stbtt__point *pts, int *wcou
       j = wcount[i]-1;
       for (k=0; k < wcount[i]; j=k++) {
          int a=k,b=j;
-         /* skip the edge if horizontal */
+         // skip the edge if horizontal
          if (p[j].y == p[k].y)
             continue;
-         /* add edge from j to k to the list */
+         // add edge from j to k to the list
          e[n].invert = 0;
          if (invert ? p[j].y > p[k].y : p[j].y < p[k].y) {
             e[n].invert = 1;
@@ -12939,11 +11817,11 @@ static void stbtt__rasterize(stbtt__bitmap *result, stbtt__point *pts, int *wcou
       }
    }
 
-   /* now sort the edges by their highest point (should snap to integer, and then by x) */
-   /* STBTT_sort(e, n, sizeof(e[0]), stbtt__edge_compare); */
+   // now sort the edges by their highest point (should snap to integer, and then by x)
+   //STBTT_sort(e, n, sizeof(e[0]), stbtt__edge_compare);
    stbtt__sort_edges(e, n);
 
-   /* now, traverse the scanlines and find the intersections on each scanline, use xor winding rule */
+   // now, traverse the scanlines and find the intersections on each scanline, use xor winding rule
    stbtt__rasterize_sorted_edges(result, e, n, vsubsample, off_x, off_y, userdata);
 
    STBTT_free(e, userdata);
@@ -12951,23 +11829,23 @@ static void stbtt__rasterize(stbtt__bitmap *result, stbtt__point *pts, int *wcou
 
 static void stbtt__add_point(stbtt__point *points, int n, float x, float y)
 {
-   if (!points) return; /* during first pass, it's unallocated */
+   if (!points) return; // during first pass, it's unallocated
    points[n].x = x;
    points[n].y = y;
 }
 
-/* tesselate until threshhold p is happy... @TODO warped to compensate for non-linear stretching */
+// tessellate until threshold p is happy... @TODO warped to compensate for non-linear stretching
 static int stbtt__tesselate_curve(stbtt__point *points, int *num_points, float x0, float y0, float x1, float y1, float x2, float y2, float objspace_flatness_squared, int n)
 {
-   /* midpoint */
+   // midpoint
    float mx = (x0 + 2*x1 + x2)/4;
    float my = (y0 + 2*y1 + y2)/4;
-   /* versus directly drawn line */
+   // versus directly drawn line
    float dx = (x0+x2)/2 - mx;
    float dy = (y0+y2)/2 - my;
-   if (n > 16) /* 65536 segments on one curve better be enough! */
+   if (n > 16) // 65536 segments on one curve better be enough!
       return 1;
-   if (dx*dx+dy*dy > objspace_flatness_squared) { /* half-pixel error allowed... need to be smaller if AA */
+   if (dx*dx+dy*dy > objspace_flatness_squared) { // half-pixel error allowed... need to be smaller if AA
       stbtt__tesselate_curve(points, num_points, x0,y0, (x0+x1)/2.0f,(y0+y1)/2.0f, mx,my, objspace_flatness_squared,n+1);
       stbtt__tesselate_curve(points, num_points, mx,my, (x1+x2)/2.0f,(y1+y2)/2.0f, x2,y2, objspace_flatness_squared,n+1);
    } else {
@@ -12979,7 +11857,7 @@ static int stbtt__tesselate_curve(stbtt__point *points, int *num_points, float x
 
 static void stbtt__tesselate_cubic(stbtt__point *points, int *num_points, float x0, float y0, float x1, float y1, float x2, float y2, float x3, float y3, float objspace_flatness_squared, int n)
 {
-   /* @TODO this "flatness" calculation is just made-up nonsense that seems to work well enough */
+   // @TODO this "flatness" calculation is just made-up nonsense that seems to work well enough
    float dx0 = x1-x0;
    float dy0 = y1-y0;
    float dx1 = x2-x1;
@@ -12992,7 +11870,7 @@ static void stbtt__tesselate_cubic(stbtt__point *points, int *num_points, float 
    float shortlen = (float) STBTT_sqrt(dx*dx+dy*dy);
    float flatness_squared = longlen*longlen-shortlen*shortlen;
 
-   if (n > 16) /* 65536 segments on one curve better be enough! */
+   if (n > 16) // 65536 segments on one curve better be enough!
       return;
 
    if (flatness_squared > objspace_flatness_squared) {
@@ -13019,7 +11897,7 @@ static void stbtt__tesselate_cubic(stbtt__point *points, int *num_points, float 
    }
 }
 
-/* returns number of contours */
+// returns number of contours
 static stbtt__point *stbtt_FlattenCurves(stbtt_vertex *vertices, int num_verts, float objspace_flatness, int **contour_lengths, int *num_contours, void *userdata)
 {
    stbtt__point *points=0;
@@ -13028,7 +11906,7 @@ static stbtt__point *stbtt_FlattenCurves(stbtt_vertex *vertices, int num_verts, 
    float objspace_flatness_squared = objspace_flatness * objspace_flatness;
    int i,n=0,start=0, pass;
 
-   /* count how many "moves" there are to get the contour count */
+   // count how many "moves" there are to get the contour count
    for (i=0; i < num_verts; ++i)
       if (vertices[i].type == STBTT_vmove)
          ++n;
@@ -13043,7 +11921,7 @@ static stbtt__point *stbtt_FlattenCurves(stbtt_vertex *vertices, int num_verts, 
       return 0;
    }
 
-   /* make two passes through the points so we don't need to realloc */
+   // make two passes through the points so we don't need to realloc
    for (pass=0; pass < 2; ++pass) {
       float x=0,y=0;
       if (pass == 1) {
@@ -13055,7 +11933,7 @@ static stbtt__point *stbtt_FlattenCurves(stbtt_vertex *vertices, int num_verts, 
       for (i=0; i < num_verts; ++i) {
          switch (vertices[i].type) {
             case STBTT_vmove:
-               /* start the next contour */
+               // start the next contour
                if (n >= 0)
                   (*contour_lengths)[n] = num_points - start;
                ++n;
@@ -13119,7 +11997,7 @@ STBTT_DEF unsigned char *stbtt_GetGlyphBitmapSubpixel(const stbtt_fontinfo *info
 {
    int ix0,iy0,ix1,iy1;
    stbtt__bitmap gbm;
-   stbtt_vertex *vertices;
+   stbtt_vertex *vertices;   
    int num_verts = stbtt_GetGlyphShape(info, glyph, &vertices);
 
    if (scale_x == 0) scale_x = scale_y;
@@ -13133,16 +12011,16 @@ STBTT_DEF unsigned char *stbtt_GetGlyphBitmapSubpixel(const stbtt_fontinfo *info
 
    stbtt_GetGlyphBitmapBoxSubpixel(info, glyph, scale_x, scale_y, shift_x, shift_y, &ix0,&iy0,&ix1,&iy1);
 
-   /* now we get the size */
+   // now we get the size
    gbm.w = (ix1 - ix0);
    gbm.h = (iy1 - iy0);
-   gbm.pixels = NULL; /* in case we error */
+   gbm.pixels = NULL; // in case we error
 
    if (width ) *width  = gbm.w;
    if (height) *height = gbm.h;
    if (xoff  ) *xoff   = ix0;
    if (yoff  ) *yoff   = iy0;
-
+   
    if (gbm.w && gbm.h) {
       gbm.pixels = (unsigned char *) STBTT_malloc(gbm.w * gbm.h, info->userdata);
       if (gbm.pixels) {
@@ -13153,7 +12031,7 @@ STBTT_DEF unsigned char *stbtt_GetGlyphBitmapSubpixel(const stbtt_fontinfo *info
    }
    STBTT_free(vertices, info->userdata);
    return gbm.pixels;
-}
+}   
 
 STBTT_DEF unsigned char *stbtt_GetGlyphBitmap(const stbtt_fontinfo *info, float scale_x, float scale_y, int glyph, int *width, int *height, int *xoff, int *yoff)
 {
@@ -13165,7 +12043,7 @@ STBTT_DEF void stbtt_MakeGlyphBitmapSubpixel(const stbtt_fontinfo *info, unsigne
    int ix0,iy0;
    stbtt_vertex *vertices;
    int num_verts = stbtt_GetGlyphShape(info, glyph, &vertices);
-   stbtt__bitmap gbm;
+   stbtt__bitmap gbm;   
 
    stbtt_GetGlyphBitmapBoxSubpixel(info, glyph, scale_x, scale_y, shift_x, shift_y, &ix0,&iy0,0,0);
    gbm.pixels = output;
@@ -13187,7 +12065,7 @@ STBTT_DEF void stbtt_MakeGlyphBitmap(const stbtt_fontinfo *info, unsigned char *
 STBTT_DEF unsigned char *stbtt_GetCodepointBitmapSubpixel(const stbtt_fontinfo *info, float scale_x, float scale_y, float shift_x, float shift_y, int codepoint, int *width, int *height, int *xoff, int *yoff)
 {
    return stbtt_GetGlyphBitmapSubpixel(info, scale_x, scale_y,shift_x,shift_y, stbtt_FindGlyphIndex(info,codepoint), width,height,xoff,yoff);
-}
+}   
 
 STBTT_DEF void stbtt_MakeCodepointBitmapSubpixelPrefilter(const stbtt_fontinfo *info, unsigned char *output, int out_w, int out_h, int out_stride, float scale_x, float scale_y, float shift_x, float shift_y, int oversample_x, int oversample_y, float *sub_x, float *sub_y, int codepoint)
 {
@@ -13202,23 +12080,23 @@ STBTT_DEF void stbtt_MakeCodepointBitmapSubpixel(const stbtt_fontinfo *info, uns
 STBTT_DEF unsigned char *stbtt_GetCodepointBitmap(const stbtt_fontinfo *info, float scale_x, float scale_y, int codepoint, int *width, int *height, int *xoff, int *yoff)
 {
    return stbtt_GetCodepointBitmapSubpixel(info, scale_x, scale_y, 0.0f,0.0f, codepoint, width,height,xoff,yoff);
-}
+}   
 
 STBTT_DEF void stbtt_MakeCodepointBitmap(const stbtt_fontinfo *info, unsigned char *output, int out_w, int out_h, int out_stride, float scale_x, float scale_y, int codepoint)
 {
    stbtt_MakeCodepointBitmapSubpixel(info, output, out_w, out_h, out_stride, scale_x, scale_y, 0.0f,0.0f, codepoint);
 }
 
-/* //////////////////////////////////////////////////////////////////////////// */
-/*  */
-/* bitmap baking */
-/*  */
-/* This is SUPER-CRAPPY packing to keep source code small */
+//////////////////////////////////////////////////////////////////////////////
+//
+// bitmap baking
+//
+// This is SUPER-CRAPPY packing to keep source code small
 
-static int stbtt_BakeFontBitmap_internal(unsigned char *data, int offset,  /* font location (use offset=0 for plain .ttf) */
-                                float pixel_height,                     /* height of font in pixels */
-                                unsigned char *pixels, int pw, int ph,  /* bitmap to be filled in */
-                                int first_char, int num_chars,          /* characters to bake */
+static int stbtt_BakeFontBitmap_internal(unsigned char *data, int offset,  // font location (use offset=0 for plain .ttf)
+                                float pixel_height,                     // height of font in pixels
+                                unsigned char *pixels, int pw, int ph,  // bitmap to be filled in
+                                int first_char, int num_chars,          // characters to bake
                                 stbtt_bakedchar *chardata)
 {
    float scale;
@@ -13227,7 +12105,7 @@ static int stbtt_BakeFontBitmap_internal(unsigned char *data, int offset,  /* fo
    f.userdata = NULL;
    if (!stbtt_InitFont(&f, data, offset))
       return -1;
-   STBTT_memset(pixels, 0, pw*ph); /* background of 0 around pixels */
+   STBTT_memset(pixels, 0, pw*ph); // background of 0 around pixels
    x=y=1;
    bottom_y = 1;
 
@@ -13241,8 +12119,8 @@ static int stbtt_BakeFontBitmap_internal(unsigned char *data, int offset,  /* fo
       gw = x1-x0;
       gh = y1-y0;
       if (x + gw + 1 >= pw)
-         y = bottom_y, x = 1; /* advance to next row */
-      if (y + gh + 1 >= ph) /* check if it fits vertically AFTER potentially moving to next row */
+         y = bottom_y, x = 1; // advance to next row
+      if (y + gh + 1 >= ph) // check if it fits vertically AFTER potentially moving to next row
          return -i;
       STBTT_assert(x+gw < pw);
       STBTT_assert(y+gh < ph);
@@ -13282,25 +12160,25 @@ STBTT_DEF void stbtt_GetBakedQuad(const stbtt_bakedchar *chardata, int pw, int p
    *xpos += b->xadvance;
 }
 
-/* //////////////////////////////////////////////////////////////////////////// */
-/*  */
-/* rectangle packing replacement routines if you don't have stb_rect_pack.h */
-/*  */
+//////////////////////////////////////////////////////////////////////////////
+//
+// rectangle packing replacement routines if you don't have stb_rect_pack.h
+//
 
 #ifndef STB_RECT_PACK_VERSION
 
 typedef int stbrp_coord;
 
-/* ////////////////////////////////////////////////////////////////////////////////// */
-/* // */
-/* // */
-/* COMPILER WARNING ?!?!?                                                         // */
-/* // */
-/* // */
-/* if you get a compile warning due to these symbols being defined more than      // */
-/* once, move #include "stb_rect_pack.h" before #include "stb_truetype.h"         // */
-/* // */
-/* ////////////////////////////////////////////////////////////////////////////////// */
+////////////////////////////////////////////////////////////////////////////////////
+//                                                                                //
+//                                                                                //
+// COMPILER WARNING ?!?!?                                                         //
+//                                                                                //
+//                                                                                //
+// if you get a compile warning due to these symbols being defined more than      //
+// once, move #include "stb_rect_pack.h" before #include "stb_truetype.h"         //
+//                                                                                //
+////////////////////////////////////////////////////////////////////////////////////
 
 typedef struct
 {
@@ -13327,7 +12205,7 @@ static void stbrp_init_target(stbrp_context *con, int pw, int ph, stbrp_node *no
    con->y = 0;
    con->bottom_y = 0;
    STBTT__NOTUSED(nodes);
-   STBTT__NOTUSED(num_nodes);
+   STBTT__NOTUSED(num_nodes);   
 }
 
 static void stbrp_pack_rects(stbrp_context *con, stbrp_rect *rects, int num_rects)
@@ -13352,12 +12230,12 @@ static void stbrp_pack_rects(stbrp_context *con, stbrp_rect *rects, int num_rect
 }
 #endif
 
-/* //////////////////////////////////////////////////////////////////////////// */
-/*  */
-/* bitmap baking */
-/*  */
-/* This is SUPER-AWESOME (tm Ryan Gordon) packing using stb_rect_pack.h. If */
-/* stb_rect_pack.h isn't available, it uses the BakeFontBitmap strategy. */
+//////////////////////////////////////////////////////////////////////////////
+//
+// bitmap baking
+//
+// This is SUPER-AWESOME (tm Ryan Gordon) packing using stb_rect_pack.h. If
+// stb_rect_pack.h isn't available, it uses the BakeFontBitmap strategy.
 
 STBTT_DEF int stbtt_PackBegin(stbtt_pack_context *spc, unsigned char *pixels, int pw, int ph, int stride_in_bytes, int padding, void *alloc_context)
 {
@@ -13381,11 +12259,12 @@ STBTT_DEF int stbtt_PackBegin(stbtt_pack_context *spc, unsigned char *pixels, in
    spc->stride_in_bytes = stride_in_bytes != 0 ? stride_in_bytes : pw;
    spc->h_oversample = 1;
    spc->v_oversample = 1;
+   spc->skip_missing = 0;
 
    stbrp_init_target(context, pw-padding, ph-padding, nodes, num_nodes);
 
    if (pixels)
-      STBTT_memset(pixels, 0, pw*ph); /* background of 0 around pixels */
+      STBTT_memset(pixels, 0, pw*ph); // background of 0 around pixels
 
    return 1;
 }
@@ -13406,6 +12285,11 @@ STBTT_DEF void stbtt_PackSetOversampling(stbtt_pack_context *spc, unsigned int h
       spc->v_oversample = v_oversample;
 }
 
+STBTT_DEF void stbtt_PackSetSkipMissingCodepoints(stbtt_pack_context *spc, int skip)
+{
+   spc->skip_missing = skip;
+}
+
 #define STBTT__OVER_MASK  (STBTT_MAX_OVERSAMPLE-1)
 
 static void stbtt__h_prefilter(unsigned char *pixels, int w, int h, int stride_in_bytes, unsigned int kernel_width)
@@ -13413,7 +12297,7 @@ static void stbtt__h_prefilter(unsigned char *pixels, int w, int h, int stride_i
    unsigned char buffer[STBTT_MAX_OVERSAMPLE];
    int safe_w = w - kernel_width;
    int j;
-   STBTT_memset(buffer, 0, STBTT_MAX_OVERSAMPLE); /* suppress bogus warning from VS2013 -analyze */
+   STBTT_memset(buffer, 0, STBTT_MAX_OVERSAMPLE); // suppress bogus warning from VS2013 -analyze
    for (j=0; j < h; ++j) {
       int i;
       unsigned int total;
@@ -13421,7 +12305,7 @@ static void stbtt__h_prefilter(unsigned char *pixels, int w, int h, int stride_i
 
       total = 0;
 
-      /* make kernel_width a constant in common cases so compiler can optimize out the divide */
+      // make kernel_width a constant in common cases so compiler can optimize out the divide
       switch (kernel_width) {
          case 2:
             for (i=0; i <= safe_w; ++i) {
@@ -13475,7 +12359,7 @@ static void stbtt__v_prefilter(unsigned char *pixels, int w, int h, int stride_i
    unsigned char buffer[STBTT_MAX_OVERSAMPLE];
    int safe_h = h - kernel_width;
    int j;
-   STBTT_memset(buffer, 0, STBTT_MAX_OVERSAMPLE); /* suppress bogus warning from VS2013 -analyze */
+   STBTT_memset(buffer, 0, STBTT_MAX_OVERSAMPLE); // suppress bogus warning from VS2013 -analyze
    for (j=0; j < w; ++j) {
       int i;
       unsigned int total;
@@ -13483,7 +12367,7 @@ static void stbtt__v_prefilter(unsigned char *pixels, int w, int h, int stride_i
 
       total = 0;
 
-      /* make kernel_width a constant in common cases so compiler can optimize out the divide */
+      // make kernel_width a constant in common cases so compiler can optimize out the divide
       switch (kernel_width) {
          case 2:
             for (i=0; i <= safe_h; ++i) {
@@ -13537,17 +12421,18 @@ static float stbtt__oversample_shift(int oversample)
    if (!oversample)
       return 0.0f;
 
-   /* The prefilter is a box filter of width "oversample", */
-   /* which shifts phase by (oversample - 1)/2 pixels in */
-   /* oversampled space. We want to shift in the opposite */
-   /* direction to counter this. */
+   // The prefilter is a box filter of width "oversample",
+   // which shifts phase by (oversample - 1)/2 pixels in
+   // oversampled space. We want to shift in the opposite
+   // direction to counter this.
    return (float)-(oversample - 1) / (2.0f * (float)oversample);
 }
 
-/* rects array must be big enough to accommodate all characters in the given ranges */
+// rects array must be big enough to accommodate all characters in the given ranges
 STBTT_DEF int stbtt_PackFontRangesGatherRects(stbtt_pack_context *spc, const stbtt_fontinfo *info, stbtt_pack_range *ranges, int num_ranges, stbrp_rect *rects)
 {
    int i,j,k;
+   int missing_glyph_added = 0;
 
    k=0;
    for (i=0; i < num_ranges; ++i) {
@@ -13559,13 +12444,19 @@ STBTT_DEF int stbtt_PackFontRangesGatherRects(stbtt_pack_context *spc, const stb
          int x0,y0,x1,y1;
          int codepoint = ranges[i].array_of_unicode_codepoints == NULL ? ranges[i].first_unicode_codepoint_in_range + j : ranges[i].array_of_unicode_codepoints[j];
          int glyph = stbtt_FindGlyphIndex(info, codepoint);
-         stbtt_GetGlyphBitmapBoxSubpixel(info,glyph,
-                                         scale * spc->h_oversample,
-                                         scale * spc->v_oversample,
-                                         0,0,
-                                         &x0,&y0,&x1,&y1);
-         rects[k].w = (stbrp_coord) (x1-x0 + spc->padding + spc->h_oversample-1);
-         rects[k].h = (stbrp_coord) (y1-y0 + spc->padding + spc->v_oversample-1);
+         if (glyph == 0 && (spc->skip_missing || missing_glyph_added)) {
+            rects[k].w = rects[k].h = 0;
+         } else {
+            stbtt_GetGlyphBitmapBoxSubpixel(info,glyph,
+                                            scale * spc->h_oversample,
+                                            scale * spc->v_oversample,
+                                            0,0,
+                                            &x0,&y0,&x1,&y1);
+            rects[k].w = (stbrp_coord) (x1-x0 + spc->padding + spc->h_oversample-1);
+            rects[k].h = (stbrp_coord) (y1-y0 + spc->padding + spc->v_oversample-1);
+            if (glyph == 0)
+               missing_glyph_added = 1;
+         }
          ++k;
       }
    }
@@ -13596,12 +12487,12 @@ STBTT_DEF void stbtt_MakeGlyphBitmapSubpixelPrefilter(const stbtt_fontinfo *info
    *sub_y = stbtt__oversample_shift(prefilter_y);
 }
 
-/* rects array must be big enough to accommodate all characters in the given ranges */
+// rects array must be big enough to accommodate all characters in the given ranges
 STBTT_DEF int stbtt_PackFontRangesRenderIntoRects(stbtt_pack_context *spc, const stbtt_fontinfo *info, stbtt_pack_range *ranges, int num_ranges, stbrp_rect *rects)
 {
-   int i,j,k, return_value = 1;
+   int i,j,k, missing_glyph = -1, return_value = 1;
 
-   /* save current values */
+   // save current values
    int old_h_over = spc->h_oversample;
    int old_v_over = spc->v_oversample;
 
@@ -13618,14 +12509,14 @@ STBTT_DEF int stbtt_PackFontRangesRenderIntoRects(stbtt_pack_context *spc, const
       sub_y = stbtt__oversample_shift(spc->v_oversample);
       for (j=0; j < ranges[i].num_chars; ++j) {
          stbrp_rect *r = &rects[k];
-         if (r->was_packed) {
+         if (r->was_packed && r->w != 0 && r->h != 0) {
             stbtt_packedchar *bc = &ranges[i].chardata_for_range[j];
             int advance, lsb, x0,y0,x1,y1;
             int codepoint = ranges[i].array_of_unicode_codepoints == NULL ? ranges[i].first_unicode_codepoint_in_range + j : ranges[i].array_of_unicode_codepoints[j];
             int glyph = stbtt_FindGlyphIndex(info, codepoint);
             stbrp_coord pad = (stbrp_coord) spc->padding;
 
-            /* pad on left and top */
+            // pad on left and top
             r->x += pad;
             r->y += pad;
             r->w -= pad;
@@ -13664,15 +12555,22 @@ STBTT_DEF int stbtt_PackFontRangesRenderIntoRects(stbtt_pack_context *spc, const
             bc->yoff     =       (float)  y0 * recip_v + sub_y;
             bc->xoff2    =                (x0 + r->w) * recip_h + sub_x;
             bc->yoff2    =                (y0 + r->h) * recip_v + sub_y;
+
+            if (glyph == 0)
+               missing_glyph = j;
+         } else if (spc->skip_missing) {
+            return_value = 0;
+         } else if (r->was_packed && r->w == 0 && r->h == 0 && missing_glyph >= 0) {
+            ranges[i].chardata_for_range[j] = ranges[i].chardata_for_range[missing_glyph];
          } else {
-            return_value = 0; /* if any fail, report failure */
+            return_value = 0; // if any fail, report failure
          }
 
          ++k;
       }
    }
 
-   /* restore original values */
+   // restore original values
    spc->h_oversample = old_h_over;
    spc->v_oversample = old_v_over;
 
@@ -13688,10 +12586,10 @@ STBTT_DEF int stbtt_PackFontRanges(stbtt_pack_context *spc, const unsigned char 
 {
    stbtt_fontinfo info;
    int i,j,n, return_value = 1;
-   /* stbrp_context *context = (stbrp_context *) spc->pack_info; */
+   //stbrp_context *context = (stbrp_context *) spc->pack_info;
    stbrp_rect    *rects;
 
-   /* flag all characters as NOT packed */
+   // flag all characters as NOT packed
    for (i=0; i < num_ranges; ++i)
       for (j=0; j < ranges[i].num_chars; ++j)
          ranges[i].chardata_for_range[j].x0 =
@@ -13702,7 +12600,7 @@ STBTT_DEF int stbtt_PackFontRanges(stbtt_pack_context *spc, const unsigned char 
    n = 0;
    for (i=0; i < num_ranges; ++i)
       n += ranges[i].num_chars;
-
+         
    rects = (stbrp_rect *) STBTT_malloc(sizeof(*rects) * n, spc->user_allocator_context);
    if (rects == NULL)
       return 0;
@@ -13713,7 +12611,7 @@ STBTT_DEF int stbtt_PackFontRanges(stbtt_pack_context *spc, const unsigned char 
    n = stbtt_PackFontRangesGatherRects(spc, &info, ranges, num_ranges, rects);
 
    stbtt_PackFontRangesPackRects(spc, rects, n);
-
+  
    return_value = stbtt_PackFontRangesRenderIntoRects(spc, &info, ranges, num_ranges, rects);
 
    STBTT_free(rects, spc->user_allocator_context);
@@ -13730,6 +12628,19 @@ STBTT_DEF int stbtt_PackFontRange(stbtt_pack_context *spc, const unsigned char *
    range.chardata_for_range          = chardata_for_range;
    range.font_size                   = font_size;
    return stbtt_PackFontRanges(spc, fontdata, font_index, &range, 1);
+}
+
+STBTT_DEF void stbtt_GetScaledFontVMetrics(const unsigned char *fontdata, int index, float size, float *ascent, float *descent, float *lineGap)
+{
+   int i_ascent, i_descent, i_lineGap;
+   float scale;
+   stbtt_fontinfo info;
+   stbtt_InitFont(&info, fontdata, stbtt_GetFontOffsetForIndex(fontdata, index));
+   scale = size > 0 ? stbtt_ScaleForPixelHeight(&info, size) : stbtt_ScaleForMappingEmToPixels(&info, -size);
+   stbtt_GetFontVMetrics(&info, &i_ascent, &i_descent, &i_lineGap);
+   *ascent  = (float) i_ascent  * scale;
+   *descent = (float) i_descent * scale;
+   *lineGap = (float) i_lineGap * scale;
 }
 
 STBTT_DEF void stbtt_GetPackedQuad(const stbtt_packedchar *chardata, int pw, int ph, int char_index, float *xpos, float *ypos, stbtt_aligned_quad *q, int align_to_integer)
@@ -13759,10 +12670,10 @@ STBTT_DEF void stbtt_GetPackedQuad(const stbtt_packedchar *chardata, int pw, int
    *xpos += b->xadvance;
 }
 
-/* //////////////////////////////////////////////////////////////////////////// */
-/*  */
-/* sdf computation */
-/*  */
+//////////////////////////////////////////////////////////////////////////////
+//
+// sdf computation
+//
 
 #define STBTT_min(a,b)  ((a) < (b) ? (a) : (b))
 #define STBTT_max(a,b)  ((a) < (b) ? (b) : (a))
@@ -13796,8 +12707,8 @@ static int stbtt__ray_intersect_bezier(float orig[2], float ray[2], float q0[2],
          }
       }
    } else {
-      /* 2*b*s + c = 0 */
-      /* s = -c / (2*b) */
+      // 2*b*s + c = 0
+      // s = -c / (2*b)
       s0 = c / (-2 * b);
       if (s0 >= 0.0 && s0 <= 1.0)
          num_s = 1;
@@ -13846,7 +12757,7 @@ static int stbtt__compute_crossings_x(float x, float y, int nverts, stbtt_vertex
    orig[0] = x;
    orig[1] = y;
 
-   /* make sure y never passes through a vertex of the shape */
+   // make sure y never passes through a vertex of the shape
    y_frac = (float) STBTT_fmod(y, 1.0f);
    if (y_frac < 0.01f)
       y += 0.01f;
@@ -13854,14 +12765,14 @@ static int stbtt__compute_crossings_x(float x, float y, int nverts, stbtt_vertex
       y -= 0.01f;
    orig[1] = y;
 
-   /* test a ray from (-infinity,y) to (x,y) */
+   // test a ray from (-infinity,y) to (x,y)
    for (i=0; i < nverts; ++i) {
       if (verts[i].type == STBTT_vline) {
          int x0 = (int) verts[i-1].x, y0 = (int) verts[i-1].y;
          int x1 = (int) verts[i  ].x, y1 = (int) verts[i  ].y;
          if (y > STBTT_min(y0,y1) && y < STBTT_max(y0,y1) && x > STBTT_min(x0,x1)) {
             float x_inter = (y - y0) / (y1 - y0) * (x1-x0) + x0;
-            if (x_inter < x)
+            if (x_inter < x)  
                winding += (y0 < y1) ? 1 : -1;
          }
       }
@@ -13887,7 +12798,7 @@ static int stbtt__compute_crossings_x(float x, float y, int nverts, stbtt_vertex
                y1 = (int)verts[i  ].y;
                if (y > STBTT_min(y0,y1) && y < STBTT_max(y0,y1) && x > STBTT_min(x0,x1)) {
                   float x_inter = (y - y0) / (y1 - y0) * (x1-x0) + x0;
-                  if (x_inter < x)
+                  if (x_inter < x)  
                      winding += (y0 < y1) ? 1 : -1;
                }
             } else {
@@ -13899,7 +12810,7 @@ static int stbtt__compute_crossings_x(float x, float y, int nverts, stbtt_vertex
                   if (hits[1][0] < 0)
                      winding += (hits[1][1] < 0 ? -1 : 1);
             }
-         }
+         } 
       }
    }
    return winding;
@@ -13913,35 +12824,35 @@ static float stbtt__cuberoot( float x )
       return  (float) STBTT_pow( x,1.0f/3.0f);
 }
 
-/* x^3 + c*x^2 + b*x + a = 0 */
+// x^3 + c*x^2 + b*x + a = 0
 static int stbtt__solve_cubic(float a, float b, float c, float* r)
 {
-    float s = -a / 3;
-    float p = b - a*a / 3;
-    float q = a * (2*a*a - 9*b) / 27 + c;
+	float s = -a / 3;
+	float p = b - a*a / 3;
+	float q = a * (2*a*a - 9*b) / 27 + c;
    float p3 = p*p*p;
-    float d = q*q + 4*p3 / 27;
-    if (d >= 0) {
-        float z = (float) STBTT_sqrt(d);
-        float u = (-q + z) / 2;
-        float v = (-q - z) / 2;
-        u = stbtt__cuberoot(u);
-        v = stbtt__cuberoot(v);
-        r[0] = s + u + v;
-        return 1;
-    } else {
-       float u = (float) STBTT_sqrt(-p/3);
-       float v = (float) STBTT_acos(-STBTT_sqrt(-27/p3) * q / 2) / 3; /* p3 must be negative, since d is negative */
-       float m = (float) STBTT_cos(v);
+	float d = q*q + 4*p3 / 27;
+	if (d >= 0) {
+		float z = (float) STBTT_sqrt(d);
+		float u = (-q + z) / 2;
+		float v = (-q - z) / 2;
+		u = stbtt__cuberoot(u);
+		v = stbtt__cuberoot(v);
+		r[0] = s + u + v;
+		return 1;
+	} else {
+	   float u = (float) STBTT_sqrt(-p/3);
+	   float v = (float) STBTT_acos(-STBTT_sqrt(-27/p3) * q / 2) / 3; // p3 must be negative, since d is negative
+	   float m = (float) STBTT_cos(v);
       float n = (float) STBTT_cos(v-3.141592/2)*1.732050808f;
-       r[0] = s + u * 2 * m;
-       r[1] = s - u * (m + n);
-       r[2] = s - u * (m - n);
+	   r[0] = s + u * 2 * m;
+	   r[1] = s - u * (m + n);
+	   r[2] = s - u * (m - n);
 
-      /* STBTT_assert( STBTT_fabs(((r[0]+a)*r[0]+b)*r[0]+c) < 0.05f);  // these asserts may not be safe at all scales, though they're in bezier t parameter units so maybe? */
-      /* STBTT_assert( STBTT_fabs(((r[1]+a)*r[1]+b)*r[1]+c) < 0.05f); */
-      /* STBTT_assert( STBTT_fabs(((r[2]+a)*r[2]+b)*r[2]+c) < 0.05f); */
-    return 3;
+      //STBTT_assert( STBTT_fabs(((r[0]+a)*r[0]+b)*r[0]+c) < 0.05f);  // these asserts may not be safe at all scales, though they're in bezier t parameter units so maybe?
+      //STBTT_assert( STBTT_fabs(((r[1]+a)*r[1]+b)*r[1]+c) < 0.05f);
+      //STBTT_assert( STBTT_fabs(((r[2]+a)*r[2]+b)*r[2]+c) < 0.05f);
+   	return 3;
    }
 }
 
@@ -13952,16 +12863,11 @@ STBTT_DEF unsigned char * stbtt_GetGlyphSDF(const stbtt_fontinfo *info, float sc
    int w,h;
    unsigned char *data;
 
-   /* if one scale is 0, use same scale for both */
-   if (scale_x == 0) scale_x = scale_y;
-   if (scale_y == 0) {
-      if (scale_x == 0) return NULL;  /* if both scales are 0, return NULL */
-      scale_y = scale_x;
-   }
+   if (scale == 0) return NULL;
 
    stbtt_GetGlyphBitmapBoxSubpixel(info, glyph, scale, scale, 0.0f,0.0f, &ix0,&iy0,&ix1,&iy1);
 
-   /* if empty, return NULL */
+   // if empty, return NULL
    if (ix0 == ix1 || iy0 == iy1)
       return NULL;
 
@@ -13978,9 +12884,9 @@ STBTT_DEF unsigned char * stbtt_GetGlyphSDF(const stbtt_fontinfo *info, float sc
    if (xoff  ) *xoff   = ix0;
    if (yoff  ) *yoff   = iy0;
 
-   /* invert for y-downwards bitmaps */
+   // invert for y-downwards bitmaps
    scale_y = -scale_y;
-
+      
    {
       int x,y,i,j;
       float *precompute;
@@ -14018,12 +12924,12 @@ STBTT_DEF unsigned char * stbtt_GetGlyphSDF(const stbtt_fontinfo *info, float sc
             float x_gspace = (sx / scale_x);
             float y_gspace = (sy / scale_y);
 
-            int winding = stbtt__compute_crossings_x(x_gspace, y_gspace, num_verts, verts); /* @OPTIMIZE: this could just be a rasterization, but needs to be line vs. non-tesselated curves so a new path */
+            int winding = stbtt__compute_crossings_x(x_gspace, y_gspace, num_verts, verts); // @OPTIMIZE: this could just be a rasterization, but needs to be line vs. non-tesselated curves so a new path
 
             for (i=0; i < num_verts; ++i) {
                float x0 = verts[i].x*scale_x, y0 = verts[i].y*scale_y;
 
-               /* check against every point here rather than inside line/curve primitives -- @TODO: wrong if multiple 'moves' in a row produce a garbage point, and given culling, probably more efficient to do within line/curve */
+               // check against every point here rather than inside line/curve primitives -- @TODO: wrong if multiple 'moves' in a row produce a garbage point, and given culling, probably more efficient to do within line/curve
                float dist2 = (x0-sx)*(x0-sx) + (y0-sy)*(y0-sy);
                if (dist2 < min_dist*min_dist)
                   min_dist = (float) STBTT_sqrt(dist2);
@@ -14031,19 +12937,19 @@ STBTT_DEF unsigned char * stbtt_GetGlyphSDF(const stbtt_fontinfo *info, float sc
                if (verts[i].type == STBTT_vline) {
                   float x1 = verts[i-1].x*scale_x, y1 = verts[i-1].y*scale_y;
 
-                  /* coarse culling against bbox */
-                  /* if (sx > STBTT_min(x0,x1)-min_dist && sx < STBTT_max(x0,x1)+min_dist && */
-                  /* sy > STBTT_min(y0,y1)-min_dist && sy < STBTT_max(y0,y1)+min_dist) */
+                  // coarse culling against bbox
+                  //if (sx > STBTT_min(x0,x1)-min_dist && sx < STBTT_max(x0,x1)+min_dist &&
+                  //    sy > STBTT_min(y0,y1)-min_dist && sy < STBTT_max(y0,y1)+min_dist)
                   float dist = (float) STBTT_fabs((x1-x0)*(y0-sy) - (y1-y0)*(x0-sx)) * precompute[i];
                   STBTT_assert(i != 0);
                   if (dist < min_dist) {
-                     /* check position along line */
-                     /* x' = x0 + t*(x1-x0), y' = y0 + t*(y1-y0) */
-                     /* minimize (x'-sx)*(x'-sx)+(y'-sy)*(y'-sy) */
+                     // check position along line
+                     // x' = x0 + t*(x1-x0), y' = y0 + t*(y1-y0)
+                     // minimize (x'-sx)*(x'-sx)+(y'-sy)*(y'-sy)
                      float dx = x1-x0, dy = y1-y0;
                      float px = x0-sx, py = y0-sy;
-                     /* minimize (px+t*dx)^2 + (py+t*dy)^2 = px*px + 2*px*dx*t + t^2*dx*dx + py*py + 2*py*dy*t + t^2*dy*dy */
-                     /* derivative: 2*px*dx + 2*py*dy + (2*dx*dx+2*dy*dy)*t, set to 0 and solve */
+                     // minimize (px+t*dx)^2 + (py+t*dy)^2 = px*px + 2*px*dx*t + t^2*dx*dx + py*py + 2*py*dy*t + t^2*dy*dy
+                     // derivative: 2*px*dx + 2*py*dy + (2*dx*dx+2*dy*dy)*t, set to 0 and solve
                      float t = -(px*dx + py*dy) / (dx*dx + dy*dy);
                      if (t >= 0.0f && t <= 1.0f)
                         min_dist = dist;
@@ -14055,7 +12961,7 @@ STBTT_DEF unsigned char * stbtt_GetGlyphSDF(const stbtt_fontinfo *info, float sc
                   float box_y0 = STBTT_min(STBTT_min(y0,y1),y2);
                   float box_x1 = STBTT_max(STBTT_max(x0,x1),x2);
                   float box_y1 = STBTT_max(STBTT_max(y0,y1),y2);
-                  /* coarse culling against bbox to avoid computing cubic unnecessarily */
+                  // coarse culling against bbox to avoid computing cubic unnecessarily
                   if (sx > box_x0-min_dist && sx < box_x1+min_dist && sy > box_y0-min_dist && sy < box_y1+min_dist) {
                      int num=0;
                      float ax = x1-x0, ay = y1-y0;
@@ -14063,11 +12969,11 @@ STBTT_DEF unsigned char * stbtt_GetGlyphSDF(const stbtt_fontinfo *info, float sc
                      float mx = x0 - sx, my = y0 - sy;
                      float res[3],px,py,t,it;
                      float a_inv = precompute[i];
-                     if (a_inv == 0.0) { /* if a_inv is 0, it's 2nd degree so use quadratic formula */
+                     if (a_inv == 0.0) { // if a_inv is 0, it's 2nd degree so use quadratic formula
                         float a = 3*(ax*bx + ay*by);
                         float b = 2*(ax*ax + ay*ay) + (mx*bx+my*by);
                         float c = mx*ax+my*ay;
-                        if (a == 0.0) { /* if a is 0, it's linear */
+                        if (a == 0.0) { // if a is 0, it's linear
                            if (b != 0.0) {
                               res[num++] = -c/b;
                            }
@@ -14079,11 +12985,11 @@ STBTT_DEF unsigned char * stbtt_GetGlyphSDF(const stbtt_fontinfo *info, float sc
                               float root = (float) STBTT_sqrt(discriminant);
                               res[0] = (-b - root)/(2*a);
                               res[1] = (-b + root)/(2*a);
-                              num = 2; /* don't bother distinguishing 1-solution case, as code below will still work */
+                              num = 2; // don't bother distinguishing 1-solution case, as code below will still work
                            }
                         }
                      } else {
-                        float b = 3*(ax*bx + ay*by) * a_inv; /* could precompute this as it doesn't depend on sample point */
+                        float b = 3*(ax*bx + ay*by) * a_inv; // could precompute this as it doesn't depend on sample point
                         float c = (2*(ax*ax + ay*ay) + (mx*bx+my*by)) * a_inv;
                         float d = (mx*ax+my*ay) * a_inv;
                         num = stbtt__solve_cubic(b, c, d, res);
@@ -14116,7 +13022,7 @@ STBTT_DEF unsigned char * stbtt_GetGlyphSDF(const stbtt_fontinfo *info, float sc
                }
             }
             if (winding == 0)
-               min_dist = -min_dist;  /* if outside the shape, value is negative */
+               min_dist = -min_dist;  // if outside the shape, value is negative
             val = onedge_value + pixel_dist_scale * min_dist;
             if (val < 0)
                val = 0;
@@ -14129,7 +13035,7 @@ STBTT_DEF unsigned char * stbtt_GetGlyphSDF(const stbtt_fontinfo *info, float sc
       STBTT_free(verts, info->userdata);
    }
    return data;
-}
+}   
 
 STBTT_DEF unsigned char * stbtt_GetCodepointSDF(const stbtt_fontinfo *info, float scale, int codepoint, int padding, unsigned char onedge_value, float pixel_dist_scale, int *width, int *height, int *xoff, int *yoff)
 {
@@ -14141,17 +13047,17 @@ STBTT_DEF void stbtt_FreeSDF(unsigned char *bitmap, void *userdata)
    STBTT_free(bitmap, userdata);
 }
 
-/* //////////////////////////////////////////////////////////////////////////// */
-/*  */
-/* font name matching -- recommended not to use this */
-/*  */
+//////////////////////////////////////////////////////////////////////////////
+//
+// font name matching -- recommended not to use this
+//
 
-/* check if a utf8 string contains a prefix which is the utf16 string; if so return length of matching utf8 string */
-static stbtt_int32 stbtt__CompareUTF8toUTF16_bigendian_prefix(stbtt_uint8 *s1, stbtt_int32 len1, stbtt_uint8 *s2, stbtt_int32 len2)
+// check if a utf8 string contains a prefix which is the utf16 string; if so return length of matching utf8 string
+static stbtt_int32 stbtt__CompareUTF8toUTF16_bigendian_prefix(stbtt_uint8 *s1, stbtt_int32 len1, stbtt_uint8 *s2, stbtt_int32 len2) 
 {
    stbtt_int32 i=0;
 
-   /* convert utf16 to utf8 and compare the results while converting */
+   // convert utf16 to utf8 and compare the results while converting
    while (len2) {
       stbtt_uint16 ch = s2[0]*256 + s2[1];
       if (ch < 0x80) {
@@ -14170,7 +13076,7 @@ static stbtt_int32 stbtt__CompareUTF8toUTF16_bigendian_prefix(stbtt_uint8 *s1, s
          if (s1[i++] != 0x80 + ((c >> 12) & 0x3f)) return -1;
          if (s1[i++] != 0x80 + ((c >>  6) & 0x3f)) return -1;
          if (s1[i++] != 0x80 + ((c      ) & 0x3f)) return -1;
-         s2 += 2; /* plus another 2 below */
+         s2 += 2; // plus another 2 below
          len2 -= 2;
       } else if (ch >= 0xdc00 && ch < 0xe000) {
          return -1;
@@ -14186,13 +13092,13 @@ static stbtt_int32 stbtt__CompareUTF8toUTF16_bigendian_prefix(stbtt_uint8 *s1, s
    return i;
 }
 
-static int stbtt_CompareUTF8toUTF16_bigendian_internal(char *s1, int len1, char *s2, int len2)
+static int stbtt_CompareUTF8toUTF16_bigendian_internal(char *s1, int len1, char *s2, int len2) 
 {
    return len1 == stbtt__CompareUTF8toUTF16_bigendian_prefix((stbtt_uint8*) s1, len1, (stbtt_uint8*) s2, len2);
 }
 
-/* returns results in whatever encoding you request... but note that 2-byte encodings */
-/* will be BIG-ENDIAN... use stbtt_CompareUTF8toUTF16_bigendian() to compare */
+// returns results in whatever encoding you request... but note that 2-byte encodings
+// will be BIG-ENDIAN... use stbtt_CompareUTF8toUTF16_bigendian() to compare
 STBTT_DEF const char *stbtt_GetFontNameString(const stbtt_fontinfo *font, int *length, int platformID, int encodingID, int languageID, int nameID)
 {
    stbtt_int32 i,count,stringOffset;
@@ -14224,18 +13130,18 @@ static int stbtt__matchpair(stbtt_uint8 *fc, stbtt_uint32 nm, stbtt_uint8 *name,
       stbtt_uint32 loc = nm + 6 + 12 * i;
       stbtt_int32 id = ttUSHORT(fc+loc+6);
       if (id == target_id) {
-         /* find the encoding */
+         // find the encoding
          stbtt_int32 platform = ttUSHORT(fc+loc+0), encoding = ttUSHORT(fc+loc+2), language = ttUSHORT(fc+loc+4);
 
-         /* is this a Unicode encoding? */
+         // is this a Unicode encoding?
          if (platform == 0 || (platform == 3 && encoding == 1) || (platform == 3 && encoding == 10)) {
             stbtt_int32 slen = ttUSHORT(fc+loc+8);
             stbtt_int32 off = ttUSHORT(fc+loc+10);
 
-            /* check if there's a prefix match */
+            // check if there's a prefix match
             stbtt_int32 matchlen = stbtt__CompareUTF8toUTF16_bigendian_prefix(name, nlen, fc+stringOffset+off,slen);
             if (matchlen >= 0) {
-               /* check for target_id+1 immediately following, with same encoding & language */
+               // check for target_id+1 immediately following, with same encoding & language
                if (i+1 < count && ttUSHORT(fc+loc+12+6) == next_id && ttUSHORT(fc+loc+12) == platform && ttUSHORT(fc+loc+12+2) == encoding && ttUSHORT(fc+loc+12+4) == language) {
                   slen = ttUSHORT(fc+loc+12+8);
                   off = ttUSHORT(fc+loc+12+10);
@@ -14248,14 +13154,14 @@ static int stbtt__matchpair(stbtt_uint8 *fc, stbtt_uint32 nm, stbtt_uint8 *name,
                         return 1;
                   }
                } else {
-                  /* if nothing immediately following */
+                  // if nothing immediately following
                   if (matchlen == nlen)
                      return 1;
                }
             }
          }
 
-         /* @TODO handle other encodings */
+         // @TODO handle other encodings
       }
    }
    return 0;
@@ -14267,7 +13173,7 @@ static int stbtt__matches(stbtt_uint8 *fc, stbtt_uint32 offset, stbtt_uint8 *nam
    stbtt_uint32 nm,hd;
    if (!stbtt__isfont(fc+offset)) return 0;
 
-   /* check italics/bold/underline flags in macStyle... */
+   // check italics/bold/underline flags in macStyle...
    if (flags) {
       hd = stbtt__find_table(fc, offset, "head");
       if ((ttUSHORT(fc+hd+44) & 7) != (flags & 7)) return 0;
@@ -14277,7 +13183,7 @@ static int stbtt__matches(stbtt_uint8 *fc, stbtt_uint32 offset, stbtt_uint8 *nam
    if (!nm) return 0;
 
    if (flags) {
-      /* if we checked the macStyle flags, then just check the family and ignore the subfamily */
+      // if we checked the macStyle flags, then just check the family and ignore the subfamily
       if (stbtt__matchpair(fc, nm, name, nlen, 16, -1))  return 1;
       if (stbtt__matchpair(fc, nm, name, nlen,  1, -1))  return 1;
       if (stbtt__matchpair(fc, nm, name, nlen,  3, -1))  return 1;
@@ -14315,7 +13221,7 @@ STBTT_DEF int stbtt_BakeFontBitmap(const unsigned char *data, int offset,
 
 STBTT_DEF int stbtt_GetFontOffsetForIndex(const unsigned char *data, int index)
 {
-   return stbtt_GetFontOffsetForIndex_internal((unsigned char *) data, index);
+   return stbtt_GetFontOffsetForIndex_internal((unsigned char *) data, index);   
 }
 
 STBTT_DEF int stbtt_GetNumberOfFonts(const unsigned char *data)
@@ -14342,65 +13248,65 @@ STBTT_DEF int stbtt_CompareUTF8toUTF16_bigendian(const char *s1, int len1, const
 #pragma GCC diagnostic pop
 #endif
 
-#endif /* STB_TRUETYPE_IMPLEMENTATION */
+#endif // STB_TRUETYPE_IMPLEMENTATION
 
 
-/* FULL VERSION HISTORY */
-/*  */
-/* 1.19 (2018-02-11) OpenType GPOS kerning (horizontal only), STBTT_fmod */
-/* 1.18 (2018-01-29) add missing function */
-/* 1.17 (2017-07-23) make more arguments const; doc fix */
-/* 1.16 (2017-07-12) SDF support */
-/* 1.15 (2017-03-03) make more arguments const */
-/* 1.14 (2017-01-16) num-fonts-in-TTC function */
-/* 1.13 (2017-01-02) support OpenType fonts, certain Apple fonts */
-/* 1.12 (2016-10-25) suppress warnings about casting away const with -Wcast-qual */
-/* 1.11 (2016-04-02) fix unused-variable warning */
-/* 1.10 (2016-04-02) allow user-defined fabs() replacement */
-/* fix memory leak if fontsize=0.0 */
-/* fix warning from duplicate typedef */
-/* 1.09 (2016-01-16) warning fix; avoid crash on outofmem; use alloc userdata for PackFontRanges */
-/* 1.08 (2015-09-13) document stbtt_Rasterize(); fixes for vertical & horizontal edges */
-/* 1.07 (2015-08-01) allow PackFontRanges to accept arrays of sparse codepoints; */
-/* allow PackFontRanges to pack and render in separate phases; */
-/* fix stbtt_GetFontOFfsetForIndex (never worked for non-0 input?); */
-/* fixed an assert() bug in the new rasterizer */
-/* replace assert() with STBTT_assert() in new rasterizer */
-/* 1.06 (2015-07-14) performance improvements (~35% faster on x86 and x64 on test machine) */
-/* also more precise AA rasterizer, except if shapes overlap */
-/* remove need for STBTT_sort */
-/* 1.05 (2015-04-15) fix misplaced definitions for STBTT_STATIC */
-/* 1.04 (2015-04-15) typo in example */
-/* 1.03 (2015-04-12) STBTT_STATIC, fix memory leak in new packing, various fixes */
-/* 1.02 (2014-12-10) fix various warnings & compile issues w/ stb_rect_pack, C++ */
-/* 1.01 (2014-12-08) fix subpixel position when oversampling to exactly match */
-/* non-oversampled; STBTT_POINT_SIZE for packed case only */
-/* 1.00 (2014-12-06) add new PackBegin etc. API, w/ support for oversampling */
-/* 0.99 (2014-09-18) fix multiple bugs with subpixel rendering (ryg) */
-/* 0.9  (2014-08-07) support certain mac/iOS fonts without an MS platformID */
-/* 0.8b (2014-07-07) fix a warning */
-/* 0.8  (2014-05-25) fix a few more warnings */
-/* 0.7  (2013-09-25) bugfix: subpixel glyph bug fixed in 0.5 had come back */
-/* 0.6c (2012-07-24) improve documentation */
-/* 0.6b (2012-07-20) fix a few more warnings */
-/* 0.6  (2012-07-17) fix warnings; added stbtt_ScaleForMappingEmToPixels, */
-/* stbtt_GetFontBoundingBox, stbtt_IsGlyphEmpty */
-/* 0.5  (2011-12-09) bugfixes: */
-/* subpixel glyph renderer computed wrong bounding box */
-/* first vertex of shape can be off-curve (FreeSans) */
-/* 0.4b (2011-12-03) fixed an error in the font baking example */
-/* 0.4  (2011-12-01) kerning, subpixel rendering (tor) */
-/* bugfixes for: */
-/* codepoint-to-glyph conversion using table fmt=12 */
-/* codepoint-to-glyph conversion using table fmt=4 */
-/* stbtt_GetBakedQuad with non-square texture (Zer) */
-/* updated Hello World! sample to use kerning and subpixel */
-/* fixed some warnings */
-/* 0.3  (2009-06-24) cmap fmt=12, compound shapes (MM) */
-/* userdata, malloc-from-userdata, non-zero fill (stb) */
-/* 0.2  (2009-03-11) Fix unsigned/signed char warnings */
-/* 0.1  (2009-03-09) First public release */
-/*  */
+// FULL VERSION HISTORY
+//
+//   1.19 (2018-02-11) OpenType GPOS kerning (horizontal only), STBTT_fmod
+//   1.18 (2018-01-29) add missing function
+//   1.17 (2017-07-23) make more arguments const; doc fix
+//   1.16 (2017-07-12) SDF support
+//   1.15 (2017-03-03) make more arguments const
+//   1.14 (2017-01-16) num-fonts-in-TTC function
+//   1.13 (2017-01-02) support OpenType fonts, certain Apple fonts
+//   1.12 (2016-10-25) suppress warnings about casting away const with -Wcast-qual
+//   1.11 (2016-04-02) fix unused-variable warning
+//   1.10 (2016-04-02) allow user-defined fabs() replacement
+//                     fix memory leak if fontsize=0.0
+//                     fix warning from duplicate typedef
+//   1.09 (2016-01-16) warning fix; avoid crash on outofmem; use alloc userdata for PackFontRanges
+//   1.08 (2015-09-13) document stbtt_Rasterize(); fixes for vertical & horizontal edges
+//   1.07 (2015-08-01) allow PackFontRanges to accept arrays of sparse codepoints;
+//                     allow PackFontRanges to pack and render in separate phases;
+//                     fix stbtt_GetFontOFfsetForIndex (never worked for non-0 input?);
+//                     fixed an assert() bug in the new rasterizer
+//                     replace assert() with STBTT_assert() in new rasterizer
+//   1.06 (2015-07-14) performance improvements (~35% faster on x86 and x64 on test machine)
+//                     also more precise AA rasterizer, except if shapes overlap
+//                     remove need for STBTT_sort
+//   1.05 (2015-04-15) fix misplaced definitions for STBTT_STATIC
+//   1.04 (2015-04-15) typo in example
+//   1.03 (2015-04-12) STBTT_STATIC, fix memory leak in new packing, various fixes
+//   1.02 (2014-12-10) fix various warnings & compile issues w/ stb_rect_pack, C++
+//   1.01 (2014-12-08) fix subpixel position when oversampling to exactly match
+//                        non-oversampled; STBTT_POINT_SIZE for packed case only
+//   1.00 (2014-12-06) add new PackBegin etc. API, w/ support for oversampling
+//   0.99 (2014-09-18) fix multiple bugs with subpixel rendering (ryg)
+//   0.9  (2014-08-07) support certain mac/iOS fonts without an MS platformID
+//   0.8b (2014-07-07) fix a warning
+//   0.8  (2014-05-25) fix a few more warnings
+//   0.7  (2013-09-25) bugfix: subpixel glyph bug fixed in 0.5 had come back
+//   0.6c (2012-07-24) improve documentation
+//   0.6b (2012-07-20) fix a few more warnings
+//   0.6  (2012-07-17) fix warnings; added stbtt_ScaleForMappingEmToPixels,
+//                        stbtt_GetFontBoundingBox, stbtt_IsGlyphEmpty
+//   0.5  (2011-12-09) bugfixes:
+//                        subpixel glyph renderer computed wrong bounding box
+//                        first vertex of shape can be off-curve (FreeSans)
+//   0.4b (2011-12-03) fixed an error in the font baking example
+//   0.4  (2011-12-01) kerning, subpixel rendering (tor)
+//                    bugfixes for:
+//                        codepoint-to-glyph conversion using table fmt=12
+//                        codepoint-to-glyph conversion using table fmt=4
+//                        stbtt_GetBakedQuad with non-square texture (Zer)
+//                    updated Hello World! sample to use kerning and subpixel
+//                    fixed some warnings
+//   0.3  (2009-06-24) cmap fmt=12, compound shapes (MM)
+//                    userdata, malloc-from-userdata, non-zero fill (stb)
+//   0.2  (2009-03-11) Fix unsigned/signed char warnings
+//   0.1  (2009-03-09) First public release
+//
 
 /*
 ------------------------------------------------------------------------------
@@ -14408,44 +13314,42 @@ This software is available under 2 licenses -- choose whichever you prefer.
 ------------------------------------------------------------------------------
 ALTERNATIVE A - MIT License
 Copyright (c) 2017 Sean Barrett
-Permission is hereby granted, free of charge, to any person obtaining a copy of
-this software and associated documentation files (the "Software"), to deal in
-the Software without restriction, including without limitation the rights to
-use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
-of the Software, and to permit persons to whom the Software is furnished to do
+Permission is hereby granted, free of charge, to any person obtaining a copy of 
+this software and associated documentation files (the "Software"), to deal in 
+the Software without restriction, including without limitation the rights to 
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies 
+of the Software, and to permit persons to whom the Software is furnished to do 
 so, subject to the following conditions:
-The above copyright notice and this permission notice shall be included in all
+The above copyright notice and this permission notice shall be included in all 
 copies or substantial portions of the Software.
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE 
 SOFTWARE.
 ------------------------------------------------------------------------------
 ALTERNATIVE B - Public Domain (www.unlicense.org)
 This is free and unencumbered software released into the public domain.
-Anyone is free to copy, modify, publish, use, compile, sell, or distribute this
-software, either in source code form or as a compiled binary, for any purpose,
+Anyone is free to copy, modify, publish, use, compile, sell, or distribute this 
+software, either in source code form or as a compiled binary, for any purpose, 
 commercial or non-commercial, and by any means.
-In jurisdictions that recognize copyright laws, the author or authors of this
-software dedicate any and all copyright interest in the software to the public
-domain. We make this dedication for the benefit of the public at large and to
-the detriment of our heirs and successors. We intend this dedication to be an
-overt act of relinquishment in perpetuity of all present and future rights to
+In jurisdictions that recognize copyright laws, the author or authors of this 
+software dedicate any and all copyright interest in the software to the public 
+domain. We make this dedication for the benefit of the public at large and to 
+the detriment of our heirs and successors. We intend this dedication to be an 
+overt act of relinquishment in perpetuity of all present and future rights to 
 this software under copyright law.
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
-ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
+AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN 
+ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ------------------------------------------------------------------------------
 */
-
 /* X_FONT */
-
 
 unsigned char __x_font_buffer_profont[46628] = {
   0x00, 0x01, 0x00, 0x00, 0x00, 0x10, 0x01, 0x00, 0x00, 0x04, 0x00, 0x00, 0x46, 0x46, 0x54, 0x4d,
@@ -17365,5 +16269,1046 @@ unsigned char __x_font_buffer_profont[46628] = {
   0xd5, 0x15, 0x03, 0xf7
   };
 
+static X_Color __board_palette[256];
+
+X_Color X_COLOR_WHITE     = {238, 232, 213};
+X_Color X_COLOR_BLACK     = {7  , 54 , 66 };
+X_Color X_COLOR_GREEN     = {133, 153, 0  };
+X_Color X_COLOR_RED       = {211, 1  , 2  };
+X_Color X_COLOR_BLUE      = {38 , 139, 210};
+X_Color X_COLOR_YELLOW    = {181, 137, 0  };
+X_Color X_COLOR_CYAN      = {42 , 161, 152};
+X_Color X_COLOR_MAGENTA   = {211, 54 , 130};
+X_Color X_COLOR_ORANGE    = {253, 106, 2  };
+X_Color X_COLOR_VIOLET    = {108, 113, 196};
+
+
+X_Color x_make_color(uchar r, uchar g, uchar b){
+    X_Color x = {r, g, b};
+    return x;
+}
+
+void x_set_palette(char c, X_Color color){
+    __board_palette[(int)c] = color;
+}
+
+X_Color x_get_palette(char c){
+    return __board_palette[(int)c];
+}
+
+void __x_init_colors(void){
+    int i = 0;
+    for(i = 0; i < 256; i++)
+        __board_palette[i] = X_COLOR_WHITE;
+
+    __board_palette['r'] = X_COLOR_RED;
+    __board_palette['g'] = X_COLOR_GREEN;
+    __board_palette['b'] = X_COLOR_BLUE;
+    __board_palette['y'] = X_COLOR_YELLOW;
+    __board_palette['m'] = X_COLOR_MAGENTA;
+    __board_palette['c'] = X_COLOR_CYAN;
+    __board_palette['k'] = X_COLOR_BLACK;
+    __board_palette['w'] = X_COLOR_WHITE;
+    __board_palette['o'] = X_COLOR_ORANGE;
+    __board_palette['v'] = X_COLOR_VIOLET;
+}
+
+#include <stdio.h>
+#include <stdbool.h>
+#include <stdlib.h> /* mencpy, srand */
+#include <string.h> /* strcpy */
+#include <time.h>   /* time */
+
+
+void x_save_ppm(unsigned dimx, unsigned dimy, unsigned char * bitmap, const char * filename);
+void x_save_png(unsigned dimx, unsigned dimy, unsigned char * bitmap, const char * filename);
+void x_init_font();
+
+/* #define X_SAVE_PPM */
+
+#ifndef X_SAVE_PPM
+const char * __board_extension = ".png";
+#else
+const char * __board_extension = ".ppm";
 #endif
-#undef XPAINT_FULL
+
+
+static uchar *   __board_bitmap  = NULL; /* 3 uchar per pixel */
+static unsigned  __board_width  = 0;
+static unsigned  __board_height = 0;
+
+static uchar     __board_color[3];
+
+static bool      __board_is_open = false;
+static char      __board_filename[200] = "";
+static char      __board_viewer  [200] = "";
+static int       __board_step          = 1;
+
+/* Local prototypes */
+uchar * __x_get_pixel_pos(unsigned int x, unsigned int y);
+
+uchar * __x_get_pixel_pos(unsigned x, unsigned y){
+    return __board_bitmap + 3 * (__board_width * y + x);
+}
+
+
+
+void x_open(unsigned int width, unsigned int height, const char * filename){
+    if(__board_is_open){
+        fprintf(stderr, "fail: bitmat already open\n");
+        return;
+    }
+    __board_is_open = true;
+    __board_height = height;
+    __board_width = width;
+    strcpy(__board_filename, filename);
+
+    __board_bitmap = (uchar*) calloc(sizeof(uchar), width * height * 3);
+    __board_color[0] = 200;
+    __board_color[1] = 200;
+    __board_color[2] = 200;
+
+    __x_init_colors();
+    __x_init_font();
+    srand((unsigned) time(NULL));
+}
+
+int x_get_height(void){
+    return (int) __board_height;
+}
+
+int x_get_width(void){
+    return (int) __board_width;
+}
+
+uchar * x_get_bitmap(void){
+    return __board_bitmap;
+}
+
+const char * x_get_filename(void){
+    return __board_filename;
+}
+
+void x_close(void){
+    if(__board_bitmap != NULL){
+        free(__board_bitmap);
+        __board_is_open = false;
+    }
+    __board_is_open = false;
+    //TODO close font
+}
+
+void x_set_filename(const char * filename){
+    if(filename != NULL)
+        strcpy(__board_filename, filename);
+    else
+        strcpy(__board_filename, "");
+}
+
+void x_set_viewer(const char * viewer){
+    if(viewer != NULL)
+        strcpy(__board_viewer, viewer);
+    else
+        strcpy(__board_viewer, "");
+}
+
+void x_plot(int x, int y){
+    if(!__board_is_open){
+        fprintf(stderr, "fail: x_open(weight, width, filename) missing\n");
+        exit(1);
+    }
+    if((x >= 0) && (x < (int) __board_width) && (y >= 0) && (y <  (int) __board_height))
+        memcpy(__x_get_pixel_pos((unsigned) x, (unsigned) y), __board_color, 3 * sizeof(uchar));
+}
+
+X_Color x_get_pixel(int x, int y){
+    uchar * pixel = __x_get_pixel_pos((unsigned) x, (unsigned) y);
+    X_Color color = {pixel[0], pixel[1], pixel[2]};
+    return color;
+}
+
+void x_set_color(X_Color color){
+    __board_color[0] = color.r;
+    __board_color[1] = color.g;
+    __board_color[2] = color.b;
+}
+
+X_Color x_get_color(void){
+    X_Color color = {__board_color[0], __board_color[1], __board_color[2]};
+    return color;
+}
+
+void x_clear(void){
+    unsigned x, y;
+    for(x = 0; x < __board_width; x++)
+        for(y = 0; y < __board_height; y++)
+            memcpy(__x_get_pixel_pos((unsigned) x, (unsigned) y), __board_color, 3 * sizeof(uchar));
+}
+
+void x_save(){
+#ifndef X_SAVE_PPM
+    x_save_png(__board_width, __board_height, __board_bitmap, __board_filename);
+#else
+    x_save_ppm(__board_width, __board_height, __board_bitmap, __board_filename);
+#endif
+    static int init = 1;
+    if(init){
+        init = 0;
+        char cmd[500];
+        if(strcmp(__board_viewer, "") != 0){
+            sprintf(cmd, "%s %s%s&",__board_viewer, __board_filename, __board_extension);
+            puts(cmd);
+            system(cmd);
+        }
+    }
+}
+
+void x_log(){
+    static int index = 0;
+    char * name = (char *) malloc((strlen(__board_filename) + 10) * sizeof(char));
+    sprintf(name, "%s%05d", __board_filename, index);
+    index += 1;
+    printf("saving: %s%s\n", name, __board_extension);
+#ifndef X_SAVE_PPM
+    x_save_png(__board_width, __board_height, __board_bitmap, name);
+#else
+    x_save_ppm(__board_width, __board_height, __board_bitmap, name);
+#endif
+    free(name);
+}
+
+void x_set_step(int value){
+    __board_step = value;
+}
+
+int x_control(){
+    static int init = 1;
+    static int rounds = 0;
+    static int state = 0;
+    if(init == 1){
+        init = 0;
+        printf("press{enter/step value/0 to skip}\n");
+    }
+
+    rounds += 1;
+    state += 1;
+    if((__board_step != 0) && (rounds >= __board_step)){
+        printf("(state: %i, step: %i): ", state, __board_step);
+        char line[200];
+        fgets(line, sizeof(line), stdin);
+        char * ptr = line;
+        int value = (int) strtol(line, &ptr, 10);
+        if(ptr != line)
+            __board_step = value;
+        rounds = 0;
+        return true;
+    }
+    return false;
+}
+#include <assert.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <inttypes.h>
+
+
+void x_plot(int x, int y);
+
+
+void x_draw_line(int x0, int y0, int x1, int y1){
+    /* Bresenham's Line Algorithm */
+    int dx = (x0 > x1) ? x0 - x1 : x1 - x0;
+    int dy = (y0 > y1) ? y0 - y1 : y1 - y0;
+    int sx = (x0 < x1) ? 1 : -1;
+    int sy = (y0 < y1) ? 1 : -1;
+    int err = dx - dy;
+
+    while (1) {
+        x_plot(x0, y0);
+        if (x0 == x1 && y0 == y1) break;
+        int e2 = 2 * err;
+        if (e2 > -dy) {
+            err -= dy;
+            x0 += sx;
+        }
+        if (e2 < dx) {
+            err += dx;
+            y0 += sy;
+        }
+    }
+}
+
+void __x_fill_bottom_flat_triangle(float v1x, float v1y, float v2x, float v2y, float v3x, float v3y)
+{
+    float invslope1 = ((int)v2x - (int)v1x) / (float)((int)v2y - (int)v1y);
+    float invslope2 = ((int)v3x - (int)v1x) / (float)((int)v3y - (int)v1y);
+
+    float curx1 = v1x;
+    float curx2 = v1x;
+    int scanlineY;
+
+    for (scanlineY = v1y; scanlineY <= (int)v2y; scanlineY++){
+        x_draw_line(curx1, scanlineY, curx2, scanlineY);
+        curx1 += invslope1;
+        curx2 += invslope2;
+    }
+}
+
+void __x_fill_top_flat_triangle(float v1x, float v1y, float v2x, float v2y, float v3x, float v3y)
+{
+    float invslope1 = ((int)v3x - (int)v1x) / (float)((int)v3y - (int)v1y);
+    float invslope2 = ((int)v3x - (int)v2x) / (float)((int)v3y - (int)v2y);
+
+    float curx1 = v3x;
+    float curx2 = v3x;
+
+    int scanlineY;
+
+    for (scanlineY = v3y; scanlineY >= v1y; scanlineY--)
+    {
+        x_draw_line(curx1, scanlineY, curx2, scanlineY);
+        curx1 -= invslope1;
+        curx2 -= invslope2;
+    }
+}
+
+void x_fill_triangle(float v1x, float v1y, float v2x, float v2y, float v3x, float v3y)
+{
+    X_V2d v1 = {v1x, v1y};
+    X_V2d v2 = {v2x, v2y};
+    X_V2d v3 = {v3x, v3y};
+    /* at first sort the three vertices by y-coordinate ascending so v1 is the topmost vertice */
+    if((v2.y <= v1.y) && (v2.y <= v3.y))
+        X_SWAP(v1, v2, X_V2d);
+    if((v3.y <= v1.y) && (v3.y <= v2.y))
+        X_SWAP(v1, v3, X_V2d);
+    if(v3.y < v2.y)
+        X_SWAP(v2, v3, X_V2d);
+
+    /* here we know that v1.y <= v2.y <= v3.y */
+    /* check for trivial case of bottom-flat triangle */
+    if (v2.y == v3.y)
+        __x_fill_bottom_flat_triangle(v1.x, v1.y, v2.x, v2.y, v3.x, v3.y);
+    else if (v1.y == v2.y)
+        __x_fill_top_flat_triangle(v1.x, v1.y, v2.x, v2.y, v3.x, v3.y);
+    else
+    {
+        /* general case - split the triangle in a topflat and bottom-flat one */
+        X_V2d v4 = {0.f, 0.f};
+        v4.x = (v1.x + ((float)(v2.y - v1.y) / (float)(v3.y - v1.y)) * (v3.x - v1.x));
+        v4.y = v2.y;
+        __x_fill_bottom_flat_triangle(v1.x, v1.y, v2.x, v2.y, v4.x, v4.y);
+        __x_fill_top_flat_triangle(v2.x, v2.y, v4.x, v4.y, v3.x, v3.y);
+    }
+}
+
+void x_fill_line(float x0, float y0, float x1, float y1, int thickness){
+    X_V2d a = {x0, y0};
+    X_V2d b = {x1, y1};
+    if(thickness == 1){
+        x_draw_line(a.x, a.y, b.x, b.y);
+        return;
+    }
+    X_V2d _offset = x_make_v2d(b.x - a.x, b.y - a.y);
+    _offset = x_v2d_dot(x_v2d_ortho(x_v2d_normalize(_offset)), (thickness / 2.f));
+
+    X_V2d p1 = x_v2d_sub(a, _offset);
+    X_V2d p2 = x_v2d_sub(b, _offset);
+    X_V2d p3 = x_v2d_sum(a, _offset);
+    X_V2d p4 = x_v2d_sum(b, _offset);
+
+    x_fill_triangle(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);
+    x_fill_triangle(p3.x, p3.y, p2.x, p2.y, p4.x, p4.y);
+}
+
+void x_fill_rect(int x0, int y0, int width, int height){
+    int i, x1 = x0 + width - 1, y1 = y0 + height - 1;
+    for(i = x0; i <= x1; i++)
+        x_draw_line(i, y0, i, y1);
+}
+
+/* https://en.wikipedia.org/wiki/Midpoint_circle_algorithm */
+void x_draw_circle(int centerx, int centery, int radius){
+    int x = radius - 1;
+    int y = 0;
+    int dx = 1;
+    int dy = 1;
+    int err = dx - (radius << 1);
+    while(x >= y){
+        x_plot(centerx + x, centery + y);
+        x_plot(centerx - x, centery + y);
+        x_plot(centerx + x, centery - y);
+        x_plot(centerx - x, centery - y);
+        x_plot(centerx + y, centery + x);
+        x_plot(centerx - y, centery + x);
+        x_plot(centerx - y, centery - x);
+        x_plot(centerx + y, centery - x);
+
+        if(err <= 0){
+            y++;
+            err += dy;
+            dy += 2;
+        }else{
+            x--;
+            dx += 2;
+            err += dx - (radius << 1);
+        }
+    }
+}
+
+void x_fill_circle(int centerx, int centery, int radius){
+    int x = radius - 1;
+    int y = 0;
+    int dx = 1;
+    int dy = 1;
+    int err = dx - (radius << 1);
+    while(x >= y){
+        x_draw_line(centerx + x, centery + y, centerx - x, centery + y);
+        x_draw_line(centerx + x, centery - y, centerx - x, centery - y);
+        x_draw_line(centerx + y, centery + x, centerx - y, centery + x);
+        x_draw_line(centerx - y, centery - x, centerx + y, centery - x);
+        if(err <= 0){
+            y++;
+            err += dy;
+            dy += 2;
+        }else{
+            x--;
+            dx += 2;
+            err += dx - (radius << 1);
+        }
+    }
+}
+
+void x_draw_ellipse(int x0, int y0, int x1, int y1)
+{
+    int a = abs(x1-x0), b = abs(y1-y0), b1 = b&1; /* values of diameter */
+    long dx = 4*(1-a)*b*b, dy = 4*(b1+1)*a*a; /* error increment */
+    long err = dx+dy+b1*a*a, e2; /* error of 1.step */
+
+    if (x0 > x1) { x0 = x1; x1 += a; } /* if called with swapped points */
+    if (y0 > y1) y0 = y1; /* .. exchange them */
+    y0 += (b+1)/2; y1 = y0-b1;   /* starting pixel */
+    a *= 8*a; b1 = 8*b*b;
+
+    do {
+        x_plot(x1, y0); /*   I. Quadrant */
+        x_plot(x0, y0); /*  II. Quadrant */
+        x_plot(x0, y1); /* III. Quadrant */
+        x_plot(x1, y1); /*  IV. Quadrant */
+        e2 = 2*err;
+        if (e2 <= dy) { y0++; y1--; err += dy += a; }  /* y step */
+        if (e2 >= dx || 2*err > dy) { x0++; x1--; err += dx += b1; } /* x step */
+    } while (x0 <= x1);
+
+    while (y0-y1 < b) {  /* too early stop of flat ellipses a=1 */
+        x_plot(x0-1, y0); /* -> finish tip of ellipse */
+        x_plot(x1+1, y0++);
+        x_plot(x0-1, y1);
+        x_plot(x1+1, y1--);
+    }
+}
+
+void x_fill_ellipse(int x0, int y0, int x1, int y1)
+{
+    int a = abs(x1-x0), b = abs(y1-y0), b1 = b&1; /* values of diameter */
+    long dx = 4*(1-a)*b*b, dy = 4*(b1+1)*a*a; /* error increment */
+    long err = dx+dy+b1*a*a, e2; /* error of 1.step */
+
+    if (x0 > x1) { x0 = x1; x1 += a; } /* if called with swapped points */
+    if (y0 > y1) y0 = y1; /* .. exchange them */
+    y0 += (b+1)/2; y1 = y0-b1;   /* starting pixel */
+    a *= 8*a; b1 = 8*b*b;
+
+    do {
+        x_draw_line(x1, y0, x0, y0); /*   I. Quadrant */
+        x_draw_line(x0, y1, x1, y1); /* III. Quadrant */
+        e2 = 2*err;
+        if (e2 <= dy) { y0++; y1--; err += dy += a; }  /* y step */
+        if (e2 >= dx || 2*err > dy) { x0++; x1--; err += dx += b1; } /* x step */
+    } while (x0 <= x1);
+
+    while (y0-y1 < b) {  /* too early stop of flat ellipses a=1 */
+        x_plot(x0-1, y0); /* -> finish tip of ellipse */
+        x_plot(x1+1, y0++);
+        x_plot(x0-1, y1);
+        x_plot(x1+1, y1--);
+    }
+}
+
+void __x_plot_quad_bezier_seg(int x0, int y0, int x1, int y1, int x2, int y2)
+{
+    int sx = x2-x1, sy = y2-y1;
+    long xx = x0-x1, yy = y0-y1, xy;         /* relative values for checks */
+    double dx, dy, err, cur = xx*sy-yy*sx;                    /* curvature */
+
+    assert(xx*sx <= 0 && yy*sy <= 0);  /* sign of gradient must not change */
+
+    if (sx*(long)sx+sy*(long)sy > xx*xx+yy*yy) { /* begin with longer part */
+        x2 = x0; x0 = sx+x1; y2 = y0; y0 = sy+y1; cur = -cur;  /* swap P0 P2 */
+    }
+    if (cur != 0) {                                    /* no straight line */
+        xx += sx; xx *= sx = x0 < x2 ? 1 : -1;           /* x step direction */
+        yy += sy; yy *= sy = y0 < y2 ? 1 : -1;           /* y step direction */
+        xy = 2*xx*yy; xx *= xx; yy *= yy;          /* differences 2nd degree */
+        if (cur*sx*sy < 0) {                           /* negated curvature? */
+            xx = -xx; yy = -yy; xy = -xy; cur = -cur;
+        }
+        dx = 4.0*sy*cur*(x1-x0)+xx-xy;             /* differences 1st degree */
+        dy = 4.0*sx*cur*(y0-y1)+yy-xy;
+        xx += xx; yy += yy; err = dx+dy+xy;                /* error 1st step */
+        do {
+            x_plot(x0,y0);                                     /* plot curve */
+            if (x0 == x2 && y0 == y2) return;  /* last pixel -> curve finished */
+            y1 = 2*err < dx;                  /* save value for test of y step */
+            if (2*err > dy) { x0 += sx; dx -= xy; err += dy += yy; } /* x step */
+            if (    y1    ) { y0 += sy; dy -= xy; err += dx += xx; } /* y step */
+        } while (dy < dx );           /* gradient negates -> algorithm fails */
+    }
+    x_draw_line(x0, y0, x2, y2);                  /* plot remaining part to end */
+}
+void x_draw_bezier(int x0, int y0, int x1, int y1, int x2, int y2)
+{                                          /* plot any quadratic Bezier curve */
+    int x = x0-x1, y = y0-y1;
+    double t = x0-2*x1+x2, r;
+
+    if ((long)x*(x2-x1) > 0) {                        /* horizontal cut at P4? */
+        if ((long)y*(y2-y1) > 0)                     /* vertical cut at P6 too? */
+            if (xm_fabs((y0-2*y1+y2)/t*x) > abs(y)) {               /* which first? */
+                x0 = x2; x2 = x+x1; y0 = y2; y2 = y+y1;            /* swap points */
+            }                            /* now horizontal cut at P4 comes first */
+        t = (x0-x1)/t;
+        r = (1-t)*((1-t)*y0+2.0*t*y1)+t*t*y2;                       /* By(t=P4) */
+        t = (x0*x2-x1*x1)*t/(x0-x1);                       /* gradient dP4/dx=0 */
+        x = xm_floor(t+0.5); y = xm_floor(r+0.5);
+        r = (y1-y0)*(t-x0)/(x1-x0)+y0;                  /* intersect P3 | P0 P1 */
+        __x_plot_quad_bezier_seg(x0,y0, x,xm_floor(r+0.5), x,y);
+        r = (y1-y2)*(t-x2)/(x1-x2)+y2;                  /* intersect P4 | P1 P2 */
+        x0 = x1 = x; y0 = y; y1 = xm_floor(r+0.5);             /* P0 = P4, P1 = P8 */
+    }
+    if ((long)(y0-y1)*(y2-y1) > 0) {                    /* vertical cut at P6? */
+        t = y0-2*y1+y2; t = (y0-y1)/t;
+        r = (1-t)*((1-t)*x0+2.0*t*x1)+t*t*x2;                       /* Bx(t=P6) */
+        t = (y0*y2-y1*y1)*t/(y0-y1);                       /* gradient dP6/dy=0 */
+        x = xm_floor(r+0.5); y = xm_floor(t+0.5);
+        r = (x1-x0)*(t-y0)/(y1-y0)+x0;                  /* intersect P6 | P0 P1 */
+        __x_plot_quad_bezier_seg(x0,y0, xm_floor(r+0.5),y, x,y);
+        r = (x1-x2)*(t-y2)/(y1-y2)+x2;                  /* intersect P7 | P1 P2 */
+        x0 = x; x1 = xm_floor(r+0.5); y0 = y1 = y;             /* P0 = P6, P1 = P7 */
+    }
+    __x_plot_quad_bezier_seg(x0,y0, x1,y1, x2,y2);                  /* remaining part */
+}
+
+/* https://github.com/Jnmattern/Minimalist_2.0/blob/master/src/bitmap.h */
+#define __TRIG_MAX (1<<24)
+#define __TRIG_NORM(v) ((v)>>24)
+#define __TRIG_MULT(v) ((v)<<24)
+
+const int32_t __sinTable__[91] = {
+    0, 292802, 585516, 878051, 1170319, 1462230, 1753696, 2044628, 2334937, 2624534, 2913332, 3201243, 3488179, 3774052,
+    4058775, 4342263, 4624427, 4905183, 5184444, 5462127, 5738145, 6012416, 6284855, 6555380, 6823908, 7090357, 7354647,
+    7616696, 7876425, 8133755, 8388607, 8640905, 8890569, 9137526, 9381700, 9623015, 9861400, 10096780, 10329085, 10558244,
+    10784186, 11006844, 11226148, 11442033, 11654433, 11863283, 12068519, 12270079, 12467901, 12661925, 12852093, 13038345,
+    13220626, 13398880, 13573052, 13743090, 13908942, 14070557, 14227886, 14380880, 14529495, 14673683, 14813402, 14948608,
+    15079261, 15205321, 15326749, 15443508, 15555563, 15662880, 15765426, 15863169, 15956080, 16044131, 16127295, 16205546,
+    16278860, 16347217, 16410593, 16468971, 16522332, 16570660, 16613941, 16652161, 16685308, 16713373, 16736347, 16754223,
+    16766995, 16774660, 16777216
+};
+
+static int32_t __SIN(int d) {
+    d = d%360;
+    if (d < 90) {
+        return __sinTable__[d];
+    } else if (d < 180) {
+        return __sinTable__[180-d];
+    } else if (d < 270) {
+        return -__sinTable__[d-180];
+    } else {
+        return -__sinTable__[360-d];
+    }
+}
+
+static int32_t __COS(int d) {
+    d = d%360;
+    if (d < 90) {
+        return __sinTable__[90-d];
+    } else if (d < 180) {
+        return -__sinTable__[d-90];
+    } else if (d < 270) {
+        return -__sinTable__[270-d];
+    } else {
+        return __sinTable__[d-270];
+    }
+}
+
+/* begin should be smaller than end, and both must be in interval [0, 360] */
+void __x_fill_arc(float centerx, float centery, int radius, int thickness, int degrees_begin, int degrees_end) {
+    X_V2d center = {centerx, centery};
+    float sslope = (float)__COS(degrees_begin) / (float)__SIN(degrees_begin);
+    float eslope = (float)__COS(degrees_end) / (float)__SIN(degrees_end);
+
+    if (degrees_end == 360) eslope = -1000000;
+
+    int ir2 = (radius - thickness) * (radius - thickness);
+    int or2 = radius * radius;
+    int x, y;
+
+    for (x = -radius; x <= radius; x++) {
+        for (y = -radius; y <= radius; y++)
+        {
+            int x2 = x * x;
+            int y2 = y * y;
+
+            if (
+                    (x2 + y2 < or2 && x2 + y2 >= ir2) && (
+                            (y > 0 && degrees_begin < 180 && x <= y * sslope) ||
+                            (y < 0 && degrees_begin > 180 && x >= y * sslope) ||
+                            (y < 0 && degrees_begin <= 180) ||
+                            (y == 0 && degrees_begin <= 180 && x < 0) ||
+                            (y == 0 && degrees_begin == 0 && x > 0)
+                    ) && (
+                            (y > 0 && degrees_end < 180 && x >= y * eslope) ||
+                            (y < 0 && degrees_end > 180 && x <= y * eslope) ||
+                            (y > 0 && degrees_end >= 180) ||
+                            (y == 0 && degrees_end >= 180 && x < 0) ||
+                            (y == 0 && degrees_begin == 0 && x > 0)
+                    )
+                    )
+                x_plot(center.x+x, center.y-y);
+        }
+    }
+
+}
+
+void x_fill_arc(float centerx, float centery, int radius, int thickness, int degrees_begin, int degrees_lenght){
+    if(degrees_lenght % 360 == 0)
+        degrees_lenght = 360;
+    else
+        degrees_lenght %= 360;
+    if(degrees_lenght < 0){
+        degrees_lenght *= -1;
+        degrees_begin -= degrees_lenght;
+    }
+    degrees_begin %= 360;
+    if(degrees_begin < 0)
+        degrees_begin += 360;
+    int degrees_end = degrees_begin + degrees_lenght;
+
+    if(degrees_end <= 360){
+        __x_fill_arc(centerx, centery, radius, thickness, degrees_begin, degrees_end);
+    }else{
+        __x_fill_arc(centerx, centery, radius, thickness, degrees_begin, 360);
+        __x_fill_arc(centerx, centery, radius, thickness, 0, degrees_end - 360);
+    }
+}
+
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+void x_save_ppm(unsigned dimx, unsigned dimy, unsigned char * bitmap, const char * filename){
+    /* const int dimx = x_get_width();
+    const int dimy = x_get_height();
+     */
+    char path[400];
+    sprintf(path, "%s.ppm", filename);
+    FILE *fp = fopen(path, "wb"); /* b - binary mode */
+    fprintf(fp, "P6\n%d %d\n255\n", dimx, dimy);
+    fwrite(bitmap, 1, (size_t) (dimx * dimy * 3), fp);
+    fclose(fp);
+}
+
+void x_save_png(unsigned dimx, unsigned dimy, unsigned char * bitmap, const char * filename){
+    char * dest = (char*) malloc(strlen(filename + 10));
+    strcpy(dest, filename);
+    strcat(dest, ".png");
+    unsigned error = lodepng_encode_file(dest, bitmap, dimx, dimy, LCT_RGB, 8);
+    if(error)
+        printf("error %u: %s\n", error, lodepng_error_text(error));
+    free(dest);
+}
+
+
+#include <stdarg.h>
+#include <stdio.h>
+#include <stdbool.h>
+
+
+typedef struct{
+    unsigned char * buffer;
+    struct stbtt_fontinfo info;
+    float scale;
+    int ascent;
+    int descent;
+    int lineGap;
+} X_Font;
+
+static X_Font __board_font_default;
+static X_Font * __board_font = NULL;
+static bool __board_using_default_font = false;
+static int __board_font_size = 20;
+
+void __x_init_font(){
+    /*__board_font_default = (X_Font*) malloc(sizeof(X_Font));*/
+    __board_font_default.buffer = __x_font_buffer_profont;
+    stbtt_InitFont(&__board_font_default.info, __board_font_default.buffer, 0);
+
+    /* setando a font default como fonte do sistema */
+    __board_font = &__board_font_default;
+    __board_using_default_font = true;
+    x_set_font_size(20);
+}
+
+void x_set_font_size(int size){
+    __board_font_size = size;
+    __board_font->scale = stbtt_ScaleForPixelHeight(&__board_font->info, size);
+    stbtt_GetFontVMetrics(&__board_font->info, &__board_font->ascent, &__board_font->descent, &__board_font->lineGap);
+    __board_font->ascent *= __board_font->scale;
+    __board_font->descent *= __board_font->scale;
+}
+
+int x_write(int x, int y, const char * format, ...){
+    char text[1000];
+    va_list args;
+    va_start( args, format );
+    vsprintf(text, format, args);
+    va_end( args );
+
+    int i;
+    unsigned _x = x;
+
+    /* setando a cor */
+    X_Color xc = x_get_color();
+    unsigned char color[3] = {xc.r, xc.g, xc.b};
+    __board_font->info.userdata = (void *) color;
+
+    for (i = 0; i < (int) strlen(text); ++i) {
+        if(text[i] == '\n'){
+            y += __board_font_size;
+            _x = x;
+            continue;
+        }
+
+        /* how wide is this character */
+        int ax;
+        stbtt_GetCodepointHMetrics(&__board_font->info, text[i], &ax, 0);
+        ax = ax * __board_font->scale;
+
+        if(_x + ax > x_get_width()){
+            y += __board_font_size;
+            _x = 10;
+        }
+
+        if((unsigned) y + __board_font_size > x_get_height()){
+            return _x;
+        }
+
+        /* get bounding box for character (may be offset to account for chars that dip above or below the line */
+        int c_x1, c_y1, c_x2, c_y2;
+        stbtt_GetCodepointBitmapBox(&__board_font->info, text[i], __board_font->scale, __board_font->scale, &c_x1, &c_y1, &c_x2, &c_y2);
+
+        /* compute y (different characters have different heights */
+        int _y = y + __board_font->ascent + c_y1;
+
+        /* render character (stride and offset is important here) */
+        uchar * bitmap = x_get_bitmap();
+        int byteOffset = _x + (_y  * x_get_width());
+        stbtt_MakeCodepointBitmap(&__board_font->info, bitmap + 3 * byteOffset, c_x2 - c_x1, c_y2 - c_y1,
+                                  x_get_width(), __board_font->scale, __board_font->scale, text[i]);
+
+        _x += ax; /* desloca x para proximo caractere */
+
+        /* add kerning */
+        int kern;
+        kern = stbtt_GetCodepointKernAdvance(&__board_font->info, text[i], text[i + 1]);
+        _x += kern * __board_font->scale;
+    }
+    return _x;
+}
+
+
+/*########################*/
+/*###### X_MATH MODULE ###*/
+/*########################*/
+
+#include <stdint.h>
+#include <stdlib.h>
+
+X_V2d x_make_v2d(double x, double y){
+    X_V2d v = {x, y};
+    return v;
+}
+
+double x_v2d_length(double x, double y){
+    return xm_sqrt(x * x + y * y);
+}
+
+double x_v2d_distance(double ax, double ay, double bx, double by){
+    return x_v2d_length(bx - ax, by - ay);
+}
+
+X_V2d x_v2d_sum(X_V2d a, X_V2d b){
+    return x_make_v2d(a.x + b.x, a.y + b.y);
+}
+
+X_V2d x_v2d_sub(X_V2d a, X_V2d b){
+    return x_make_v2d(a.x - b.x, a.y - b.y);
+}
+
+X_V2d x_v2d_dot(X_V2d a, double value){
+    return x_make_v2d(a.x * value, a.y * value);
+}
+
+X_V2d x_v2d_normalize(X_V2d v){
+    double lenght = x_v2d_length(v.x, v.y);
+    if(lenght < 0.0000001)
+        return v;
+    v.x = v.x * (1.0/lenght);
+    v.y = v.y * (1.0/lenght);
+    return v;
+}
+
+X_V2d x_v2d_ortho(X_V2d v){
+    return x_make_v2d(v.y, -v.x);
+}
+
+int   xm_rand(int min, int max){
+    return rand() % (max + 1 - min) + min;
+}
+
+/* https://stackoverflow.com/questions/5122993/floor-int-function-implementaton?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa */
+int xm_floor(double x) {
+    int xi = (int) x;
+    return x < xi ? xi - 1 : xi;
+}
+
+
+/* funcao necessario para o po */
+double xm_sqrt(const double m)
+{
+   double i=0;
+   double x1 = 0, x2 = 0;
+   while( (i*i) <= m )
+          i+=0.1;
+   x1=i;
+   int j;
+   for(j=0;j<10;j++)
+   {
+       x2=m;
+      x2/=x1;
+      x2+=x1;
+      x2/=2;
+      x1=x2;
+   }
+   return x2;
+}
+
+double xm_pow( double x, double z ){
+    int y =  (int) z;
+    double temp;
+    if (y == 0)
+    return 1;
+    temp = xm_pow (x, y / 2);
+    if ((y % 2) == 0) {
+        return temp * temp;
+    } else {
+        if (y > 0)
+            return x * temp * temp;
+        else
+            return (temp * temp) / x;
+    }
+}
+
+double xm_fmod(double a, double b)
+{
+    return (a - b * xm_floor(a / b));
+}
+
+int xm_ceil(double n){
+    return -xm_floor(-n);
+}
+
+
+/* Sin e Cos retirados de
+   http://forum.arduino.cc/index.php?topic=69723.0
+*/
+
+static unsigned int __isinTable16[] = {
+    0, 1144, 2287, 3430, 4571, 5712, 6850, 7987, 9121, 10252, 11380,
+    12505, 13625, 14742, 15854, 16962, 18064, 19161, 20251, 21336, 22414,
+    23486, 24550, 25607, 26655, 27696, 28729, 29752, 30767, 31772, 32768,
+
+    33753, 34728, 35693, 36647, 37589, 38521, 39440, 40347, 41243, 42125,
+    42995, 43851, 44695, 45524, 46340, 47142, 47929, 48702, 49460, 50203,
+    50930, 51642, 52339, 53019, 53683, 54331, 54962, 55577, 56174, 56755,
+
+    57318, 57864, 58392, 58902, 59395, 59869, 60325, 60763, 61182, 61583,
+    61965, 62327, 62671, 62996, 63302, 63588, 63855, 64103, 64331, 64539,
+    64728, 64897, 65047, 65176, 65286, 65375, 65445, 65495, 65525, 65535,
+};
+
+double __isin(long x);
+double __isin(long x)
+{
+    int bool_pos = 1;  /* positive - keeps an eye on the sign. */
+    if (x < 0)
+    {
+        x = -x;
+        bool_pos = !bool_pos;
+    }
+    if (x >= 360) x %= 360;
+    if (x > 180)
+    {
+        x -= 180;
+        bool_pos = !bool_pos;
+    }
+    if (x > 90) x = 180 - x;
+    if (bool_pos) return __isinTable16[x] * 0.0000152590219;
+    return __isinTable16[x] * -0.0000152590219 ;
+}
+
+double __icos(long x);
+double __icos(long x)
+{
+    return __isin(x+90);
+}
+
+double xm_sin(double d)
+{
+    double a = __isin((long) d);
+    double b = __isin((long) d+1);
+    return a + (d-(int)d) * (b-a);
+}
+
+double xm_cos(double d)
+{
+    double a = __icos((long) d);
+    double b = __icos((long) d+1);
+    return a + (d-(int)d) * (b-a);
+}
+
+/* Nvidia */
+double xm_acos(double x) {
+    double negate = (double)(x < 0);
+    x = (x >= 0) ? x : -x;
+    double ret = -0.0187293;
+    ret = ret * x;
+    ret = ret + 0.0742610;
+    ret = ret * x;
+    ret = ret - 0.2121144;
+    ret = ret * x;
+    ret = ret + 1.5707288;
+    ret = ret * xm_sqrt(1.0-x);
+    ret = ret - 2 * negate * ret;
+    return negate * 3.14159265358979 + ret;
+}
+
+double xm_fabs(double f){
+    return f < 0 ? -f : f;
+}
+
+
+#include <stdio.h>
+
+int __X_GRID_SIZE = 50;
+int __X_GRID_SEP = 1;
+
+void x_grid_init(int side, int sep){
+    __X_GRID_SIZE = side;
+    __X_GRID_SEP = sep;
+}
+
+void x_grid_square(int l, int c){
+    int size = __X_GRID_SIZE, sep = __X_GRID_SEP;
+    x_fill_rect(c * size + sep, l * size + sep, size - sep, size - sep);
+}
+
+void x_grid_circle(int l, int c){
+    x_fill_circle(c * __X_GRID_SIZE + __X_GRID_SIZE / 2, l * __X_GRID_SIZE + __X_GRID_SIZE / 2,
+                  __X_GRID_SIZE / 2 - __X_GRID_SEP + 1);
+}
+
+
+void x_grid_text(int l, int c, const char *text){
+    float font_factor = 1.0;
+    float fsize = 0, xdelta = 0, ydelta = 0;
+    static char text2[1000];
+    strcpy(text2, text);
+    int value = strlen(text);
+    if(value == 1){
+        fsize = 0.9; xdelta = 0.3; ydelta = 0.1;
+    }else if(value == 2){
+        fsize = 0.7; xdelta = 0.2; ydelta = 0.2;
+    }else if(value == 3){
+        fsize = 0.5; xdelta = 0.18; ydelta = 0.3;
+    }else if(value == 4){
+        fsize = 0.4; xdelta = 0.13; ydelta = 0.35;
+    }else if(value == 5){
+        fsize = 0.35; xdelta = 0.1; ydelta = 0.35;
+    }else {
+        fsize = 0.35; xdelta = 0.1; ydelta = 0.35;
+        text2[5] = '\0';
+    }
+    x_set_font_size(__X_GRID_SIZE * fsize * font_factor);
+    x_write((c + xdelta) * __X_GRID_SIZE, (l + ydelta) * __X_GRID_SIZE, "%s", text2);
+
+}
+
+void x_grid_number(int l, int c, int value){
+    char data[50];
+    sprintf(data, "%d", value);
+    x_grid_text(l, c, data);
+}
+
+/*########################*/
+/*###### X_BAR MODULE ####*/
+/*########################*/
+
+
+static float __X_BAR_WIDTH = 20; /* bar width */
+static float __X_BAR_YFACTOR = 1; /* multiplicative factor of bar height  */
+static int __X_BAR_SIZE = 0;
+static int __X_BAR_MAX = 0;
+
+void x_bar_init(int size, int max){
+    __X_BAR_SIZE = size;
+    __X_BAR_MAX = max;
+    __X_BAR_WIDTH = x_get_width() / (size + 2);
+    __X_BAR_YFACTOR = (x_get_height() - 4.0 * __X_BAR_WIDTH);
+    __X_BAR_YFACTOR = __X_BAR_YFACTOR < 0 ? -__X_BAR_YFACTOR : __X_BAR_YFACTOR;
+    __X_BAR_YFACTOR /= max;
+    if(__X_BAR_YFACTOR < 0.2)
+        __X_BAR_YFACTOR = 0.2;
+}
+
+void x_bar_one(int i, int value){
+    if((i < 0)||(i >= __X_BAR_SIZE))
+        return;
+    int x = __X_BAR_WIDTH * (i + 1);
+    int ybase = x_get_height() - __X_BAR_WIDTH;
+    int j;
+    for(j = 0; j < ((int) __X_BAR_WIDTH - 2) ; j++)
+        x_draw_line(x + j, ybase, x + j, ybase - __X_BAR_YFACTOR * value);
+}
+
+void x_bar_all(int * vet, int size, const char * colors, int * indices){
+    x_set_color(X_COLOR_BLACK);
+    x_clear();
+    int i = 0;
+    x_set_color(X_COLOR_WHITE);
+    for(i = 0; i < size; i++)
+        x_bar_one(i, vet[i]);
+    if(colors != NULL && (strcmp(colors, "") != 0)){
+        int qtd = strlen(colors);
+        for(i = 0; i < qtd; i++){
+            x_set_color(x_get_palette(colors[i]));
+            x_bar_one(indices[i], vet[indices[i]]);
+        }
+    }
+    static int atual = 0;
+    x_set_color(X_COLOR_WHITE); /* desenhando estado */
+    x_write(0, 0, "%d", atual++);
+}
+
+#ifdef __cplusplus
+}
+#endif
+#endif /* XPAINT_FULL */

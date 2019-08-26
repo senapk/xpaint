@@ -3,8 +3,8 @@
 #include <stdlib.h>
 #include <inttypes.h>
 
-#include "draw.h"
-#include "xmath.h"
+#include "draw.h" /*XDDDX*/
+#include "xmath.h" /*XDDDX*/
 
 void x_plot(int x, int y);
 
@@ -393,5 +393,5 @@ void x_fill_arc(float centerx, float centery, int radius, int thickness, int deg
         __x_fill_arc(centerx, centery, radius, thickness, degrees_begin, 360);
         __x_fill_arc(centerx, centery, radius, thickness, 0, degrees_end - 360);
     }
-
 }
+

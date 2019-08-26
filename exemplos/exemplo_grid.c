@@ -1,6 +1,10 @@
 #define XPAINT_FULL
 #include "../xpaint.h"
 
+void x_set_pcolor(char c){
+    x_set_color(x_get_palette(c));
+}
+
 void xgrid_matrix(int nl, int nc, char mat[nl][nc]){
     x_set_pcolor('w');
     x_clear();

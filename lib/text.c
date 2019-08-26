@@ -1,26 +1,12 @@
-#include "text.h"
+
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdbool.h>
 
-#include "base.h"
-#include "font.h"
-
-
-#include "xmath.h"
-#define STBTT_ifloor(x)   ((int) xm_floor(x))
-#define STBTT_iceil(x)    (xm_ceil(x))
-#define STBTT_sqrt(x)      xm_sqrt(x)
-#define STBTT_pow(x,y)     xm_pow(x,y)
-#define STBTT_fmod(x,y)    xm_fmod(x,y)
-#define STBTT_cos(x)       xm_cos(x)
-#define STBTT_acos(x)      xm_acos(x)
-#define STBTT_fabs(x)      xm_fabs(x)
-#define STBTT_RGB_MODE
-#define STB_TRUETYPE_IMPLEMENTATION
-#define STBTT_RASTERIZER_VERSION 2
-
-#include "true.h"
+#include "text.h" /*XDDDX*/
+#include "base.h" /*XDDDX*/
+#include "font.h" /*XDDDX*/
+#include "true.h" /*XDDDX*/
 
 typedef struct{
     unsigned char * buffer;
@@ -36,7 +22,7 @@ static X_Font * __board_font = NULL;
 static bool __board_using_default_font = false;
 static int __board_font_size = 20;
 
-void x_font_init(){
+void __x_init_font(){
     /*__board_font_default = (X_Font*) malloc(sizeof(X_Font));*/
     __board_font_default.buffer = __x_font_buffer_profont;
     stbtt_InitFont(&__board_font_default.info, __board_font_default.buffer, 0);
@@ -113,3 +99,4 @@ int x_write(int x, int y, const char * format, ...){
     }
     return _x;
 }
+

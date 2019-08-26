@@ -1,5 +1,5 @@
-CFLAGS= -std=c89 -Wall -Werror
-CC = gcc
+CFLAGS= -Wall -Werror
+CC = clang 
 
 %: %.c
 	$(CC)  $@.c -o exec_$@ $(CFLAGS)

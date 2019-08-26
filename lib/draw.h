@@ -1,9 +1,9 @@
-#ifndef DRAW_H
-#define DRAW_H
+#ifndef DRAW_H /*XDDDX*/
+#define DRAW_H /*XDDDX*/
+
 /* ############################################### */
 /* ############ FUNÇÕES DE DESENHO DE LINHAS ##### */
 /* ############################################### */
-
 
 /* Desenha as seguintes formas sem preenchimento */
 
@@ -47,4 +47,4 @@ void x_fill_circle(int centerx, int centery, int radius);
 /* e ponto inferior direito (x1, y1) */
 void x_fill_ellipse(int x0, int y0, int x1, int y1);
 
-#endif
+#endif /*XDDDX*/

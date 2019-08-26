@@ -1,5 +1,12 @@
-#ifndef COLORS_H
-#define COLORS_H
+#ifndef COLORS_H /*XDDDX*/
+#define COLORS_H /*XDDDX*/
+
+
+/*
+###############################################
+######## DEFINES e TIPOS BASICOS ##############
+###############################################
+*/
 
 /* apelido para um char sem sinal */
 typedef unsigned char uchar;
@@ -43,6 +50,6 @@ X_Color x_get_palette(char c);
 
 /* inicializa as cores da paleta
 */
-void x_init_colors(void);
+void __x_init_colors(void);
 
-#endif
+#endif /*XDDDX*/

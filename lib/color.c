@@ -1,4 +1,4 @@
-#include "color.h"
+#include "color.h" /*XDDDX*/
 
 static X_Color __board_palette[256];
 
@@ -27,7 +27,7 @@ X_Color x_get_palette(char c){
     return __board_palette[(int)c];
 }
 
-void x_init_colors(void){
+void __x_init_colors(void){
     int i = 0;
     for(i = 0; i < 256; i++)
         __board_palette[i] = X_COLOR_WHITE;

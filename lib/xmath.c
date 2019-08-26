@@ -1,4 +1,5 @@
-#include "xmath.h"
+#include "xmath.h" /*XDDDX*/
+
 /*########################*/
 /*###### X_MATH MODULE ###*/
 /*########################*/
@@ -178,3 +179,4 @@ double xm_acos(double x) {
 double xm_fabs(double f){
     return f < 0 ? -f : f;
 }
+

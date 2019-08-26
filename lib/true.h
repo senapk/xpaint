@@ -1,3 +1,17 @@
+#include "xmath.h" /*XDDDX*/
+
+#define STBTT_ifloor(x)   ((int) xm_floor(x))
+#define STBTT_iceil(x)    (xm_ceil(x))
+#define STBTT_sqrt(x)      xm_sqrt(x)
+#define STBTT_pow(x,y)     xm_pow(x,y)
+#define STBTT_fmod(x,y)    xm_fmod(x,y)
+#define STBTT_cos(x)       xm_cos(x)
+#define STBTT_acos(x)      xm_acos(x)
+#define STBTT_fabs(x)      xm_fabs(x)
+#define STBTT_RGB_MODE
+#define STB_TRUETYPE_IMPLEMENTATION
+#define STBTT_RASTERIZER_VERSION 2
+
 // stb_truetype.h - v1.22 - public domain
 // authored from 2009-2019 by Sean Barrett / RAD Game Tools
 //

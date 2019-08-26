@@ -1,5 +1,6 @@
 
-#include "base.h"
+#include "base.h" /*XDDDX*/
+#include "text.h" /*XDDDX*/
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h> /* mencpy, srand */
@@ -9,7 +10,7 @@
 
 void x_save_ppm(unsigned dimx, unsigned dimy, unsigned char * bitmap, const char * filename);
 void x_save_png(unsigned dimx, unsigned dimy, unsigned char * bitmap, const char * filename);
-
+void x_init_font();
 
 /* #define X_SAVE_PPM */
 
@@ -55,7 +56,8 @@ void x_open(unsigned int width, unsigned int height, const char * filename){
     __board_color[1] = 200;
     __board_color[2] = 200;
 
-    x_init_colors();
+    __x_init_colors();
+    __x_init_font();
     srand((unsigned) time(NULL));
 }
 

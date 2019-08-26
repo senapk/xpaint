@@ -1,9 +1,14 @@
-#ifndef TEXT_H
-#define TEXT_H
+#ifndef TEXT_H /*XDDDX*/
+#define TEXT_H /*XDDDX*/
 
+//inicializa o módulo de escrita
+void __x_init_font();
 
-void x_font_init();
+// muda o tamanho da font
 void x_set_font_size(int size);
-int x_write(int x, int y, const char * format, ...);
 
-#endif
+// escreve utilizando o formato printf
+int  x_write(int x, int y, const char * format, ...);
+
+#endif /*XDDDX*/
+

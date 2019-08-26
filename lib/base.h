@@ -1,7 +1,13 @@
-#ifndef BASE_H
-#define BASE_H
+#ifndef BASE_H /*XDDDX*/
+#define BASE_H /*XDDDX*/
 
-#include "color.h"
+#include "color.h" /*XDDDX*/
+
+/*
+###############################################
+######## ABRINDO, FECHANDO, SALVANDO ##########
+###############################################
+*/
 
 /* @brief Open the board to draw */
 /* @param filename path to save the png */
@@ -57,4 +63,4 @@ void x_set_step(int value);
 /* Returns true if save is should be done */
 int x_control();
 
-#endif
+#endif /*XDDDX*/

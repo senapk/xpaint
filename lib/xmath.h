@@ -1,5 +1,5 @@
-#ifndef XMATH_H
-#define XMATH_H
+#ifndef XMATH_H /*XDDDX*/
+#define XMATH_H /*XDDDX*/
 
 /* Faz o SWAP entre dois tipos */
 #define X_SWAP(x, y, T) do { T X_SWAP = x; x = y; y = X_SWAP; } while (0)
@@ -65,4 +65,5 @@ double xm_fabs(double f);
 /* Generates a int number in interval [min, max] */
 int   xm_rand(int min, int max);
 
-#endif
+#endif /*XDDDX*/
+

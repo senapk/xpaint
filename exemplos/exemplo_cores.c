@@ -27,7 +27,7 @@ int main() {
         x_set_font_size(100);
         int i;
         for(i = 0; i < 10; i++){
-            x_set_pcolor(colors[i]);
+            x_set_color(x_get_palette(colors[i]));
             x = x_write(x, 500, "%c", colors[i]);
         }
     }

@@ -4,13 +4,36 @@ temp="xpaint.hh"
 cd lib
 echo "#ifndef XPAINT_H" > $temp
 echo "#define XPAINT_H" >> $temp
-cat aintro.h base.h color.h draw.h xmath.h save.h text.h >> $temp
+
+echo "#ifdef __cplusplus" >> $temp
+echo "extern \"C\" {"  >> $temp
+echo "#endif" >> $temp
+
+cat aintro.h color.h base.h draw.h save.h text.h xmath.h modules.h >> $temp
+
+echo "#ifdef __cplusplus" >> $temp
+echo "}"  >> $temp
+echo "#endif" >> $temp
+
+
 echo "#endif /* XPAINT_H */" >> $temp
 echo "#ifdef XPAINT_FULL /* inicio da implementacao */" >> $temp
-#cat xpng.h xpng.c xttf.h xfont.h >> $temp
-#cat ximage.c xdraw.c xy.c xmath.c >> $temp
-echo "#endif /* H_ONLY */" >> $temp
+
+echo "#ifdef __cplusplus" >> $temp
+echo "extern \"C\" {"  >> $temp
+echo "#endif" >> $temp
+
+
+cat lodepng.h lodepng.c true.h font.h >> $temp
+cat color.c base.c draw.c save.c text.c xmath.c modules.c >> $temp
+
+echo "#ifdef __cplusplus" >> $temp
+echo "}"  >> $temp
+echo "#endif" >> $temp
+
+
+echo "#endif /* XPAINT_FULL */" >> $temp
 #echo "#undef H_ONLY /* Para evitar a propagação da Flag ela deve ser apagada */" >> $temp
-sed '/XDDDX/d' $temp > $final
+sed '/XDDDX/d' $temp > ../$final
 rm $temp
 cd ..
