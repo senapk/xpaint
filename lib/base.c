@@ -23,6 +23,10 @@ const char * __board_extension = ".ppm";
 
 
 static uchar *   __board_bitmap  = NULL;
+
+static uchar *   __board_layer   = NULL;
+static int       __board_layer_level = 0;
+
 static unsigned  __board_width  = 0;
 static unsigned  __board_height = 0;
 
@@ -40,7 +44,36 @@ uchar * __x_get_pixel_pos(unsigned x, unsigned y){
     return __board_bitmap + X_BYTES_PER_PIXEL * (__board_width * y + x);
 }
 
+//plot sem as verificações de limite
+void __x_plot(int x, int y, uchar * color);
 
+void __x_make_layer(void){
+    if(__board_layer_level > 0){
+        __board_layer_level += 1; //increasing layer account
+    }else{
+        __board_layer = __board_bitmap;
+        __board_layer_level += 1;
+        __board_bitmap = (uchar*) calloc(sizeof(uchar), __board_width * __board_height * X_BYTES_PER_PIXEL);
+    }
+}
+
+void __x_merge_layer(void){
+    if(__board_layer_level > 1){
+        __board_layer_level -= 1;
+    }else if(__board_layer_level == 1){
+        uchar * layer = __board_bitmap;
+        __board_bitmap = __board_layer;
+        __board_layer = NULL;
+        __board_layer_level = 0;
+
+        for(int x = 0; x < __board_width; x++){
+            for(int y = 0; y < __board_height; y++){
+                __x_plot(x, y, layer + X_BYTES_PER_PIXEL * (y * __board_width + x));
+            }
+        }
+        free(layer);
+    }
+}
 
 void x_open(unsigned int width, unsigned int height, const char * filename){
     if(__board_is_open){
@@ -56,6 +89,7 @@ void x_open(unsigned int width, unsigned int height, const char * filename){
     __board_color[0] = 200;
     __board_color[1] = 200;
     __board_color[2] = 200;
+    __board_color[3] = 255;
 
     __x_init_colors();
     __x_init_font();
@@ -101,15 +135,29 @@ void x_set_viewer(const char * viewer){
         strcpy(__board_viewer, "");
 }
 
+void __x_plot(int x, int y, uchar * color){
+    uchar * pos = __x_get_pixel_pos((unsigned) x, (unsigned) y);
+    if(__board_layer_level > 0){
+        memcpy(pos, color, X_BYTES_PER_PIXEL * sizeof(uchar));
+    }else{
+        for(int i = 0; i < 3; i++){
+            float fc = color[i] / 255.f;
+            float fa = color[3] / 255.f;
+            float bc = pos[i] / 255.f;
+            float ba = pos[3] / 255.f;
+            pos[i] = ((fc * fa) + (bc * (1 - fa))) * 255;
+            pos[3] = (fa + (ba * (1 - fa))) * 255;
+        }
+    }
+}
+
 void x_plot(int x, int y){
     if(!__board_is_open){
         fprintf(stderr, "fail: x_open(weight, width, filename) missing\n");
         exit(1);
     }
-    if((x >= 0) && (x < (int) __board_width) && (y >= 0) && (y <  (int) __board_height)){
-        uchar * pos = __x_get_pixel_pos((unsigned) x, (unsigned) y);
-        memcpy(pos, __board_color, X_BYTES_PER_PIXEL * sizeof(uchar));
-    }
+    if((x >= 0) && (x < (int) __board_width) && (y >= 0) && (y <  (int) __board_height))
+        __x_plot(x, y, __board_color);
 }
 
 X_Color x_get_pixel(int x, int y){

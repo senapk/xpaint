@@ -7,7 +7,8 @@
 #include "xmath.h" /*XDDDX*/
 
 void x_plot(int x, int y);
-
+void __x_make_layer(void);
+void __x_merge_layer(void);
 
 void x_draw_line(int x0, int y0, int x1, int y1){
     /* Bresenham's Line Algorithm */
@@ -68,6 +69,7 @@ void __x_fill_top_flat_triangle(float v1x, float v1y, float v2x, float v2y, floa
 
 void x_fill_triangle(float v1x, float v1y, float v2x, float v2y, float v3x, float v3y)
 {
+    __x_make_layer();
     X_V2d v1 = {v1x, v1y};
     X_V2d v2 = {v2x, v2y};
     X_V2d v3 = {v3x, v3y};
@@ -94,9 +96,11 @@ void x_fill_triangle(float v1x, float v1y, float v2x, float v2y, float v3x, floa
         __x_fill_bottom_flat_triangle(v1.x, v1.y, v2.x, v2.y, v4.x, v4.y);
         __x_fill_top_flat_triangle(v2.x, v2.y, v4.x, v4.y, v3.x, v3.y);
     }
+    __x_merge_layer();
 }
 
 void x_fill_line(float x0, float y0, float x1, float y1, int thickness){
+    __x_make_layer();
     X_V2d a = {x0, y0};
     X_V2d b = {x1, y1};
     if(thickness == 1){
@@ -113,6 +117,7 @@ void x_fill_line(float x0, float y0, float x1, float y1, int thickness){
 
     x_fill_triangle(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);
     x_fill_triangle(p3.x, p3.y, p2.x, p2.y, p4.x, p4.y);
+    __x_merge_layer();
 }
 
 void x_fill_rect(int x0, int y0, int width, int height){
@@ -156,11 +161,30 @@ void x_fill_circle(int centerx, int centery, int radius){
     int dx = 1;
     int dy = 1;
     int err = dx - (radius << 1);
+    int * lined = (int *) calloc(2 * radius, sizeof(int));
     while(x >= y){
+        if(lined[y + radius] == 0){
+            x_draw_line(centerx + x, centery + y, centerx - x, centery + y);
+            lined[y + radius] = 1;
+        }
+        if(lined[-y + radius] == 0){
+            x_draw_line(centerx + x, centery - y, centerx - x, centery - y);
+            lined[-y + radius] = 1;
+        }
+        if(lined[x + radius] == 0){
+            x_draw_line(centerx + y, centery + x, centerx - y, centery + x);
+            lined[x + radius] = 1;
+        }
+        if(lined[-x + radius] == 0){
+            x_draw_line(centerx - y, centery - x, centerx + y, centery - x);
+            lined[-x + radius] = 1;
+        }
+        /* 
         x_draw_line(centerx + x, centery + y, centerx - x, centery + y);
         x_draw_line(centerx + x, centery - y, centerx - x, centery - y);
         x_draw_line(centerx + y, centery + x, centerx - y, centery + x);
         x_draw_line(centerx - y, centery - x, centerx + y, centery - x);
+         */
         if(err <= 0){
             y++;
             err += dy;
@@ -171,10 +195,11 @@ void x_fill_circle(int centerx, int centery, int radius){
             err += dx - (radius << 1);
         }
     }
+    free(lined);
 }
 
-void x_draw_ellipse(int x0, int y0, int x1, int y1)
-{
+void x_draw_ellipse(int x0, int y0, int width, int height){
+    int x1 = x0 + width - 1, y1 = y0 + height - 1;
     int a = abs(x1-x0), b = abs(y1-y0), b1 = b&1; /* values of diameter */
     long dx = 4*(1-a)*b*b, dy = 4*(b1+1)*a*a; /* error increment */
     long err = dx+dy+b1*a*a, e2; /* error of 1.step */
@@ -202,8 +227,9 @@ void x_draw_ellipse(int x0, int y0, int x1, int y1)
     }
 }
 
-void x_fill_ellipse(int x0, int y0, int x1, int y1)
-{
+void x_fill_ellipse(int x0, int y0, int width, int height){
+    int ytop = y0;
+    int x1 = x0 + width - 1, y1 = y0 + height - 1;
     int a = abs(x1-x0), b = abs(y1-y0), b1 = b&1; /* values of diameter */
     long dx = 4*(1-a)*b*b, dy = 4*(b1+1)*a*a; /* error increment */
     long err = dx+dy+b1*a*a, e2; /* error of 1.step */
@@ -212,10 +238,18 @@ void x_fill_ellipse(int x0, int y0, int x1, int y1)
     if (y0 > y1) y0 = y1; /* .. exchange them */
     y0 += (b+1)/2; y1 = y0-b1;   /* starting pixel */
     a *= 8*a; b1 = 8*b*b;
-
+    
+    int * lined = calloc(height, sizeof(int));
+    
     do {
-        x_draw_line(x1, y0, x0, y0); /*   I. Quadrant */
-        x_draw_line(x0, y1, x1, y1); /* III. Quadrant */
+        if(lined[y0 - ytop] == 0){
+            x_draw_line(x1, y0, x0, y0); /*   I. Quadrant */
+            lined[y0 - ytop] = 1;
+        }
+        if(lined[y1 - ytop] == 0){
+            x_draw_line(x0, y1, x1, y1); /* III. Quadrant */
+            lined[y1 - ytop] = 1;
+        }
         e2 = 2*err;
         if (e2 <= dy) { y0++; y1--; err += dy += a; }  /* y step */
         if (e2 >= dx || 2*err > dy) { x0++; x1--; err += dx += b1; } /* x step */
@@ -227,6 +261,7 @@ void x_fill_ellipse(int x0, int y0, int x1, int y1)
         x_plot(x0-1, y1);
         x_plot(x1+1, y1--);
     }
+    free(lined);
 }
 
 void __x_plot_quad_bezier_seg(int x0, int y0, int x1, int y1, int x2, int y2)

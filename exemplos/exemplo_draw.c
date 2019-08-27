@@ -7,7 +7,7 @@ void x_set_pcolor(char c){
 
 int main(){
     x_open(1000, 600, "figura_draw");
-    x_set_pcolor('k');
+    x_set_color(X_COLOR_BLACK);
     x_clear();
 
     /* cada exemplo vai ser apresentado num espaço de 200x200 pixels */
@@ -15,7 +15,7 @@ int main(){
     x_set_pcolor('g');
     x_write(30, 30, "Exemplo das funcoes de desenho de formas geometricas");
 
-    x_set_pcolor('w');
+    x_set_color(x_make_color(255, 0, 0, 180));
     x_set_font_size(20);
     int x = 10;
     int y = 100;
@@ -24,7 +24,7 @@ int main(){
 
     x += 200;
     x_write(x, y, "x_fill_line");
-    x_fill_line(x + 30, y + 30, x + 180, y + 180, 3);
+    x_fill_line(x + 30, y + 30, x + 180, y + 180, 30);
 
     x += 200;
     x_write(x, y, "x_draw_circle");
@@ -32,7 +32,7 @@ int main(){
 
     x += 200;
     x_write(x, y, "x_draw_ellipse");
-    x_draw_ellipse(x + 20, y + 50, x + 180, y + 180);  
+    x_draw_ellipse(x + 20, y + 50, 180, 100);  
 
     x += 200;
     x_write(x, y, "x_draw_bezier");
@@ -53,7 +53,7 @@ int main(){
 
     x += 200;
     x_write(x, y, "x_fill_ellipse");
-    x_fill_ellipse(x + 20, y + 50, x + 180, y + 180);  
+    x_fill_ellipse(x + 20, y + 50, 180, 100);  
 
     x += 200;
     x_write(x, y, "x_fill_rect");

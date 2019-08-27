@@ -1,10 +1,15 @@
-- 0.8 [ ] split in many files
-    - [ ] detach write and save insepared files
-    - [ ] ver requisitos em cada módulo
+- 0.8 [x] split in many files
+    - [x] detach write and save insepared files
     - [ ] colocar módulos como opcionais
-    - [ ] moving current color from colors to base
+    - [x] moving current color from colors to base
     - [x] consertando xmath
     - [x] consertando xcolor
+    - [ ] adicionar suporte a transparências no rgba
+    - [x] consertar sobreposição no círculo e na elipse por causa das transparências
+    - [ ] fazer módulo da caneta
+    - [ ] adicionar descrições para função da caneta
+    - [ ] trocar variáveis de desenho de float para double
+    - [ ] make layer, merge layer
 - 0.7 23/08/2019
     - [x] início da tradução de nomes e comentários para o ingles
     - [x] inserção do x_bar

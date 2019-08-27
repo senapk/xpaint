@@ -63,4 +63,8 @@ void x_set_step(int value);
 /* Returns true if save is should be done */
 int x_control();
 
+void __x_make_layer(void);
+void __x_merge_layer(void);
+
+
 #endif /*XDDDX*/

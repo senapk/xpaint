@@ -53,13 +53,14 @@ int main(){
 /* apelido para um char sem sinal */
 typedef unsigned char uchar;
 
-#define X_BYTES_PER_PIXEL 3
+#define X_BYTES_PER_PIXEL 4
 
 /* struct que representa uma cor RGB */
 typedef struct{
     uchar r;
     uchar g;
     uchar b;
+    uchar a;
 } X_Color;
 
 /* lista de cores default */
@@ -75,7 +76,7 @@ extern X_Color X_COLOR_WHITE;
 extern X_Color X_COLOR_BLACK;
 
 /* cria e retorna uma struct X_Color passando rgb */
-X_Color x_make_color(uchar r, uchar g, uchar b);
+X_Color x_make_color(uchar r, uchar g, uchar b, uchar a);
 
 /*
 ###############################################
@@ -158,6 +159,10 @@ void x_set_step(int value);
 /* Returns true if save is should be done */
 int x_control();
 
+void __x_make_layer(void);
+void __x_merge_layer(void);
+
+
 
 /* ############################################### */
 /* ############ FUNÇÕES DE DESENHO DE LINHAS ##### */
@@ -168,24 +173,24 @@ int x_control();
 /* desenha uma linha com espessura de 1 pixel entre os pontos (x0, y0) e (x1, y1) */
 void x_draw_line(int x0, int y0, int x1, int y1);
 
+/* desenha uma linha com espessura de thickness pixels entre os pontos (x0, y0) e (x1, y1) */
+void x_fill_line(float x0, float y0, float x1, float y1, int thickness);
+
 /* desenha um circulo com centro (centerx, centerx) e raio radius */
 void x_draw_circle(int centerx, int centery, int radius);
 
-/* desenha uma elipse dentro do rect de ponto superior esquerdo(x0, y0) */
-/* e ponto inferior direito (x1, y1) */
-void x_draw_ellipse(int x0, int y0, int x1, int y1);
+/* desenha um circulo dado centro e raio */
+void x_fill_circle(int centerx, int centery, int radius);
+
+/* desenha uma elipse dentro do rect de ponto superior esquerdo(x0, y0), largura e altura */
+void x_draw_ellipse(int x0, int y0, int width, int height);
+
+/* desenha uma elipse dentro do rect de ponto superior esquerdo(x0, y0), largura e altura */
+void x_fill_ellipse(int x0, int y0, int width, int height);
 
 /* desenha uma curva de bezier entre os pontos (x0, y0) e (x2, y2) */
 /* a curvatura eh dada pelo ponto (x1, y1) */
 void x_draw_bezier(int x0, int y0, int x1, int y1, int x2, int y2);
-
-
-/* ############################################### */
-/* ### FUNÇÕES DE DESENHO FORMAS PREENCHIDAS ##### */
-/* ############################################### */
-
-/* desenha uma linha com espessura de thickness pixels entre os pontos (x0, y0) e (x1, y1) */
-void x_fill_line(float x0, float y0, float x1, float y1, int thickness);
 
 /* desenha um arco dado o ponto de centro, raio, espessura */
 /* o angulo de inicio e o comprimento do arco em graus */
@@ -198,12 +203,6 @@ void x_fill_triangle(float v1x, float v1y, float v2x, float v2y, float v3x, floa
 /* desenha um retangulo dados os cantos superior esquerdo (x0, y0), largura e altura */
 void x_fill_rect(int x0, int y0, int width, int height);
 
-/* desenha um circulo dado centro e raio */
-void x_fill_circle(int centerx, int centery, int radius);
-
-/* desenha uma elipse dentro do rect de ponto superior esquerdo(x0, y0) */
-/* e ponto inferior direito (x1, y1) */
-void x_fill_ellipse(int x0, int y0, int x1, int y1);
 
 
 //saves the bitmap in ppm format
@@ -347,6 +346,28 @@ void x_bar_one(int i, int value);
  * @param indices the array with the unique indices to be marked with the colors
  */
 void x_bar_all(int * vet, int size, const char * colors, int * indices);
+
+
+/*
+###############################################
+####### FUNÇÕES PARA DESENHAR COM A CANETA ####
+###############################################
+*/
+
+void   x_pen_set_angle(double degrees);
+void   x_pen_set_thick(int thick);
+void   x_pen_set_pos(double x, double y);
+double x_pen_get_angle();
+int    x_pen_get_thick();
+double x_pen_get_x();
+double x_pen_get_y();
+void   x_pen_up(void);
+void   x_pen_down(void); 
+void   x_pen_walk(double distance);
+void   x_pen_rotate(int degrees);
+void   x_pen_goto(double x, double y);
+
+
 
 
 #ifdef __cplusplus
@@ -11651,11 +11672,10 @@ static void stbtt__rasterize_sorted_edges(stbtt__bitmap *result, stbtt__edge *e,
             result->pixels[j*result->stride + i] = (unsigned char) m;
 #else
             const unsigned char * color = (const unsigned char*) userdata;
-            unsigned char * pos = result->pixels + X_BYTES_PER_PIXEL * j * result->stride + X_BYTES_PER_PIXEL * i;
+            unsigned char * pos = result->pixels + X_BYTES_PER_PIXEL * (j * result->stride + i);
             for(int qbbp = 0; qbbp < X_BYTES_PER_PIXEL; qbbp++){
                pos[qbbp] = pos[qbbp] + (color[qbbp] - pos[qbbp]) * (m/255.f);
-            }
-            
+            }          
 #endif
          }
       }
@@ -16274,20 +16294,20 @@ unsigned char __x_font_buffer_profont[46628] = {
 
 static X_Color __board_palette[256];
 
-X_Color X_COLOR_WHITE     = {238, 232, 213};
-X_Color X_COLOR_BLACK     = {7  , 54 , 66 };
-X_Color X_COLOR_GREEN     = {133, 153, 0  };
-X_Color X_COLOR_RED       = {211, 1  , 2  };
-X_Color X_COLOR_BLUE      = {38 , 139, 210};
-X_Color X_COLOR_YELLOW    = {181, 137, 0  };
-X_Color X_COLOR_CYAN      = {42 , 161, 152};
-X_Color X_COLOR_MAGENTA   = {211, 54 , 130};
-X_Color X_COLOR_ORANGE    = {253, 106, 2  };
-X_Color X_COLOR_VIOLET    = {108, 113, 196};
+X_Color X_COLOR_WHITE     = {238, 232, 213, 255};
+X_Color X_COLOR_BLACK     = {7  , 54 , 66 , 255};
+X_Color X_COLOR_GREEN     = {133, 153, 0  , 255};
+X_Color X_COLOR_RED       = {211, 1  , 2  , 255};
+X_Color X_COLOR_BLUE      = {38 , 139, 210, 255};
+X_Color X_COLOR_YELLOW    = {181, 137, 0  , 255};
+X_Color X_COLOR_CYAN      = {42 , 161, 152, 255};
+X_Color X_COLOR_MAGENTA   = {211, 54 , 130, 255};
+X_Color X_COLOR_ORANGE    = {253, 106, 2  , 255};
+X_Color X_COLOR_VIOLET    = {108, 113, 196, 255};
 
 
-X_Color x_make_color(uchar r, uchar g, uchar b){
-    X_Color x = {r, g, b};
+X_Color x_make_color(uchar r, uchar g, uchar b, uchar a){
+    X_Color x = {r, g, b, a};
     return x;
 }
 
@@ -16338,6 +16358,10 @@ const char * __board_extension = ".ppm";
 
 
 static uchar *   __board_bitmap  = NULL;
+
+static uchar *   __board_layer   = NULL;
+static int       __board_layer_level = 0;
+
 static unsigned  __board_width  = 0;
 static unsigned  __board_height = 0;
 
@@ -16355,7 +16379,36 @@ uchar * __x_get_pixel_pos(unsigned x, unsigned y){
     return __board_bitmap + X_BYTES_PER_PIXEL * (__board_width * y + x);
 }
 
+//plot sem as verificações de limite
+void __x_plot(int x, int y, uchar * color);
 
+void __x_make_layer(void){
+    if(__board_layer_level > 0){
+        __board_layer_level += 1; //increasing layer account
+    }else{
+        __board_layer = __board_bitmap;
+        __board_layer_level += 1;
+        __board_bitmap = (uchar*) calloc(sizeof(uchar), __board_width * __board_height * X_BYTES_PER_PIXEL);
+    }
+}
+
+void __x_merge_layer(void){
+    if(__board_layer_level > 1){
+        __board_layer_level -= 1;
+    }else if(__board_layer_level == 1){
+        uchar * layer = __board_bitmap;
+        __board_bitmap = __board_layer;
+        __board_layer = NULL;
+        __board_layer_level = 0;
+
+        for(int x = 0; x < __board_width; x++){
+            for(int y = 0; y < __board_height; y++){
+                __x_plot(x, y, layer + X_BYTES_PER_PIXEL * (y * __board_width + x));
+            }
+        }
+        free(layer);
+    }
+}
 
 void x_open(unsigned int width, unsigned int height, const char * filename){
     if(__board_is_open){
@@ -16371,6 +16424,7 @@ void x_open(unsigned int width, unsigned int height, const char * filename){
     __board_color[0] = 200;
     __board_color[1] = 200;
     __board_color[2] = 200;
+    __board_color[3] = 255;
 
     __x_init_colors();
     __x_init_font();
@@ -16416,15 +16470,29 @@ void x_set_viewer(const char * viewer){
         strcpy(__board_viewer, "");
 }
 
+void __x_plot(int x, int y, uchar * color){
+    uchar * pos = __x_get_pixel_pos((unsigned) x, (unsigned) y);
+    if(__board_layer_level > 0){
+        memcpy(pos, color, X_BYTES_PER_PIXEL * sizeof(uchar));
+    }else{
+        for(int i = 0; i < 3; i++){
+            float fc = color[i] / 255.f;
+            float fa = color[3] / 255.f;
+            float bc = pos[i] / 255.f;
+            float ba = pos[3] / 255.f;
+            pos[i] = ((fc * fa) + (bc * (1 - fa))) * 255;
+            pos[3] = (fa + (ba * (1 - fa))) * 255;
+        }
+    }
+}
+
 void x_plot(int x, int y){
     if(!__board_is_open){
         fprintf(stderr, "fail: x_open(weight, width, filename) missing\n");
         exit(1);
     }
-    if((x >= 0) && (x < (int) __board_width) && (y >= 0) && (y <  (int) __board_height)){
-        uchar * pos = __x_get_pixel_pos((unsigned) x, (unsigned) y);
-        memcpy(pos, __board_color, X_BYTES_PER_PIXEL * sizeof(uchar));
-    }
+    if((x >= 0) && (x < (int) __board_width) && (y >= 0) && (y <  (int) __board_height))
+        __x_plot(x, y, __board_color);
 }
 
 X_Color x_get_pixel(int x, int y){
@@ -16518,7 +16586,8 @@ int x_control(){
 
 
 void x_plot(int x, int y);
-
+void __x_make_layer(void);
+void __x_merge_layer(void);
 
 void x_draw_line(int x0, int y0, int x1, int y1){
     /* Bresenham's Line Algorithm */
@@ -16579,6 +16648,7 @@ void __x_fill_top_flat_triangle(float v1x, float v1y, float v2x, float v2y, floa
 
 void x_fill_triangle(float v1x, float v1y, float v2x, float v2y, float v3x, float v3y)
 {
+    __x_make_layer();
     X_V2d v1 = {v1x, v1y};
     X_V2d v2 = {v2x, v2y};
     X_V2d v3 = {v3x, v3y};
@@ -16605,9 +16675,11 @@ void x_fill_triangle(float v1x, float v1y, float v2x, float v2y, float v3x, floa
         __x_fill_bottom_flat_triangle(v1.x, v1.y, v2.x, v2.y, v4.x, v4.y);
         __x_fill_top_flat_triangle(v2.x, v2.y, v4.x, v4.y, v3.x, v3.y);
     }
+    __x_merge_layer();
 }
 
 void x_fill_line(float x0, float y0, float x1, float y1, int thickness){
+    __x_make_layer();
     X_V2d a = {x0, y0};
     X_V2d b = {x1, y1};
     if(thickness == 1){
@@ -16624,6 +16696,7 @@ void x_fill_line(float x0, float y0, float x1, float y1, int thickness){
 
     x_fill_triangle(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);
     x_fill_triangle(p3.x, p3.y, p2.x, p2.y, p4.x, p4.y);
+    __x_merge_layer();
 }
 
 void x_fill_rect(int x0, int y0, int width, int height){
@@ -16667,11 +16740,30 @@ void x_fill_circle(int centerx, int centery, int radius){
     int dx = 1;
     int dy = 1;
     int err = dx - (radius << 1);
+    int * lined = (int *) calloc(2 * radius, sizeof(int));
     while(x >= y){
+        if(lined[y + radius] == 0){
+            x_draw_line(centerx + x, centery + y, centerx - x, centery + y);
+            lined[y + radius] = 1;
+        }
+        if(lined[-y + radius] == 0){
+            x_draw_line(centerx + x, centery - y, centerx - x, centery - y);
+            lined[-y + radius] = 1;
+        }
+        if(lined[x + radius] == 0){
+            x_draw_line(centerx + y, centery + x, centerx - y, centery + x);
+            lined[x + radius] = 1;
+        }
+        if(lined[-x + radius] == 0){
+            x_draw_line(centerx - y, centery - x, centerx + y, centery - x);
+            lined[-x + radius] = 1;
+        }
+        /* 
         x_draw_line(centerx + x, centery + y, centerx - x, centery + y);
         x_draw_line(centerx + x, centery - y, centerx - x, centery - y);
         x_draw_line(centerx + y, centery + x, centerx - y, centery + x);
         x_draw_line(centerx - y, centery - x, centerx + y, centery - x);
+         */
         if(err <= 0){
             y++;
             err += dy;
@@ -16682,10 +16774,11 @@ void x_fill_circle(int centerx, int centery, int radius){
             err += dx - (radius << 1);
         }
     }
+    free(lined);
 }
 
-void x_draw_ellipse(int x0, int y0, int x1, int y1)
-{
+void x_draw_ellipse(int x0, int y0, int width, int height){
+    int x1 = x0 + width - 1, y1 = y0 + height - 1;
     int a = abs(x1-x0), b = abs(y1-y0), b1 = b&1; /* values of diameter */
     long dx = 4*(1-a)*b*b, dy = 4*(b1+1)*a*a; /* error increment */
     long err = dx+dy+b1*a*a, e2; /* error of 1.step */
@@ -16713,8 +16806,9 @@ void x_draw_ellipse(int x0, int y0, int x1, int y1)
     }
 }
 
-void x_fill_ellipse(int x0, int y0, int x1, int y1)
-{
+void x_fill_ellipse(int x0, int y0, int width, int height){
+    int ytop = y0;
+    int x1 = x0 + width - 1, y1 = y0 + height - 1;
     int a = abs(x1-x0), b = abs(y1-y0), b1 = b&1; /* values of diameter */
     long dx = 4*(1-a)*b*b, dy = 4*(b1+1)*a*a; /* error increment */
     long err = dx+dy+b1*a*a, e2; /* error of 1.step */
@@ -16723,10 +16817,18 @@ void x_fill_ellipse(int x0, int y0, int x1, int y1)
     if (y0 > y1) y0 = y1; /* .. exchange them */
     y0 += (b+1)/2; y1 = y0-b1;   /* starting pixel */
     a *= 8*a; b1 = 8*b*b;
-
+    
+    int * lined = calloc(height, sizeof(int));
+    
     do {
-        x_draw_line(x1, y0, x0, y0); /*   I. Quadrant */
-        x_draw_line(x0, y1, x1, y1); /* III. Quadrant */
+        if(lined[y0 - ytop] == 0){
+            x_draw_line(x1, y0, x0, y0); /*   I. Quadrant */
+            lined[y0 - ytop] = 1;
+        }
+        if(lined[y1 - ytop] == 0){
+            x_draw_line(x0, y1, x1, y1); /* III. Quadrant */
+            lined[y1 - ytop] = 1;
+        }
         e2 = 2*err;
         if (e2 <= dy) { y0++; y1--; err += dy += a; }  /* y step */
         if (e2 >= dx || 2*err > dy) { x0++; x1--; err += dx += b1; } /* x step */
@@ -16738,6 +16840,7 @@ void x_fill_ellipse(int x0, int y0, int x1, int y1)
         x_plot(x0-1, y1);
         x_plot(x1+1, y1--);
     }
+    free(lined);
 }
 
 void __x_plot_quad_bezier_seg(int x0, int y0, int x1, int y1, int x2, int y2)
@@ -16910,6 +17013,7 @@ void x_fill_arc(float centerx, float centery, int radius, int thickness, int deg
 #include <string.h>
 #include <stdlib.h>
 
+
 void x_save_ppm(unsigned dimx, unsigned dimy, unsigned char * bitmap, const char * filename){
     /* const int dimx = x_get_width();
     const int dimy = x_get_height();
@@ -16926,7 +17030,11 @@ void x_save_png(unsigned dimx, unsigned dimy, unsigned char * bitmap, const char
     char * dest = (char*) malloc(strlen(filename + 10));
     strcpy(dest, filename);
     strcat(dest, ".png");
-    unsigned error = lodepng_encode_file(dest, bitmap, dimx, dimy, LCT_RGB, 8);
+    unsigned error = 0;
+    if(X_BYTES_PER_PIXEL == 3)
+        error = lodepng_encode_file(dest, bitmap, dimx, dimy, LCT_RGB, 8);
+    else
+        error = lodepng_encode_file(dest, bitmap, dimx, dimy, LCT_RGBA, 8);
     if(error)
         printf("error %u: %s\n", error, lodepng_error_text(error));
     free(dest);
@@ -16946,6 +17054,9 @@ typedef struct{
     int descent;
     int lineGap;
 } X_Font;
+
+void __x_make_layer(void);
+void __x_merge_layer(void);
 
 static X_Font __board_font_default;
 static X_Font * __board_font = NULL;
@@ -16972,6 +17083,7 @@ void x_set_font_size(int size){
 }
 
 int x_write(int x, int y, const char * format, ...){
+    __x_make_layer();
     char text[1000];
     va_list args;
     va_start( args, format );
@@ -16983,7 +17095,7 @@ int x_write(int x, int y, const char * format, ...){
 
     /* setando a cor */
     X_Color xc = x_get_color();
-    unsigned char color[3] = {xc.r, xc.g, xc.b};
+    unsigned char color[X_BYTES_PER_PIXEL] = {xc.r, xc.g, xc.b, xc.a};
     __board_font->info.userdata = (void *) color;
 
     for (i = 0; i < (int) strlen(text); ++i) {
@@ -17017,7 +17129,7 @@ int x_write(int x, int y, const char * format, ...){
         /* render character (stride and offset is important here) */
         uchar * bitmap = x_get_bitmap();
         int byteOffset = _x + (_y  * x_get_width());
-        stbtt_MakeCodepointBitmap(&__board_font->info, bitmap + 3 * byteOffset, c_x2 - c_x1, c_y2 - c_y1,
+        stbtt_MakeCodepointBitmap(&__board_font->info, bitmap + X_BYTES_PER_PIXEL * byteOffset, c_x2 - c_x1, c_y2 - c_y1,
                                   x_get_width(), __board_font->scale, __board_font->scale, text[i]);
 
         _x += ax; /* desloca x para proximo caractere */
@@ -17027,6 +17139,7 @@ int x_write(int x, int y, const char * format, ...){
         kern = stbtt_GetCodepointKernAdvance(&__board_font->info, text[i], text[i + 1]);
         _x += kern * __board_font->scale;
     }
+    __x_merge_layer();
     return _x;
 }
 
@@ -17213,9 +17326,11 @@ double xm_fabs(double f){
 
 
 #include <stdio.h>
+#include <string.h>
 
-int __X_GRID_SIZE = 50;
-int __X_GRID_SEP = 1;
+
+static int __X_GRID_SIZE = 50;
+static int __X_GRID_SEP = 1;
 
 void x_grid_init(int side, int sep){
     __X_GRID_SIZE = side;
@@ -17312,6 +17427,63 @@ void x_bar_all(int * vet, int size, const char * colors, int * indices){
     static int atual = 0;
     x_set_color(X_COLOR_WHITE); /* desenhando estado */
     x_write(0, 0, "%d", atual++);
+}
+
+/*########################*/
+/*###### X_PEN MODULE ####*/
+/*########################*/
+
+static double  __X_PEN_ANGLE = 0;
+static double  __X_PEN_X = 200;
+static double  __X_PEN_Y = 200;
+static double  __X_PEN_THICK = 1;
+static int     __X_PEN_DOWN = 1;
+
+void   x_pen_set_angle(double degrees){
+    __X_PEN_ANGLE = degrees;
+}
+void   x_pen_set_thick(int thick){
+    if(thick > 0)
+        __X_PEN_THICK = thick;
+}
+void   x_pen_set_pos(double x, double y){
+    __X_PEN_X = x;
+    __X_PEN_Y = y;
+}
+double x_pen_get_angle(){
+    return __X_PEN_ANGLE;
+}
+int    x_pen_get_thick(){
+    return __X_PEN_THICK;
+}
+double    x_pen_get_x(){
+    return __X_PEN_X;
+}
+double    x_pen_get_y(){
+    return __X_PEN_Y;
+}
+void   x_pen_up(void){
+    __X_PEN_DOWN = 0;
+}
+void   x_pen_down(void){
+    __X_PEN_DOWN = 1;
+}
+void   x_pen_walk(double distance){
+    double x = __X_PEN_X + distance * xm_cos(__X_PEN_ANGLE);
+    double y = __X_PEN_Y - distance * xm_sin(__X_PEN_ANGLE);
+    if(__X_PEN_DOWN)
+        x_fill_line(__X_PEN_X, __X_PEN_Y, x, y, __X_PEN_THICK);
+    __X_PEN_X = x;
+    __X_PEN_Y = y;
+}
+void   x_pen_rotate(int degrees){
+    __X_PEN_ANGLE += degrees;
+}
+void   x_pen_goto(double x, double y){
+    if(__X_PEN_DOWN)
+        x_fill_line(__X_PEN_X, __X_PEN_Y, x, y, __X_PEN_THICK);
+    __X_PEN_X = x;
+    __X_PEN_Y = y;
 }
 
 #ifdef __cplusplus

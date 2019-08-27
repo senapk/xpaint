@@ -11,13 +11,14 @@
 /* apelido para um char sem sinal */
 typedef unsigned char uchar;
 
-#define X_BYTES_PER_PIXEL 3
+#define X_BYTES_PER_PIXEL 4
 
 /* struct que representa uma cor RGB */
 typedef struct{
     uchar r;
     uchar g;
     uchar b;
+    uchar a;
 } X_Color;
 
 /* lista de cores default */
@@ -33,7 +34,7 @@ extern X_Color X_COLOR_WHITE;
 extern X_Color X_COLOR_BLACK;
 
 /* cria e retorna uma struct X_Color passando rgb */
-X_Color x_make_color(uchar r, uchar g, uchar b);
+X_Color x_make_color(uchar r, uchar g, uchar b, uchar a);
 
 /*
 ###############################################

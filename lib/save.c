@@ -3,6 +3,8 @@
 #include <string.h>
 #include <stdlib.h>
 #include "lodepng.h" /*XDDDX*/
+#include "color.h" /*XDDDX*/
+
 
 void x_save_ppm(unsigned dimx, unsigned dimy, unsigned char * bitmap, const char * filename){
     /* const int dimx = x_get_width();
@@ -20,7 +22,11 @@ void x_save_png(unsigned dimx, unsigned dimy, unsigned char * bitmap, const char
     char * dest = (char*) malloc(strlen(filename + 10));
     strcpy(dest, filename);
     strcat(dest, ".png");
-    unsigned error = lodepng_encode_file(dest, bitmap, dimx, dimy, LCT_RGB, 8);
+    unsigned error = 0;
+    if(X_BYTES_PER_PIXEL == 3)
+        error = lodepng_encode_file(dest, bitmap, dimx, dimy, LCT_RGB, 8);
+    else
+        error = lodepng_encode_file(dest, bitmap, dimx, dimy, LCT_RGBA, 8);
     if(error)
         printf("error %u: %s\n", error, lodepng_error_text(error));
     free(dest);

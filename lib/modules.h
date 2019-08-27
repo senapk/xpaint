@@ -56,3 +56,25 @@ void x_bar_one(int i, int value);
 void x_bar_all(int * vet, int size, const char * colors, int * indices);
 
 
+/*
+###############################################
+####### FUNÇÕES PARA DESENHAR COM A CANETA ####
+###############################################
+*/
+
+void   x_pen_set_angle(double degrees);
+void   x_pen_set_thick(int thick);
+void   x_pen_set_pos(double x, double y);
+double x_pen_get_angle();
+int    x_pen_get_thick();
+double x_pen_get_x();
+double x_pen_get_y();
+void   x_pen_up(void);
+void   x_pen_down(void); 
+void   x_pen_walk(double distance);
+void   x_pen_rotate(int degrees);
+void   x_pen_goto(double x, double y);
+
+
+
+

@@ -17,6 +17,9 @@ typedef struct{
     int lineGap;
 } X_Font;
 
+void __x_make_layer(void);
+void __x_merge_layer(void);
+
 static X_Font __board_font_default;
 static X_Font * __board_font = NULL;
 static bool __board_using_default_font = false;
@@ -42,6 +45,7 @@ void x_set_font_size(int size){
 }
 
 int x_write(int x, int y, const char * format, ...){
+    __x_make_layer();
     char text[1000];
     va_list args;
     va_start( args, format );
@@ -53,7 +57,7 @@ int x_write(int x, int y, const char * format, ...){
 
     /* setando a cor */
     X_Color xc = x_get_color();
-    unsigned char color[3] = {xc.r, xc.g, xc.b};
+    unsigned char color[X_BYTES_PER_PIXEL] = {xc.r, xc.g, xc.b, xc.a};
     __board_font->info.userdata = (void *) color;
 
     for (i = 0; i < (int) strlen(text); ++i) {
@@ -87,7 +91,7 @@ int x_write(int x, int y, const char * format, ...){
         /* render character (stride and offset is important here) */
         uchar * bitmap = x_get_bitmap();
         int byteOffset = _x + (_y  * x_get_width());
-        stbtt_MakeCodepointBitmap(&__board_font->info, bitmap + 3 * byteOffset, c_x2 - c_x1, c_y2 - c_y1,
+        stbtt_MakeCodepointBitmap(&__board_font->info, bitmap + X_BYTES_PER_PIXEL * byteOffset, c_x2 - c_x1, c_y2 - c_y1,
                                   x_get_width(), __board_font->scale, __board_font->scale, text[i]);
 
         _x += ax; /* desloca x para proximo caractere */
@@ -97,6 +101,7 @@ int x_write(int x, int y, const char * format, ...){
         kern = stbtt_GetCodepointKernAdvance(&__board_font->info, text[i], text[i + 1]);
         _x += kern * __board_font->scale;
     }
+    __x_merge_layer();
     return _x;
 }
 

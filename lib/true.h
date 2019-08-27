@@ -3211,11 +3211,10 @@ static void stbtt__rasterize_sorted_edges(stbtt__bitmap *result, stbtt__edge *e,
             result->pixels[j*result->stride + i] = (unsigned char) m;
 #else
             const unsigned char * color = (const unsigned char*) userdata;
-            unsigned char * pos = result->pixels + X_BYTES_PER_PIXEL * j * result->stride + X_BYTES_PER_PIXEL * i;
+            unsigned char * pos = result->pixels + X_BYTES_PER_PIXEL * (j * result->stride + i);
             for(int qbbp = 0; qbbp < X_BYTES_PER_PIXEL; qbbp++){
                pos[qbbp] = pos[qbbp] + (color[qbbp] - pos[qbbp]) * (m/255.f);
-            }
-            
+            }          
 #endif
          }
       }
