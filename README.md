@@ -112,7 +112,8 @@ Se você clonar esse repositório, entrar na pasta exemplos e der um make, ele v
 
 Esta é uma biblioteca header only, ou seja, não está dividida em .c e .h. Declarações e definições estão todas no .h. 
 
-Se você der o include na biblioteca ele vai incluir as declarações e as definições, ou seja, cabeçalhos e implementações. Se estiver utilizando módulos e precisar fazer outras inclusões da biblioteca, todas as outras inclusões devem ser precedidas de 
+Se você der o include na biblioteca ele vai incluir as declarações apenas, ou seja, os cabeçalhos.
+No módulo principal do seu programa, você deve dar o define `XPAINT_FULL` para incluir também as definições.
 
 ```
 #define XPAINT_FULL
@@ -126,6 +127,14 @@ Se você der o include na biblioteca ele vai incluir as declarações e as defin
 Você pode encontrar as funções todas documentadas no arquivo xpaint.h, mas eu copio e colo abaixo.
 
 ```c
+/* struct que representa uma cor RGB */
+typedef struct{
+    uchar r;
+    uchar g;
+    uchar b;
+    uchar a;
+} X_Color;
+
 /* lista de cores default */
 extern X_Color X_COLOR_RED;
 extern X_Color X_COLOR_GREEN;
@@ -138,43 +147,69 @@ extern X_Color X_COLOR_VIOLET;
 extern X_Color X_COLOR_WHITE;
 extern X_Color X_COLOR_BLACK;
 
+/* cria e retorna uma struct X_Color passando rgb */
+X_Color x_make_color(uchar r, uchar g, uchar b, uchar a);
+
+/*
+###############################################
+### FUNÇÕES SET: Cor, Fonte, Paleta de Cores ##
+###############################################
+*/
+
+/* define uma cor na palheta de caracteres */
+void x_set_palette(char c, X_Color color);
+
+/* retorna uma cor dado um char.
+   os char default da paleta são rgbmcybk
+   outros podem ser definidos ou redefinidor com x_set_palette
+*/
+X_Color x_get_palette(char c);
+
+
 /*
 ###############################################
 ######## ABRINDO, FECHANDO, SALVANDO ##########
 ###############################################
 */
 
-/**
- * @brief Open the board to draw
- * 
- * @param width
- * @param height 
- * @param filename path to save the png 
- */
+/* @brief Open the board to draw */
+/* @param filename path to save the png */
 void x_open(unsigned int width, unsigned int height, const char * filename);
 
-/**
- * @brief Clear all resources
- * 
- */
-void x_close();
+/* retorna altura, largura, filename and bitmap */
+int           x_get_height(void);
+int           x_get_width(void);
+const char *  x_get_filename(void);
+uchar       * x_get_bitmap(void);
 
-/**
- * @brief Save the image using the path defined in x_open
- * 
- */
-void x_save();
+/* @brief Clear all resources */
+void x_close(void);
 
-/**
- * @brief Changes the the default filename to save the image
- * 
- * @param filename new path
- */
+/* @brief Changes the the default filename to save the image */
+/* @param filename path */
 void x_set_filename(const char * filename);
 
 /* define the path ou command to external tool to open the image in first save */
 /* Ex: "eog", "gthumb" */
 void x_set_viewer(const char * viewer);
+
+/* a funcao plot pinta o pixel usando a cor padrão */
+void x_plot(int x, int y);
+
+/* retorna a cor do pixel dessa posicao do bitmap */
+X_Color x_get_pixel(int x, int y);
+
+/* muda a cor do pincel para todas as funcoes de desenho */
+void x_set_color(X_Color color);
+
+/* return the current color for brush */
+X_Color x_get_color(void);
+
+/* limpa a tela inteira com a mesma cor */
+void x_clear(void);
+
+/* save the bitmap in filename.png */
+void x_save(void);
 
 /*
     saves the file with a numeric sufix at the end
@@ -191,94 +226,33 @@ void x_set_step(int value);
 /* Returns true if save is should be done */
 int x_control();
 
-/*
-###############################################
-#### PLOTANDO, ESCREVENDO, LIMPANDO ###########
-###############################################
-*/
-
-/* a funcao plot pinta o pixel usando a cor padrão */
-void x_plot(int x, int y);
-
-/* a funcao write escreve um texto text, na posição px, py.
-   retorna o x da posição após o último caractere escrito.
-*/
-int x_write(int x, int y, const char * format, ...);
-
-/* limpa a tela inteira com a mesma cor */
-void x_clear();
-
-/*
-###############################################
-### FUNÇÕES SET: Cor, Fonte, Paleta de Cores ##
-###############################################
-*/
-
-/* muda a cor do pincel para todas as funcoes de desenho */
-void x_set_color(X_Color color);
-
-/* change colors using palette colors */
-void x_set_pcolor(char color);
-
-/* retorna a cor corrente do pincel */
-X_Color x_get_color();
-
-/* define uma cor na palheta de caracteres */
-void x_set_palette(char c, X_Color color);
-
-/* retorna uma cor dado um char.
-   os char default da paleta são rgbmcybk
-   outros podem ser definidos ou redefinidor com x_set_palette
-*/
-X_Color x_get_palette(char c);
-
-/* mudar o tamanho da fonte em pixels */
-void x_set_font_size(int size);
-
-/* muda a font passando o path da nova fonte */
-void x_set_font(const char *filename);
-
-/*
-###############################################
-############## FUNÇÕES GET ####################
-###############################################
-*/
-
-/* retorna altura e largura do bitmap criado */
-int    x_get_height();
-int    x_get_width();
-
-/* retorna a cor do pixel dessa posicao do bitmap */
-X_Color x_get_pixel(int x, int y);
-
 /* ############################################### */
 /* ############ FUNÇÕES DE DESENHO DE LINHAS ##### */
 /* ############################################### */
-
 
 /* Desenha as seguintes formas sem preenchimento */
 
 /* desenha uma linha com espessura de 1 pixel entre os pontos (x0, y0) e (x1, y1) */
 void x_draw_line(int x0, int y0, int x1, int y1);
 
+/* desenha uma linha com espessura de thickness pixels entre os pontos (x0, y0) e (x1, y1) */
+void x_fill_line(float x0, float y0, float x1, float y1, int thickness);
+
 /* desenha um circulo com centro (centerx, centerx) e raio radius */
 void x_draw_circle(int centerx, int centery, int radius);
 
-/* desenha uma elipse dentro do rect de ponto superior esquerdo(x0, y0) */
-/* e ponto inferior direito (x1, y1) */
-void x_draw_ellipse(int x0, int y0, int x1, int y1);
+/* desenha um circulo dado centro e raio */
+void x_fill_circle(int centerx, int centery, int radius);
+
+/* desenha uma elipse dentro do rect de ponto superior esquerdo(x0, y0), largura e altura */
+void x_draw_ellipse(int x0, int y0, int width, int height);
+
+/* desenha uma elipse dentro do rect de ponto superior esquerdo(x0, y0), largura e altura */
+void x_fill_ellipse(int x0, int y0, int width, int height);
 
 /* desenha uma curva de bezier entre os pontos (x0, y0) e (x2, y2) */
 /* a curvatura eh dada pelo ponto (x1, y1) */
 void x_draw_bezier(int x0, int y0, int x1, int y1, int x2, int y2);
-
-
-/* ############################################### */
-/* ### FUNÇÕES DE DESENHO FORMAS PREENCHIDAS ##### */
-/* ############################################### */
-
-/* desenha uma linha com espessura de thickness pixels entre os pontos (x0, y0) e (x1, y1) */
-void x_fill_line(float x0, float y0, float x1, float y1, int thickness);
 
 /* desenha um arco dado o ponto de centro, raio, espessura */
 /* o angulo de inicio e o comprimento do arco em graus */
@@ -291,12 +265,17 @@ void x_fill_triangle(float v1x, float v1y, float v2x, float v2y, float v3x, floa
 /* desenha um retangulo dados os cantos superior esquerdo (x0, y0), largura e altura */
 void x_fill_rect(int x0, int y0, int width, int height);
 
-/* desenha um circulo dado centro e raio */
-void x_fill_circle(int centerx, int centery, int radius);
 
-/* desenha uma elipse dentro do rect de ponto superior esquerdo(x0, y0) */
-/* e ponto inferior direito (x1, y1) */
-void x_fill_ellipse(int x0, int y0, int x1, int y1);
+// muda o tamanho da font
+void x_set_font_size(int size);
+
+// escreve utilizando o formato printf
+int  x_write(int x, int y, const char * format, ...);
+
+
+
+/* Faz o SWAP entre dois tipos */
+#define X_SWAP(x, y, T) do { T X_SWAP = x; x = y; y = X_SWAP; } while (0)
 
 /*
 ###############################################
@@ -306,18 +285,18 @@ void x_fill_ellipse(int x0, int y0, int x1, int y1);
 
 /* Define um vetor bidimensional com x e y */
 typedef struct{
-    float x;
-    float y;
+    double x;
+    double y;
 } X_V2d;
 
 /* cria e retorna um vetor */
-X_V2d x_make_v2d(float x, float y);
+X_V2d x_make_v2d(double x, double y);
 
 /* retorna o tamanho de um vetor da origem */
-float x_v2d_length(float x, float y);
+double x_v2d_length(double x, double y);
 
 /* retorna a distancia entre dois pontos */
-float x_v2d_distance(float ax, float ay, float bx, float by);
+double x_v2d_distance(double ax, double ay, double bx, double by);
 
 /* retorna a + b */
 X_V2d x_v2d_sum(X_V2d a, X_V2d b);
@@ -326,7 +305,7 @@ X_V2d x_v2d_sum(X_V2d a, X_V2d b);
 X_V2d x_v2d_sub(X_V2d a, X_V2d b);
 
 /* retorna (a.x * value, a.y * value) */
-X_V2d x_v2d_dot(X_V2d a, float value);
+X_V2d x_v2d_dot(X_V2d a, double value);
 
 /* retorna o vetor normalizado */
 X_V2d x_v2d_normalize(X_V2d v);
@@ -346,16 +325,16 @@ xpaint não dependesse de incluir a biblioteca math.h
 nos parametros de compilação com o -lm
 */
 
-float xm_sqrt(const float m);
-float xm_pow( float x, float y );
+double xm_sqrt(const double m);
+double xm_pow( double x, double y );
 int   xm_floor(double x);
-float xm_fmod(float a, float b);
-int   xm_ceil(float n);
+double xm_fmod(double a, double b);
+int   xm_ceil(double n);
 /* degrees */
-float xm_sin(float d);
-float xm_cos(float d);
-float xm_acos(float x);
-float xm_fabs(float f);
+double xm_sin(double d);
+double xm_cos(double d);
+double xm_acos(double x);
+double xm_fabs(double f);
 /* Generates a int number in interval [min, max] */
 int   xm_rand(int min, int max);
 
@@ -416,5 +395,25 @@ void x_bar_one(int i, int value);
  * @param indices the array with the unique indices to be marked with the colors
  */
 void x_bar_all(int * vet, int size, const char * colors, int * indices);
+
+
+/*
+###############################################
+####### FUNÇÕES PARA DESENHAR COM A CANETA ####
+###############################################
+*/
+
+void   x_pen_set_angle(double degrees);
+void   x_pen_set_thick(int thick);
+void   x_pen_set_pos(double x, double y);
+double x_pen_get_angle();
+int    x_pen_get_thick();
+double x_pen_get_x();
+double x_pen_get_y();
+void   x_pen_up(void);
+void   x_pen_down(void); 
+void   x_pen_walk(double distance);
+void   x_pen_rotate(int degrees);
+void   x_pen_goto(double x, double y);
 
 ```
