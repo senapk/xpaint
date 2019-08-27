@@ -16421,6 +16421,13 @@ void x_open(unsigned int width, unsigned int height, const char * filename){
     strcpy(__board_filename, filename);
 
     __board_bitmap = (uchar*) calloc(sizeof(uchar), width * height * X_BYTES_PER_PIXEL);
+    __board_color[0] = 30;
+    __board_color[1] = 30;
+    __board_color[2] = 30;
+    __board_color[3] = 255;
+    x_clear();
+
+
     __board_color[0] = 200;
     __board_color[1] = 200;
     __board_color[2] = 200;
