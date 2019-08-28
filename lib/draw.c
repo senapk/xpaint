@@ -100,13 +100,13 @@ void x_fill_triangle(float v1x, float v1y, float v2x, float v2y, float v3x, floa
 }
 
 void x_fill_line(float x0, float y0, float x1, float y1, int thickness){
-    __x_make_layer();
     X_V2d a = {x0, y0};
     X_V2d b = {x1, y1};
     if(thickness == 1){
         x_draw_line(a.x, a.y, b.x, b.y);
         return;
     }
+    __x_make_layer();
     X_V2d _offset = x_make_v2d(b.x - a.x, b.y - a.y);
     _offset = x_v2d_dot(x_v2d_ortho(x_v2d_normalize(_offset)), (thickness / 2.f));
 
