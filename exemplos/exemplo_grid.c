@@ -1,33 +1,31 @@
-#define XPAINT_FULL
+#define XPAINT
 #include "../xpaint.h"
 
-void x_set_pcolor(char c){
-    x_set_color(x_get_palette(c));
-}
-
 void xgrid_matrix(int nl, int nc, char mat[nl][nc]){
-    x_set_pcolor('w');
+    x_set_color("w");
     x_clear();
     char * colors = "rgbymcov";
     int l, c;
     for(l = 0; l < nl; l++)
         for(c = 0; c < nc; c++){
-            x_set_pcolor(mat[l][c]);
+            x_set_color("%c", mat[l][c]);
             x_grid_square(l, c);
-            x_set_pcolor(colors[(c + l) % strlen(colors)]);
+            x_set_color("%c", colors[(c + l) % strlen(colors)]);
             x_grid_circle(l, c);
-            x_set_pcolor('k');
+            x_set_color("k");
             if(rand() % 2 == 0)
-                x_grid_number(l, c, rand() % 500 - 250);
+                x_grid_text(l, c, "%d", rand() % 500 - 250);
             else{
                 char str[] = "abcdef";
                 str[rand() % 5 + 1] = '\0';
+                x_set_font_size(30);
                 x_grid_text(l, c, str);
             }
         }
 }
 
 int main(){
+    x_set_viewer("eog");
     int w = 902, h = 602, side = 100;
     x_open(w, h, "figura_grid");
     x_grid_init(side, 2);

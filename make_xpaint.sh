@@ -17,14 +17,14 @@ echo "#endif" >> $temp
 
 
 echo "#endif /* XPAINT_H */" >> $temp
-echo "#ifdef XPAINT_FULL /* inicio da implementacao */" >> $temp
+echo "#ifdef XPAINT /* inicio da implementacao */" >> $temp
 
 echo "#ifdef __cplusplus" >> $temp
 echo "extern \"C\" {"  >> $temp
 echo "#endif" >> $temp
 
 
-cat lodepng.h lodepng.c true.h font.h >> $temp
+cat lodepng.h lodepng.c >> $temp
 cat color.c base.c draw.c save.c text.c xmath.c modules.c >> $temp
 
 echo "#ifdef __cplusplus" >> $temp
@@ -32,8 +32,8 @@ echo "}"  >> $temp
 echo "#endif" >> $temp
 
 
-echo "#endif /* XPAINT_FULL */" >> $temp
+echo "#endif /* XPAINT */" >> $temp
 #echo "#undef H_ONLY /* Para evitar a propagação da Flag ela deve ser apagada */" >> $temp
-sed '/XDDDX/d' $temp > ../$final
+sed '/XDDDX/d' $temp > ~/Dropbox/gits/0_tools/xpaint/$final
 rm $temp
 cd ..

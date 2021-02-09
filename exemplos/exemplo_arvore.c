@@ -1,6 +1,5 @@
-#define XPAINT_FULL
+#define XPAINT
 #include "../xpaint.h"
-#include <stdlib.h>
 
 void fractal(float x, float y, float ang, float lado){
     float delta = 35 + xm_rand(-2, 2); /* angulo de rotacao */
@@ -19,6 +18,7 @@ void fractal(float x, float y, float ang, float lado){
 
 int main(){
     x_open(800, 500, "figura_arvore");
+    //x_set_viewer("eog");
     fractal(400, 450, 90, 100);
     x_save();
     x_close();

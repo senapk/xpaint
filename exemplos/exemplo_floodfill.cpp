@@ -1,4 +1,4 @@
-#define XPAINT_FULL
+#define XPAINT
 #include "../xpaint.h"
 #include <vector>
 #include <iostream>
@@ -48,19 +48,19 @@ void xgrid_matrix(matriz<Item> mat, list<Pos> path){
     for(int l = 0; l < mat.nl; l++){
         for(int c = 0; c < mat.nc; c++){
             Item& item = mat.get(Pos{l, c});
-            x_set_pcolor(item.wall ? WALL : EMPTY);
+            x_set_color("%c", item.wall ? WALL : EMPTY);
             x_grid_square(l, c);
             if(item.distance != -1){
-                x_set_pcolor('k');
+                x_set_color("k");
                 x_grid_number(l, c, item.distance);
             }
         }
     }
     int i = 0;
     for(auto p : path){
-        x_set_color(X_COLOR_VIOLET);
+        x_set_color_rgba(X_COLOR_VIOLET);
         x_grid_circle(p.l, p.c);
-        x_set_pcolor('k');
+        x_set_color("k");
         x_grid_number(p.l, p.c, i++);
     }
 }
@@ -146,6 +146,7 @@ int main(){
     } */
     
     x_open(1002, 402, "figura_floodfill");
+    //x_set_viewer("eog");
     x_grid_init(1002/nc, 1);
     xgrid_matrix(mat, path);
     x_save();

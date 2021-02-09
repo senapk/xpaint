@@ -1,21 +1,19 @@
-#define XPAINT_FULL
+#define XPAINT
 #include "../xpaint.h"
 
-void x_set_pcolor(char c){
-    x_set_color(x_get_palette(c));
-}
 
 int main(){
     x_open(1000, 600, "figura_draw");
-    x_set_color(X_COLOR_BLACK);
+    x_set_viewer("eog");
+    x_set_color("k");
     x_clear();
 
     /* cada exemplo vai ser apresentado num espaço de 200x200 pixels */
-    x_set_font_size(35);
-    x_set_pcolor('g');
-    x_write(30, 30, "Exemplo das funcoes de desenho de formas geometricas");
+    x_set_font_size(30);
+    x_set_color("yellow");
+    x_write(90, 30, "Exemplo das funções de desenho de\n         formas geométricas");
 
-    x_set_color(x_make_color(255, 0, 0, 180));
+    x_set_color("white");
     x_set_font_size(20);
     int x = 10;
     int y = 100;

@@ -1,5 +1,5 @@
 #include <stdio.h>
-#define XPAINT_FULL
+#define XPAINT
 #include "../xpaint.h"
 
 #define vet_show(vet, size, colors, ...) do{\
@@ -39,7 +39,7 @@ void verify(int * vet, int size){
 int main() {
 
     x_open(600, 300, "figura_insertion");
-    
+    //x_set_viewer("eog");
     int size = 30, max = 900;
     x_bar_init(size, max);
     srand(2); 
