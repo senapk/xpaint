@@ -53,81 +53,53 @@ int main(){
 /* apelido para um char sem sinal */
 typedef unsigned char uchar;
 
-#define X_BYTES_PER_PIXEL 4
-
 /* struct que representa uma cor RGB */
 typedef struct{
     uchar r;
     uchar g;
     uchar b;
     uchar a;
-} X_Color;
+} Color;
 
-/* lista de cores default */
-extern X_Color X_COLOR_RED;
-extern X_Color X_COLOR_GREEN;
-extern X_Color X_COLOR_BLUE;
-extern X_Color X_COLOR_YELLOW;
-extern X_Color X_COLOR_CYAN;
-extern X_Color X_COLOR_MAGENTA;
-extern X_Color X_COLOR_ORANGE;
-extern X_Color X_COLOR_VIOLET;
-extern X_Color X_COLOR_WHITE;
-extern X_Color X_COLOR_BLACK;
+
+#define WHITE     (Color) {238, 232, 213, 255}
+#define BLACK     (Color) {7  , 54 , 66 , 255}
+#define GREEN     (Color) {133, 153, 0  , 255}
+#define RED       (Color) {211, 1  , 2  , 255}
+#define BLUE      (Color) {38 , 139, 210, 255}
+#define YELLOW    (Color) {181, 137, 0  , 255}
+#define CYAN      (Color) {42 , 161, 152, 255}
+#define MAGENTA   (Color) {211, 54 , 130, 255}
+#define ORANGE    (Color) {253, 106,   2, 255}
+#define VIOLET    (Color) {108, 113, 196, 255}
 
 /* cria e retorna uma struct X_Color passando rgb */
-X_Color x_make_color(uchar r, uchar g, uchar b, uchar a);
+Color make_color(uchar r, uchar g, uchar b, uchar a);
 
-/*
-###############################################
-### FUNÇÕES SET: Cor, Fonte, Paleta de Cores ##
-###############################################
-*/
-
-/* define uma cor na palheta de caracteres */
-void x_set_palette(char c, X_Color color);
+/* define uma cor na paleta de caracteres */
+void x_set_palette(char c, Color color);
 
 /* retorna uma cor dado um char.
    os char default da paleta são rgbmcybk
-   outros podem ser definidos ou redefinidor com x_set_palette
+   outros podem ser definidos ou redefinidor com palette_set
 */
-X_Color x_get_palette(char c);
+Color x_get_palette(char c);
 
-/* define uma entrada na paleta de cores */
-void x_color_add(const char * entry, X_Color color);
 
-/* obtém uma cor da paleta, possui vários modos
-1: uso de hexadecimal como : "#00ffbb"
-2: uso de rgba entre virgulas "144,123,12,255"
-3: uso de palavras chave ou letras
-    "black" ou "k"
-    "white" ou "w"
-    "red", "blue", "yellow", "pink", "cyan", ...
-*/
-X_Color x_color_decode(const char * color);
-
-/* inicializa as cores da paleta e da base
-*/
-void __x_init_colors(void);
+void __x_init_pallete();
 
 
 #include <stdarg.h>
-
-/*
-###############################################
-######## ABRINDO, FECHANDO, SALVANDO ##########
-###############################################
-*/
 
 /* @brief Open the board to draw */
 /* @param filename path to save the png */
 void x_open(unsigned int width, unsigned int height, const char * filename);
 
 /* retorna altura, largura, filename and bitmap */
-int           x_get_height(void);
-int           x_get_width(void);
-const char *  x_get_filename(void);
-uchar * x_get_bitmap(void);
+int          x_get_height(void);
+int          x_get_width(void);
+const char * x_get_filename(void);
+uchar      * x_get_bitmap(void);
 
 /* @brief Clear all resources */
 void x_close(void);
@@ -144,16 +116,16 @@ void x_set_viewer(const char * viewer);
 void x_plot(int x, int y);
 
 /* retorna a cor do pixel dessa posicao do bitmap */
-X_Color x_get_pixel(int x, int y);
+Color x_get_pixel(int x, int y);
 
-/* muda a cor do pincel utilizando a função x_color_decode */
-void x_set_color(const char * format, ...);
+/* muda a cor do pincel*/
+void x_set_color(Color color);
 
-/* muda a cor do pincel utilizando */
-void x_set_color_rgba(X_Color color);
+/* muda a cor do pincel usando a paleta de cores*/
+void x_set_pcolor(char color);
 
 /* return the current color for brush */
-X_Color x_get_color(void);
+Color x_get_color(void);
 
 /* limpa a tela inteira com a mesma cor */
 void x_clear(void);
@@ -167,7 +139,12 @@ void x_save(void);
     will save the following files
     img_00000.png img_00001.png img_00002.png img_00003.png
 */
-void x_log();
+void x_log(const char * folder);
+
+/*
+ * Usa o ffmpeg para renderizar as imagens dessa pasta em um video.mp4
+ */
+void x_video_make(const char * folder, int framerate);
 
 /* set the step for x_control */
 void x_set_step(int value);
@@ -223,12 +200,6 @@ void x_fill_rect(int x0, int y0, int width, int height);
 
 
 
-//saves the bitmap in png format
-void x_save_png(unsigned dimx, unsigned dimy, unsigned char * bitmap, const char * filename);
-
-
-
-
 #include <stdarg.h>
 //inicializa o módulo de escrita
 void __x_init_font();
@@ -241,7 +212,7 @@ void x_set_font_size(int size);
 int x_write(int x, int y, const char * format, ...);
 
 /* Faz o SWAP entre dois tipos */
-#define X_SWAP(x, y, T) do { T X_SWAP = x; x = y; y = X_SWAP; } while (0)
+#define __X_SWAP(x, y, T) do { T __X_SWAP = x; x = y; y = __X_SWAP; } while (0)
 
 /*
 ###############################################
@@ -253,56 +224,46 @@ int x_write(int x, int y, const char * format, ...);
 typedef struct{
     double x;
     double y;
-} X_V2d;
+} V2d;
 
 /* cria e retorna um vetor */
-X_V2d x_make_v2d(double x, double y);
+V2d make_v2d(double x, double y);
 
 /* retorna o tamanho de um vetor da origem */
-double x_v2d_length(double x, double y);
+double v2d_length(double x, double y);
 
 /* retorna a distancia entre dois pontos */
-double x_v2d_distance(double ax, double ay, double bx, double by);
+double v2d_distance(double ax, double ay, double bx, double by);
 
 /* retorna a + b */
-X_V2d x_v2d_sum(X_V2d a, X_V2d b);
+V2d v2d_sum(V2d a, V2d b);
 
 /* retorna a - b */
-X_V2d x_v2d_sub(X_V2d a, X_V2d b);
+V2d v2d_sub(V2d a, V2d b);
 
 /* retorna (a.x * value, a.y * value) */
-X_V2d x_v2d_dot(X_V2d a, double value);
+V2d v2d_dot(V2d a, double value);
 
 /* retorna o vetor normalizado */
-X_V2d x_v2d_normalize(X_V2d v);
+V2d v2d_normalize(V2d v);
 
 /* retorna o vetor orthogonal */
-X_V2d x_v2d_ortho(X_V2d v);
+V2d v2d_ortho(V2d v);
 
-/*
-###############################################
-############ FUNÇÕES MATEMATICAS ##############
-###############################################
-*/
+// ####### FUNÇÕES MATEMATICAS ##############
 
-/*
-Essas funções foram adicionadas para que a biblioteca
-xpaint não dependesse de incluir a biblioteca math.h
-nos parametros de compilação com o -lm
-*/
-
-double xm_sqrt(const double m);
-double xm_pow( double x, double y );
-int   xm_floor(double x);
-double xm_fmod(double a, double b);
-int   xm_ceil(double n);
+double math_sqrt(const double m);
+double math_pow( double x, double y );
+int    math_floor(double x);
+double math_fmod(double a, double b);
+int    math_ceil(double n);
 /* degrees */
-double xm_sin(double d);
-double xm_cos(double d);
-double xm_acos(double x);
-double xm_fabs(double f);
-/* Generates a int number in interval [min, max] */
-int   xm_rand(int min, int max);
+double math_sin(double d);
+double math_cos(double d);
+double math_acos(double x);
+double math_fabs(double f);
+/* Generates a int number in interval [min, max[ */
+int    math_rand(int min, int max);
 
 
 /*
@@ -314,16 +275,16 @@ int   xm_rand(int min, int max);
 /*Init the grid*/
 /*side is the size of the cell */
 /*sep the space in black between cells */
-void x_grid_init(int side, int sep);
+void grid_init(int side, int sep);
 
 /*plots a square in cell*/
-void x_grid_square(int l, int c);
+void grid_square(int l, int c);
 
 /*plots a circle in cell*/
-void x_grid_circle(int l, int c);
+void grid_circle(int l, int c);
 
 /*writes a text until 5 char in cell*/
-void x_grid_text(int l, int c, const char *format, ...);
+void grid_write(int l, int c, const char *format, ...);
 
 
 /*
@@ -339,7 +300,7 @@ void x_grid_text(int l, int c, const char *format, ...);
  * @param size the size of the array
  * @param max the max value of the array
  */
-void x_bar_init(int size, int max);
+void bar_init(int size, int max);
 
 /**
  * @brief print a single bar
@@ -347,7 +308,7 @@ void x_bar_init(int size, int max);
  * @param i the index
  * @param value the value of the bar size
  */
-void x_bar_one(int i, int value);
+void bar_one(int i, int value);
 
 /**
  * @brief show the entire array
@@ -357,7 +318,7 @@ void x_bar_one(int i, int value);
  * @param colors the array of color to mark unique elements or NULL
  * @param indices the array with the unique indices to be marked with the colors
  */
-void x_bar_all(int * vet, int size, const char * colors, int * indices);
+void bar_all(int * vet, int size, const char * colors, int * indices);
 
 
 /*
@@ -366,18 +327,18 @@ void x_bar_all(int * vet, int size, const char * colors, int * indices);
 ###############################################
 */
 
-void   x_pen_set_angle(double degrees);
-void   x_pen_set_thick(int thick);
-void   x_pen_set_pos(double x, double y);
-double x_pen_get_angle();
-int    x_pen_get_thick();
-double x_pen_get_x();
-double x_pen_get_y();
-void   x_pen_up(void);
-void   x_pen_down(void); 
-void   x_pen_walk(double distance);
-void   x_pen_rotate(int degrees);
-void   x_pen_goto(double x, double y);
+void   pen_set_angle(double degrees);
+void   pen_set_thick(int thick);
+void   pen_set_pos(double x, double y);
+double pen_get_angle();
+int    pen_get_thick();
+double pen_get_x();
+double pen_get_y();
+void   pen_up(void);
+void   pen_down(void);
+void   pen_walk(double distance);
+void   pen_rotate(int degrees);
+void   pen_goto(double x, double y);
 
 
 
@@ -8479,255 +8440,235 @@ unsigned encode(const std::string& filename,
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
-#define X_MAX_ITENS 1000
 
-typedef struct X_ColorEntry{
-    char key[20];
-    X_Color color;
-} X_ColorEntry;
+static Color __board_palette[256];
 
-static X_Color __board_palette[256];
-X_ColorEntry x_arr_colors[X_MAX_ITENS];
-int x_arr_colors_size = 0;
-
-X_Color X_COLOR_WHITE     = {238, 232, 213, 255};
-X_Color X_COLOR_BLACK     = {7  , 54 , 66 , 255};
-X_Color X_COLOR_GREEN     = {133, 153, 0  , 255};
-X_Color X_COLOR_RED       = {211, 1  , 2  , 255};
-X_Color X_COLOR_BLUE      = {38 , 139, 210, 255};
-X_Color X_COLOR_YELLOW    = {181, 137, 0  , 255};
-X_Color X_COLOR_CYAN      = {42 , 161, 152, 255};
-X_Color X_COLOR_MAGENTA   = {211, 54 , 130, 255};
-X_Color X_COLOR_ORANGE    = {253, 106,   2, 255};
-X_Color X_COLOR_VIOLET    = {108, 113, 196, 255};
-
-X_Color x_make_color(uchar r, uchar g, uchar b, uchar a){
-    X_Color x = {r, g, b, a};
+Color make_color(uchar r, uchar g, uchar b, uchar a){
+    Color x = {r, g, b, a};
     return x;
 }
 
-
-void x_set_palette(char c, X_Color color){
+void x_set_palette(char c, Color color){
     __board_palette[(int)c] = color;
 }
 
-X_Color x_get_palette(char c){
+Color x_get_palette(char c){
     return __board_palette[(int)c];
 }
 
-//void __x_init_pallete(void){
-//    int i = 0;
-//    for(i = 0; i < 256; i++)
-//        __board_palette[i] = X_COLOR_WHITE;
+void __x_init_pallete(void){
+    int i = 0;
+    for(i = 0; i < 256; i++)
+        __board_palette[i] = WHITE;
 
-//    __board_palette['r'] = X_COLOR_RED;
-//    __board_palette['g'] = X_COLOR_GREEN;
-//    __board_palette['b'] = X_COLOR_BLUE;
-//    __board_palette['y'] = X_COLOR_YELLOW;
-//    __board_palette['m'] = X_COLOR_MAGENTA;
-//    __board_palette['c'] = X_COLOR_CYAN;
-//    __board_palette['k'] = X_COLOR_BLACK;
-//    __board_palette['w'] = X_COLOR_WHITE;
-//    __board_palette['o'] = X_COLOR_ORANGE;
-//    __board_palette['v'] = X_COLOR_VIOLET;
+    __board_palette['r'] = RED;
+    __board_palette['g'] = GREEN;
+    __board_palette['b'] = BLUE;
+    __board_palette['y'] = YELLOW;
+    __board_palette['m'] = MAGENTA;
+    __board_palette['c'] = CYAN;
+    __board_palette['k'] = BLACK;
+    __board_palette['w'] = WHITE;
+    __board_palette['o'] = ORANGE;
+    __board_palette['v'] = VIOLET;
+}
+
+
+//bool __x_validate_hex(const char * color){
+//    for(int i = 1; i < 7; i++){
+//        if(color[i] >= '0' && color[i] <= '9')
+//            continue;
+//        else if(color[i] >= 'a' && color[i] <= 'f')
+//            continue;
+//        else
+//            return false;
+//    }
+//    return true;
 //}
 
+//bool __x_decode_hex(const char * _color, Color * xc){
+//    if(strlen(_color) != 7 || _color[0] != '#')
+//        return false;
+//    char color[8];
+//    strcpy(color, _color);
+//    for(int i = 1; i < 7; i++)
+//        color[i] = tolower(_color[i]);
+//    if(!__x_validate_hex(color))
+//        return false;
+//    unsigned int r, g, b;
+//    int readings = sscanf(color + 1, "%02x%02x%02x", &r, &g, &b);
+//    if(readings != 3)
+//        return false;
+//    *xc = (Color){r, g, b, 255};
+//    return true;
+//}
 
-bool __x_validate_hex(const char * color){
-    for(int i = 1; i < 7; i++){
-        if(color[i] >= '0' && color[i] <= '9')
-            continue;
-        else if(color[i] >= 'a' && color[i] <= 'f')
-            continue;
-        else
-            return false;
-    }
-    return true;
-}
+//int __x_count_colon(const char * color){
+//    int cont = 0;
+//    int size = strlen(color);
+//    for(int i = 0; i < size; i++)
+//        if(color[i] == ',')
+//            cont += 1;
+//    return cont;
+//}
 
-bool __x_decode_hex(const char * _color, X_Color * xc){
-    if(strlen(_color) != 7 || _color[0] != '#')
-        return false;
-    char color[8];
-    strcpy(color, _color);
-    for(int i = 1; i < 7; i++)
-        color[i] = tolower(_color[i]);
-    if(!__x_validate_hex(color))
-        return false;
-    unsigned int r, g, b;
-    int readings = sscanf(color + 1, "%02x%02x%02x", &r, &g, &b);
-    if(readings != 3)
-        return false;
-    *xc = (X_Color){r, g, b, 255};
-    return true;
-}
-
-int __x_count_colon(const char * color){
-    int cont = 0;
-    int size = strlen(color);
-    for(int i = 0; i < size; i++)
-        if(color[i] == ',')
-            cont += 1;
-    return cont;
-}
-
-bool __x_decode_rgba(const char * color, X_Color * xc){
-    int number_of_colons = __x_count_colon(color);
-    if(number_of_colons != 2 && number_of_colons != 3)
-        return false;
-    char decode[4][4] = {"", "", "", ""};
-    int  idecode[4];
-    int ind = 0;
-    int size = strlen(color);
-    for(int i = 0; i < size; i++){
-        if(color[i] == ',')
-            ind += 1;
-        else if(color[i] == ' ')
-            continue;
-        else if((color[i] >= '0') && (color[i] <= '9')){
-            char str[2] = "x";
-            str[0] = color[i];
-            strcat(decode[ind], str);
-        }
-        else{
-            return false;
-        }
-    }
-    if(ind == 2)
-        strcpy(decode[3], "255");
-    for(int i = 0; i < 4; i++)
-        idecode[i] = atoi(decode[i]);
-    xc->r = idecode[0];
-    xc->g = idecode[1];
-    xc->b = idecode[2];
-    xc->a = idecode[3];
-    for(int i = 0; i < 4; i++){
-        if((idecode[i] < 0) || (idecode[i] > 255))
-            printf("warning: a rgb color should be inside the interval [0, 255]: %d\n", idecode[i]);
-    }
+//bool __x_decode_rgba(const char * color, Color * xc){
+//    int number_of_colons = __x_count_colon(color);
+//    if(number_of_colons != 2 && number_of_colons != 3)
+//        return false;
+//    char decode[4][4] = {"", "", "", ""};
+//    int  idecode[4];
+//    int ind = 0;
+//    int size = strlen(color);
+//    for(int i = 0; i < size; i++){
+//        if(color[i] == ',')
+//            ind += 1;
+//        else if(color[i] == ' ')
+//            continue;
+//        else if((color[i] >= '0') && (color[i] <= '9')){
+//            char str[2] = "x";
+//            str[0] = color[i];
+//            strcat(decode[ind], str);
+//        }
+//        else{
+//            return false;
+//        }
+//    }
+//    if(ind == 2)
+//        strcpy(decode[3], "255");
+//    for(int i = 0; i < 4; i++)
+//        idecode[i] = atoi(decode[i]);
+//    xc->r = idecode[0];
+//    xc->g = idecode[1];
+//    xc->b = idecode[2];
+//    xc->a = idecode[3];
+//    for(int i = 0; i < 4; i++){
+//        if((idecode[i] < 0) || (idecode[i] > 255))
+//            printf("warning: a rgb color should be inside the interval [0, 255]: %d\n", idecode[i]);
+//    }
     
-    return true;
-}
+//    return true;
+//}
 
-bool __x_color_load(const char * color, X_Color * xc){
-    if(strlen(color) == 1){
-        int pos = color[0];
-        *xc = __board_palette[pos];
-        return true;
-    }
+//bool __x_color_load(const char * color, Color * xc){
+//    if(strlen(color) == 1){
+//        int pos = color[0];
+//        *xc = __board_palette[pos];
+//        return true;
+//    }
 
-    for(int i = 0; i < x_arr_colors_size; i++){
-        if(strcmp(x_arr_colors[i].key, color) == 0){
-            *xc = x_arr_colors[i].color;
-            return true;
-        }
-    }
-    return false;
-}
+//    for(int i = 0; i < x_arr_colors_size; i++){
+//        if(strcmp(x_arr_colors[i].key, color) == 0){
+//            *xc = x_arr_colors[i].color;
+//            return true;
+//        }
+//    }
+//    return false;
+//}
 
-void x_color_store(char shortcut[2], const char * entry, X_Color color){
-    x_set_palette(shortcut[0], color);
-    x_color_add(entry, color);
-}
+//void x_color_store(char shortcut[2], const char * entry, Color color){
+//    palette_set(shortcut[0], color);
+//    x_color_add(entry, color);
+//}
 
-void x_color_add(const char * entry, X_Color color){
-    if(x_arr_colors_size < X_MAX_ITENS){
-        strcpy(x_arr_colors[x_arr_colors_size].key, entry);
-        x_arr_colors[x_arr_colors_size].color = color;
-        x_arr_colors_size += 1;
-    }
-}
+//void x_color_add(const char * entry, Color color){
+//    if(x_arr_colors_size < X_MAX_ITENS){
+//        strcpy(x_arr_colors[x_arr_colors_size].key, entry);
+//        x_arr_colors[x_arr_colors_size].color = color;
+//        x_arr_colors_size += 1;
+//    }
+//}
 
-void __x_init_colors(){
-    for(int i = 0; i < 256; i++)
-        __board_palette[i] = X_COLOR_WHITE;
+//void __x_init_colors(){
+//    for(int i = 0; i < 256; i++)
+//        __board_palette[i] = WHITE;
 
-    x_color_store("a", "aqua",    x_make_color(0, 255, 255, 255));
-    x_color_store("A", "amber",    x_make_color(255,191,0, 255));
+//    x_color_store("a", "aqua",    make_color(0, 255, 255, 255));
+//    x_color_store("A", "amber",    make_color(255,191,0, 255));
 
-    x_color_store("b", "blue",    x_make_color(38 , 139, 210, 255));
-    x_color_store("B", "brown",    x_make_color(150,75,0, 255));
+//    x_color_store("b", "blue",    make_color(38 , 139, 210, 255));
+//    x_color_store("B", "brown",    make_color(150,75,0, 255));
 
-    x_color_store("c", "cyan",    x_make_color(42 , 161, 152, 255));
-    x_color_store("C", "corn",    x_make_color(251,236,93, 255));
-    x_color_store("0", "coral",  x_make_color(255, 127, 80  , 255));
+//    x_color_store("c", "cyan",    make_color(42 , 161, 152, 255));
+//    x_color_store("C", "corn",    make_color(251,236,93, 255));
+//    x_color_store("0", "coral",  make_color(255, 127, 80  , 255));
 
-    x_color_store("d", "dark",    x_make_color(7  , 54 , 66 , 255));
-    x_color_store("D", "desert",    x_make_color(193, 154, 107, 255));
+//    x_color_store("d", "dark",    make_color(7  , 54 , 66 , 255));
+//    x_color_store("D", "desert",    make_color(193, 154, 107, 255));
 
-    x_color_store("e", "error",   x_make_color(255,   0,   0, 255));
-    x_color_store("E", "emerald", x_make_color(80,200,120, 255));
+//    x_color_store("e", "error",   make_color(255,   0,   0, 255));
+//    x_color_store("E", "emerald", make_color(80,200,120, 255));
 
-    x_color_store("f", "flax",    x_make_color(238, 220, 130, 255));
-    x_color_store("F", "forest",  x_make_color(34,139,34, 255));
+//    x_color_store("f", "flax",    make_color(238, 220, 130, 255));
+//    x_color_store("F", "forest",  make_color(34,139,34, 255));
 
-    x_color_store("g", "green",   x_make_color(133, 153, 0  , 255));
-    x_color_store("G", "gold",    x_make_color(255, 215, 0, 255));
-    x_color_store("1", "gray",  x_make_color(128, 128, 128  , 255));
+//    x_color_store("g", "green",   make_color(133, 153, 0  , 255));
+//    x_color_store("G", "gold",    make_color(255, 215, 0, 255));
+//    x_color_store("1", "gray",  make_color(128, 128, 128  , 255));
 
-    x_color_store("h", "heaven",  x_make_color(180, 176, 236, 255));
-    x_color_store("H", "han",     x_make_color(68, 108, 207, 255));
+//    x_color_store("h", "heaven",  make_color(180, 176, 236, 255));
+//    x_color_store("H", "han",     make_color(68, 108, 207, 255));
 
-    x_color_store("i", "indigo",  x_make_color(0  ,  65, 106, 255));
-    x_color_store("I", "iceberg",  x_make_color(113, 166, 210, 255));
+//    x_color_store("i", "indigo",  make_color(0  ,  65, 106, 255));
+//    x_color_store("I", "iceberg",  make_color(113, 166, 210, 255));
 
-    x_color_store("j", "jade",    x_make_color(0  , 168, 107, 255));
-    x_color_store("J", "jasmine",    x_make_color(248, 222, 126, 255));
+//    x_color_store("j", "jade",    make_color(0  , 168, 107, 255));
+//    x_color_store("J", "jasmine",    make_color(248, 222, 126, 255));
 
-    x_color_store("k", "black",   x_make_color(7  , 54 , 66 , 255));
-    x_color_store("K", "khaki",   x_make_color(195, 176, 145, 255));
+//    x_color_store("k", "black",   make_color(7  , 54 , 66 , 255));
+//    x_color_store("K", "khaki",   make_color(195, 176, 145, 255));
 
-    x_color_store("l", "lavender",x_make_color(240, 230, 140, 255));
-    x_color_store("L", "lime",    x_make_color(191, 255, 0, 255));
+//    x_color_store("l", "lavender",make_color(240, 230, 140, 255));
+//    x_color_store("L", "lime",    make_color(191, 255, 0, 255));
 
-    x_color_store("m", "magenta", x_make_color(211, 54 , 130, 255));
-    x_color_store("M", "maroon", x_make_color(128,0,0, 255));
-    x_color_store("2", "midnight",x_make_color(25, 25, 112, 255));
+//    x_color_store("m", "magenta", make_color(211, 54 , 130, 255));
+//    x_color_store("M", "maroon", make_color(128,0,0, 255));
+//    x_color_store("2", "midnight",make_color(25, 25, 112, 255));
 
-    x_color_store("n", "navy", x_make_color(0,0,128, 255));
+//    x_color_store("n", "navy", make_color(0,0,128, 255));
 
-    x_color_store("o", "orange",  x_make_color(253, 106, 2, 255));
-    x_color_store("O", "olive",  x_make_color(128, 128, 0, 255));
+//    x_color_store("o", "orange",  make_color(253, 106, 2, 255));
+//    x_color_store("O", "olive",  make_color(128, 128, 0, 255));
 
-    x_color_store("p", "pink",    x_make_color(255, 20, 147, 255));
-    x_color_store("P", "purple",  x_make_color(128,0,128, 255));
+//    x_color_store("p", "pink",    make_color(255, 20, 147, 255));
+//    x_color_store("P", "purple",  make_color(128,0,128, 255));
 
-    x_color_store("r", "red",     x_make_color(211, 1  , 2  , 255));
-    x_color_store("R", "ruby",    x_make_color(224, 17, 95, 255));
+//    x_color_store("r", "red",     make_color(211, 1  , 2  , 255));
+//    x_color_store("R", "ruby",    make_color(224, 17, 95, 255));
 
-    x_color_store("s", "silver",  x_make_color(192, 192, 192, 255));
-    x_color_store("S", "sepia",  x_make_color(112, 66, 20, 255));
-    x_color_store("3", "salmon",  x_make_color(250, 128, 114  , 255));
+//    x_color_store("s", "silver",  make_color(192, 192, 192, 255));
+//    x_color_store("S", "sepia",  make_color(112, 66, 20, 255));
+//    x_color_store("3", "salmon",  make_color(250, 128, 114  , 255));
 
-    x_color_store("t", "tan",  x_make_color(210, 180, 140, 255));
-    x_color_store("T", "turquoise",  x_make_color(62, 224, 208, 255));
-    x_color_store("4", "teal",  x_make_color(0, 128, 128 , 255));
+//    x_color_store("t", "tan",  make_color(210, 180, 140, 255));
+//    x_color_store("T", "turquoise",  make_color(62, 224, 208, 255));
+//    x_color_store("4", "teal",  make_color(0, 128, 128 , 255));
 
-    x_color_store("u", "umber",  x_make_color(99, 81, 71, 255));
-    x_color_store("U", "ultramarine",  x_make_color(18, 10, 143, 255));
+//    x_color_store("u", "umber",  make_color(99, 81, 71, 255));
+//    x_color_store("U", "ultramarine",  make_color(18, 10, 143, 255));
 
-    x_color_store("v", "violet",  x_make_color(108, 113, 196, 255));
-    x_color_store("V", "vanilla",  x_make_color(243, 229, 171, 255));
+//    x_color_store("v", "violet",  make_color(108, 113, 196, 255));
+//    x_color_store("V", "vanilla",  make_color(243, 229, 171, 255));
 
-    x_color_store("w", "white",   x_make_color(238, 232, 213, 255));
-    x_color_store("W", "wheat",   x_make_color(254, 222, 179, 255));
+//    x_color_store("w", "white",   make_color(238, 232, 213, 255));
+//    x_color_store("W", "wheat",   make_color(254, 222, 179, 255));
 
-    x_color_store("y", "yellow",  x_make_color(181, 137, 0  , 255));
+//    x_color_store("y", "yellow",  make_color(181, 137, 0  , 255));
 
-//    __x_init_pallete();
-}
+////    __x_init_pallete();
+//}
 
-void x_color_show(X_Color color){
-    printf("{%3d, %3d, %3d, %3d}\n", color.r, color.g, color.b, color.a);
-}
+//void x_color_show(Color color){
+//    printf("{%3d, %3d, %3d, %3d}\n", color.r, color.g, color.b, color.a);
+//}
 
-X_Color x_color_decode(const char * color){
-    X_Color xc;
-    if(__x_decode_rgba(color, &xc) || __x_decode_hex(color, &xc) || __x_color_load(color, &xc))
-        return xc;
-    printf("fail: Color \"%s\" could not be decoded\n", color);
-    return xc;
-}
+//Color x_color_decode(const char * color){
+//    Color xc;
+//    if(__x_decode_rgba(color, &xc) || __x_decode_hex(color, &xc) || __x_color_load(color, &xc))
+//        return xc;
+//    printf("fail: Color \"%s\" could not be decoded\n", color);
+//    return xc;
+//}
 
 #include <stdio.h>
 #include <stdbool.h>
@@ -8741,6 +8682,7 @@ void x_init_font();
 
 //#define XPPM
 
+#define __X_BYTES_PER_PIXEL 4
 
 #ifndef XPPM
 const char * __board_extension = ".png";
@@ -8757,7 +8699,7 @@ static int       __board_layer_level = 0;
 static unsigned  __board_width  = 0;
 static unsigned  __board_height = 0;
 
-static uchar     __board_color[X_BYTES_PER_PIXEL];
+static uchar     __board_color[__X_BYTES_PER_PIXEL];
 
 static bool      __board_is_open = false;
 static char      __board_filename[200] = "";
@@ -8768,7 +8710,7 @@ static int       __board_step          = 1;
 uchar * __x_get_pixel_pos(unsigned int x, unsigned int y);
 
 uchar * __x_get_pixel_pos(unsigned x, unsigned y){
-    return __board_bitmap + X_BYTES_PER_PIXEL * (__board_width * y + x);
+    return __board_bitmap + __X_BYTES_PER_PIXEL * (__board_width * y + x);
 }
 
 //plot sem as verificações de limite
@@ -8780,7 +8722,7 @@ void __x_make_layer(void){
     }else{
         __board_layer = __board_bitmap;
         __board_layer_level += 1;
-        __board_bitmap = (uchar*) calloc(sizeof(uchar), __board_width * __board_height * X_BYTES_PER_PIXEL);
+        __board_bitmap = (uchar*) calloc(sizeof(uchar), __board_width * __board_height * __X_BYTES_PER_PIXEL);
     }
 }
 
@@ -8795,7 +8737,7 @@ void __x_merge_layer(void){
 
         for(size_t x = 0; x < __board_width; x++){
             for(size_t y = 0; y < __board_height; y++){
-                __x_plot(x, y, layer + X_BYTES_PER_PIXEL * (y * __board_width + x));
+                __x_plot(x, y, layer + __X_BYTES_PER_PIXEL * (y * __board_width + x));
             }
         }
         free(layer);
@@ -8812,7 +8754,7 @@ void x_open(unsigned int width, unsigned int height, const char * filename){
     __board_width = width;
     strcpy(__board_filename, filename);
 
-    __board_bitmap = (uchar*) calloc(sizeof(uchar), width * height * X_BYTES_PER_PIXEL);
+    __board_bitmap = (uchar*) calloc(sizeof(uchar), width * height * __X_BYTES_PER_PIXEL);
     __board_color[0] = 30;
     __board_color[1] = 30;
     __board_color[2] = 30;
@@ -8824,7 +8766,7 @@ void x_open(unsigned int width, unsigned int height, const char * filename){
     __board_color[2] = 200;
     __board_color[3] = 255;
 
-    __x_init_colors();
+    __x_init_pallete();
     __x_init_font();
     srand((unsigned) time(NULL));
 }
@@ -8871,7 +8813,7 @@ void x_set_viewer(const char * viewer){
 void __x_plot(int x, int y, uchar * color){
     uchar * pos = __x_get_pixel_pos((unsigned) x, (unsigned) y);
     if(__board_layer_level > 0){
-        memcpy(pos, color, X_BYTES_PER_PIXEL * sizeof(uchar));
+        memcpy(pos, color, __X_BYTES_PER_PIXEL * sizeof(uchar));
     }else{
         for(int i = 0; i < 3; i++){
             float fc = color[i] / 255.f;
@@ -8893,29 +8835,26 @@ void x_plot(int x, int y){
         __x_plot(x, y, __board_color);
 }
 
-X_Color x_get_pixel(int x, int y){
+Color x_get_pixel(int x, int y){
     uchar * pixel = __x_get_pixel_pos((unsigned) x, (unsigned) y);
-    X_Color color;
-    memcpy(&color, pixel, X_BYTES_PER_PIXEL * sizeof(uchar));
+    Color color;
+    memcpy(&color, pixel, __X_BYTES_PER_PIXEL * sizeof(uchar));
     return color;
 }
 
-void x_set_color(const char * format, ...){
-    char text[1000];
-    va_list args;
-    va_start( args, format );
-    vsprintf(text, format, args);
-    va_end( args );
-    x_set_color_rgba(x_color_decode(text));
+void x_set_color(Color color){
+    memcpy(__board_color, &color, __X_BYTES_PER_PIXEL * sizeof(uchar));
 }
 
-void x_set_color_rgba(X_Color color){
-    memcpy(__board_color, &color, X_BYTES_PER_PIXEL * sizeof(uchar));
+void x_set_pcolor(char color){
+    Color pcolor = x_get_palette(color);
+    memcpy(__board_color, &pcolor, __X_BYTES_PER_PIXEL * sizeof(uchar));
 }
 
-X_Color x_get_color(void){
-    X_Color color;
-    memcpy(&color, __board_color, X_BYTES_PER_PIXEL * sizeof(uchar));
+
+Color x_get_color(){
+    Color color;
+    memcpy(&color, __board_color, __X_BYTES_PER_PIXEL * sizeof(uchar));
     return color;
 }
 
@@ -8923,7 +8862,7 @@ void x_clear(void){
     unsigned x, y;
     for(x = 0; x < __board_width; x++)
         for(y = 0; y < __board_height; y++)
-            memcpy(__x_get_pixel_pos((unsigned) x, (unsigned) y), __board_color, X_BYTES_PER_PIXEL * sizeof(uchar));
+            memcpy(__x_get_pixel_pos((unsigned) x, (unsigned) y), __board_color, __X_BYTES_PER_PIXEL * sizeof(uchar));
 }
 
 void x_save(){
@@ -8944,10 +8883,28 @@ void x_save(){
     }
 }
 
-void x_log(){
+void make_video(const char * folder, int framerate){
+    char cmd[500];
+    char * name = (char *) malloc((strlen(folder) + 20) * sizeof(char));
+    strcpy(name, folder);
+    if(folder[strlen(folder) - 1] != '/')
+        strcat(name, "/");
+
+    sprintf(cmd, "ffmpeg -y -framerate %d -pattern_type glob -i '%s*.png' -c:v libx264 -profile:v high -crf 20 -pix_fmt yuv420p video.mp4", framerate, name);
+    puts(cmd);
+    int result = system(cmd);
+    if(result != 0)
+        printf("%d\n", result);
+    free(name);
+}
+
+void x_log(const char * folder){
     static int index = 0;
-    char * name = (char *) malloc((strlen(__board_filename) + 10) * sizeof(char));
-    sprintf(name, "%s%05d", __board_filename, index);
+    char * name = (char *) malloc((strlen(folder) + 20) * sizeof(char));
+    if(folder[strlen(folder) - 1] != '/')
+        sprintf(name, "%s/%05d", folder, index);
+    else
+        sprintf(name, "%s%05d", folder, index);
     index += 1;
     printf("saving: %s%s\n", name, __board_extension);
 #ifndef XPPM
@@ -8996,9 +8953,20 @@ void x_save_ppm(unsigned dimx, unsigned dimy, unsigned char * bitmap, const char
     FILE *fp = fopen(path, "wb"); /* b - binary mode */
     fprintf(fp, "P6\n%d %d\n255\n", dimx, dimy);
     for(size_t i = 0; i < dimx * dimy; i++){
-        fwrite(bitmap + i * X_BYTES_PER_PIXEL, 1, 3, fp);
+        fwrite(bitmap + i * __X_BYTES_PER_PIXEL, 1, 3, fp);
     }
     fclose(fp);
+}
+
+void x_save_png(unsigned dimx, unsigned dimy, unsigned char * bitmap, const char * filename){
+    char * dest = (char*) malloc(strlen(filename + 10));
+    strcpy(dest, filename);
+    strcat(dest, ".png");
+    unsigned error = 0;
+    error = lodepng_encode_file(dest, bitmap, dimx, dimy, LCT_RGBA, 8);
+    if(error)
+        printf("error %u: %s\n", error, lodepng_error_text(error));
+    free(dest);
 }
 #include <assert.h>
 #include <stdio.h>
@@ -9034,7 +9002,7 @@ int x_draw_art(int x, int y, int zoom, const char * picture){
             dx += 1;
             maxdx = dx > maxdx ? dx : maxdx;
         }else{
-            x_set_color("%c", picture[i]);
+            x_set_pcolor(picture[i]);
             __x_draw_block(x + dx * zoom, y + dy * zoom, zoom);
             dx += 1;
             maxdx = dx > maxdx ? dx : maxdx;
@@ -9103,16 +9071,16 @@ void __x_fill_top_flat_triangle(float v1x, float v1y, float v2x, float v2y, floa
 void x_fill_triangle(float v1x, float v1y, float v2x, float v2y, float v3x, float v3y)
 {
     __x_make_layer();
-    X_V2d v1 = {v1x, v1y};
-    X_V2d v2 = {v2x, v2y};
-    X_V2d v3 = {v3x, v3y};
+    V2d v1 = {v1x, v1y};
+    V2d v2 = {v2x, v2y};
+    V2d v3 = {v3x, v3y};
     /* at first sort the three vertices by y-coordinate ascending so v1 is the topmost vertice */
     if((v2.y <= v1.y) && (v2.y <= v3.y))
-        X_SWAP(v1, v2, X_V2d);
+        __X_SWAP(v1, v2, V2d);
     if((v3.y <= v1.y) && (v3.y <= v2.y))
-        X_SWAP(v1, v3, X_V2d);
+        __X_SWAP(v1, v3, V2d);
     if(v3.y < v2.y)
-        X_SWAP(v2, v3, X_V2d);
+        __X_SWAP(v2, v3, V2d);
 
     /* here we know that v1.y <= v2.y <= v3.y */
     /* check for trivial case of bottom-flat triangle */
@@ -9123,7 +9091,7 @@ void x_fill_triangle(float v1x, float v1y, float v2x, float v2y, float v3x, floa
     else
     {
         /* general case - split the triangle in a topflat and bottom-flat one */
-        X_V2d v4 = {0.f, 0.f};
+        V2d v4 = {0.f, 0.f};
         v4.x = (v1.x + ((float)(v2.y - v1.y) / (float)(v3.y - v1.y)) * (v3.x - v1.x));
         v4.y = v2.y;
         __x_fill_bottom_flat_triangle(v1.x, v1.y, v2.x, v2.y, v4.x, v4.y);
@@ -9133,20 +9101,20 @@ void x_fill_triangle(float v1x, float v1y, float v2x, float v2y, float v3x, floa
 }
 
 void x_fill_line(float x0, float y0, float x1, float y1, int thickness){
-    X_V2d a = {x0, y0};
-    X_V2d b = {x1, y1};
+    V2d a = {x0, y0};
+    V2d b = {x1, y1};
     if(thickness == 1){
         x_draw_line(a.x, a.y, b.x, b.y);
         return;
     }
     __x_make_layer();
-    X_V2d _offset = x_make_v2d(b.x - a.x, b.y - a.y);
-    _offset = x_v2d_dot(x_v2d_ortho(x_v2d_normalize(_offset)), (thickness / 2.f));
+    V2d _offset = make_v2d(b.x - a.x, b.y - a.y);
+    _offset = v2d_dot(v2d_ortho(v2d_normalize(_offset)), (thickness / 2.f));
 
-    X_V2d p1 = x_v2d_sub(a, _offset);
-    X_V2d p2 = x_v2d_sub(b, _offset);
-    X_V2d p3 = x_v2d_sum(a, _offset);
-    X_V2d p4 = x_v2d_sum(b, _offset);
+    V2d p1 = v2d_sub(a, _offset);
+    V2d p2 = v2d_sub(b, _offset);
+    V2d p3 = v2d_sum(a, _offset);
+    V2d p4 = v2d_sum(b, _offset);
 
     x_fill_triangle(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);
     x_fill_triangle(p3.x, p3.y, p2.x, p2.y, p4.x, p4.y);
@@ -9335,27 +9303,27 @@ void x_draw_bezier(int x0, int y0, int x1, int y1, int x2, int y2)
 
     if ((long)x*(x2-x1) > 0) {                        /* horizontal cut at P4? */
         if ((long)y*(y2-y1) > 0)                     /* vertical cut at P6 too? */
-            if (xm_fabs((y0-2*y1+y2)/t*x) > abs(y)) {               /* which first? */
+            if (math_fabs((y0-2*y1+y2)/t*x) > abs(y)) {               /* which first? */
                 x0 = x2; x2 = x+x1; y0 = y2; y2 = y+y1;            /* swap points */
             }                            /* now horizontal cut at P4 comes first */
         t = (x0-x1)/t;
         r = (1-t)*((1-t)*y0+2.0*t*y1)+t*t*y2;                       /* By(t=P4) */
         t = (x0*x2-x1*x1)*t/(x0-x1);                       /* gradient dP4/dx=0 */
-        x = xm_floor(t+0.5); y = xm_floor(r+0.5);
+        x = math_floor(t+0.5); y = math_floor(r+0.5);
         r = (y1-y0)*(t-x0)/(x1-x0)+y0;                  /* intersect P3 | P0 P1 */
-        __x_plot_quad_bezier_seg(x0,y0, x,xm_floor(r+0.5), x,y);
+        __x_plot_quad_bezier_seg(x0,y0, x,math_floor(r+0.5), x,y);
         r = (y1-y2)*(t-x2)/(x1-x2)+y2;                  /* intersect P4 | P1 P2 */
-        x0 = x1 = x; y0 = y; y1 = xm_floor(r+0.5);             /* P0 = P4, P1 = P8 */
+        x0 = x1 = x; y0 = y; y1 = math_floor(r+0.5);             /* P0 = P4, P1 = P8 */
     }
     if ((long)(y0-y1)*(y2-y1) > 0) {                    /* vertical cut at P6? */
         t = y0-2*y1+y2; t = (y0-y1)/t;
         r = (1-t)*((1-t)*x0+2.0*t*x1)+t*t*x2;                       /* Bx(t=P6) */
         t = (y0*y2-y1*y1)*t/(y0-y1);                       /* gradient dP6/dy=0 */
-        x = xm_floor(r+0.5); y = xm_floor(t+0.5);
+        x = math_floor(r+0.5); y = math_floor(t+0.5);
         r = (x1-x0)*(t-y0)/(y1-y0)+x0;                  /* intersect P6 | P0 P1 */
-        __x_plot_quad_bezier_seg(x0,y0, xm_floor(r+0.5),y, x,y);
+        __x_plot_quad_bezier_seg(x0,y0, math_floor(r+0.5),y, x,y);
         r = (x1-x2)*(t-y2)/(y1-y2)+x2;                  /* intersect P7 | P1 P2 */
-        x0 = x; x1 = xm_floor(r+0.5); y0 = y1 = y;             /* P0 = P6, P1 = P7 */
+        x0 = x; x1 = math_floor(r+0.5); y0 = y1 = y;             /* P0 = P6, P1 = P7 */
     }
     __x_plot_quad_bezier_seg(x0,y0, x1,y1, x2,y2);                  /* remaining part */
 }
@@ -9404,7 +9372,7 @@ static int32_t __COS(int d) {
 
 /* begin should be smaller than end, and both must be in interval [0, 360] */
 void __x_fill_arc(float centerx, float centery, int radius, int thickness, int degrees_begin, int degrees_end) {
-    X_V2d center = {centerx, centery};
+    V2d center = {centerx, centery};
     float sslope = (float)__COS(degrees_begin) / (float)__SIN(degrees_begin);
     float eslope = (float)__COS(degrees_end) / (float)__SIN(degrees_end);
 
@@ -9463,118 +9431,102 @@ void x_fill_arc(float centerx, float centery, int radius, int thickness, int deg
     }
 }
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-
-
-void x_save_png(unsigned dimx, unsigned dimy, unsigned char * bitmap, const char * filename){
-    char * dest = (char*) malloc(strlen(filename + 10));
-    strcpy(dest, filename);
-    strcat(dest, ".png");
-    unsigned error = 0;
-    error = lodepng_encode_file(dest, bitmap, dimx, dimy, LCT_RGBA, 8);
-    if(error)
-        printf("error %u: %s\n", error, lodepng_error_text(error));
-    free(dest);
-}
-
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 
-#define X_LETTER_SIZE 10
-#define X_LETTER_FIRST ' '
-#define X_LETTER_LAST '~'
-const char * asc_map_[256];
-static int __font_size = 10;
+#define __X_LETTER_SIZE 10
+#define __X_LETTER_FIRST ' '
+#define __X_LETTER_LAST '~'
+const char * __x_asc_map[256];
+static int   __x_font_size = 10;
 
 void __x_init_font();
 
-void show_asc_map(){
-    for(int i = X_LETTER_FIRST; i <= X_LETTER_LAST; i++){
+void __show_asc_map(){
+    for(int i = __X_LETTER_FIRST; i <= __X_LETTER_LAST; i++){
         printf("%c\n", i);
-        puts(asc_map_[i]);
+        puts(__x_asc_map[i]);
     }
 }
 
-const int agudo = 1;
-const int til = 2;
-const int circu = 3;
-const int crase = 4;
-const int rabo = 5;
+const int __x_agudo = 1;
+const int __x_til = 2;
+const int __x_circu = 3;
+const int __x_crase = 4;
+const int __x_rabo = 5;
 
 typedef struct{
     char value;
     int acento;
-}letter;
+}__x_Letter;
 
-letter replace_one(char c){
+__x_Letter __x_replace_one(char c){
     int value = c;
     value += 128;
-    if(value == -1)      return (letter){0, 0};
-    else if(value ==  0) return (letter){'A', crase};//À
-    else if(value ==  1) return (letter){'A', agudo};//Á
-    else if(value ==  2) return (letter){'A', circu};//Â
-    else if(value ==  3) return (letter){'A', til};//Ã
+    if(value == -1)      return (__x_Letter){0, 0};
+    else if(value ==  0) return (__x_Letter){'A', __x_crase};//À
+    else if(value ==  1) return (__x_Letter){'A', __x_agudo};//Á
+    else if(value ==  2) return (__x_Letter){'A', __x_circu};//Â
+    else if(value ==  3) return (__x_Letter){'A', __x_til};//Ã
 
-    else if(value ==  7) return (letter){'C', rabo};//Ç
+    else if(value ==  7) return (__x_Letter){'C', __x_rabo};//Ç
 
-    else if(value ==  8) return (letter){'E', crase};//È
-    else if(value ==  9) return (letter){'E', agudo};//É
-    else if(value == 10) return (letter){'E', circu};//Ê
+    else if(value ==  8) return (__x_Letter){'E', __x_crase};//È
+    else if(value ==  9) return (__x_Letter){'E', __x_agudo};//É
+    else if(value == 10) return (__x_Letter){'E', __x_circu};//Ê
 
-    else if(value == 12) return (letter){'I', crase};//Ì
-    else if(value == 13) return (letter){'I', agudo};//Í
-    else if(value == 14) return (letter){'I', circu};//Î
+    else if(value == 12) return (__x_Letter){'I', __x_crase};//Ì
+    else if(value == 13) return (__x_Letter){'I', __x_agudo};//Í
+    else if(value == 14) return (__x_Letter){'I', __x_circu};//Î
 
-    else if(value == 18) return (letter){'O', crase};//Ò
-    else if(value == 19) return (letter){'O', agudo};//Ó
-    else if(value == 20) return (letter){'O', circu};//Ô
-    else if(value == 21) return (letter){'O', til};//Õ
+    else if(value == 18) return (__x_Letter){'O', __x_crase};//Ò
+    else if(value == 19) return (__x_Letter){'O', __x_agudo};//Ó
+    else if(value == 20) return (__x_Letter){'O', __x_circu};//Ô
+    else if(value == 21) return (__x_Letter){'O', __x_til};//Õ
 
-    else if(value == 25) return (letter){'U', crase};//Ù
-    else if(value == 26) return (letter){'U', agudo};//Ú
-    else if(value == 27) return (letter){'U', circu};//Û
+    else if(value == 25) return (__x_Letter){'U', __x_crase};//Ù
+    else if(value == 26) return (__x_Letter){'U', __x_agudo};//Ú
+    else if(value == 27) return (__x_Letter){'U', __x_circu};//Û
 
-    else if(value == 32) return (letter){'a', crase};//à
-    else if(value == 33) return (letter){'a', agudo};//á
-    else if(value == 34) return (letter){'a', circu};//â
-    else if(value == 35) return (letter){'a', til};//ã
+    else if(value == 32) return (__x_Letter){'a', __x_crase};//à
+    else if(value == 33) return (__x_Letter){'a', __x_agudo};//á
+    else if(value == 34) return (__x_Letter){'a', __x_circu};//â
+    else if(value == 35) return (__x_Letter){'a', __x_til};//ã
 
-    else if(value == 39) return (letter){'c', rabo};//ç
+    else if(value == 39) return (__x_Letter){'c', __x_rabo};//ç
 
-    else if(value == 40) return (letter){'e', crase};//è
-    else if(value == 41) return (letter){'e', agudo};//é
-    else if(value == 42) return (letter){'e', circu};//ê
+    else if(value == 40) return (__x_Letter){'e', __x_crase};//è
+    else if(value == 41) return (__x_Letter){'e', __x_agudo};//é
+    else if(value == 42) return (__x_Letter){'e', __x_circu};//ê
 
-    else if(value == 44) return (letter){'i', crase};//ì
-    else if(value == 45) return (letter){'i', agudo};//í
-    else if(value == 46) return (letter){'i', circu};//î
+    else if(value == 44) return (__x_Letter){'i', __x_crase};//ì
+    else if(value == 45) return (__x_Letter){'i', __x_agudo};//í
+    else if(value == 46) return (__x_Letter){'i', __x_circu};//î
 
-    else if(value == 50) return (letter){'o', crase};//ò
-    else if(value == 51) return (letter){'o', agudo};//ó
-    else if(value == 52) return (letter){'o', circu};//ô
-    else if(value == 53) return (letter){'o', til};//õ
+    else if(value == 50) return (__x_Letter){'o', __x_crase};//ò
+    else if(value == 51) return (__x_Letter){'o', __x_agudo};//ó
+    else if(value == 52) return (__x_Letter){'o', __x_circu};//ô
+    else if(value == 53) return (__x_Letter){'o', __x_til};//õ
 
-    else if(value == 57) return (letter){'u', crase};//ù
-    else if(value == 58) return (letter){'u', agudo};//ú
-    else if(value == 59) return (letter){'u', circu};//û
+    else if(value == 57) return (__x_Letter){'u', __x_crase};//ù
+    else if(value == 58) return (__x_Letter){'u', __x_agudo};//ú
+    else if(value == 59) return (__x_Letter){'u', __x_circu};//û
 
-    else return (letter){0, 0};
+    else return (__x_Letter){0, 0};
 }
 
-void replace_unicode(char * text, letter * output, size_t * length){
+void __x_replace_unicode(char * text, __x_Letter * output, size_t * length){
     int size = 0;
     int i = 0;
     while(text[i] != '\0'){
         if((int) text[i] > 0){
-            output[size] = (letter){text[i], 0};
+            output[size] = (__x_Letter){text[i], 0};
             size++;
             i += 1;
         }else if((int) text[i] == -61){
-            letter v = replace_one(text[i + 1]);
+            __x_Letter v = __x_replace_one(text[i + 1]);
             if(v.value != 0){
                 output[size] = v;
                 size++;
@@ -9586,18 +9538,18 @@ void replace_unicode(char * text, letter * output, size_t * length){
             i += 1;
         }
     }
-    output[size] = (letter){'\0', 0};
+    output[size] = (__x_Letter){'\0', 0};
     *length = size;
 }
 
 void x_set_font_size(int value){
-    __font_size = value;
+    __x_font_size = value;
 }
 
-int __x_dwrite(int x, int y, letter * text, size_t length){
+int __x_write(int x, int y, __x_Letter * text, size_t length){
     size_t dx = 0;
     size_t dy = 0;
-    int zoom = (__font_size)/X_LETTER_SIZE;
+    int zoom = (__x_font_size)/__X_LETTER_SIZE;
     for(size_t i = 0; i < length; i++){
         int delta = (4) * zoom;
         if(text[i].value == '\n'){
@@ -9606,16 +9558,16 @@ int __x_dwrite(int x, int y, letter * text, size_t length){
             continue;
         }
         if(text[i].value != ' '){
-            delta = x_draw_art(x + dx, y + dy * X_LETTER_SIZE * zoom, zoom, asc_map_[(int)text[i].value]);
+            delta = x_draw_art(x + dx, y + dy * __X_LETTER_SIZE * zoom, zoom, __x_asc_map[(int)text[i].value]);
             int adx = 0, ady = 0, Adx = 0, Ady = 0;
             if(text[i].acento != 0){
-                if(text[i].acento == agudo){
+                if(text[i].acento == __x_agudo){
                     adx = -1; ady = 0; Adx = -1; Ady = -2;
-                }else if(text[i].acento == til){
+                }else if(text[i].acento == __x_til){
                     adx = -2; ady = 0;  Adx = -2; Ady = -2;
-                }else if(text[i].acento == circu){
+                }else if(text[i].acento == __x_circu){
                     adx = -2; ady = 0;  Adx = -2; Ady = -2;
-                }else if(text[i].acento == crase){
+                }else if(text[i].acento == __x_crase){
                     adx = -2; ady = 0; Adx = -2; Ady = -2;
                 }else{
                     adx = -1; ady = 0;   Adx = -1; Ady = 0;
@@ -9624,12 +9576,12 @@ int __x_dwrite(int x, int y, letter * text, size_t length){
                 int px = 0, py = 0;
                 if(text[i].value >= 'a'){
                     px = adx * zoom + x + dx + delta/2;
-                    py = ady * zoom + y + dy * X_LETTER_SIZE * zoom;
+                    py = ady * zoom + y + dy * __X_LETTER_SIZE * zoom;
                 }else{
                     px = Adx * zoom + x + dx + delta/2;
-                    py = Ady * zoom + y + dy * X_LETTER_SIZE * zoom;
+                    py = Ady * zoom + y + dy * __X_LETTER_SIZE * zoom;
                 }
-                x_draw_art(px, py, zoom, asc_map_[text[i].acento]);
+                x_draw_art(px, py, zoom, __x_asc_map[text[i].acento]);
             }
         }
         dx += delta;
@@ -9650,34 +9602,34 @@ int x_write(int x, int y, const char * format, ...){
     vsprintf(text, format, args);
     va_end( args );
 
-    letter output[1000];
+    __x_Letter output[1000];
     size_t length = strlen(text);
-    replace_unicode(text, output, &length);
+    __x_replace_unicode(text, output, &length);
 
-    int dx =__x_dwrite(x, y, output, length);
+    int dx =__x_write(x, y, output, length);
     return dx;
 }
 
 void __x_init_font(){
-asc_map_[agudo] = (\
+__x_asc_map[__x_agudo] = (\
 "   \n"
 " #\n"
 "#\0");
-asc_map_[til] = (\
+__x_asc_map[__x_til] = (\
 "   \n"
 " # #\n"
 "# #\0");
 
-asc_map_[circu] = (\
+__x_asc_map[__x_circu] = (\
 "   \n"
 " #\n"
 "# #\0");
 
-asc_map_[crase] = (\
+__x_asc_map[__x_crase] = (\
 "\n"
 "#\n"
 " #\0");
-asc_map_[rabo] = (\
+__x_asc_map[__x_rabo] = (\
 "\n"
 "\n"
 "\n"
@@ -9691,8 +9643,8 @@ asc_map_[rabo] = (\
 " #\n"
 "#\0");
 
-asc_map_[' '] = "\n\n\n\n\n\n\0";
-asc_map_['!'] = (\
+__x_asc_map[' '] = "\n\n\n\n\n\n\0";
+__x_asc_map['!'] = (\
 "\n"
 "\n"
 "###\n"
@@ -9702,13 +9654,13 @@ asc_map_['!'] = (\
 "\n"
 "###\n"
 "###\0");
-asc_map_['"'] = (\
+__x_asc_map['"'] = (\
 "\n"
 "\n"
 " # #\n"
 "# # \n"
 "# #");
-asc_map_['#'] = (\
+__x_asc_map['#'] = (\
 "\n"
 "\n"
 "  # #  \n"
@@ -9718,7 +9670,7 @@ asc_map_['#'] = (\
 "#######\n"
 "  # #  \n"
 "  # #  \0");
-asc_map_['$'] = (\
+__x_asc_map['$'] = (\
 "\n"
 "\n"
 "   #   \n"
@@ -9728,7 +9680,7 @@ asc_map_['$'] = (\
 "   # # \n"
 "#####  \n"
 "   #   \0");
-asc_map_['%'] = (\
+__x_asc_map['%'] = (\
 "\n"
 "\n"
 "      \n"
@@ -9738,7 +9690,7 @@ asc_map_['%'] = (\
 " # ## \n"
 "#  ## \n"
 "\0");
-asc_map_['&'] = (\
+__x_asc_map['&'] = (\
 "\n"
 "\n"
 " ###  \n"
@@ -9748,7 +9700,7 @@ asc_map_['&'] = (\
 " # #  \n"
 "#   # \n"
 " ##  #\0");
-asc_map_['\''] = (\
+__x_asc_map['\''] = (\
 "\n"
 "\n"
 "   \n"
@@ -9758,7 +9710,7 @@ asc_map_['\''] = (\
 "   \n"
 "   \n"
 "   \0");
-asc_map_['('] = (\
+__x_asc_map['('] = (\
 "\n"
 "\n"
 "  ## \n"
@@ -9768,7 +9720,7 @@ asc_map_['('] = (\
 "#    \n"
 " #   \n"
 "  ## \0");
-asc_map_[')'] = (\
+__x_asc_map[')'] = (\
 "\n"
 "\n"
 "##    \n"
@@ -9778,7 +9730,7 @@ asc_map_[')'] = (\
 "   #  \n"
 "  #   \n"
 "##    \0");
-asc_map_['*'] = (\
+__x_asc_map['*'] = (\
 "\n"
 "\n"
 "\n"
@@ -9788,7 +9740,7 @@ asc_map_['*'] = (\
 "\n"
 "\n"
 "\0");
-asc_map_['+'] = (\
+__x_asc_map['+'] = (\
 "\n"
 "\n"
 "      \n"
@@ -9798,7 +9750,7 @@ asc_map_['+'] = (\
 "  #   \n"
 "  #   \n"
 "\0");
-asc_map_[','] = (\
+__x_asc_map[','] = (\
 "\n"
 "\n"
 "\n"
@@ -9810,7 +9762,7 @@ asc_map_[','] = (\
 " ##  \n"
 " #   \n"
 "#    \0");
-asc_map_['-'] = (\
+__x_asc_map['-'] = (\
 "\n"
 "\n"
 "\n"
@@ -9820,7 +9772,7 @@ asc_map_['-'] = (\
 "\n"
 "\n"
 "\0");
-asc_map_['.'] = (\
+__x_asc_map['.'] = (\
 "\n"
 "\n"
 "\n"
@@ -9830,7 +9782,7 @@ asc_map_['.'] = (\
 "\n"
 "##\n"
 "##\0");
-asc_map_['/'] = (\
+__x_asc_map['/'] = (\
 "\n"
 "\n"
 "      #\n"
@@ -9840,7 +9792,7 @@ asc_map_['/'] = (\
 "  #    \n"
 " #     \n"
 "#      \0");
-asc_map_['0'] = (\
+__x_asc_map['0'] = (\
 "\n"
 "\n"
 "  ###  \n"
@@ -9850,7 +9802,7 @@ asc_map_['0'] = (\
 "#     #\n"
 " #   # \n"
 "  ###  \0");
-asc_map_['1'] = (\
+__x_asc_map['1'] = (\
 "\n"
 "\n"
 "   #   \n"
@@ -9860,7 +9812,7 @@ asc_map_['1'] = (\
 "   #   \n"
 "   #   \n"
 " ##### \0");
-asc_map_['2'] = (\
+__x_asc_map['2'] = (\
 "\n"
 "\n"
 " ##### \n"
@@ -9870,7 +9822,7 @@ asc_map_['2'] = (\
 "#      \n"
 "#      \n"
 "#######\0");
-asc_map_['3'] = (\
+__x_asc_map['3'] = (\
 "\n"
 "\n"
 " ##### \n"
@@ -9880,7 +9832,7 @@ asc_map_['3'] = (\
 "      #\n"
 "#     #\n"
 " ##### \0");
-asc_map_['4'] = (\
+__x_asc_map['4'] = (\
 "\n"
 "\n"
 "#      \n"
@@ -9890,7 +9842,7 @@ asc_map_['4'] = (\
 "#######\n"
 "     # \n"
 "     # \0");
-asc_map_['5'] = (\
+__x_asc_map['5'] = (\
 "\n"
 "\n"
 "#######\n"
@@ -9900,7 +9852,7 @@ asc_map_['5'] = (\
 "      #\n"
 "#     #\n"
 " ##### \0");
-asc_map_['6'] = (\
+__x_asc_map['6'] = (\
 "\n"
 "\n"
 " ##### \n"
@@ -9910,7 +9862,7 @@ asc_map_['6'] = (\
 "#     #\n"
 "#     #\n"
 " ##### \0");
-asc_map_['7'] = (\
+__x_asc_map['7'] = (\
 "\n"
 "\n"
 "#######\n"
@@ -9920,7 +9872,7 @@ asc_map_['7'] = (\
 "  #    \n"
 "  #    \n"
 "  #    \0");
-asc_map_['8'] = (\
+__x_asc_map['8'] = (\
 "\n"
 "\n"
 " ##### \n"
@@ -9930,7 +9882,7 @@ asc_map_['8'] = (\
 "#     #\n"
 "#     #\n"
 " ##### \0");
-asc_map_['9'] = (\
+__x_asc_map['9'] = (\
 "\n"
 "\n"
 " ##### \n"
@@ -9940,7 +9892,7 @@ asc_map_['9'] = (\
 "      #\n"
 "#     #\n"
 " ##### \0");
-asc_map_[':'] = (\
+__x_asc_map[':'] = (\
 "\n"
 "\n"
 "\n"
@@ -9949,7 +9901,7 @@ asc_map_[':'] = (\
 "\n"
 " ##\n"
 " ##");
-asc_map_[';'] = (\
+__x_asc_map[';'] = (\
 "\n"
 "\n"
 "\n"
@@ -9960,7 +9912,7 @@ asc_map_[';'] = (\
 " ##  \n"
 " #   \n"
 "#    \0");
-asc_map_['<'] = (\
+__x_asc_map['<'] = (\
 "\n"
 "\n"
 "     # \n"
@@ -9970,7 +9922,7 @@ asc_map_['<'] = (\
 " #     \n"
 "   #   \n"
 "     # \0");
-asc_map_['='] = (\
+__x_asc_map['='] = (\
 "\n"
 "\n"
 "       \n"
@@ -9980,7 +9932,7 @@ asc_map_['='] = (\
 "#######\n"
 "       \n"
 "       \0");
-asc_map_['>'] = (\
+__x_asc_map['>'] = (\
 "\n"
 "\n"
 " #     \n"
@@ -9990,7 +9942,7 @@ asc_map_['>'] = (\
 "     # \n"
 "   #   \n"
 " #     \0");
-asc_map_['?'] = (\
+__x_asc_map['?'] = (\
 "\n"
 "\n"
 " ##### \n"
@@ -10000,7 +9952,7 @@ asc_map_['?'] = (\
 "   #   \n"
 "       \n"
 "   #   \0");
-asc_map_['@'] = (\
+__x_asc_map['@'] = (\
 "\n"
 "\n"
 " ##### \n"
@@ -10010,7 +9962,7 @@ asc_map_['@'] = (\
 "# #### \n"
 "#      \n"
 " ##### \0");
-asc_map_['A'] = (\
+__x_asc_map['A'] = (\
 "\n"
 "\n"
 "   #   \n"
@@ -10020,7 +9972,7 @@ asc_map_['A'] = (\
 "#######\n"
 "#     #\n"
 "#     #\0");
-asc_map_['B'] = (\
+__x_asc_map['B'] = (\
 "\n"
 "\n"
 "###### \n"
@@ -10030,7 +9982,7 @@ asc_map_['B'] = (\
 "#     #\n"
 "#     #\n"
 "###### \0");
-asc_map_['C'] = (\
+__x_asc_map['C'] = (\
 "\n"
 "\n"
 " ##### \n"
@@ -10040,7 +9992,7 @@ asc_map_['C'] = (\
 "#      \n"
 "#     #\n"
 " ##### \0");
-asc_map_['D'] = (\
+__x_asc_map['D'] = (\
 "\n"
 "\n"
 "###### \n"
@@ -10050,7 +10002,7 @@ asc_map_['D'] = (\
 "#     #\n"
 "#     #\n"
 "###### \0");
-asc_map_['E'] = (\
+__x_asc_map['E'] = (\
 "\n"
 "\n"
 "#######\n"
@@ -10060,7 +10012,7 @@ asc_map_['E'] = (\
 "#      \n"
 "#      \n"
 "#######\0");
-asc_map_['F'] = (\
+__x_asc_map['F'] = (\
 "\n"
 "\n"
 "#######\n"
@@ -10070,7 +10022,7 @@ asc_map_['F'] = (\
 "#      \n"
 "#      \n"
 "#      \0");
-asc_map_['G'] = (\
+__x_asc_map['G'] = (\
 "\n"
 "\n"
 " ##### \n"
@@ -10080,7 +10032,7 @@ asc_map_['G'] = (\
 "#     #\n"
 "#     #\n"
 " ##### \0");
-asc_map_['H'] = (\
+__x_asc_map['H'] = (\
 "\n"
 "\n"
 "#     #\n"
@@ -10090,7 +10042,7 @@ asc_map_['H'] = (\
 "#     #\n"
 "#     #\n"
 "#     #\0");
-asc_map_['I'] = (\
+__x_asc_map['I'] = (\
 "\n"
 "\n"
 "###  \n"
@@ -10100,7 +10052,7 @@ asc_map_['I'] = (\
 " #   \n"
 " #   \n"
 "###  \0");
-asc_map_['J'] = (\
+__x_asc_map['J'] = (\
 "\n"
 "\n"
 "      #\n"
@@ -10110,7 +10062,7 @@ asc_map_['J'] = (\
 "#     #\n"
 "#     #\n"
 " ##### \0");
-asc_map_['K'] = (\
+__x_asc_map['K'] = (\
 "\n"
 "\n"
 "#    # \n"
@@ -10120,7 +10072,7 @@ asc_map_['K'] = (\
 "#  #   \n"
 "#   #  \n"
 "#    # \0");
-asc_map_['L'] = (\
+__x_asc_map['L'] = (\
 "\n"
 "\n"
 "#      \n"
@@ -10130,7 +10082,7 @@ asc_map_['L'] = (\
 "#      \n"
 "#      \n"
 "#######\0");
-asc_map_['M'] = (\
+__x_asc_map['M'] = (\
 "\n"
 "\n"
 "#     #\n"
@@ -10140,7 +10092,7 @@ asc_map_['M'] = (\
 "#     #\n"
 "#     #\n"
 "#     #\0");
-asc_map_['N'] = (\
+__x_asc_map['N'] = (\
 "\n"
 "\n"
 "#     #\n"
@@ -10150,7 +10102,7 @@ asc_map_['N'] = (\
 "#   # #\n"
 "#    ##\n"
 "#     #\0");
-asc_map_['O'] = (\
+__x_asc_map['O'] = (\
 "\n"
 "\n"
 " ##### \n"
@@ -10160,7 +10112,7 @@ asc_map_['O'] = (\
 "#     #\n"
 "#     #\n"
 " ##### \0");
-asc_map_['P'] = (\
+__x_asc_map['P'] = (\
 "\n"
 "\n"
 "###### \n"
@@ -10170,7 +10122,7 @@ asc_map_['P'] = (\
 "#      \n"
 "#      \n"
 "#      \0");
-asc_map_['Q'] = (\
+__x_asc_map['Q'] = (\
 "\n"
 "\n"
 " ##### \n"
@@ -10180,7 +10132,7 @@ asc_map_['Q'] = (\
 "#   # #\n"
 "#    # \n"
 " #### #\0");
-asc_map_['R'] = (\
+__x_asc_map['R'] = (\
 "\n"
 "\n"
 "###### \n"
@@ -10190,7 +10142,7 @@ asc_map_['R'] = (\
 "#   #  \n"
 "#    # \n"
 "#     #\0");
-asc_map_['S'] = (\
+__x_asc_map['S'] = (\
 "\n"
 "\n"
 " ##### \n"
@@ -10200,7 +10152,7 @@ asc_map_['S'] = (\
 "      #\n"
 "#     #\n"
 " ##### \0");
-asc_map_['T'] = (\
+__x_asc_map['T'] = (\
 "\n"
 "\n"
 "#######\n"
@@ -10210,7 +10162,7 @@ asc_map_['T'] = (\
 "   #   \n"
 "   #   \n"
 "   #   \0");
-asc_map_['U'] = (\
+__x_asc_map['U'] = (\
 "\n"
 "\n"
 "#     #\n"
@@ -10220,7 +10172,7 @@ asc_map_['U'] = (\
 "#     #\n"
 "#     #\n"
 " ##### \0");
-asc_map_['V'] = (\
+__x_asc_map['V'] = (\
 "\n"
 "\n"
 "#     #\n"
@@ -10230,7 +10182,7 @@ asc_map_['V'] = (\
 " #   # \n"
 "  # #  \n"
 "   #   \0");
-asc_map_['W'] = (\
+__x_asc_map['W'] = (\
 "\n"
 "\n"
 "#     #\n"
@@ -10240,7 +10192,7 @@ asc_map_['W'] = (\
 "#  #  #\n"
 "#  #  #\n"
 " ## ## \0");
-asc_map_['X'] = (\
+__x_asc_map['X'] = (\
 "\n"
 "\n"
 "#     #\n"
@@ -10250,7 +10202,7 @@ asc_map_['X'] = (\
 "  # #  \n"
 " #   # \n"
 "#     #\0");
-asc_map_['Y'] = (\
+__x_asc_map['Y'] = (\
 "\n"
 "\n"
 "#     #\n"
@@ -10260,7 +10212,7 @@ asc_map_['Y'] = (\
 "   #   \n"
 "   #   \n"
 "   #   \0");
-asc_map_['Z'] = (\
+__x_asc_map['Z'] = (\
 "\n"
 "\n"
 "#######\n"
@@ -10270,7 +10222,7 @@ asc_map_['Z'] = (\
 "  #    \n"
 " #     \n"
 "#######\0");
-asc_map_['['] = (\
+__x_asc_map['['] = (\
 "\n"
 "\n"
 "  ###  \n"
@@ -10280,7 +10232,7 @@ asc_map_['['] = (\
 "  #    \n"
 "  #    \n"
 "  ###  \0");
-asc_map_['\\'] = (\
+__x_asc_map['\\'] = (\
 "\n"
 "\n"
 "#      \n"
@@ -10290,7 +10242,7 @@ asc_map_['\\'] = (\
 "    #  \n"
 "     # \n"
 "      #\0");
-asc_map_[']'] = (\
+__x_asc_map[']'] = (\
 "\n"
 "\n"
 "  ###  \n"
@@ -10300,7 +10252,7 @@ asc_map_[']'] = (\
 "    #  \n"
 "    #  \n"
 "  ###  \0");
-asc_map_['^'] = (\
+__x_asc_map['^'] = (\
 "\n"
 "\n"
 "   #   \n"
@@ -10310,7 +10262,7 @@ asc_map_['^'] = (\
 "       \n"
 "       \n"
 "       \0");
-asc_map_['_'] = (\
+__x_asc_map['_'] = (\
 "\n"
 "\n"
 "       \n"
@@ -10320,7 +10272,7 @@ asc_map_['_'] = (\
 "       \n"
 "       \n"
 "####\0");
-asc_map_['`'] = (\
+__x_asc_map['`'] = (\
 "\n"
 "\n"
 " ##    \n"
@@ -10330,7 +10282,7 @@ asc_map_['`'] = (\
 "       \n"
 "       \n"
 "       \0");
-asc_map_['a'] = (\
+__x_asc_map['a'] = (\
 "\n"
 "\n"
 "\n"
@@ -10340,7 +10292,7 @@ asc_map_['a'] = (\
 " ####\n"
 "#   #\n"
 " ####\0");
-asc_map_['b'] = (\
+__x_asc_map['b'] = (\
 "\n"
 "\n"
 "#     \n"
@@ -10350,7 +10302,7 @@ asc_map_['b'] = (\
 "#   # \n"
 "#   # \n"
 "####  \0");
-asc_map_['c'] = (\
+__x_asc_map['c'] = (\
 "\n"
 "\n"
 "      \n"
@@ -10360,7 +10312,7 @@ asc_map_['c'] = (\
 "#     \n"
 "#   # \n"
 " ###  \0");
-asc_map_['d'] = (\
+__x_asc_map['d'] = (\
 "\n"
 "\n"
 "    # \n"
@@ -10370,7 +10322,7 @@ asc_map_['d'] = (\
 "#   # \n"
 "#   # \n"
 " #### \0");
-asc_map_['e'] = (\
+__x_asc_map['e'] = (\
 "\n"
 "\n"
 "      \n"
@@ -10380,7 +10332,7 @@ asc_map_['e'] = (\
 "####  \n"
 "#     \n"
 " ###  \0");
-asc_map_['f'] = (\
+__x_asc_map['f'] = (\
 "\n"
 "\n"
 "      \n"
@@ -10390,7 +10342,7 @@ asc_map_['f'] = (\
 "###   \n"
 "#     \n"
 "#     \0");
-asc_map_['g'] = (\
+__x_asc_map['g'] = (\
 "\n"
 "\n"
 "      \n"
@@ -10402,7 +10354,7 @@ asc_map_['g'] = (\
 " #### \n"
 "    # \n"
 " ###  \0");
-asc_map_['h'] = (\
+__x_asc_map['h'] = (\
 "\n"
 "\n"
 "#     \n"
@@ -10412,7 +10364,7 @@ asc_map_['h'] = (\
 "#   # \n"
 "#   # \n"
 "#   # \0");
-asc_map_['i'] = (\
+__x_asc_map['i'] = (\
 "\n"
 "\n"
 "#\n"
@@ -10423,7 +10375,7 @@ asc_map_['i'] = (\
 "# \n"
 "# \0");
 
-asc_map_['j'] = (\
+__x_asc_map['j'] = (\
 "\n"
 "\n"
 "   #   \n"
@@ -10435,7 +10387,7 @@ asc_map_['j'] = (\
 "   #  \n"
 "#  #  \n"
 " ##   \0");
-asc_map_['k'] = (\
+__x_asc_map['k'] = (\
 "\n"
 "\n"
 "       \n"
@@ -10445,7 +10397,7 @@ asc_map_['k'] = (\
 "###    \n"
 "#  #   \n"
 "#   #  \0");
-asc_map_['l'] = (\
+__x_asc_map['l'] = (\
 "\n"
 "\n"
 "# \n"
@@ -10455,7 +10407,7 @@ asc_map_['l'] = (\
 "# \n"
 "# \n"
 " # \0");
-asc_map_['m'] = (\
+__x_asc_map['m'] = (\
 "\n"
 "\n"
 "       \n"
@@ -10465,7 +10417,7 @@ asc_map_['m'] = (\
 "#  #  #\n"
 "#  #  #\n"
 "#  #  #\0");
-asc_map_['n'] = (\
+__x_asc_map['n'] = (\
 "\n"
 "\n"
 "       \n"
@@ -10475,7 +10427,7 @@ asc_map_['n'] = (\
 "#   #  \n"
 "#   #  \n"
 "#   #  \0");
-asc_map_['o'] = (\
+__x_asc_map['o'] = (\
 "\n"
 "\n"
 "       \n"
@@ -10485,7 +10437,7 @@ asc_map_['o'] = (\
 "#   #  \n"
 "#   #  \n"
 " ###   \0");
-asc_map_['p'] = (\
+__x_asc_map['p'] = (\
 "\n"
 "\n"
 "       \n"
@@ -10497,7 +10449,7 @@ asc_map_['p'] = (\
 "####   \n"
 "#      \n"
 "#      \0");
-asc_map_['q'] = (\
+__x_asc_map['q'] = (\
 "\n"
 "\n"
 "       \n"
@@ -10509,7 +10461,7 @@ asc_map_['q'] = (\
 " ####  \n"
 "    #  \n"
 "    #  \0");
-asc_map_['r'] = (\
+__x_asc_map['r'] = (\
 "\n"
 "\n"
 "       \n"
@@ -10519,7 +10471,7 @@ asc_map_['r'] = (\
 "#      \n"
 "#      \n"
 "#      \0");
-asc_map_['s'] = (\
+__x_asc_map['s'] = (\
 "\n"
 "\n"
 "       \n"
@@ -10529,7 +10481,7 @@ asc_map_['s'] = (\
 " ###   \n"
 "    #  \n"
 "####   \0");
-asc_map_['t'] = (\
+__x_asc_map['t'] = (\
 "\n"
 "\n"
 " #    \n"
@@ -10539,7 +10491,7 @@ asc_map_['t'] = (\
 " #    \n"
 " # #  \n"
 "  #   \0");
-asc_map_['u'] = (\
+__x_asc_map['u'] = (\
 "\n"
 "\n"
 "       \n"
@@ -10549,7 +10501,7 @@ asc_map_['u'] = (\
 "#   #  \n"
 "#   #  \n"
 " ####  \0");
-asc_map_['v'] = (\
+__x_asc_map['v'] = (\
 "\n"
 "\n"
 "       \n"
@@ -10559,7 +10511,7 @@ asc_map_['v'] = (\
 "#   #  \n"
 " # #   \n"
 "  #    \0");
-asc_map_['w'] = (\
+__x_asc_map['w'] = (\
 "\n"
 "\n"
 "       \n"
@@ -10569,7 +10521,7 @@ asc_map_['w'] = (\
 "# # #  \n"
 "# # #  \n"
 " # #   \0");
-asc_map_['x'] = (\
+__x_asc_map['x'] = (\
 "\n"
 "\n"
 "\n"
@@ -10579,7 +10531,7 @@ asc_map_['x'] = (\
 "  #  \n"
 " # # \n"
 "#   #\0");
-asc_map_['y'] = (\
+__x_asc_map['y'] = (\
 "\n"
 "\n"
 "       \n"
@@ -10591,7 +10543,7 @@ asc_map_['y'] = (\
 " ####  \n"
 "    #  \n"
 " ###   \0");
-asc_map_['z'] = (\
+__x_asc_map['z'] = (\
 "\n"
 "\n"
 "       \n"
@@ -10601,7 +10553,7 @@ asc_map_['z'] = (\
 " ###   \n"
 "#      \n"
 "#####  \0");
-asc_map_['{'] = (\
+__x_asc_map['{'] = (\
 "\n"
 " ### \n"
 " #   \n"
@@ -10612,7 +10564,7 @@ asc_map_['{'] = (\
 " #   \n"
 " #   \n"
 " ### \0");
-asc_map_['|'] = (\
+__x_asc_map['|'] = (\
 "\n"
 "\n"
 " #   \n"
@@ -10622,7 +10574,7 @@ asc_map_['|'] = (\
 " #   \n"
 " #   \n"
 " #   \0");
-asc_map_['}'] = (\
+__x_asc_map['}'] = (\
 "\n"
 "###   \n"
 "  #   \n"
@@ -10633,7 +10585,7 @@ asc_map_['}'] = (\
 "  #   \n"
 "  #   \n"
 "###   \0");
-asc_map_['~'] = (\
+__x_asc_map['~'] = (\
 "\n"
 "\n"
 "       \n"
@@ -10652,33 +10604,33 @@ asc_map_['~'] = (\
 #include <stdint.h>
 #include <stdlib.h>
 
-X_V2d x_make_v2d(double x, double y){
-    X_V2d v = {x, y};
+V2d make_v2d(double x, double y){
+    V2d v = {x, y};
     return v;
 }
 
-double x_v2d_length(double x, double y){
-    return xm_sqrt(x * x + y * y);
+double v2d_length(double x, double y){
+    return math_sqrt(x * x + y * y);
 }
 
-double x_v2d_distance(double ax, double ay, double bx, double by){
-    return x_v2d_length(bx - ax, by - ay);
+double v2d_distance(double ax, double ay, double bx, double by){
+    return v2d_length(bx - ax, by - ay);
 }
 
-X_V2d x_v2d_sum(X_V2d a, X_V2d b){
-    return x_make_v2d(a.x + b.x, a.y + b.y);
+V2d v2d_sum(V2d a, V2d b){
+    return make_v2d(a.x + b.x, a.y + b.y);
 }
 
-X_V2d x_v2d_sub(X_V2d a, X_V2d b){
-    return x_make_v2d(a.x - b.x, a.y - b.y);
+V2d v2d_sub(V2d a, V2d b){
+    return make_v2d(a.x - b.x, a.y - b.y);
 }
 
-X_V2d x_v2d_dot(X_V2d a, double value){
-    return x_make_v2d(a.x * value, a.y * value);
+V2d v2d_dot(V2d a, double value){
+    return make_v2d(a.x * value, a.y * value);
 }
 
-X_V2d x_v2d_normalize(X_V2d v){
-    double lenght = x_v2d_length(v.x, v.y);
+V2d v2d_normalize(V2d v){
+    double lenght = v2d_length(v.x, v.y);
     if(lenght < 0.0000001)
         return v;
     v.x = v.x * (1.0/lenght);
@@ -10686,23 +10638,23 @@ X_V2d x_v2d_normalize(X_V2d v){
     return v;
 }
 
-X_V2d x_v2d_ortho(X_V2d v){
-    return x_make_v2d(v.y, -v.x);
+V2d v2d_ortho(V2d v){
+    return make_v2d(v.y, -v.x);
 }
 
-int   xm_rand(int min, int max){
-    return rand() % (max + 1 - min) + min;
+int   math_rand(int min, int max){
+    return rand() % (max - min) + min;
 }
 
 /* https://stackoverflow.com/questions/5122993/floor-int-function-implementaton?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa */
-int xm_floor(double x) {
+int math_floor(double x) {
     int xi = (int) x;
     return x < xi ? xi - 1 : xi;
 }
 
 
 /* funcao necessario para o po */
-double xm_sqrt(const double m)
+double math_sqrt(const double m)
 {
    double i=0;
    double x1 = 0, x2 = 0;
@@ -10721,12 +10673,12 @@ double xm_sqrt(const double m)
    return x2;
 }
 
-double xm_pow( double x, double z ){
+double math_pow( double x, double z ){
     int y =  (int) z;
     double temp;
     if (y == 0)
     return 1;
-    temp = xm_pow (x, y / 2);
+    temp = math_pow (x, y / 2);
     if ((y % 2) == 0) {
         return temp * temp;
     } else {
@@ -10737,13 +10689,13 @@ double xm_pow( double x, double z ){
     }
 }
 
-double xm_fmod(double a, double b)
+double math_fmod(double a, double b)
 {
-    return (a - b * xm_floor(a / b));
+    return (a - b * math_floor(a / b));
 }
 
-int xm_ceil(double n){
-    return -xm_floor(-n);
+int math_ceil(double n){
+    return -math_floor(-n);
 }
 
 
@@ -10791,14 +10743,14 @@ double __icos(long x)
     return __isin(x+90);
 }
 
-double xm_sin(double d)
+double math_sin(double d)
 {
     double a = __isin((long) d);
     double b = __isin((long) d+1);
     return a + (d-(int)d) * (b-a);
 }
 
-double xm_cos(double d)
+double math_cos(double d)
 {
     double a = __icos((long) d);
     double b = __icos((long) d+1);
@@ -10806,7 +10758,7 @@ double xm_cos(double d)
 }
 
 /* Nvidia */
-double xm_acos(double x) {
+double math_acos(double x) {
     double negate = (double)(x < 0);
     x = (x >= 0) ? x : -x;
     double ret = -0.0187293;
@@ -10816,12 +10768,12 @@ double xm_acos(double x) {
     ret = ret - 0.2121144;
     ret = ret * x;
     ret = ret + 1.5707288;
-    ret = ret * xm_sqrt(1.0-x);
+    ret = ret * math_sqrt(1.0-x);
     ret = ret - 2 * negate * ret;
     return negate * 3.14159265358979 + ret;
 }
 
-double xm_fabs(double f){
+double math_fabs(double f){
     return f < 0 ? -f : f;
 }
 
@@ -10833,23 +10785,23 @@ double xm_fabs(double f){
 static int __X_GRID_SIZE = 50;
 static int __X_GRID_SEP = 1;
 
-void x_grid_init(int side, int sep){
+void grid_init(int side, int sep){
     __X_GRID_SIZE = side;
     __X_GRID_SEP = sep;
 }
 
-void x_grid_square(int l, int c){
+void grid_square(int l, int c){
     int size = __X_GRID_SIZE, sep = __X_GRID_SEP;
     x_fill_rect(c * size + sep, l * size + sep, size - sep, size - sep);
 }
 
-void x_grid_circle(int l, int c){
+void grid_circle(int l, int c){
     x_fill_circle(c * __X_GRID_SIZE + __X_GRID_SIZE / 2, l * __X_GRID_SIZE + __X_GRID_SIZE / 2,
                   __X_GRID_SIZE / 2 - __X_GRID_SEP + 1);
 }
 
 
-void x_grid_text(int l, int c, const char *format, ...){
+void grid_write(int l, int c, const char *format, ...){
     char text[1000];
     va_list args;
     va_start( args, format );
@@ -10870,7 +10822,7 @@ static float __X_BAR_YFACTOR = 1; /* multiplicative factor of bar height  */
 static int __X_BAR_SIZE = 0;
 static int __X_BAR_MAX = 0;
 
-void x_bar_init(int size, int max){
+void bar_init(int size, int max){
     __X_BAR_SIZE = size;
     __X_BAR_MAX = max;
     __X_BAR_WIDTH = x_get_width() / (size + 2);
@@ -10881,7 +10833,7 @@ void x_bar_init(int size, int max){
         __X_BAR_YFACTOR = 0.2;
 }
 
-void x_bar_one(int i, int value){
+void bar_one(int i, int value){
     if((i < 0)||(i >= __X_BAR_SIZE))
         return;
     int x = __X_BAR_WIDTH * (i + 1);
@@ -10891,22 +10843,22 @@ void x_bar_one(int i, int value){
         x_draw_line(x + j, ybase, x + j, ybase - __X_BAR_YFACTOR * value);
 }
 
-void x_bar_all(int * vet, int size, const char * colors, int * indices){
-    x_set_color("black");
+void bar_all(int * vet, int size, const char * colors, int * indices){
+    x_set_color(BLACK);
     x_clear();
     int i = 0;
-    x_set_color("white");
+    x_set_color(WHITE);
     for(i = 0; i < size; i++)
-        x_bar_one(i, vet[i]);
+        bar_one(i, vet[i]);
     if(colors != NULL && (strcmp(colors, "") != 0)){
         int qtd = strlen(colors);
         for(i = 0; i < qtd; i++){
-            x_set_color("%c", colors[i]);
-            x_bar_one(indices[i], vet[indices[i]]);
+            x_set_pcolor(colors[i]);
+            bar_one(indices[i], vet[indices[i]]);
         }
     }
     static int atual = 0;
-    x_set_color("white"); /* desenhando estado */
+    x_set_color(WHITE); /* desenhando estado */
     x_write(0, 0, "%d", atual++);
 }
 
@@ -10920,47 +10872,47 @@ static double  __X_PEN_Y = 200;
 static double  __X_PEN_THICK = 1;
 static int     __X_PEN_DOWN = 1;
 
-void   x_pen_set_angle(double degrees){
+void   pen_set_angle(double degrees){
     __X_PEN_ANGLE = degrees;
 }
-void   x_pen_set_thick(int thick){
+void   pen_set_thick(int thick){
     if(thick > 0)
         __X_PEN_THICK = thick;
 }
-void   x_pen_set_pos(double x, double y){
+void   pen_set_pos(double x, double y){
     __X_PEN_X = x;
     __X_PEN_Y = y;
 }
-double x_pen_get_angle(){
+double pen_get_angle(){
     return __X_PEN_ANGLE;
 }
-int    x_pen_get_thick(){
+int    pen_get_thick(){
     return __X_PEN_THICK;
 }
-double    x_pen_get_x(){
+double    pen_get_x(){
     return __X_PEN_X;
 }
-double    x_pen_get_y(){
+double    pen_get_y(){
     return __X_PEN_Y;
 }
-void   x_pen_up(void){
+void   pen_up(void){
     __X_PEN_DOWN = 0;
 }
-void   x_pen_down(void){
+void   pen_down(void){
     __X_PEN_DOWN = 1;
 }
-void   x_pen_walk(double distance){
-    double x = __X_PEN_X + distance * xm_cos(__X_PEN_ANGLE);
-    double y = __X_PEN_Y - distance * xm_sin(__X_PEN_ANGLE);
+void   pen_walk(double distance){
+    double x = __X_PEN_X + distance * math_cos(__X_PEN_ANGLE);
+    double y = __X_PEN_Y - distance * math_sin(__X_PEN_ANGLE);
     if(__X_PEN_DOWN)
         x_fill_line(__X_PEN_X, __X_PEN_Y, x, y, __X_PEN_THICK);
     __X_PEN_X = x;
     __X_PEN_Y = y;
 }
-void   x_pen_rotate(int degrees){
+void   pen_rotate(int degrees){
     __X_PEN_ANGLE += degrees;
 }
-void   x_pen_goto(double x, double y){
+void   pen_goto(double x, double y){
     if(__X_PEN_DOWN)
         x_fill_line(__X_PEN_X, __X_PEN_Y, x, y, __X_PEN_THICK);
     __X_PEN_X = x;

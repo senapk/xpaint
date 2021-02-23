@@ -58,7 +58,7 @@ void xgrid_matrix(matriz<Item> mat, list<Pos> path){
     }
     int i = 0;
     for(auto p : path){
-        x_set_color_rgba(X_COLOR_VIOLET);
+        x_set_color(X_COLOR_VIOLET);
         x_grid_circle(p.l, p.c);
         x_set_color("k");
         x_grid_number(p.l, p.c, i++);

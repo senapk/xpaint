@@ -9,7 +9,7 @@ echo "#ifdef __cplusplus" >> $temp
 echo "extern \"C\" {"  >> $temp
 echo "#endif" >> $temp
 
-cat aintro.h color.h base.h draw.h save.h text.h xmath.h modules.h >> $temp
+cat aintro.h color.h base.h draw.h text.h xmath.h modules.h >> $temp
 
 echo "#ifdef __cplusplus" >> $temp
 echo "}"  >> $temp
@@ -25,7 +25,7 @@ echo "#endif" >> $temp
 
 
 cat lodepng.h lodepng.c >> $temp
-cat color.c base.c draw.c save.c text.c xmath.c modules.c >> $temp
+cat color.c base.c draw.c text.c xmath.c modules.c >> $temp
 
 echo "#ifdef __cplusplus" >> $temp
 echo "}"  >> $temp
