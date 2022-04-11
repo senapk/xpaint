@@ -129,25 +129,20 @@ void x_clear(void);
 /* save the bitmap in filename.png */
 void x_save(void);
 
+/* Enable interactive save and lock control */
+void x_set_lock();
+
 /*
-    saves the file with a numeric sufix at the end
+    define folder to saves the file with a numeric sufix at the end
     if the filename is img, sequencial calls of this function
     will save the following files
     img_00000.png img_00001.png img_00002.png img_00003.png
 */
-void x_log(const char * folder);
+void x_set_log(const char * folder);
 
-/*
- * Usa o ffmpeg para renderizar as imagens dessa pasta em um video.mp4
- */
-//void x_video_make(const char * folder, int framerate);
+/* creates a .mp4 video using all .png stored in folder using ffmpeg */
+void x_make_video(int framerate);
 
-/* set the step for x_control */
-void x_set_step(int value);
-
-/* Interact with user to perform saves */
-/* Returns true if save is should be done */
-int x_control();
 
 void __x_make_layer(void);
 void __x_merge_layer(void);
@@ -208,7 +203,7 @@ void x_write_set_size(int size);
 int x_write(int x, int y, const char * format, ...);
 
 /* Faz o SWAP entre dois tipos */
-#define __X_SWAP(x, y, T) do { T __X_SWAP = x; x = y; y = __X_SWAP; } while (0)
+#define X_SWAP(x, y, T) do { T X_SWAP = x; x = y; y = X_SWAP; } while (0)
 
 /*
 ###############################################
@@ -249,7 +244,7 @@ V2d x_v2d_ortho(V2d v);
 // ####### FUNÇÕES MATEMATICAS ##############
 
 double x_math_sqrt(const double m);
-double math_pow( double x, double y );
+double x_math_pow( double x, double y );
 int    x_math_floor(double x);
 double x_math_fmod(double a, double b);
 int    x_math_ceil(double n);
@@ -316,6 +311,12 @@ void x_bar_one(int i, int value);
  */
 void x_bar_all(int * vet, int size, const char * colors, int * indices);
 
+
+#define x_bar_save(vet, size, colors, ...) do{\
+    int __indices[] = {__VA_ARGS__};\
+    x_bar_all(vet, size, colors, __indices);\
+    x_save();\
+} while(0);
 
 /*
 ###############################################
@@ -8692,8 +8693,10 @@ static unsigned  __board_height = 0;
 static uchar     __board_color[__X_BYTES_PER_PIXEL];
 
 static bool      __board_is_open = false;
+static bool      __board_lock = false;
 static char      __board_filename[200] = "";
 static char      __board_viewer  [200] = "";
+static char      __board_folder  [200] = "";
 static int       __board_step          = 1;
 
 /* Local prototypes */
@@ -8855,12 +8858,15 @@ void x_clear(void){
             memcpy(__x_get_pixel_pos((unsigned) x, (unsigned) y), __board_color, __X_BYTES_PER_PIXEL * sizeof(uchar));
 }
 
-void x_save(){
+void __x_save_buffer(const char * filename) {
 #ifndef XPPM
-    x_save_png(__board_width, __board_height, __board_bitmap, __board_filename);
+    x_save_png(__board_width, __board_height, __board_bitmap, filename);
 #else
-    x_save_ppm(__board_width, __board_height, __board_bitmap, __board_filename);
+    x_save_ppm(__board_width, __board_height, __board_bitmap, filename);
 #endif
+}
+
+void __x_open_viewer() {
     static int init = 1;
     if(init){
         init = 0;
@@ -8873,23 +8879,14 @@ void x_save(){
     }
 }
 
-void make_video(const char * folder, int framerate){
-    char cmd[500];
-    char * name = (char *) malloc((strlen(folder) + 20) * sizeof(char));
-    strcpy(name, folder);
-    if(folder[strlen(folder) - 1] != '/')
-        strcat(name, "/");
-
-    sprintf(cmd, "ffmpeg -y -framerate %d -pattern_type glob -i '%s*.png' -c:v libx264 -profile:v high -crf 20 -pix_fmt yuv420p video.mp4", framerate, name);
-    puts(cmd);
-    int result = system(cmd);
-    if(result != 0)
-        printf("%d\n", result);
-    free(name);
+void __x_save(){
+    __x_save_buffer(__board_filename);
+    __x_open_viewer();
 }
 
-void x_log(const char * folder){
+void __x_log(){
     static int index = 0;
+    const char * folder = __board_folder;
     char * name = (char *) malloc((strlen(folder) + 20) * sizeof(char));
     if(folder[strlen(folder) - 1] != '/')
         sprintf(name, "%s/%05d", folder, index);
@@ -8897,19 +8894,11 @@ void x_log(const char * folder){
         sprintf(name, "%s%05d", folder, index);
     index += 1;
     printf("saving: %s%s\n", name, __board_extension);
-#ifndef XPPM
-    x_save_png(__board_width, __board_height, __board_bitmap, name);
-#else
-    x_save_ppm(__board_width, __board_height, __board_bitmap, name);
-#endif
+    __x_save_buffer(name);
     free(name);
 }
 
-void x_set_step(int value){
-    __board_step = value;
-}
-
-int x_control(){
+void __x_lock(){
     static int init = 1;
     static int rounds = 0;
     static int state = 0;
@@ -8929,9 +8918,42 @@ int x_control(){
         if(ptr != line)
             __board_step = value;
         rounds = 0;
-        return true;
+        __x_save();
     }
-    return false;
+}
+
+
+
+void x_save(){
+    if (strcmp(__board_folder, "") != 0)
+        __x_log();
+    if (__board_lock)
+        __x_lock();
+    else
+        __x_save();
+}
+
+void x_make_video(int framerate){
+    char cmd[500];
+    const char * folder = __board_folder;
+    char * name = (char *) malloc((strlen(folder) + 20) * sizeof(char));
+    strcpy(name, folder);
+    if(folder[strlen(folder) - 1] != '/')
+        strcat(name, "/");
+    sprintf(cmd, "ffmpeg -y -framerate %d -pattern_type glob -i '%s*.png' -c:v libx264 -profile:v high -crf 20 -pix_fmt yuv420p video.mp4", framerate, name);
+    puts(cmd);
+    int result = system(cmd);
+    if(result != 0)
+        printf("%d\n", result);
+    free(name);
+}
+
+void x_set_log(const char * folder) {
+    strcpy(__board_folder, folder);
+}
+
+void x_set_lock(){
+    __board_lock = true;
 }
 
 void x_save_ppm(unsigned dimx, unsigned dimy, unsigned char * bitmap, const char * filename){
@@ -9066,11 +9088,11 @@ void x_fill_triangle(float v1x, float v1y, float v2x, float v2y, float v3x, floa
     V2d v3 = {v3x, v3y};
     /* at first sort the three vertices by y-coordinate ascending so v1 is the topmost vertice */
     if((v2.y <= v1.y) && (v2.y <= v3.y))
-        __X_SWAP(v1, v2, V2d);
+        X_SWAP(v1, v2, V2d);
     if((v3.y <= v1.y) && (v3.y <= v2.y))
-        __X_SWAP(v1, v3, V2d);
+        X_SWAP(v1, v3, V2d);
     if(v3.y < v2.y)
-        __X_SWAP(v2, v3, V2d);
+        X_SWAP(v2, v3, V2d);
 
     /* here we know that v1.y <= v2.y <= v3.y */
     /* check for trivial case of bottom-flat triangle */
@@ -10663,12 +10685,12 @@ double x_math_sqrt(const double m)
    return x2;
 }
 
-double math_pow( double x, double z ){
+double x_math_pow( double x, double z ){
     int y =  (int) z;
     double temp;
     if (y == 0)
     return 1;
-    temp = math_pow (x, y / 2);
+    temp = x_math_pow (x, y / 2);
     if ((y % 2) == 0) {
         return temp * temp;
     } else {

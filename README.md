@@ -173,20 +173,20 @@ X_Color x_color_get(void);
 
 ### Controle interativo
 ```c
+/* Enable interactive save and lock control */
+void x_set_lock();
+
 /*
-    saves the file with a numeric sufix at the end
+    define folder to saves the file with a numeric sufix at the end
     if the filename is img, sequencial calls of this function
     will save the following files
     img_00000.png img_00001.png img_00002.png img_00003.png
 */
-void x_log();
+void x_set_log(const char * folder);
 
-/* set the step for x_control */
-void x_set_step(int value);
+/* creates a .mp4 video using all .png stored in folder using ffmpeg */
+void x_make_video(int framerate);
 
-/* Interact with user to perform saves */
-/* Returns true if save is should be done */
-int x_control();
 ```
 
 ### Cores
@@ -386,6 +386,12 @@ void x_bar_one(int i, int value);
  * @param indices the array with the unique indices to be marked with the colors
  */
 void x_bar_all(int * vet, int size, const char * colors, int * indices);
+
+
+/*
+ * Save the array using vararg to pass multiple indexes 
+*/
+#define x_bar_save(vet, size, colors, ...)
 ```
 
 ### Módulo Turtle de Desenho
@@ -415,9 +421,9 @@ void   x_pen_goto(double x, double y);
 
 ## Criando animações
 
-O exemplo_movie.c mostra como criar animações. O nome do arquivo a ser gerado deve conter também o path onde os arquivos serão salvos.
+O exemplo_insertion.c mostra como criar animações. O nome do arquivo a ser gerado deve conter também o path onde os arquivos serão salvos.
 
-Você pode usar a função `x_log()` ao invés do `x_save()` para salvar vários pngs em sequência numérica. 
+Você pode usar a função `x_set_log(folder)` para definir a pasta onde salvar cada save gerado. 
 
 Utilizando o ffmpeg, é possível juntar todos os pngs em uma animação através do comando:
 
