@@ -10,7 +10,7 @@ int main(){
     /* utilizando o mesmo formato do printf */
     x_write(50, 30, "Pintarei um circulo vermelho em %d %d", largura/2, altura/2);
     /* muda a cor do pincel para vermelho */
-    x_set_color(RED);
+    x_color_set(RED);
     /* desenha um circulo preenchido com centro no meio da tela e raio 200 */
     x_fill_circle(largura/2, altura/2, 200);
     /* salva no arquivo exemplo.png */

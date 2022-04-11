@@ -48,19 +48,20 @@ void xgrid_matrix(matriz<Item> mat, list<Pos> path){
     for(int l = 0; l < mat.nl; l++){
         for(int c = 0; c < mat.nc; c++){
             Item& item = mat.get(Pos{l, c});
-            x_set_color("%c", item.wall ? WALL : EMPTY);
+            
+            x_color_set("%c", item.wall ? WALL : EMPTY);
             x_grid_square(l, c);
             if(item.distance != -1){
-                x_set_color("k");
-                x_grid_number(l, c, item.distance);
+                x_color_set("k");
+                x_grid_write(l, c, item.distance);
             }
         }
     }
     int i = 0;
     for(auto p : path){
-        x_set_color(VIOLET);
+        x_color_set(VIOLET);
         x_grid_circle(p.l, p.c);
-        x_set_color("k");
+        x_color_set("k");
         x_grid_number(p.l, p.c, i++);
     }
 }
