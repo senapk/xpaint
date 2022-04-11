@@ -76,7 +76,7 @@ int main(){
     /* utilizando o mesmo formato do printf */
     x_write(50, 30, "Pintarei um circulo vermelho em %d %d", largura/2, altura/2);
     /* muda a cor do pincel para vermelho */
-    x_set_color(RED);
+    x_color_set(RED);
     /* desenha um circulo preenchido com centro no meio da tela e raio 200 */
     x_fill_circle(largura/2, altura/2, 200);
     /* salva no arquivo exemplo.png */
@@ -158,10 +158,29 @@ void x_set_filename(const char * filename);  // muda o nome do arquivo
 void x_set_viewer(const char * viewer);      // define qual programa vai abrir a imagem
 ```
 
+### Utilizando cores
+
 ```c
-void x_set_color(const char * color, ...);   // muda a cor do pincel para todas as funções de desenho
-X_Color x_get_pixel(int x, int y);           // retorna a cor do pixel dessa posicao do bitmap
-X_Color x_get_color(void);                   // retorna a cor corrente do pincel
+/* Cores default e char da paleta de cores */
+#define WHITE     (X_Color) {238, 232, 213, 255} // w
+#define BLACK     (X_Color) {7  , 54 , 66 , 255} // k
+#define GREEN     (X_Color) {133, 153, 0  , 255} // g
+#define RED       (X_Color) {211, 1  , 2  , 255} // r
+#define BLUE      (X_Color) {38 , 139, 210, 255} // b
+#define YELLOW    (X_Color) {181, 137, 0  , 255} // y
+#define CYAN      (X_Color) {42 , 161, 152, 255} // c
+#define MAGENTA   (X_Color) {211, 54 , 130, 255} // m
+#define ORANGE    (X_Color) {253, 106,   2, 255} // o
+#define VIOLET    (X_Color) {108, 113, 196, 255} // v
+
+/* muda a cor do pincel*/
+void x_color_set(X_Color color);
+
+/* muda a cor do pincel usando a paleta de cores*/
+void x_color_load(char color);
+
+/* return the current color for brush */
+X_Color x_color_get(void);
 ```
 
 ### Controle interativo
@@ -195,28 +214,17 @@ typedef struct{
 } X_Color;
 
 
-X_Color x_make_color(uchar r, uchar g, uchar b, uchar a);
+X_Color x_color_make(uchar r, uchar g, uchar b, uchar a);
 
-/* lista de cores default */
-X_Color RED;
-X_Color GREEN;
-X_Color BLUE;
-X_Color YELLOW;
-X_Color CYAN;
-X_Color MAGENTA;
-X_Color ORANGE;
-X_Color VIOLET;
-X_Color WHITE;
-X_Color BLACK;
 
 /* define uma cor na palheta de caracteres */
-void x_set_palette(char c, X_Color color);
+void x_color_set_palette(char c, X_Color color);
 
 /* retorna uma cor dado um char.
    os char default da paleta são rgbmcybk
-   outros podem ser definidos ou redefinidor com x_set_palette
+   outros podem ser definidos ou redefinidor com x_color_set_palette
 */
-X_Color x_get_palette(char c);
+X_Color x_color_get_palette(char c);
 ```
 
 ### Desenhando
@@ -267,7 +275,7 @@ void x_fill_rect(int x0, int y0, int width, int height);
 ```c
 // muda o tamanho da font
 // OBS: a font só muda em múltiplos de 8, ex: 8, 16, 24, ...
-void x_set_font_size(int size); 
+void x_write_set_size(int size); 
 
 // escreve utilizando o formato printf
 int  x_write(int x, int y, const char * format, ...);
@@ -282,7 +290,7 @@ typedef struct{
 } X_V2d;
 
 /* cria e retorna um vetor */
-X_V2d x_make_v2d(double x, double y);
+X_V2d x_v2d_make(double x, double y);
 
 /* retorna o tamanho de um vetor da origem */
 double x_v2d_length(double x, double y);

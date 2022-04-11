@@ -6,7 +6,7 @@ colors
     X_Color defines
     X_Color pallete[256]
     X_Color current
-    make_color
+    x_color_make
     __init_color_module()
     set_color()
     set_colorfp()

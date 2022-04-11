@@ -16,7 +16,6 @@ Autor:
 
 Principais fontes:
     png: https://lodev.org/lodepng
-    tff: https://github.com/nothings/stb
     funções de desenho e matemáticas estão comentadas nas funções
 
 Licença: GPLv3
@@ -34,7 +33,7 @@ int main(){
     int largura = 600, altura = 500;
     x_open(largura, altura, "figura_base"); 
     x_write(50, 30, "Pintarei um circulo vermelho em %d %d", largura/2, altura/2);
-    x_set_color("red");
+    x_color_set("red");
     x_fill_circle(largura/2, altura/2, 200);
     x_save();
     x_close();
@@ -59,31 +58,31 @@ typedef struct{
     uchar g;
     uchar b;
     uchar a;
-} Color;
+} X_Color;
 
 
-#define WHITE     (Color) {238, 232, 213, 255}
-#define BLACK     (Color) {7  , 54 , 66 , 255}
-#define GREEN     (Color) {133, 153, 0  , 255}
-#define RED       (Color) {211, 1  , 2  , 255}
-#define BLUE      (Color) {38 , 139, 210, 255}
-#define YELLOW    (Color) {181, 137, 0  , 255}
-#define CYAN      (Color) {42 , 161, 152, 255}
-#define MAGENTA   (Color) {211, 54 , 130, 255}
-#define ORANGE    (Color) {253, 106,   2, 255}
-#define VIOLET    (Color) {108, 113, 196, 255}
+#define WHITE     (X_Color) {238, 232, 213, 255} // w
+#define BLACK     (X_Color) {7  , 54 , 66 , 255} // k
+#define GREEN     (X_Color) {133, 153, 0  , 255} // g
+#define RED       (X_Color) {211, 1  , 2  , 255} // r
+#define BLUE      (X_Color) {38 , 139, 210, 255} // b
+#define YELLOW    (X_Color) {181, 137, 0  , 255} // y
+#define CYAN      (X_Color) {42 , 161, 152, 255} // c
+#define MAGENTA   (X_Color) {211, 54 , 130, 255} // m
+#define ORANGE    (X_Color) {253, 106,   2, 255} // o
+#define VIOLET    (X_Color) {108, 113, 196, 255} // v
 
 /* cria e retorna uma struct X_Color passando rgb */
-Color make_color(uchar r, uchar g, uchar b, uchar a);
+X_Color x_color_make(uchar r, uchar g, uchar b, uchar a);
 
 /* define uma cor na paleta de caracteres */
-void x_set_palette(char c, Color color);
+void x_color_set_palette(char c, X_Color color);
 
 /* retorna uma cor dado um char.
    os char default da paleta são rgbmcybk
    outros podem ser definidos ou redefinidor com palette_set
 */
-Color x_get_palette(char c);
+X_Color x_color_get_palette(char c);
 
 
 void __x_init_pallete();
@@ -116,16 +115,16 @@ void x_set_viewer(const char * viewer);
 void x_plot(int x, int y);
 
 /* retorna a cor do pixel dessa posicao do bitmap */
-Color x_get_pixel(int x, int y);
+X_Color x_get_pixel(int x, int y);
 
 /* muda a cor do pincel*/
-void x_set_color(Color color);
+void x_color_set(X_Color color);
 
 /* muda a cor do pincel usando a paleta de cores*/
-void x_set_pcolor(char color);
+void x_color_load(char color);
 
 /* return the current color for brush */
-Color x_get_color(void);
+X_Color x_color_get(void);
 
 /* limpa a tela inteira com a mesma cor */
 void x_clear(void);
@@ -144,7 +143,7 @@ void x_log(const char * folder);
 /*
  * Usa o ffmpeg para renderizar as imagens dessa pasta em um video.mp4
  */
-void x_video_make(const char * folder, int framerate);
+//void x_video_make(const char * folder, int framerate);
 
 /* set the step for x_control */
 void x_set_step(int value);
@@ -205,7 +204,7 @@ void x_fill_rect(int x0, int y0, int width, int height);
 void __x_init_font();
 
 // muda o tamanho da font
-void x_set_font_size(int size);
+void x_write_set_size(int size);
 
 // escreve utilizando o formato printf
 // retorna a posicao final em x
@@ -227,7 +226,7 @@ typedef struct{
 } V2d;
 
 /* cria e retorna um vetor */
-V2d make_v2d(double x, double y);
+V2d x_v2d_make(double x, double y);
 
 /* retorna o tamanho de um vetor da origem */
 double x_v2d_length(double x, double y);
@@ -676,7 +675,7 @@ void lodepng_compress_settings_init(LodePNGCompressSettings* settings);
 
 #ifdef LODEPNG_COMPILE_PNG
 /*
-Color mode of an image. Contains all information required to decode the pixel
+X_Color mode of an image. Contains all information required to decode the pixel
 bits to RGBA colors. This information is the same as used in the PNG file
 format, and is used both for PNG and raw image data in LodePNG.
 */
@@ -848,7 +847,7 @@ typedef struct LodePNGInfo {
   unsigned phys_unit; /*may be 0 (unknown unit) or 1 (metre)*/
 
   /*
-  Color profile related chunks: gAMA, cHRM, sRGB, iCPP
+  X_Color profile related chunks: gAMA, cHRM, sRGB, iCPP
 
   LodePNG does not apply any color conversions on pixels in the encoder or decoder and does not interpret these color
   profile values. It merely passes on the information. If you wish to use color profiles and convert colors, please
@@ -4759,7 +4758,7 @@ unsigned lodepng_chunk_create(unsigned char** out, size_t* outlength, unsigned l
 }
 
 /* ////////////////////////////////////////////////////////////////////////// */
-/* / Color types, channels, bits                                            / */
+/* / X_Color types, channels, bits                                            / */
 /* ////////////////////////////////////////////////////////////////////////// */
 
 /*checks if the colortype is valid and the bitdepth bd is allowed for this colortype.
@@ -5817,7 +5816,7 @@ void lodepng_compute_color_stats(LodePNGColorStats* stats,
           stats->key_g = g;
           stats->key_b = b;
         } else if(a == 65535 && stats->key && matchkey) {
-          /* Color key cannot be used if an opaque pixel also has that RGB color. */
+          /* X_Color key cannot be used if an opaque pixel also has that RGB color. */
           stats->alpha = 1;
           stats->key = 0;
           alpha_done = 1;
@@ -5830,7 +5829,7 @@ void lodepng_compute_color_stats(LodePNGColorStats* stats,
       for(i = 0; i != numpixels; ++i) {
         getPixelColorRGBA16(&r, &g, &b, &a, in, i, mode_in);
         if(a != 0 && r == stats->key_r && g == stats->key_g && b == stats->key_b) {
-          /* Color key cannot be used if an opaque pixel also has that RGB color. */
+          /* X_Color key cannot be used if an opaque pixel also has that RGB color. */
           stats->alpha = 1;
           stats->key = 0;
           alpha_done = 1;
@@ -5868,7 +5867,7 @@ void lodepng_compute_color_stats(LodePNGColorStats* stats,
           stats->key_g = g;
           stats->key_b = b;
         } else if(a == 255 && stats->key && matchkey) {
-          /* Color key cannot be used if an opaque pixel also has that RGB color. */
+          /* X_Color key cannot be used if an opaque pixel also has that RGB color. */
           stats->alpha = 1;
           stats->key = 0;
           alpha_done = 1;
@@ -5899,7 +5898,7 @@ void lodepng_compute_color_stats(LodePNGColorStats* stats,
       for(i = 0; i != numpixels; ++i) {
         getPixelColorRGBA8(&r, &g, &b, &a, in, i, mode_in);
         if(a != 0 && r == stats->key_r && g == stats->key_g && b == stats->key_b) {
-          /* Color key cannot be used if an opaque pixel also has that RGB color. */
+          /* X_Color key cannot be used if an opaque pixel also has that RGB color. */
           stats->alpha = 1;
           stats->key = 0;
           alpha_done = 1;
@@ -8441,18 +8440,18 @@ unsigned encode(const std::string& filename,
 #include <stdio.h>
 #include <stdlib.h>
 
-static Color __board_palette[256];
+static X_Color __board_palette[256];
 
-Color make_color(uchar r, uchar g, uchar b, uchar a){
-    Color x = {r, g, b, a};
+X_Color x_color_make(uchar r, uchar g, uchar b, uchar a){
+    X_Color x = {r, g, b, a};
     return x;
 }
 
-void x_set_palette(char c, Color color){
+void x_color_set_palette(char c, X_Color color){
     __board_palette[(int)c] = color;
 }
 
-Color x_get_palette(char c){
+X_Color x_color_get_palette(char c){
     return __board_palette[(int)c];
 }
 
@@ -8486,7 +8485,7 @@ void __x_init_pallete(void){
 //    return true;
 //}
 
-//bool __x_decode_hex(const char * _color, Color * xc){
+//bool __x_decode_hex(const char * _color, X_Color * xc){
 //    if(strlen(_color) != 7 || _color[0] != '#')
 //        return false;
 //    char color[8];
@@ -8499,7 +8498,7 @@ void __x_init_pallete(void){
 //    int readings = sscanf(color + 1, "%02x%02x%02x", &r, &g, &b);
 //    if(readings != 3)
 //        return false;
-//    *xc = (Color){r, g, b, 255};
+//    *xc = (X_Color){r, g, b, 255};
 //    return true;
 //}
 
@@ -8512,7 +8511,7 @@ void __x_init_pallete(void){
 //    return cont;
 //}
 
-//bool __x_decode_rgba(const char * color, Color * xc){
+//bool __x_decode_rgba(const char * color, X_Color * xc){
 //    int number_of_colons = __x_count_colon(color);
 //    if(number_of_colons != 2 && number_of_colons != 3)
 //        return false;
@@ -8550,7 +8549,7 @@ void __x_init_pallete(void){
 //    return true;
 //}
 
-//bool __x_color_load(const char * color, Color * xc){
+//bool __x_color_load(const char * color, X_Color * xc){
 //    if(strlen(color) == 1){
 //        int pos = color[0];
 //        *xc = __board_palette[pos];
@@ -8566,12 +8565,12 @@ void __x_init_pallete(void){
 //    return false;
 //}
 
-//void x_color_store(char shortcut[2], const char * entry, Color color){
+//void x_color_store(char shortcut[2], const char * entry, X_Color color){
 //    palette_set(shortcut[0], color);
 //    x_color_add(entry, color);
 //}
 
-//void x_color_add(const char * entry, Color color){
+//void x_color_add(const char * entry, X_Color color){
 //    if(x_arr_colors_size < X_MAX_ITENS){
 //        strcpy(x_arr_colors[x_arr_colors_size].key, entry);
 //        x_arr_colors[x_arr_colors_size].color = color;
@@ -8583,90 +8582,90 @@ void __x_init_pallete(void){
 //    for(int i = 0; i < 256; i++)
 //        __board_palette[i] = WHITE;
 
-//    x_color_store("a", "aqua",    make_color(0, 255, 255, 255));
-//    x_color_store("A", "amber",    make_color(255,191,0, 255));
+//    x_color_store("a", "aqua",    x_color_make(0, 255, 255, 255));
+//    x_color_store("A", "amber",    x_color_make(255,191,0, 255));
 
-//    x_color_store("b", "blue",    make_color(38 , 139, 210, 255));
-//    x_color_store("B", "brown",    make_color(150,75,0, 255));
+//    x_color_store("b", "blue",    x_color_make(38 , 139, 210, 255));
+//    x_color_store("B", "brown",    x_color_make(150,75,0, 255));
 
-//    x_color_store("c", "cyan",    make_color(42 , 161, 152, 255));
-//    x_color_store("C", "corn",    make_color(251,236,93, 255));
-//    x_color_store("0", "coral",  make_color(255, 127, 80  , 255));
+//    x_color_store("c", "cyan",    x_color_make(42 , 161, 152, 255));
+//    x_color_store("C", "corn",    x_color_make(251,236,93, 255));
+//    x_color_store("0", "coral",  x_color_make(255, 127, 80  , 255));
 
-//    x_color_store("d", "dark",    make_color(7  , 54 , 66 , 255));
-//    x_color_store("D", "desert",    make_color(193, 154, 107, 255));
+//    x_color_store("d", "dark",    x_color_make(7  , 54 , 66 , 255));
+//    x_color_store("D", "desert",    x_color_make(193, 154, 107, 255));
 
-//    x_color_store("e", "error",   make_color(255,   0,   0, 255));
-//    x_color_store("E", "emerald", make_color(80,200,120, 255));
+//    x_color_store("e", "error",   x_color_make(255,   0,   0, 255));
+//    x_color_store("E", "emerald", x_color_make(80,200,120, 255));
 
-//    x_color_store("f", "flax",    make_color(238, 220, 130, 255));
-//    x_color_store("F", "forest",  make_color(34,139,34, 255));
+//    x_color_store("f", "flax",    x_color_make(238, 220, 130, 255));
+//    x_color_store("F", "forest",  x_color_make(34,139,34, 255));
 
-//    x_color_store("g", "green",   make_color(133, 153, 0  , 255));
-//    x_color_store("G", "gold",    make_color(255, 215, 0, 255));
-//    x_color_store("1", "gray",  make_color(128, 128, 128  , 255));
+//    x_color_store("g", "green",   x_color_make(133, 153, 0  , 255));
+//    x_color_store("G", "gold",    x_color_make(255, 215, 0, 255));
+//    x_color_store("1", "gray",  x_color_make(128, 128, 128  , 255));
 
-//    x_color_store("h", "heaven",  make_color(180, 176, 236, 255));
-//    x_color_store("H", "han",     make_color(68, 108, 207, 255));
+//    x_color_store("h", "heaven",  x_color_make(180, 176, 236, 255));
+//    x_color_store("H", "han",     x_color_make(68, 108, 207, 255));
 
-//    x_color_store("i", "indigo",  make_color(0  ,  65, 106, 255));
-//    x_color_store("I", "iceberg",  make_color(113, 166, 210, 255));
+//    x_color_store("i", "indigo",  x_color_make(0  ,  65, 106, 255));
+//    x_color_store("I", "iceberg",  x_color_make(113, 166, 210, 255));
 
-//    x_color_store("j", "jade",    make_color(0  , 168, 107, 255));
-//    x_color_store("J", "jasmine",    make_color(248, 222, 126, 255));
+//    x_color_store("j", "jade",    x_color_make(0  , 168, 107, 255));
+//    x_color_store("J", "jasmine",    x_color_make(248, 222, 126, 255));
 
-//    x_color_store("k", "black",   make_color(7  , 54 , 66 , 255));
-//    x_color_store("K", "khaki",   make_color(195, 176, 145, 255));
+//    x_color_store("k", "black",   x_color_make(7  , 54 , 66 , 255));
+//    x_color_store("K", "khaki",   x_color_make(195, 176, 145, 255));
 
-//    x_color_store("l", "lavender",make_color(240, 230, 140, 255));
-//    x_color_store("L", "lime",    make_color(191, 255, 0, 255));
+//    x_color_store("l", "lavender",x_color_make(240, 230, 140, 255));
+//    x_color_store("L", "lime",    x_color_make(191, 255, 0, 255));
 
-//    x_color_store("m", "magenta", make_color(211, 54 , 130, 255));
-//    x_color_store("M", "maroon", make_color(128,0,0, 255));
-//    x_color_store("2", "midnight",make_color(25, 25, 112, 255));
+//    x_color_store("m", "magenta", x_color_make(211, 54 , 130, 255));
+//    x_color_store("M", "maroon", x_color_make(128,0,0, 255));
+//    x_color_store("2", "midnight",x_color_make(25, 25, 112, 255));
 
-//    x_color_store("n", "navy", make_color(0,0,128, 255));
+//    x_color_store("n", "navy", x_color_make(0,0,128, 255));
 
-//    x_color_store("o", "orange",  make_color(253, 106, 2, 255));
-//    x_color_store("O", "olive",  make_color(128, 128, 0, 255));
+//    x_color_store("o", "orange",  x_color_make(253, 106, 2, 255));
+//    x_color_store("O", "olive",  x_color_make(128, 128, 0, 255));
 
-//    x_color_store("p", "pink",    make_color(255, 20, 147, 255));
-//    x_color_store("P", "purple",  make_color(128,0,128, 255));
+//    x_color_store("p", "pink",    x_color_make(255, 20, 147, 255));
+//    x_color_store("P", "purple",  x_color_make(128,0,128, 255));
 
-//    x_color_store("r", "red",     make_color(211, 1  , 2  , 255));
-//    x_color_store("R", "ruby",    make_color(224, 17, 95, 255));
+//    x_color_store("r", "red",     x_color_make(211, 1  , 2  , 255));
+//    x_color_store("R", "ruby",    x_color_make(224, 17, 95, 255));
 
-//    x_color_store("s", "silver",  make_color(192, 192, 192, 255));
-//    x_color_store("S", "sepia",  make_color(112, 66, 20, 255));
-//    x_color_store("3", "salmon",  make_color(250, 128, 114  , 255));
+//    x_color_store("s", "silver",  x_color_make(192, 192, 192, 255));
+//    x_color_store("S", "sepia",  x_color_make(112, 66, 20, 255));
+//    x_color_store("3", "salmon",  x_color_make(250, 128, 114  , 255));
 
-//    x_color_store("t", "tan",  make_color(210, 180, 140, 255));
-//    x_color_store("T", "turquoise",  make_color(62, 224, 208, 255));
-//    x_color_store("4", "teal",  make_color(0, 128, 128 , 255));
+//    x_color_store("t", "tan",  x_color_make(210, 180, 140, 255));
+//    x_color_store("T", "turquoise",  x_color_make(62, 224, 208, 255));
+//    x_color_store("4", "teal",  x_color_make(0, 128, 128 , 255));
 
-//    x_color_store("u", "umber",  make_color(99, 81, 71, 255));
-//    x_color_store("U", "ultramarine",  make_color(18, 10, 143, 255));
+//    x_color_store("u", "umber",  x_color_make(99, 81, 71, 255));
+//    x_color_store("U", "ultramarine",  x_color_make(18, 10, 143, 255));
 
-//    x_color_store("v", "violet",  make_color(108, 113, 196, 255));
-//    x_color_store("V", "vanilla",  make_color(243, 229, 171, 255));
+//    x_color_store("v", "violet",  x_color_make(108, 113, 196, 255));
+//    x_color_store("V", "vanilla",  x_color_make(243, 229, 171, 255));
 
-//    x_color_store("w", "white",   make_color(238, 232, 213, 255));
-//    x_color_store("W", "wheat",   make_color(254, 222, 179, 255));
+//    x_color_store("w", "white",   x_color_make(238, 232, 213, 255));
+//    x_color_store("W", "wheat",   x_color_make(254, 222, 179, 255));
 
-//    x_color_store("y", "yellow",  make_color(181, 137, 0  , 255));
+//    x_color_store("y", "yellow",  x_color_make(181, 137, 0  , 255));
 
 ////    __x_init_pallete();
 //}
 
-//void x_color_show(Color color){
+//void x_color_show(X_Color color){
 //    printf("{%3d, %3d, %3d, %3d}\n", color.r, color.g, color.b, color.a);
 //}
 
-//Color x_color_decode(const char * color){
-//    Color xc;
+//X_Color x_color_decode(const char * color){
+//    X_Color xc;
 //    if(__x_decode_rgba(color, &xc) || __x_decode_hex(color, &xc) || __x_color_load(color, &xc))
 //        return xc;
-//    printf("fail: Color \"%s\" could not be decoded\n", color);
+//    printf("fail: X_Color \"%s\" could not be decoded\n", color);
 //    return xc;
 //}
 
@@ -8835,25 +8834,25 @@ void x_plot(int x, int y){
         __x_plot(x, y, __board_color);
 }
 
-Color x_get_pixel(int x, int y){
+X_Color x_get_pixel(int x, int y){
     uchar * pixel = __x_get_pixel_pos((unsigned) x, (unsigned) y);
-    Color color;
+    X_Color color;
     memcpy(&color, pixel, __X_BYTES_PER_PIXEL * sizeof(uchar));
     return color;
 }
 
-void x_set_color(Color color){
+void x_color_set(X_Color color){
     memcpy(__board_color, &color, __X_BYTES_PER_PIXEL * sizeof(uchar));
 }
 
-void x_set_pcolor(char color){
-    Color pcolor = x_get_palette(color);
+void x_color_load(char color){
+    X_Color pcolor = x_color_get_palette(color);
     memcpy(__board_color, &pcolor, __X_BYTES_PER_PIXEL * sizeof(uchar));
 }
 
 
-Color x_get_color(){
-    Color color;
+X_Color x_color_get(){
+    X_Color color;
     memcpy(&color, __board_color, __X_BYTES_PER_PIXEL * sizeof(uchar));
     return color;
 }
@@ -9002,7 +9001,7 @@ int x_draw_art(int x, int y, int zoom, const char * picture){
             dx += 1;
             maxdx = dx > maxdx ? dx : maxdx;
         }else{
-            x_set_pcolor(picture[i]);
+            x_color_load(picture[i]);
             __x_draw_block(x + dx * zoom, y + dy * zoom, zoom);
             dx += 1;
             maxdx = dx > maxdx ? dx : maxdx;
@@ -9108,7 +9107,7 @@ void x_fill_line(float x0, float y0, float x1, float y1, int thickness){
         return;
     }
     __x_make_layer();
-    V2d _offset = make_v2d(b.x - a.x, b.y - a.y);
+    V2d _offset = x_v2d_make(b.x - a.x, b.y - a.y);
     _offset = x_v2d_dot(x_v2d_ortho(x_v2d_normalize(_offset)), (thickness / 2.f));
 
     V2d p1 = x_v2d_sub(a, _offset);
@@ -9542,7 +9541,7 @@ void __x_replace_unicode(char * text, __x_Letter * output, size_t * length){
     *length = size;
 }
 
-void x_set_font_size(int value){
+void x_write_set_size(int value){
     __x_font_size = value;
 }
 
@@ -10604,7 +10603,7 @@ __x_asc_map['~'] = (\
 #include <stdint.h>
 #include <stdlib.h>
 
-V2d make_v2d(double x, double y){
+V2d x_v2d_make(double x, double y){
     V2d v = {x, y};
     return v;
 }
@@ -10618,15 +10617,15 @@ double x_v2d_distance(double ax, double ay, double bx, double by){
 }
 
 V2d x_v2d_sum(V2d a, V2d b){
-    return make_v2d(a.x + b.x, a.y + b.y);
+    return x_v2d_make(a.x + b.x, a.y + b.y);
 }
 
 V2d x_v2d_sub(V2d a, V2d b){
-    return make_v2d(a.x - b.x, a.y - b.y);
+    return x_v2d_make(a.x - b.x, a.y - b.y);
 }
 
 V2d x_v2d_dot(V2d a, double value){
-    return make_v2d(a.x * value, a.y * value);
+    return x_v2d_make(a.x * value, a.y * value);
 }
 
 V2d x_v2d_normalize(V2d v){
@@ -10639,7 +10638,7 @@ V2d x_v2d_normalize(V2d v){
 }
 
 V2d x_v2d_ortho(V2d v){
-    return make_v2d(v.y, -v.x);
+    return x_v2d_make(v.y, -v.x);
 }
 
 int   x_math_rand(int min, int max){
@@ -10844,21 +10843,21 @@ void x_bar_one(int i, int value){
 }
 
 void x_bar_all(int * vet, int size, const char * colors, int * indices){
-    x_set_color(BLACK);
+    x_color_set(BLACK);
     x_clear();
     int i = 0;
-    x_set_color(WHITE);
+    x_color_set(WHITE);
     for(i = 0; i < size; i++)
         x_bar_one(i, vet[i]);
     if(colors != NULL && (strcmp(colors, "") != 0)){
         int qtd = strlen(colors);
         for(i = 0; i < qtd; i++){
-            x_set_pcolor(colors[i]);
+            x_color_load(colors[i]);
             x_bar_one(indices[i], vet[indices[i]]);
         }
     }
     static int atual = 0;
-    x_set_color(WHITE); /* desenhando estado */
+    x_color_set(WHITE); /* desenhando estado */
     x_write(0, 0, "%d", atual++);
 }
 
