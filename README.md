@@ -100,9 +100,6 @@ Ele deve gerar o arquivo figura_base.png que se parece com isso:
 
 ![](exemplos/figura_base.png)
 
-
-![](exemplos/figura_floodfill.png)
-
 Se você clonar esse repositório, entrar na pasta exemplos e der um make, ele vai compilar e re-gerar todas as figuras.
 
 Esta é uma biblioteca header only, ou seja, não está dividida em .c e .h. Declarações e definições estão todas no .h. 
