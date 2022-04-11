@@ -1,8 +1,5 @@
 #ifndef XPAINT_H
 #define XPAINT_H
-#ifdef __cplusplus
-extern "C" {
-#endif
 /*
 You must use the following define in your code before #include the library
 #define XPAINT
@@ -342,14 +339,8 @@ void   x_pen_goto(double x, double y);
 
 
 
-#ifdef __cplusplus
-}
-#endif
 #endif /* XPAINT_H */
 #ifdef XPAINT /* inicio da implementacao */
-#ifdef __cplusplus
-extern "C" {
-#endif
 /*
 LodePNG version 20190814
 
@@ -9239,7 +9230,7 @@ void x_fill_ellipse(int x0, int y0, int width, int height){
     y0 += (b+1)/2; y1 = y0-b1;   /* starting pixel */
     a *= 8*a; b1 = 8*b*b;
     
-    int * lined = calloc(height, sizeof(int));
+    int * lined = (int *) calloc(height, sizeof(int));
     
     do {
         if(lined[y0 - ytop] == 0){
@@ -10918,7 +10909,4 @@ void   x_pen_goto(double x, double y){
     __X_PEN_Y = y;
 }
 
-#ifdef __cplusplus
-}
-#endif
 #endif /* XPAINT */
