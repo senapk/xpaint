@@ -3,7 +3,7 @@
 
 int main(){
     int largura = 600, altura = 500;
-    x_set_viewer("eog");
+    x_set_viewer("gthumb");
     /* cria um bitmap de 600x500 que irá salvar como figura_base.png*/
     x_open(largura, altura, "figura_base"); 
     /* escreve usando a font default na posicao x=50, y=30 */

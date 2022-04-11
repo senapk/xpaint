@@ -58,7 +58,7 @@ void xgrid_matrix(matriz<Item> mat, list<Pos> path){
     }
     int i = 0;
     for(auto p : path){
-        x_set_color(X_COLOR_VIOLET);
+        x_set_color(VIOLET);
         x_grid_circle(p.l, p.c);
         x_set_color("k");
         x_grid_number(p.l, p.c, i++);
@@ -146,7 +146,7 @@ int main(){
     } */
     
     x_open(1002, 402, "figura_floodfill");
-    //x_set_viewer("eog");
+    //x_set_viewer("gthumb");
     x_grid_init(1002/nc, 1);
     xgrid_matrix(mat, path);
     x_save();

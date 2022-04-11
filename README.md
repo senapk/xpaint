@@ -76,7 +76,7 @@ int main(){
     /* utilizando o mesmo formato do printf */
     x_write(50, 30, "Pintarei um circulo vermelho em %d %d", largura/2, altura/2);
     /* muda a cor do pincel para vermelho */
-    x_set_color(X_COLOR_RED);
+    x_set_color(RED);
     /* desenha um circulo preenchido com centro no meio da tela e raio 200 */
     x_fill_circle(largura/2, altura/2, 200);
     /* salva no arquivo exemplo.png */
@@ -198,16 +198,16 @@ typedef struct{
 X_Color x_make_color(uchar r, uchar g, uchar b, uchar a);
 
 /* lista de cores default */
-X_Color X_COLOR_RED;
-X_Color X_COLOR_GREEN;
-X_Color X_COLOR_BLUE;
-X_Color X_COLOR_YELLOW;
-X_Color X_COLOR_CYAN;
-X_Color X_COLOR_MAGENTA;
-X_Color X_COLOR_ORANGE;
-X_Color X_COLOR_VIOLET;
-X_Color X_COLOR_WHITE;
-X_Color X_COLOR_BLACK;
+X_Color RED;
+X_Color GREEN;
+X_Color BLUE;
+X_Color YELLOW;
+X_Color CYAN;
+X_Color MAGENTA;
+X_Color ORANGE;
+X_Color VIOLET;
+X_Color WHITE;
+X_Color BLACK;
 
 /* define uma cor na palheta de caracteres */
 void x_set_palette(char c, X_Color color);
@@ -315,18 +315,18 @@ xpaint não dependesse de incluir a biblioteca math.h
 nos parametros de compilação com o -lm
 */
 
-double xm_sqrt(const double m);
-double xm_pow( double x, double y );
-int   xm_floor(double x);
-double xm_fmod(double a, double b);
-int   xm_ceil(double n);
+double x_math_sqrt(const double m);
+double x_math_pow( double x, double y );
+int    x_math_floor(double x);
+double x_math_fmod(double a, double b);
+int    x_math_ceil(double n);
 /* degrees */
-double xm_sin(double d);
-double xm_cos(double d);
-double xm_acos(double x);
-double xm_fabs(double f);
+double x_math_sin(double d);
+double x_math_cos(double d);
+double x_math_acos(double x);
+double x_math_fabs(double f);
 /* Generates a int number in interval [min, max] */
-int   xm_rand(int min, int max);
+int    x_math_rand(int min, int max);
 
 ```
 
@@ -355,11 +355,9 @@ void x_grid_square(int l, int c);
 /*plots a circle in cell*/
 void x_grid_circle(int l, int c);
 
-/*writes a number in cell*/
-void x_grid_number(int l, int c, int value);
-
 /*writes a text until 5 char in cell*/
-void x_grid_text(int l, int c, const char *text);
+void x_grid_write(int l, int c, const char *format, ...);
+
 ```
 
 ### Módulo de Vetores
@@ -426,9 +424,11 @@ O exemplo_movie.c mostra como criar animações. O nome do arquivo a ser gerado 
 Você pode usar a função `x_log()` ao invés do `x_save()` para salvar vários pngs em sequência numérica. 
 
 Utilizando o ffmpeg, é possível juntar todos os pngs em uma animação através do comando:
+
 ```
 ffmpeg -framerate 5 -pattern_type glob -i '*.png' -c:v libx264 -profile:v high -crf 20 -pix_fmt yuv420p video.mp4
 ```
+
 O framerate define a quantidade de imagens por segundo, se quiser que passe mais tempo numa imagem, diminua o framerate.
 
 Será gerado o arquivo video.mp4 na pasta atual.

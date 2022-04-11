@@ -38,7 +38,7 @@ void verify(int * vet, int size){
 int main() {
 
     x_open(600, 300, "imgs/insertion");
-    //x_set_viewer("eog");
+    //x_set_viewer("gthumb");
     int size = 30, max = 900;
     x_bar_init(size, max);
     srand(2); 

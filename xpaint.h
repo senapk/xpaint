@@ -21,7 +21,7 @@ Principais fontes:
 
 Licença: GPLv3
 
-Versão: 0.7
+Versão: 0.8
 
 */
 
@@ -109,7 +109,7 @@ void x_close(void);
 void x_set_filename(const char * filename);
 
 /* define the path ou command to external tool to open the image in first save */
-/* Ex: "eog", "gthumb" */
+/* Ex: "gthumb", "gthumb" */
 void x_set_viewer(const char * viewer);
 
 /* a funcao plot pinta o pixel usando a cor padrão */
@@ -230,40 +230,40 @@ typedef struct{
 V2d make_v2d(double x, double y);
 
 /* retorna o tamanho de um vetor da origem */
-double v2d_length(double x, double y);
+double x_v2d_length(double x, double y);
 
 /* retorna a distancia entre dois pontos */
-double v2d_distance(double ax, double ay, double bx, double by);
+double x_v2d_distance(double ax, double ay, double bx, double by);
 
 /* retorna a + b */
-V2d v2d_sum(V2d a, V2d b);
+V2d x_v2d_sum(V2d a, V2d b);
 
 /* retorna a - b */
-V2d v2d_sub(V2d a, V2d b);
+V2d x_v2d_sub(V2d a, V2d b);
 
 /* retorna (a.x * value, a.y * value) */
-V2d v2d_dot(V2d a, double value);
+V2d x_v2d_dot(V2d a, double value);
 
 /* retorna o vetor normalizado */
-V2d v2d_normalize(V2d v);
+V2d x_v2d_normalize(V2d v);
 
 /* retorna o vetor orthogonal */
-V2d v2d_ortho(V2d v);
+V2d x_v2d_ortho(V2d v);
 
 // ####### FUNÇÕES MATEMATICAS ##############
 
-double math_sqrt(const double m);
+double x_math_sqrt(const double m);
 double math_pow( double x, double y );
-int    math_floor(double x);
-double math_fmod(double a, double b);
-int    math_ceil(double n);
+int    x_math_floor(double x);
+double x_math_fmod(double a, double b);
+int    x_math_ceil(double n);
 /* degrees */
-double math_sin(double d);
-double math_cos(double d);
-double math_acos(double x);
-double math_fabs(double f);
+double x_math_sin(double d);
+double x_math_cos(double d);
+double x_math_acos(double x);
+double x_math_fabs(double f);
 /* Generates a int number in interval [min, max[ */
-int    math_rand(int min, int max);
+int    x_math_rand(int min, int max);
 
 
 /*
@@ -275,16 +275,16 @@ int    math_rand(int min, int max);
 /*Init the grid*/
 /*side is the size of the cell */
 /*sep the space in black between cells */
-void grid_init(int side, int sep);
+void x_grid_init(int side, int sep);
 
 /*plots a square in cell*/
-void grid_square(int l, int c);
+void x_grid_square(int l, int c);
 
 /*plots a circle in cell*/
-void grid_circle(int l, int c);
+void x_grid_circle(int l, int c);
 
 /*writes a text until 5 char in cell*/
-void grid_write(int l, int c, const char *format, ...);
+void x_grid_write(int l, int c, const char *format, ...);
 
 
 /*
@@ -300,7 +300,7 @@ void grid_write(int l, int c, const char *format, ...);
  * @param size the size of the array
  * @param max the max value of the array
  */
-void bar_init(int size, int max);
+void x_bar_init(int size, int max);
 
 /**
  * @brief print a single bar
@@ -308,7 +308,7 @@ void bar_init(int size, int max);
  * @param i the index
  * @param value the value of the bar size
  */
-void bar_one(int i, int value);
+void x_bar_one(int i, int value);
 
 /**
  * @brief show the entire array
@@ -318,7 +318,7 @@ void bar_one(int i, int value);
  * @param colors the array of color to mark unique elements or NULL
  * @param indices the array with the unique indices to be marked with the colors
  */
-void bar_all(int * vet, int size, const char * colors, int * indices);
+void x_bar_all(int * vet, int size, const char * colors, int * indices);
 
 
 /*
@@ -327,18 +327,18 @@ void bar_all(int * vet, int size, const char * colors, int * indices);
 ###############################################
 */
 
-void   pen_set_angle(double degrees);
-void   pen_set_thick(int thick);
-void   pen_set_pos(double x, double y);
-double pen_get_angle();
-int    pen_get_thick();
-double pen_get_x();
-double pen_get_y();
-void   pen_up(void);
-void   pen_down(void);
-void   pen_walk(double distance);
-void   pen_rotate(int degrees);
-void   pen_goto(double x, double y);
+void   x_pen_set_angle(double degrees);
+void   x_pen_set_thick(int thick);
+void   x_pen_set_pos(double x, double y);
+double x_pen_get_angle();
+int    x_pen_get_thick();
+double x_pen_get_x();
+double x_pen_get_y();
+void   x_pen_up(void);
+void   x_pen_down(void);
+void   x_pen_walk(double distance);
+void   x_pen_rotate(int degrees);
+void   x_pen_goto(double x, double y);
 
 
 
@@ -2015,7 +2015,7 @@ LodePNG.
 
 LodePNG should be warning-free with warning level W4. Two warnings were disabled
 with pragmas though: warning 4244 about implicit conversions, and warning 4996
-where it wants to use a non-standard function fopen_s instead of the standard C
+where it wants to use a non-standard function fox_pen_s instead of the standard C
 fopen.
 
 Visual Studio may want "stdafx.h" files to be included in each source file and
@@ -2343,7 +2343,7 @@ Rename this file to lodepng.cpp to use it for C++, or to lodepng.c to use it for
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1310) /*Visual Studio: A few warning types are not desired here.*/
 #pragma warning( disable : 4244 ) /*implicit conversions: not warned by gcc -Wall -Wextra and requires too much casts*/
-#pragma warning( disable : 4996 ) /*VS does not like fopen, but fopen_s is not standard C so unusable here*/
+#pragma warning( disable : 4996 ) /*VS does not like fopen, but fox_pen_s is not standard C so unusable here*/
 #endif /*_MSC_VER */
 
 const char* LODEPNG_VERSION_STRING = "20190814";
@@ -9109,12 +9109,12 @@ void x_fill_line(float x0, float y0, float x1, float y1, int thickness){
     }
     __x_make_layer();
     V2d _offset = make_v2d(b.x - a.x, b.y - a.y);
-    _offset = v2d_dot(v2d_ortho(v2d_normalize(_offset)), (thickness / 2.f));
+    _offset = x_v2d_dot(x_v2d_ortho(x_v2d_normalize(_offset)), (thickness / 2.f));
 
-    V2d p1 = v2d_sub(a, _offset);
-    V2d p2 = v2d_sub(b, _offset);
-    V2d p3 = v2d_sum(a, _offset);
-    V2d p4 = v2d_sum(b, _offset);
+    V2d p1 = x_v2d_sub(a, _offset);
+    V2d p2 = x_v2d_sub(b, _offset);
+    V2d p3 = x_v2d_sum(a, _offset);
+    V2d p4 = x_v2d_sum(b, _offset);
 
     x_fill_triangle(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);
     x_fill_triangle(p3.x, p3.y, p2.x, p2.y, p4.x, p4.y);
@@ -9303,27 +9303,27 @@ void x_draw_bezier(int x0, int y0, int x1, int y1, int x2, int y2)
 
     if ((long)x*(x2-x1) > 0) {                        /* horizontal cut at P4? */
         if ((long)y*(y2-y1) > 0)                     /* vertical cut at P6 too? */
-            if (math_fabs((y0-2*y1+y2)/t*x) > abs(y)) {               /* which first? */
+            if (x_math_fabs((y0-2*y1+y2)/t*x) > abs(y)) {               /* which first? */
                 x0 = x2; x2 = x+x1; y0 = y2; y2 = y+y1;            /* swap points */
             }                            /* now horizontal cut at P4 comes first */
         t = (x0-x1)/t;
         r = (1-t)*((1-t)*y0+2.0*t*y1)+t*t*y2;                       /* By(t=P4) */
         t = (x0*x2-x1*x1)*t/(x0-x1);                       /* gradient dP4/dx=0 */
-        x = math_floor(t+0.5); y = math_floor(r+0.5);
+        x = x_math_floor(t+0.5); y = x_math_floor(r+0.5);
         r = (y1-y0)*(t-x0)/(x1-x0)+y0;                  /* intersect P3 | P0 P1 */
-        __x_plot_quad_bezier_seg(x0,y0, x,math_floor(r+0.5), x,y);
+        __x_plot_quad_bezier_seg(x0,y0, x,x_math_floor(r+0.5), x,y);
         r = (y1-y2)*(t-x2)/(x1-x2)+y2;                  /* intersect P4 | P1 P2 */
-        x0 = x1 = x; y0 = y; y1 = math_floor(r+0.5);             /* P0 = P4, P1 = P8 */
+        x0 = x1 = x; y0 = y; y1 = x_math_floor(r+0.5);             /* P0 = P4, P1 = P8 */
     }
     if ((long)(y0-y1)*(y2-y1) > 0) {                    /* vertical cut at P6? */
         t = y0-2*y1+y2; t = (y0-y1)/t;
         r = (1-t)*((1-t)*x0+2.0*t*x1)+t*t*x2;                       /* Bx(t=P6) */
         t = (y0*y2-y1*y1)*t/(y0-y1);                       /* gradient dP6/dy=0 */
-        x = math_floor(r+0.5); y = math_floor(t+0.5);
+        x = x_math_floor(r+0.5); y = x_math_floor(t+0.5);
         r = (x1-x0)*(t-y0)/(y1-y0)+x0;                  /* intersect P6 | P0 P1 */
-        __x_plot_quad_bezier_seg(x0,y0, math_floor(r+0.5),y, x,y);
+        __x_plot_quad_bezier_seg(x0,y0, x_math_floor(r+0.5),y, x,y);
         r = (x1-x2)*(t-y2)/(y1-y2)+x2;                  /* intersect P7 | P1 P2 */
-        x0 = x; x1 = math_floor(r+0.5); y0 = y1 = y;             /* P0 = P6, P1 = P7 */
+        x0 = x; x1 = x_math_floor(r+0.5); y0 = y1 = y;             /* P0 = P6, P1 = P7 */
     }
     __x_plot_quad_bezier_seg(x0,y0, x1,y1, x2,y2);                  /* remaining part */
 }
@@ -10609,28 +10609,28 @@ V2d make_v2d(double x, double y){
     return v;
 }
 
-double v2d_length(double x, double y){
-    return math_sqrt(x * x + y * y);
+double x_v2d_length(double x, double y){
+    return x_math_sqrt(x * x + y * y);
 }
 
-double v2d_distance(double ax, double ay, double bx, double by){
-    return v2d_length(bx - ax, by - ay);
+double x_v2d_distance(double ax, double ay, double bx, double by){
+    return x_v2d_length(bx - ax, by - ay);
 }
 
-V2d v2d_sum(V2d a, V2d b){
+V2d x_v2d_sum(V2d a, V2d b){
     return make_v2d(a.x + b.x, a.y + b.y);
 }
 
-V2d v2d_sub(V2d a, V2d b){
+V2d x_v2d_sub(V2d a, V2d b){
     return make_v2d(a.x - b.x, a.y - b.y);
 }
 
-V2d v2d_dot(V2d a, double value){
+V2d x_v2d_dot(V2d a, double value){
     return make_v2d(a.x * value, a.y * value);
 }
 
-V2d v2d_normalize(V2d v){
-    double lenght = v2d_length(v.x, v.y);
+V2d x_v2d_normalize(V2d v){
+    double lenght = x_v2d_length(v.x, v.y);
     if(lenght < 0.0000001)
         return v;
     v.x = v.x * (1.0/lenght);
@@ -10638,23 +10638,23 @@ V2d v2d_normalize(V2d v){
     return v;
 }
 
-V2d v2d_ortho(V2d v){
+V2d x_v2d_ortho(V2d v){
     return make_v2d(v.y, -v.x);
 }
 
-int   math_rand(int min, int max){
+int   x_math_rand(int min, int max){
     return rand() % (max - min) + min;
 }
 
 /* https://stackoverflow.com/questions/5122993/floor-int-function-implementaton?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa */
-int math_floor(double x) {
+int x_math_floor(double x) {
     int xi = (int) x;
     return x < xi ? xi - 1 : xi;
 }
 
 
 /* funcao necessario para o po */
-double math_sqrt(const double m)
+double x_math_sqrt(const double m)
 {
    double i=0;
    double x1 = 0, x2 = 0;
@@ -10689,13 +10689,13 @@ double math_pow( double x, double z ){
     }
 }
 
-double math_fmod(double a, double b)
+double x_math_fmod(double a, double b)
 {
-    return (a - b * math_floor(a / b));
+    return (a - b * x_math_floor(a / b));
 }
 
-int math_ceil(double n){
-    return -math_floor(-n);
+int x_math_ceil(double n){
+    return -x_math_floor(-n);
 }
 
 
@@ -10743,14 +10743,14 @@ double __icos(long x)
     return __isin(x+90);
 }
 
-double math_sin(double d)
+double x_math_sin(double d)
 {
     double a = __isin((long) d);
     double b = __isin((long) d+1);
     return a + (d-(int)d) * (b-a);
 }
 
-double math_cos(double d)
+double x_math_cos(double d)
 {
     double a = __icos((long) d);
     double b = __icos((long) d+1);
@@ -10758,7 +10758,7 @@ double math_cos(double d)
 }
 
 /* Nvidia */
-double math_acos(double x) {
+double x_math_acos(double x) {
     double negate = (double)(x < 0);
     x = (x >= 0) ? x : -x;
     double ret = -0.0187293;
@@ -10768,12 +10768,12 @@ double math_acos(double x) {
     ret = ret - 0.2121144;
     ret = ret * x;
     ret = ret + 1.5707288;
-    ret = ret * math_sqrt(1.0-x);
+    ret = ret * x_math_sqrt(1.0-x);
     ret = ret - 2 * negate * ret;
     return negate * 3.14159265358979 + ret;
 }
 
-double math_fabs(double f){
+double x_math_fabs(double f){
     return f < 0 ? -f : f;
 }
 
@@ -10785,23 +10785,23 @@ double math_fabs(double f){
 static int __X_GRID_SIZE = 50;
 static int __X_GRID_SEP = 1;
 
-void grid_init(int side, int sep){
+void x_grid_init(int side, int sep){
     __X_GRID_SIZE = side;
     __X_GRID_SEP = sep;
 }
 
-void grid_square(int l, int c){
+void x_grid_square(int l, int c){
     int size = __X_GRID_SIZE, sep = __X_GRID_SEP;
     x_fill_rect(c * size + sep, l * size + sep, size - sep, size - sep);
 }
 
-void grid_circle(int l, int c){
+void x_grid_circle(int l, int c){
     x_fill_circle(c * __X_GRID_SIZE + __X_GRID_SIZE / 2, l * __X_GRID_SIZE + __X_GRID_SIZE / 2,
                   __X_GRID_SIZE / 2 - __X_GRID_SEP + 1);
 }
 
 
-void grid_write(int l, int c, const char *format, ...){
+void x_grid_write(int l, int c, const char *format, ...){
     char text[1000];
     va_list args;
     va_start( args, format );
@@ -10822,7 +10822,7 @@ static float __X_BAR_YFACTOR = 1; /* multiplicative factor of bar height  */
 static int __X_BAR_SIZE = 0;
 static int __X_BAR_MAX = 0;
 
-void bar_init(int size, int max){
+void x_bar_init(int size, int max){
     __X_BAR_SIZE = size;
     __X_BAR_MAX = max;
     __X_BAR_WIDTH = x_get_width() / (size + 2);
@@ -10833,7 +10833,7 @@ void bar_init(int size, int max){
         __X_BAR_YFACTOR = 0.2;
 }
 
-void bar_one(int i, int value){
+void x_bar_one(int i, int value){
     if((i < 0)||(i >= __X_BAR_SIZE))
         return;
     int x = __X_BAR_WIDTH * (i + 1);
@@ -10843,18 +10843,18 @@ void bar_one(int i, int value){
         x_draw_line(x + j, ybase, x + j, ybase - __X_BAR_YFACTOR * value);
 }
 
-void bar_all(int * vet, int size, const char * colors, int * indices){
+void x_bar_all(int * vet, int size, const char * colors, int * indices){
     x_set_color(BLACK);
     x_clear();
     int i = 0;
     x_set_color(WHITE);
     for(i = 0; i < size; i++)
-        bar_one(i, vet[i]);
+        x_bar_one(i, vet[i]);
     if(colors != NULL && (strcmp(colors, "") != 0)){
         int qtd = strlen(colors);
         for(i = 0; i < qtd; i++){
             x_set_pcolor(colors[i]);
-            bar_one(indices[i], vet[indices[i]]);
+            x_bar_one(indices[i], vet[indices[i]]);
         }
     }
     static int atual = 0;
@@ -10872,47 +10872,47 @@ static double  __X_PEN_Y = 200;
 static double  __X_PEN_THICK = 1;
 static int     __X_PEN_DOWN = 1;
 
-void   pen_set_angle(double degrees){
+void   x_pen_set_angle(double degrees){
     __X_PEN_ANGLE = degrees;
 }
-void   pen_set_thick(int thick){
+void   x_pen_set_thick(int thick){
     if(thick > 0)
         __X_PEN_THICK = thick;
 }
-void   pen_set_pos(double x, double y){
+void   x_pen_set_pos(double x, double y){
     __X_PEN_X = x;
     __X_PEN_Y = y;
 }
-double pen_get_angle(){
+double x_pen_get_angle(){
     return __X_PEN_ANGLE;
 }
-int    pen_get_thick(){
+int    x_pen_get_thick(){
     return __X_PEN_THICK;
 }
-double    pen_get_x(){
+double    x_pen_get_x(){
     return __X_PEN_X;
 }
-double    pen_get_y(){
+double    x_pen_get_y(){
     return __X_PEN_Y;
 }
-void   pen_up(void){
+void   x_pen_up(void){
     __X_PEN_DOWN = 0;
 }
-void   pen_down(void){
+void   x_pen_down(void){
     __X_PEN_DOWN = 1;
 }
-void   pen_walk(double distance){
-    double x = __X_PEN_X + distance * math_cos(__X_PEN_ANGLE);
-    double y = __X_PEN_Y - distance * math_sin(__X_PEN_ANGLE);
+void   x_pen_walk(double distance){
+    double x = __X_PEN_X + distance * x_math_cos(__X_PEN_ANGLE);
+    double y = __X_PEN_Y - distance * x_math_sin(__X_PEN_ANGLE);
     if(__X_PEN_DOWN)
         x_fill_line(__X_PEN_X, __X_PEN_Y, x, y, __X_PEN_THICK);
     __X_PEN_X = x;
     __X_PEN_Y = y;
 }
-void   pen_rotate(int degrees){
+void   x_pen_rotate(int degrees){
     __X_PEN_ANGLE += degrees;
 }
-void   pen_goto(double x, double y){
+void   x_pen_goto(double x, double y){
     if(__X_PEN_DOWN)
         x_fill_line(__X_PEN_X, __X_PEN_Y, x, y, __X_PEN_THICK);
     __X_PEN_X = x;

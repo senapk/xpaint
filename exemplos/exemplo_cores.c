@@ -3,7 +3,7 @@
 
 int main() {
     x_open(600, 600, "figura_cores");
-    x_set_viewer("eog");
+    x_set_viewer("gthumb");
     x_set_font_size(40);
 
     x_set_color(BLACK);

@@ -4,7 +4,7 @@
 
 int main(){
     x_open(1000, 600, "figura_draw");
-    x_set_viewer("eog");
+    x_set_viewer("gthumb");
     x_set_pcolor('k');
     x_clear();
 
