@@ -34,6 +34,13 @@ X_Color x_get_pixel(int x, int y);
 /* muda a cor do pincel*/
 void x_color_set(X_Color color);
 
+#ifdef __cplusplus
+
+void x_color_set(int r, int g, int b, int a = 255);
+void x_color_set(char color);
+
+#endif
+
 /* muda a cor do pincel usando a paleta de cores*/
 void x_color_load(char color);
 

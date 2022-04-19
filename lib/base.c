@@ -181,6 +181,17 @@ void x_color_set(X_Color color){
     memcpy(__board_color, &color, __X_BYTES_PER_PIXEL * sizeof(uchar));
 }
 
+#ifdef __cplusplus
+
+void x_color_set(int r, int g, int b, int a) {
+    x_color_set(x_color_make(r, g, b, a));
+}
+void x_color_set(char color) {
+    x_color_load(color);
+}
+
+#endif
+
 void x_color_load(char color){
     X_Color pcolor = x_color_get_palette(color);
     memcpy(__board_color, &pcolor, __X_BYTES_PER_PIXEL * sizeof(uchar));
