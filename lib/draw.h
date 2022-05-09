@@ -8,8 +8,11 @@
 /* desenha uma forma utilizando uma string e o mapa de cores default */
 int x_draw_art(int x, int y, int zoom, const char * picture);
 
-/* desenha uma linha com espessura de 1 pixel entre os pontos (x0, y0) e (x1, y1) */
+/* desenha uma linha com anti aliasing com espessura de 1 pixel entre os pontos (x0, y0) e (x1, y1) */
 void x_draw_line(int x0, int y0, int x1, int y1);
+
+/* linha sem anti aliasing */
+void x_draw_sline(int x0, int y0, int x1, int y1);
 
 /* desenha uma linha com espessura de thickness pixels entre os pontos (x0, y0) e (x1, y1) */
 void x_fill_line(float x0, float y0, float x1, float y1, int thickness);

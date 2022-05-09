@@ -1,0 +1,4 @@
+
+** (gthumb:278718): WARNING **: 08:07:25.918: Could not load the 'burn_disc' extension: Could not open the module “burn_disc”: libbrasero-burn3.so.1: cannot open shared object file: No such file or directory
+
+** (gthumb:283112): WARNING **: 08:29:06.769: Could not load the 'burn_disc' extension: Could not open the module “burn_disc”: libbrasero-burn3.so.1: cannot open shared object file: No such file or directory

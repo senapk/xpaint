@@ -55,6 +55,10 @@ int x_math_floor(double x) {
     return x < xi ? xi - 1 : xi;
 }
 
+int x_math_round(double x) {
+	return x + 0.5;
+}
+
 
 /* funcao necessario para o po */
 double x_math_sqrt(const double m)

@@ -68,8 +68,4 @@ void x_set_log(const char * folder);
 void x_make_video(int framerate);
 
 
-void __x_make_layer(void);
-void __x_merge_layer(void);
-
-
 #endif /*XDDDX*/

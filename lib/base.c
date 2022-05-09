@@ -26,9 +26,6 @@ const char * __board_extension = ".ppm";
 
 static uchar *   __board_bitmap  = NULL;
 
-static uchar *   __board_layer   = NULL;
-static int       __board_layer_level = 0;
-
 static unsigned  __board_width  = 0;
 static unsigned  __board_height = 0;
 
@@ -51,33 +48,7 @@ uchar * __x_get_pixel_pos(unsigned x, unsigned y){
 //plot sem as verificações de limite
 void __x_plot(int x, int y, uchar * color);
 
-void __x_make_layer(void){
-    if(__board_layer_level > 0){
-        __board_layer_level += 1; //increasing layer account
-    }else{
-        __board_layer = __board_bitmap;
-        __board_layer_level += 1;
-        __board_bitmap = (uchar*) calloc(sizeof(uchar), __board_width * __board_height * __X_BYTES_PER_PIXEL);
-    }
-}
 
-void __x_merge_layer(void){
-    if(__board_layer_level > 1){
-        __board_layer_level -= 1;
-    }else if(__board_layer_level == 1){
-        uchar * layer = __board_bitmap;
-        __board_bitmap = __board_layer;
-        __board_layer = NULL;
-        __board_layer_level = 0;
-
-        for(size_t x = 0; x < __board_width; x++){
-            for(size_t y = 0; y < __board_height; y++){
-                __x_plot(x, y, layer + __X_BYTES_PER_PIXEL * (y * __board_width + x));
-            }
-        }
-        free(layer);
-    }
-}
 
 void x_open(unsigned int width, unsigned int height, const char * filename){
     if(__board_is_open){
@@ -145,19 +116,16 @@ void x_set_viewer(const char * viewer){
         strcpy(__board_viewer, "");
 }
 
-void __x_plot(int x, int y, uchar * color){
+void __x_plot(int x, int y, uchar * color) {
     uchar * pos = __x_get_pixel_pos((unsigned) x, (unsigned) y);
-    if(__board_layer_level > 0){
-        memcpy(pos, color, __X_BYTES_PER_PIXEL * sizeof(uchar));
-    }else{
-        for(int i = 0; i < 3; i++){
-            float fc = color[i] / 255.f;
-            float fa = color[3] / 255.f;
-            float bc = pos[i] / 255.f;
-            float ba = pos[3] / 255.f;
-            pos[i] = ((fc * fa) + (bc * (1 - fa))) * 255;
-            pos[3] = (fa + (ba * (1 - fa))) * 255;
-        }
+
+    for(int i = 0; i < 3; i++) {
+        float fc = color[i] / 255.f;
+        float fa = color[3] / 255.f;
+        float bc = pos[i] / 255.f;
+        float ba = pos[3] / 255.f;
+        pos[i] = ((fc * fa) + (bc * (1 - fa))) * 255;
+        pos[3] = (fa + (ba * (1 - fa))) * 255;
     }
 }
 

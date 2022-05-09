@@ -151,10 +151,6 @@ void x_set_log(const char * folder);
 void x_make_video(int framerate);
 
 
-void __x_make_layer(void);
-void __x_merge_layer(void);
-
-
 
 /* ############################################### */
 /* ############ FUNÇÕES DE DESENHO DE LINHAS ##### */
@@ -163,8 +159,11 @@ void __x_merge_layer(void);
 /* desenha uma forma utilizando uma string e o mapa de cores default */
 int x_draw_art(int x, int y, int zoom, const char * picture);
 
-/* desenha uma linha com espessura de 1 pixel entre os pontos (x0, y0) e (x1, y1) */
+/* desenha uma linha com anti aliasing com espessura de 1 pixel entre os pontos (x0, y0) e (x1, y1) */
 void x_draw_line(int x0, int y0, int x1, int y1);
+
+/* linha sem anti aliasing */
+void x_draw_sline(int x0, int y0, int x1, int y1);
 
 /* desenha uma linha com espessura de thickness pixels entre os pontos (x0, y0) e (x1, y1) */
 void x_fill_line(float x0, float y0, float x1, float y1, int thickness);
@@ -253,6 +252,7 @@ V2d x_v2d_ortho(V2d v);
 double x_math_sqrt(const double m);
 double x_math_pow( double x, double y );
 int    x_math_floor(double x);
+int    x_math_round(double x);
 double x_math_fmod(double a, double b);
 int    x_math_ceil(double n);
 /* degrees */
@@ -8691,9 +8691,6 @@ const char * __board_extension = ".ppm";
 
 static uchar *   __board_bitmap  = NULL;
 
-static uchar *   __board_layer   = NULL;
-static int       __board_layer_level = 0;
-
 static unsigned  __board_width  = 0;
 static unsigned  __board_height = 0;
 
@@ -8716,33 +8713,7 @@ uchar * __x_get_pixel_pos(unsigned x, unsigned y){
 //plot sem as verificações de limite
 void __x_plot(int x, int y, uchar * color);
 
-void __x_make_layer(void){
-    if(__board_layer_level > 0){
-        __board_layer_level += 1; //increasing layer account
-    }else{
-        __board_layer = __board_bitmap;
-        __board_layer_level += 1;
-        __board_bitmap = (uchar*) calloc(sizeof(uchar), __board_width * __board_height * __X_BYTES_PER_PIXEL);
-    }
-}
 
-void __x_merge_layer(void){
-    if(__board_layer_level > 1){
-        __board_layer_level -= 1;
-    }else if(__board_layer_level == 1){
-        uchar * layer = __board_bitmap;
-        __board_bitmap = __board_layer;
-        __board_layer = NULL;
-        __board_layer_level = 0;
-
-        for(size_t x = 0; x < __board_width; x++){
-            for(size_t y = 0; y < __board_height; y++){
-                __x_plot(x, y, layer + __X_BYTES_PER_PIXEL * (y * __board_width + x));
-            }
-        }
-        free(layer);
-    }
-}
 
 void x_open(unsigned int width, unsigned int height, const char * filename){
     if(__board_is_open){
@@ -8810,19 +8781,16 @@ void x_set_viewer(const char * viewer){
         strcpy(__board_viewer, "");
 }
 
-void __x_plot(int x, int y, uchar * color){
+void __x_plot(int x, int y, uchar * color) {
     uchar * pos = __x_get_pixel_pos((unsigned) x, (unsigned) y);
-    if(__board_layer_level > 0){
-        memcpy(pos, color, __X_BYTES_PER_PIXEL * sizeof(uchar));
-    }else{
-        for(int i = 0; i < 3; i++){
-            float fc = color[i] / 255.f;
-            float fa = color[3] / 255.f;
-            float bc = pos[i] / 255.f;
-            float ba = pos[3] / 255.f;
-            pos[i] = ((fc * fa) + (bc * (1 - fa))) * 255;
-            pos[3] = (fa + (ba * (1 - fa))) * 255;
-        }
+
+    for(int i = 0; i < 3; i++) {
+        float fc = color[i] / 255.f;
+        float fa = color[3] / 255.f;
+        float bc = pos[i] / 255.f;
+        float ba = pos[3] / 255.f;
+        pos[i] = ((fc * fa) + (bc * (1 - fa))) * 255;
+        pos[3] = (fa + (ba * (1 - fa))) * 255;
     }
 }
 
@@ -9005,8 +8973,6 @@ void x_save_png(unsigned dimx, unsigned dimy, unsigned char * bitmap, const char
 
 
 void x_plot(int x, int y);
-void __x_make_layer(void);
-void __x_merge_layer(void);
 
 void __x_draw_block(int x, int y, int side){
     for(int i = x; i < x + side; i++)
@@ -9041,7 +9007,7 @@ int x_draw_art(int x, int y, int zoom, const char * picture){
     return (maxdx + 1) * zoom;
 }
 
-void x_draw_line(int x0, int y0, int x1, int y1){
+void x_draw_sline(int x0, int y0, int x1, int y1) {
     /* Bresenham's Line Algorithm */
     int dx = (x0 > x1) ? x0 - x1 : x1 - x0;
     int dy = (y0 > y1) ? y0 - y1 : y1 - y0;
@@ -9074,7 +9040,7 @@ void __x_fill_bottom_flat_triangle(float v1x, float v1y, float v2x, float v2y, f
     int scanlineY;
 
     for (scanlineY = v1y; scanlineY <= (int)v2y; scanlineY++){
-        x_draw_line(curx1, scanlineY, curx2, scanlineY);
+        x_draw_sline(curx1, scanlineY, curx2, scanlineY);
         curx1 += invslope1;
         curx2 += invslope2;
     }
@@ -9092,7 +9058,7 @@ void __x_fill_top_flat_triangle(float v1x, float v1y, float v2x, float v2y, floa
 
     for (scanlineY = v3y; scanlineY >= v1y; scanlineY--)
     {
-        x_draw_line(curx1, scanlineY, curx2, scanlineY);
+        x_draw_sline(curx1, scanlineY, curx2, scanlineY);
         curx1 -= invslope1;
         curx2 -= invslope2;
     }
@@ -9100,7 +9066,6 @@ void __x_fill_top_flat_triangle(float v1x, float v1y, float v2x, float v2y, floa
 
 void x_fill_triangle(float v1x, float v1y, float v2x, float v2y, float v3x, float v3y)
 {
-    __x_make_layer();
     V2d v1 = {v1x, v1y};
     V2d v2 = {v2x, v2y};
     V2d v3 = {v3x, v3y};
@@ -9127,7 +9092,6 @@ void x_fill_triangle(float v1x, float v1y, float v2x, float v2y, float v3x, floa
         __x_fill_bottom_flat_triangle(v1.x, v1.y, v2.x, v2.y, v4.x, v4.y);
         __x_fill_top_flat_triangle(v2.x, v2.y, v4.x, v4.y, v3.x, v3.y);
     }
-    __x_merge_layer();
 }
 
 void x_fill_line(float x0, float y0, float x1, float y1, int thickness){
@@ -9137,7 +9101,7 @@ void x_fill_line(float x0, float y0, float x1, float y1, int thickness){
         x_draw_line(a.x, a.y, b.x, b.y);
         return;
     }
-    __x_make_layer();
+
     V2d _offset = x_v2d_make(b.x - a.x, b.y - a.y);
     _offset = x_v2d_dot(x_v2d_ortho(x_v2d_normalize(_offset)), (thickness / 2.f));
 
@@ -9148,7 +9112,6 @@ void x_fill_line(float x0, float y0, float x1, float y1, int thickness){
 
     x_fill_triangle(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);
     x_fill_triangle(p3.x, p3.y, p2.x, p2.y, p4.x, p4.y);
-    __x_merge_layer();
 }
 
 void x_fill_rect(int x0, int y0, int width, int height){
@@ -9195,26 +9158,26 @@ void x_fill_circle(int centerx, int centery, int radius){
     int * lined = (int *) calloc(2 * radius, sizeof(int));
     while(x >= y){
         if(lined[y + radius] == 0){
-            x_draw_line(centerx + x, centery + y, centerx - x, centery + y);
+            x_draw_sline(centerx + x, centery + y, centerx - x, centery + y);
             lined[y + radius] = 1;
         }
         if(lined[-y + radius] == 0){
-            x_draw_line(centerx + x, centery - y, centerx - x, centery - y);
+            x_draw_sline(centerx + x, centery - y, centerx - x, centery - y);
             lined[-y + radius] = 1;
         }
         if(lined[x + radius] == 0){
-            x_draw_line(centerx + y, centery + x, centerx - y, centery + x);
+            x_draw_sline(centerx + y, centery + x, centerx - y, centery + x);
             lined[x + radius] = 1;
         }
         if(lined[-x + radius] == 0){
-            x_draw_line(centerx - y, centery - x, centerx + y, centery - x);
+            x_draw_sline(centerx - y, centery - x, centerx + y, centery - x);
             lined[-x + radius] = 1;
         }
         /* 
-        x_draw_line(centerx + x, centery + y, centerx - x, centery + y);
-        x_draw_line(centerx + x, centery - y, centerx - x, centery - y);
-        x_draw_line(centerx + y, centery + x, centerx - y, centery + x);
-        x_draw_line(centerx - y, centery - x, centerx + y, centery - x);
+        x_draw_sline(centerx + x, centery + y, centerx - x, centery + y);
+        x_draw_sline(centerx + x, centery - y, centerx - x, centery - y);
+        x_draw_sline(centerx + y, centery + x, centerx - y, centery + x);
+        x_draw_sline(centerx - y, centery - x, centerx + y, centery - x);
          */
         if(err <= 0){
             y++;
@@ -9274,11 +9237,11 @@ void x_fill_ellipse(int x0, int y0, int width, int height){
     
     do {
         if(lined[y0 - ytop] == 0){
-            x_draw_line(x1, y0, x0, y0); /*   I. Quadrant */
+            x_draw_sline(x1, y0, x0, y0); /*   I. Quadrant */
             lined[y0 - ytop] = 1;
         }
         if(lined[y1 - ytop] == 0){
-            x_draw_line(x0, y1, x1, y1); /* III. Quadrant */
+            x_draw_sline(x0, y1, x1, y1); /* III. Quadrant */
             lined[y1 - ytop] = 1;
         }
         e2 = 2*err;
@@ -9324,7 +9287,7 @@ void __x_plot_quad_bezier_seg(int x0, int y0, int x1, int y1, int x2, int y2)
             if (    y1    ) { y0 += sy; dy -= xy; err += dx += xx; } /* y step */
         } while (dy < dx );           /* gradient negates -> algorithm fails */
     }
-    x_draw_line(x0, y0, x2, y2);                  /* plot remaining part to end */
+    x_draw_sline(x0, y0, x2, y2);                  /* plot remaining part to end */
 }
 void x_draw_bezier(int x0, int y0, int x1, int y1, int x2, int y2)
 {                                          /* plot any quadratic Bezier curve */
@@ -9459,6 +9422,77 @@ void x_fill_arc(float centerx, float centery, int radius, int thickness, int deg
         __x_fill_arc(centerx, centery, radius, thickness, degrees_begin, 360);
         __x_fill_arc(centerx, centery, radius, thickness, 0, degrees_end - 360);
     }
+}
+
+
+//returns fractional part of a number
+float __m_fractional (float x) {
+    return x > 0 ? x - (int) x : x - ((int) x + 1);
+}
+
+//returns 1 - fractional part of number
+float __r_fractional(float x) {
+	return 1 - __m_fractional(x);
+}
+
+// draws a pixel on screen of given brightness
+// 0<=brightness<=1. We can use your own library
+// to draw on screen
+void __plot_bright_pixel( int x , int y , X_Color color, float brightness)
+{
+    uchar r = color.r * brightness;
+    uchar g = color.g * brightness;
+    uchar b = color.b * brightness;
+    x_color_set((X_Color) {r, g, b, 255});
+    x_plot(x, y);
+}
+
+void x_draw_line(int x0 , int y0 , int x1 , int y1) {
+    X_Color backup_color = x_color_get();
+
+	int steep = x_math_fabs(y1 - y0) > x_math_fabs(x1 - x0) ;
+
+	// swap the co-ordinates if slope > 1 or we
+	// draw backwards
+	if (steep) {
+        X_SWAP(x0, y0, int);
+        X_SWAP(x1, y1, int);
+	}
+	if (x0 > x1) {
+        X_SWAP(x0, x1, int);
+        X_SWAP(y0, y1, int);
+	}
+
+	//compute the slope
+	float dx = x1-x0;
+	float dy = y1-y0;
+	float gradient = dy/dx;
+	if (dx == 0.0)
+		gradient = 1;
+
+	int xpxl1 = x0;
+	int xpxl2 = x1;
+	float intersectY = y0;
+
+	// main loop
+	if (steep) {
+		for (int x = xpxl1 ; x <=xpxl2 ; x++) {
+			// pixel coverage is determined by fractional
+			// part of y co-ordinate
+			__plot_bright_pixel((int) intersectY    , x, backup_color, __r_fractional(intersectY));
+			__plot_bright_pixel((int) intersectY + 1, x, backup_color, __m_fractional(intersectY));
+			intersectY += gradient;
+		}
+	} else {
+		for (int x = xpxl1 ; x <=xpxl2 ; x++) {
+			// pixel coverage is determined by fractional
+			// part of y co-ordinate
+			__plot_bright_pixel(x, (int) intersectY    , backup_color, __r_fractional(intersectY));
+			__plot_bright_pixel(x, (int) intersectY + 1, backup_color, __m_fractional(intersectY));
+			intersectY += gradient;
+		}
+	}
+    x_color_set(backup_color);
 }
 
 #include <stdarg.h>
@@ -10680,6 +10714,10 @@ int   x_math_rand(int min, int max){
 int x_math_floor(double x) {
     int xi = (int) x;
     return x < xi ? xi - 1 : xi;
+}
+
+int x_math_round(double x) {
+	return x + 0.5;
 }
 
 

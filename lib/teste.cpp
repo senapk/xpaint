@@ -4,7 +4,8 @@
 #include "draw.h"
 #include "modules.h"
 
-void test2(){
+
+int main() {
     srand(time(NULL));
     x_open(1000, 600, "figura_draw");
     x_set_viewer("gthumb");
@@ -26,8 +27,4 @@ void test2(){
     }
     x_save();
     x_close();
-}
-
-int main() {
-    std::cout << "oi\n";
 }

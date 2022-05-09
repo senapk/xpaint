@@ -45,6 +45,7 @@ V2d x_v2d_ortho(V2d v);
 double x_math_sqrt(const double m);
 double x_math_pow( double x, double y );
 int    x_math_floor(double x);
+int    x_math_round(double x);
 double x_math_fmod(double a, double b);
 int    x_math_ceil(double n);
 /* degrees */
