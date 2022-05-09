@@ -478,7 +478,8 @@ void __plot_bright_pixel( int x , int y , X_Color color, float brightness)
     uchar r = color.r * brightness;
     uchar g = color.g * brightness;
     uchar b = color.b * brightness;
-    x_color_set((X_Color) {r, g, b, 255});
+    uchar a = color.a * brightness;
+    x_color_set((X_Color) {r, g, b,  a});
     x_plot(x, y);
 }
 

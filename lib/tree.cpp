@@ -21,7 +21,7 @@ void draw_tree(double size) {
 }
 
 int main() {
-    double fator = 9;
+    double fator = 10;
     x_open(500 * fator, 350 * fator, "img_tree");
     x_pen_set_thick(1);
     x_pen_set_angle(90);
