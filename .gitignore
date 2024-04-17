@@ -1,2 +1,4 @@
 exec_*
+*.out
+figura_base.png
 .vscode

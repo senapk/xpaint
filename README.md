@@ -33,7 +33,7 @@ Para utilizar, basta você baixar a biblioteca para o diretório onde está o se
 
 ```
 curl https://raw.githubusercontent.com/senapk/xpaint/master/xpaint.h -o xpaint.h
-curl https://raw.githubusercontent.com/senapk/xpaint/master/exemplos/exemplo_base.c -o exemplo_base.c
+curl https://raw.githubusercontent.com/senapk/xpaint/master/exemplo_base.c -o exemplo_base.c
 gcc -Wall exemplo_base.c -o exemplo_base
 ./exemplo_base
 ```
