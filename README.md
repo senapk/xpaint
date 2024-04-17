@@ -30,10 +30,11 @@ O objetivo desse projeto é criar uma biblioteca header only para programar em C
 
 Para utilizar, basta você baixar a biblioteca para o diretório onde está o seu código fonte, compilar e executar. Se estiver no linux, pode usar os seguintes comandos para baixar a biblioteca e rodar um exemplo.
 
+
 ```
-wget https://raw.githubusercontent.com/senapk/xpaint/master/xpaint.h
-wget https://raw.githubusercontent.com/senapk/xpaint/master/exemplo_base.c
-gcc exemplo_base.c -o exemplo_base
+curl https://raw.githubusercontent.com/senapk/xpaint/master/xpaint.h -o xpaint.h
+curl https://raw.githubusercontent.com/senapk/xpaint/master/exemplos/exemplo_base.c -o exemplo_base.c
+gcc -Wall exemplo_base.c -o exemplo_base
 ./exemplo_base
 ```
 

@@ -25,7 +25,6 @@ void xgrid_matrix(int nl, int nc, char mat[nl][nc]){
 }
 
 int main(){
-    x_set_viewer("gthumb");
     int w = 902, h = 602, side = 100;
     x_open(w, h, "figura_grid");
     x_grid_init(side, 2);

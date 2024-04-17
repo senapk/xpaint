@@ -3,7 +3,6 @@
 
 int main() {
     x_open(600, 600, "figura_cores");
-    x_set_viewer("gthumb");
     x_write_set_size(40);
 
     x_color_set(BLACK);

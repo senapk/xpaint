@@ -147,7 +147,6 @@ int main(){
     } */
     
     x_open(1002, 402, "figura_floodfill");
-    x_set_viewer("gthumb");
     x_grid_init(1002/nc, 1);
     xgrid_matrix(mat, path);
     x_save();

@@ -3,7 +3,6 @@
 
 int main() {
     x_open(700, 500, "figura_texto");
-    //x_set_viewer("gthumb");
     x_write_set_size(20);
     x_color_set(WHITE);
     x_write(130, 30, "texto.png - Escrevendo em imagens");
