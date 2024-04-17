@@ -1,5 +1,5 @@
 #define XPAINT
-#include "../xpaint.h"
+#include "xpaint.h"
 
 void fractal(float x, float y, float lado, float ang){
     if(lado < 5)

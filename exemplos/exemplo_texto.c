@@ -1,5 +1,5 @@
 #define XPAINT
-#include "../xpaint.h"
+#include "xpaint.h"
 
 int main() {
     x_open(700, 500, "figura_texto");

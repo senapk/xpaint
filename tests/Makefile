@@ -6,8 +6,9 @@ all:
 # 	./$@
 
 %: %.c
-	gcc -Wall $@.c ../src/*.c -o $@
+	gcc -Wall -Wextra -Werror -fsanitize=address $@.c ../src/*.c -o $@
 	./$@
+	rm -f ./$@
 
 # gcc -Wall -Wextra -Werror -fsanitize=address $@.cpp color.c xmath.c base.c lodepng.c draw.c text.c modules.c -o $@
 #	./$@

@@ -1,5 +1,5 @@
 #define XPAINT
-#include "../xpaint.h"
+#include "xpaint.h"
 
 void xgrid_matrix(int nl, int nc, char mat[nl][nc]){
     x_color_load('w');

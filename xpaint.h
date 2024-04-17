@@ -8957,14 +8957,14 @@ void x_save_ppm(unsigned dimx, unsigned dimy, unsigned char * bitmap, const char
 }
 
 void x_save_png(unsigned dimx, unsigned dimy, unsigned char * bitmap, const char * filename){
-    char * dest = (char*) malloc(strlen(filename + 10));
+    char dest[500];
     strcpy(dest, filename);
     strcat(dest, ".png");
     unsigned error = 0;
     error = lodepng_encode_file(dest, bitmap, dimx, dimy, LCT_RGBA, 8);
-    if(error)
+    if(error) {
         printf("error %u: %s\n", error, lodepng_error_text(error));
-    free(dest);
+    }
 }
 #include <assert.h>
 #include <stdio.h>

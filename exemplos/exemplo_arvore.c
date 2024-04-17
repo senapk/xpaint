@@ -1,5 +1,5 @@
 #define XPAINT
-#include "../xpaint.h"
+#include "xpaint.h"
 
 void fractal(float x, float y, float ang, float lado){
     float delta = 35 + x_math_rand(-2, 2); /* angulo de rotacao */

@@ -1,5 +1,5 @@
 #define XPAINT
-#include "../xpaint.h"
+#include "xpaint.h"
 
 
 int main(){

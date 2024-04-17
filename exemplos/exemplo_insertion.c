@@ -1,6 +1,6 @@
 #include <stdio.h>
 #define XPAINT
-#include "../xpaint.h"
+#include "xpaint.h"
 
 void insertion(int * vet, int size){
     int i;
