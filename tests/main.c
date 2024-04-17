@@ -3,18 +3,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include "base.h"
-#include "draw.h"
-#include "text.h"
-#include "modules.h"
-#include "xmath.h"
-#include "text.h"
+#include "../src/all.h"
 #include <string.h>
 #include <wchar.h>
 void test1(){
     srand(time(NULL));
     x_open(1000, 600, "figura_draw");
-    x_set_viewer("gthumb");
     x_color_set(x_color_make(0, 0, 0, 150));
     x_clear();
     x_color_load('g');
@@ -37,7 +31,6 @@ void test1(){
 
 void many_balls(){
     x_open(1000, 600, "figura_draw");
-    x_set_viewer("gthumb");
 
     for(int i = 0; i < 26; i++){
         x_color_load('a' + i);
@@ -54,7 +47,6 @@ void many_balls(){
 
 void test_texto(){
     x_open(1200, 600, "test");
-    x_set_viewer("gthumb");
     //init_asc_map();
     //show_asc_map();
     char texto[256];
@@ -96,7 +88,6 @@ void draw_gota(int x, int y, int size){
 
 void gotas(){
     x_open(500, 500, "img");
-    x_set_viewer("gthumb");
     int ngotas = 30;
     Gota gotas[ngotas];
     for(int i = 0; i < ngotas; i++){
@@ -122,14 +113,14 @@ void gotas(){
                 gotas[i].x = 0;
             draw_gota(gotas[i].x, gotas[i].y, 10);
         }
-        x_log("img");
     }
     x_save();
     //x_video_make("img", 20);
     x_close();
 }
 
-int main2(){
+int main(){
     test_texto();
+    return 0;
 }
 

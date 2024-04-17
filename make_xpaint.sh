@@ -1,7 +1,7 @@
 #!/bin/bash
 final="xpaint.h"
 temp="xpaint.hh"
-cd lib
+cd src
 echo "#ifndef XPAINT_H" > $temp
 echo "#define XPAINT_H" >> $temp
 
