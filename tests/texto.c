@@ -17,7 +17,7 @@ int main() {
     x_write(10, 100, "aeioubcdpgqyjmnwx");
     x_write(10, 250, "ãõÃÕçÇáéíóúÁÉÍÓÚàèìòùÀÈÌÒÙâêîôûÂÊÎÔÛ");
 
-    //x_write(10, 70, "Jesus, queremos te ver, o teu rosto brilhara em nós");
+    x_write(10, 70, "Jesus, queremos te ver, o teu rosto brilhara em nós");
     x_save();
     x_close();
     return 0;
