@@ -8,16 +8,16 @@
 
 static X_Color __board_palette[256];
 
-X_Color x_color_make(uchar r, uchar g, uchar b, uchar a){
+X_Color x_make_color(uchar r, uchar g, uchar b, uchar a){
     X_Color x = {r, g, b, a};
     return x;
 }
 
-void x_color_set_palette(char c, X_Color color){
+void x_set_palette(char c, X_Color color){
     __board_palette[(int)c] = color;
 }
 
-X_Color x_color_get_palette(char c){
+X_Color x_get_palette(char c){
     return __board_palette[(int)c];
 }
 

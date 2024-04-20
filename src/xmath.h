@@ -17,7 +17,7 @@ typedef struct{
 } V2d;
 
 /* cria e retorna um vetor */
-V2d x_v2d_make(double x, double y);
+V2d x_make_v2d(double x, double y);
 
 /* retorna o tamanho de um vetor da origem */
 double x_v2d_length(double x, double y);

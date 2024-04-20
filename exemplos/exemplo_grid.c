@@ -18,7 +18,7 @@ void xgrid_matrix(int nl, int nc, char mat[nl][nc]){
             else{
                 char str[] = "abcdef";
                 str[rand() % 5 + 1] = '\0';
-                x_write_set_size(30);
+                x_set_font_size(30);
                 x_grid_write(l, c, str);
             }
         }

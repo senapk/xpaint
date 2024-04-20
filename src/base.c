@@ -145,28 +145,24 @@ X_Color x_get_pixel(int x, int y){
     return color;
 }
 
-void x_color_set(X_Color color){
+void x_set_color(X_Color color){
     memcpy(__board_color, &color, __X_BYTES_PER_PIXEL * sizeof(uchar));
 }
 
-#ifdef __cplusplus
-
-void x_color_set(int r, int g, int b, int a) {
-    x_color_set(x_color_make(r, g, b, a));
-}
-void x_color_set(char color) {
-    x_color_load(color);
+void x_set_color_rgba(uchar r, uchar g, uchar b, uchar a) {
+    __board_color[0] = r;
+    __board_color[1] = g;
+    __board_color[2] = b;
+    __board_color[3] = a;
 }
 
-#endif
-
-void x_color_load(char color){
-    X_Color pcolor = x_color_get_palette(color);
-    memcpy(__board_color, &pcolor, __X_BYTES_PER_PIXEL * sizeof(uchar));
+void x_set_color_char(char c){
+    X_Color color = x_get_palette(c);
+    memcpy(__board_color, &color, __X_BYTES_PER_PIXEL * sizeof(uchar));
 }
 
 
-X_Color x_color_get(){
+X_Color x_get_color(){
     X_Color color;
     memcpy(&color, __board_color, __X_BYTES_PER_PIXEL * sizeof(uchar));
     return color;

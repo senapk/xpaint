@@ -6,7 +6,7 @@
 void __x_init_font();
 
 // muda o tamanho da font
-void x_write_set_size(int size);
+void x_set_font_size(int size);
 
 // escreve utilizando o formato printf
 // retorna a posicao final em x

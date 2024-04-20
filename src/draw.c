@@ -33,7 +33,7 @@ int x_draw_art(int x, int y, int zoom, const char * picture){
             dx += 1;
             maxdx = dx > maxdx ? dx : maxdx;
         }else{
-            x_color_load(picture[i]);
+            x_set_color_char(picture[i]);
             __x_draw_block(x + dx * zoom, y + dy * zoom, zoom);
             dx += 1;
             maxdx = dx > maxdx ? dx : maxdx;
@@ -137,7 +137,7 @@ void x_fill_line(float x0, float y0, float x1, float y1, int thickness){
         return;
     }
 
-    V2d _offset = x_v2d_make(b.x - a.x, b.y - a.y);
+    V2d _offset = x_make_v2d(b.x - a.x, b.y - a.y);
     _offset = x_v2d_dot(x_v2d_ortho(x_v2d_normalize(_offset)), (thickness / 2.f));
 
     V2d p1 = x_v2d_sub(a, _offset);
@@ -479,12 +479,12 @@ void __plot_bright_pixel( int x , int y , X_Color color, float brightness)
     uchar g = color.g * brightness;
     uchar b = color.b * brightness;
     uchar a = color.a * brightness;
-    x_color_set((X_Color) {r, g, b,  a});
+    x_set_color((X_Color) {r, g, b,  a});
     x_plot(x, y);
 }
 
 void x_draw_line(int x0 , int y0 , int x1 , int y1) {
-    X_Color backup_color = x_color_get();
+    X_Color backup_color = x_get_color();
 
 	int steep = x_math_fabs(y1 - y0) > x_math_fabs(x1 - x0) ;
 
@@ -528,6 +528,6 @@ void x_draw_line(int x0 , int y0 , int x1 , int y1) {
 			intersectY += gradient;
 		}
 	}
-    x_color_set(backup_color);
+    x_set_color(backup_color);
 }
 

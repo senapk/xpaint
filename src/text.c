@@ -112,7 +112,7 @@ void __x_replace_unicode(char * text, __x_Letter * output, size_t * length){
     *length = size;
 }
 
-void x_write_set_size(int value){
+void x_set_font_size(int value){
     __x_font_size = value;
 }
 

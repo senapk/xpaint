@@ -8,12 +8,12 @@ int main(){
     x_clear();
 
     /* cada exemplo vai ser apresentado num espaço de 200x200 pixels */
-    x_write_set_size(30);
-    x_color_set(YELLOW);
+    x_set_font_size(30);
+    x_set_color(YELLOW);
     x_write(90, 30, "Exemplo das funções de desenho de\n         formas geométricas");
 
-    x_color_set(WHITE);
-    x_write_set_size(20);
+    x_set_color(WHITE);
+    x_set_font_size(20);
     int x = 10;
     int y = 100;
     x_write(x, y, "x_draw_line");

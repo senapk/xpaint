@@ -71,21 +71,21 @@ void x_bar_one(int i, int value){
 }
 
 void x_bar_all(int * vet, int size, const char * colors, int * indices){
-    x_color_set(BLACK);
+    x_set_color(BLACK);
     x_clear();
     int i = 0;
-    x_color_set(WHITE);
+    x_set_color(WHITE);
     for(i = 0; i < size; i++)
         x_bar_one(i, vet[i]);
     if(colors != NULL && (strcmp(colors, "") != 0)){
         int qtd = strlen(colors);
         for(i = 0; i < qtd; i++){
-            x_color_load(colors[i]);
+            x_set_color_char(colors[i]);
             x_bar_one(indices[i], vet[indices[i]]);
         }
     }
     static int atual = 0;
-    x_color_set(WHITE); /* desenhando estado */
+    x_set_color(WHITE); /* desenhando estado */
     x_write(0, 0, "%d", atual++);
 }
 

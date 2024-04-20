@@ -32,20 +32,16 @@ void x_plot(int x, int y);
 X_Color x_get_pixel(int x, int y);
 
 /* muda a cor do pincel*/
-void x_color_set(X_Color color);
+void x_set_color(X_Color color);
 
-#ifdef __cplusplus
-
-void x_color_set(int r, int g, int b, int a = 255);
-void x_color_set(char color);
-
-#endif
+/* muda a cor do pincel*/
+void x_set_color_rgba(uchar r, uchar g, uchar b, uchar a);
 
 /* muda a cor do pincel usando a paleta de cores*/
-void x_color_load(char color);
+void x_set_color_char(char c);
 
 /* return the current color for brush */
-X_Color x_color_get(void);
+X_Color x_get_color(void);
 
 /* limpa a tela inteira com a mesma cor */
 void x_clear(void);

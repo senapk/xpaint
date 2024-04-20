@@ -32,16 +32,16 @@ typedef struct{
 #define VIOLET    (X_Color) {108, 113, 196, 255} // v
 
 /* cria e retorna uma struct X_Color passando rgb */
-X_Color x_color_make(uchar r, uchar g, uchar b, uchar a);
+X_Color x_make_color(uchar r, uchar g, uchar b, uchar a);
 
 /* define uma cor na paleta de caracteres */
-void x_color_set_palette(char c, X_Color color);
+void x_set_palette(char c, X_Color color);
 
 /* retorna uma cor dado um char.
    os char default da paleta são rgbmcybk
    outros podem ser definidos ou redefinidor com palette_set
 */
-X_Color x_color_get_palette(char c);
+X_Color x_get_palette(char c);
 
 
 void __x_init_pallete();
