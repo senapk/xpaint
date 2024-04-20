@@ -6,9 +6,10 @@
 #include "../src/all.h"
 #include <string.h>
 #include <wchar.h>
-void test1(){
+
+int main() {
     srand(time(NULL));
-    x_open(1000, 600, "figura_draw");
+    x_open(1000, 600, "zz_figura_draw");
     x_color_set(x_color_make(0, 0, 0, 150));
     x_clear();
     x_color_load('g');
@@ -27,100 +28,5 @@ void test1(){
     }
     x_save();
     x_close();
-}
-
-void many_balls(){
-    x_open(1000, 600, "figura_draw");
-
-    for(int i = 0; i < 26; i++){
-        x_color_load('a' + i);
-        x_fill_circle(x_math_rand(0, 1000), x_math_rand(0, 600), x_math_rand(30, 60));
-    }
-    for(int i = 0; i < 26; i++){
-        x_color_load('A' + i);
-        x_fill_circle(x_math_rand(0, 1000), x_math_rand(0, 600), x_math_rand(30, 60));
-    }
-
-    x_save();
-    x_close();
-}
-
-void test_texto(){
-    x_open(1200, 600, "test");
-    //init_asc_map();
-    //show_asc_map();
-    //char texto[256];
-    //for(int i = ' '; i <= '~'; i++)
-    //    texto[i - ' '] = (char) i;
-    //texto['~' - ' ' + 1] = '\0';
-
-    x_color_set(WHITE);
-    //x_write(10, 10, texto);
-
-    x_color_set(RED);
-    x_write_set_size(30);
-    //x_write(10, 50, "Aabcdefghijklmnopqrstuvwxyz");
-    //x_write(10, 100, "aeioubcdpgqyjmnwx");
-    //x_write(10, 250, "ãõÃÕçÇáéíóúÁÉÍÓÚàèìòùÀÈÌÒÙâêîôûÂÊÎÔÛ");
-
-    //x_write(10, 70, "Jesus, queremos te ver, o teu rosto brilhara em nós");
-    x_save();
-    x_close();
-}
-
-
-#include <stdio.h>
-#include <unistd.h>
-#include <stdlib.h>
-
-typedef struct{
-    int x;
-    int y;
-    float v;
-} Gota;
-
-void draw_gota(int x, int y, int size){
-    x_color_load('w');
-    x_fill_circle(x, y, size);
-    x_color_load('b');
-    x_fill_circle(x, y, size - 1);
-}
-
-void gotas(){
-    x_open(500, 500, "img");
-    int ngotas = 30;
-    Gota gotas[ngotas];
-    for(int i = 0; i < ngotas; i++){
-        gotas[i].x = rand() % 500;
-        gotas[i].y = rand() % 500;
-        gotas[i].v = 0;
-    }
-
-    int qtd = 2000;
-    while(qtd--){
-        x_color_set(BLACK);
-        x_clear();
-
-        for(int i = 0; i < ngotas; i++){
-            gotas[i].v += 1;
-            gotas[i].x += 2;
-            gotas[i].y += gotas[i].v;
-            if(gotas[i].y > 500){
-                gotas[i].y = 0;
-                gotas[i].v = 3;
-            }
-            if(gotas[i].x > 500)
-                gotas[i].x = 0;
-            draw_gota(gotas[i].x, gotas[i].y, 10);
-        }
-    }
-    x_save();
-    //x_video_make("img", 20);
-    x_close();
-}
-
-int main(){
-    test_texto();
-    return 0;
 }
 

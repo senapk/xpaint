@@ -8,7 +8,6 @@
 int main() {
     srand(time(NULL));
     x_open(1000, 600, "figura_draw");
-    x_set_viewer("gthumb");
     x_color_set(x_color_make(0, 0, 0, 150));
     x_clear();
     x_color_load('g');
