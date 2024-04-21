@@ -9,9 +9,8 @@
 #include "color.h" /*XDDDX*/
 #include "lodepng.h" /*XDDDX*/
 
-void x_save_ppm(unsigned dimx, unsigned dimy, unsigned char * bitmap, const char * filename);
-void x_save_png(unsigned dimx, unsigned dimy, unsigned char * bitmap, const char * filename);
-void x_init_font();
+void save_ppm(unsigned dimx, unsigned dimy, unsigned char * bitmap, const char * filename);
+void save_png(unsigned dimx, unsigned dimy, unsigned char * bitmap, const char * filename);
 
 //#define XPPM
 
@@ -29,7 +28,11 @@ static uchar *   __board_bitmap  = NULL;
 static unsigned  __board_width  = 0;
 static unsigned  __board_height = 0;
 
-static uchar     __board_color[__X_BYTES_PER_PIXEL];
+static uchar     __stroke_color[__X_BYTES_PER_PIXEL];
+static uchar     __fill_color[__X_BYTES_PER_PIXEL];
+
+static bool      __stroke_enable = true;
+static bool      __fill_enable = true;
 
 static bool      __board_is_open = false;
 static bool      __board_lock = false;
@@ -41,7 +44,7 @@ static int       __board_step          = 1;
 /* Local prototypes */
 uchar * __x_get_pixel_pos(unsigned int x, unsigned int y);
 
-uchar * __x_get_pixel_pos(unsigned x, unsigned y){
+uchar * __x_get_pixel_pos(unsigned int x, unsigned int y) {
     return __board_bitmap + __X_BYTES_PER_PIXEL * (__board_width * y + x);
 }
 
@@ -50,7 +53,7 @@ void __x_plot(int x, int y, uchar * color);
 
 
 
-void x_open(unsigned int width, unsigned int height, const char * filename){
+void open(unsigned int width, unsigned int height, const char * filename){
     if(__board_is_open){
         fprintf(stderr, "fail: bitmat already open\n");
         return;
@@ -61,55 +64,50 @@ void x_open(unsigned int width, unsigned int height, const char * filename){
     strcpy(__board_filename, filename);
 
     __board_bitmap = (uchar*) calloc(sizeof(uchar), width * height * __X_BYTES_PER_PIXEL);
-    __board_color[0] = 30;
-    __board_color[1] = 30;
-    __board_color[2] = 30;
-    __board_color[3] = 255;
-    x_clear();
+    background(make_color(30, 30, 30, 255));
 
-    __board_color[0] = 200;
-    __board_color[1] = 200;
-    __board_color[2] = 200;
-    __board_color[3] = 255;
+    __stroke_color[0] = 200;
+    __stroke_color[1] = 200;
+    __stroke_color[2] = 200;
+    __stroke_color[3] = 255;
 
     __x_init_pallete();
     __x_init_font();
     srand((unsigned) time(NULL));
 }
 
-int x_get_height(void){
+int get_height(void){
     return (int) __board_height;
 }
 
-int x_get_width(void){
+int get_width(void){
     return (int) __board_width;
 }
 
-uchar * x_get_bitmap(void){
+uchar * get_bitmap(void){
     return __board_bitmap;
 }
 
-const char * x_get_filename(void){
+const char * get_filename(void){
     return __board_filename;
 }
 
-void x_close(void){
+void close(void){
     if(__board_bitmap != NULL){
         free(__board_bitmap);
         __board_is_open = false;
     }
     __board_is_open = false;
-    //TODO close font
 }
 
-void x_set_filename(const char * filename){
+void set_filename(const char * filename){
     if(filename != NULL)
         strcpy(__board_filename, filename);
     else
         strcpy(__board_filename, "");
 }
 
-void x_set_viewer(const char * viewer){
+void set_viewer(const char * viewer){
     if(viewer != NULL)
         strcpy(__board_viewer, viewer);
     else
@@ -129,57 +127,106 @@ void __x_plot(int x, int y, uchar * color) {
     }
 }
 
-void x_plot(int x, int y){
+void point(int x, int y){
     if(!__board_is_open){
         fprintf(stderr, "fail: x_open(weight, width, filename) missing\n");
         exit(1);
     }
+    if (!__stroke_enable) {
+        return;
+    }
+        
     if((x >= 0) && (x < (int) __board_width) && (y >= 0) && (y <  (int) __board_height))
-        __x_plot(x, y, __board_color);
+        __x_plot(x, y, __stroke_color);
 }
 
-X_Color x_get_pixel(int x, int y){
+void point_fill(int x, int y){
+    if(!__board_is_open){
+        fprintf(stderr, "fail: x_open(weight, width, filename) missing\n");
+        exit(1);
+    }
+    if (!__fill_enable) {
+        return;
+    }
+    if((x >= 0) && (x < (int) __board_width) && (y >= 0) && (y <  (int) __board_height))
+        __x_plot(x, y, __fill_color);
+}
+
+Color get_pixel(int x, int y){
     uchar * pixel = __x_get_pixel_pos((unsigned) x, (unsigned) y);
-    X_Color color;
+    Color color;
     memcpy(&color, pixel, __X_BYTES_PER_PIXEL * sizeof(uchar));
     return color;
 }
 
-void x_set_color(X_Color color){
-    memcpy(__board_color, &color, __X_BYTES_PER_PIXEL * sizeof(uchar));
+void stroke(Color color){
+    memcpy(__stroke_color, &color, __X_BYTES_PER_PIXEL * sizeof(uchar));
 }
 
-void x_set_color_rgba(uchar r, uchar g, uchar b, uchar a) {
-    __board_color[0] = r;
-    __board_color[1] = g;
-    __board_color[2] = b;
-    __board_color[3] = a;
+void stroke_rgba(uchar r, uchar g, uchar b, uchar a) {
+    __stroke_color[0] = r;
+    __stroke_color[1] = g;
+    __stroke_color[2] = b;
+    __stroke_color[3] = a;
 }
 
-void x_set_color_char(char c){
-    X_Color color = x_get_palette(c);
-    memcpy(__board_color, &color, __X_BYTES_PER_PIXEL * sizeof(uchar));
+void stroke_char(char c){
+    Color color = x_get_palette(c);
+    memcpy(__stroke_color, &color, __X_BYTES_PER_PIXEL * sizeof(uchar));
+}
+
+void fill(Color color){
+    memcpy(__fill_color, &color, __X_BYTES_PER_PIXEL * sizeof(uchar));
+}
+
+void fill_rgba(uchar r, uchar g, uchar b, uchar a) {
+    __fill_color[0] = r;
+    __fill_color[1] = g;
+    __fill_color[2] = b;
+    __fill_color[3] = a;
+}
+
+void fill_char(char c){
+    Color color = x_get_palette(c);
+    memcpy(__fill_color, &color, __X_BYTES_PER_PIXEL * sizeof(uchar));
+}
+
+void no_stroke(){
+    __stroke_enable = false;
+}
+
+void no_fill(){
+    __fill_enable = false;
 }
 
 
-X_Color x_get_color(){
-    X_Color color;
-    memcpy(&color, __board_color, __X_BYTES_PER_PIXEL * sizeof(uchar));
+Color get_stroke(){
+    Color color;
+    memcpy(&color, __stroke_color, __X_BYTES_PER_PIXEL * sizeof(uchar));
     return color;
 }
 
-void x_clear(void){
+Color get_fill(){
+    Color color;
+    memcpy(&color, __fill_color, __X_BYTES_PER_PIXEL * sizeof(uchar));
+    return color;
+}
+
+void background(Color color){
+    uchar __color[__X_BYTES_PER_PIXEL];
+    memcpy(__color, &color, __X_BYTES_PER_PIXEL * sizeof(uchar));
+
     unsigned x, y;
     for(x = 0; x < __board_width; x++)
         for(y = 0; y < __board_height; y++)
-            memcpy(__x_get_pixel_pos((unsigned) x, (unsigned) y), __board_color, __X_BYTES_PER_PIXEL * sizeof(uchar));
+            memcpy(__x_get_pixel_pos((unsigned) x, (unsigned) y), __color, __X_BYTES_PER_PIXEL * sizeof(uchar));
 }
 
 void __x_save_buffer(const char * filename) {
 #ifndef XPPM
-    x_save_png(__board_width, __board_height, __board_bitmap, filename);
+    save_png(__board_width, __board_height, __board_bitmap, filename);
 #else
-    x_save_ppm(__board_width, __board_height, __board_bitmap, filename);
+    save_ppm(__board_width, __board_height, __board_bitmap, filename);
 #endif
 }
 
@@ -241,7 +288,7 @@ void __x_lock(){
 
 
 
-void x_save(){
+void save(){
     if (strcmp(__board_folder, "") != 0)
         __x_log();
     if (__board_lock)
@@ -273,9 +320,9 @@ void x_set_lock(){
     __board_lock = true;
 }
 
-void x_save_ppm(unsigned dimx, unsigned dimy, unsigned char * bitmap, const char * filename){
+void save_ppm(unsigned dimx, unsigned dimy, unsigned char * bitmap, const char * filename){
     /* const int dimx = x_get_width();
-    const int dimy = x_get_height();
+    const int dimy = get_height();
      */
     char path[400];
     sprintf(path,"%s.ppm", filename);
@@ -287,7 +334,7 @@ void x_save_ppm(unsigned dimx, unsigned dimy, unsigned char * bitmap, const char
     fclose(fp);
 }
 
-void x_save_png(unsigned dimx, unsigned dimy, unsigned char * bitmap, const char * filename){
+void save_png(unsigned dimx, unsigned dimy, unsigned char * bitmap, const char * filename){
     char dest[500];
     strcpy(dest, filename);
     strcat(dest, ".png");

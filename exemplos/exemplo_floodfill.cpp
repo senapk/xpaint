@@ -44,7 +44,7 @@ void print(Item mat[], int nl, int nc){
 char WALL = 'k', EMPTY = 'w', VISITED = 'y', PATH = 'c';
 
 void xgrid_matrix(matriz<Item> mat, list<Pos> path){
-    x_clear();
+    background();
     for(int l = 0; l < mat.nl; l++){
         for(int c = 0; c < mat.nc; c++){
             Item& item = mat.get(Pos{l, c});
@@ -59,7 +59,7 @@ void xgrid_matrix(matriz<Item> mat, list<Pos> path){
     }
     int i = 0;
     for(auto p : path){
-        x_set_color(VIOLET);
+        stroke(VIOLET);
         x_grid_circle(p.l, p.c);
         x_color_load('k');
         x_grid_write(p.l, p.c, "%d", i++);
@@ -146,11 +146,11 @@ int main(){
         cout << '\n';
     } */
     
-    x_open(1002, 402, "figura_floodfill");
+    open(1002, 402, "figura_floodfill");
     x_grid_init(1002/nc, 1);
     xgrid_matrix(mat, path);
-    x_save();
-    x_close();
+    save();
+    close();
     
     return 0;
 }

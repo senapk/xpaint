@@ -3,7 +3,7 @@
 
 void xgrid_matrix(int nl, int nc, char mat[nl][nc]){
     x_color_load('w');
-    x_clear();
+    background();
     char * colors = "rgbymcov";
     int l, c;
     for(l = 0; l < nl; l++)
@@ -26,7 +26,7 @@ void xgrid_matrix(int nl, int nc, char mat[nl][nc]){
 
 int main(){
     int w = 902, h = 602, side = 100;
-    x_open(w, h, "figura_grid");
+    open(w, h, "figura_grid");
     x_grid_init(side, 2);
     int nl = h / side, nc = w / side;
     char mat[nl][nc];
@@ -38,7 +38,7 @@ int main(){
         }
     }
     xgrid_matrix(nl, nc, mat);
-    x_save();
-    x_close();
+    save();
+    close();
     return 0;
 }

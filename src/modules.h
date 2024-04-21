@@ -56,7 +56,7 @@ void x_bar_all(int * vet, int size, const char * colors, int * indices);
 #define x_bar_save(vet, size, colors, ...) do{\
     int __indices[] = {__VA_ARGS__};\
     x_bar_all(vet, size, colors, __indices);\
-    x_save();\
+    save();\
 } while(0);
 
 /*

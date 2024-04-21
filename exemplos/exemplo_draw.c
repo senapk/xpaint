@@ -3,16 +3,16 @@
 
 
 int main(){
-    x_open(1000, 600, "figura_draw");
+    open(1000, 600, "figura_draw");
     x_color_load('k');
-    x_clear();
+    background();
 
     /* cada exemplo vai ser apresentado num espaço de 200x200 pixels */
     x_set_font_size(30);
-    x_set_color(YELLOW);
+    stroke(YELLOW);
     x_write(90, 30, "Exemplo das funções de desenho de\n         formas geométricas");
 
-    x_set_color(WHITE);
+    stroke(WHITE);
     x_set_font_size(20);
     int x = 10;
     int y = 100;
@@ -56,7 +56,7 @@ int main(){
     x_write(x, y, "x_fill_rect");
     x_fill_rect(x + 30, y + 50, 120, 100);  
 
-    x_save();
-    x_close();
+    save();
+    close();
     return 0;
 }

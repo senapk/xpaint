@@ -7,12 +7,12 @@
 #include "xmath.h" /*XDDDX*/
 #include "base.h" /*XDDDX*/
 
-void x_plot(int x, int y);
+void point(int x, int y);
 
 void __x_draw_block(int x, int y, int side){
     for(int i = x; i < x + side; i++)
         for(int j = y; j < y + side; j++)
-            x_plot(i, j);
+            point(i, j);
 }
 
 int x_draw_art(int x, int y, int zoom, const char * picture){
@@ -33,7 +33,7 @@ int x_draw_art(int x, int y, int zoom, const char * picture){
             dx += 1;
             maxdx = dx > maxdx ? dx : maxdx;
         }else{
-            x_set_color_char(picture[i]);
+            stroke_char(picture[i]);
             __x_draw_block(x + dx * zoom, y + dy * zoom, zoom);
             dx += 1;
             maxdx = dx > maxdx ? dx : maxdx;
@@ -51,7 +51,7 @@ void x_draw_sline(int x0, int y0, int x1, int y1) {
     int err = dx - dy;
 
     while (1) {
-        x_plot(x0, y0);
+        point(x0, y0);
         if (x0 == x1 && y0 == y1) break;
         int e2 = 2 * err;
         if (e2 > -dy) {
@@ -163,14 +163,14 @@ void x_draw_circle(int centerx, int centery, int radius){
     int dy = 1;
     int err = dx - (radius << 1);
     while(x >= y){
-        x_plot(centerx + x, centery + y);
-        x_plot(centerx - x, centery + y);
-        x_plot(centerx + x, centery - y);
-        x_plot(centerx - x, centery - y);
-        x_plot(centerx + y, centery + x);
-        x_plot(centerx - y, centery + x);
-        x_plot(centerx - y, centery - x);
-        x_plot(centerx + y, centery - x);
+        point(centerx + x, centery + y);
+        point(centerx - x, centery + y);
+        point(centerx + x, centery - y);
+        point(centerx - x, centery - y);
+        point(centerx + y, centery + x);
+        point(centerx - y, centery + x);
+        point(centerx - y, centery - x);
+        point(centerx + y, centery - x);
 
         if(err <= 0){
             y++;
@@ -239,20 +239,20 @@ void x_draw_ellipse(int x0, int y0, int width, int height){
     a *= 8*a; b1 = 8*b*b;
 
     do {
-        x_plot(x1, y0); /*   I. Quadrant */
-        x_plot(x0, y0); /*  II. Quadrant */
-        x_plot(x0, y1); /* III. Quadrant */
-        x_plot(x1, y1); /*  IV. Quadrant */
+        point(x1, y0); /*   I. Quadrant */
+        point(x0, y0); /*  II. Quadrant */
+        point(x0, y1); /* III. Quadrant */
+        point(x1, y1); /*  IV. Quadrant */
         e2 = 2*err;
         if (e2 <= dy) { y0++; y1--; err += dy += a; }  /* y step */
         if (e2 >= dx || 2*err > dy) { x0++; x1--; err += dx += b1; } /* x step */
     } while (x0 <= x1);
 
     while (y0-y1 < b) {  /* too early stop of flat ellipses a=1 */
-        x_plot(x0-1, y0); /* -> finish tip of ellipse */
-        x_plot(x1+1, y0++);
-        x_plot(x0-1, y1);
-        x_plot(x1+1, y1--);
+        point(x0-1, y0); /* -> finish tip of ellipse */
+        point(x1+1, y0++);
+        point(x0-1, y1);
+        point(x1+1, y1--);
     }
 }
 
@@ -285,10 +285,10 @@ void x_fill_ellipse(int x0, int y0, int width, int height){
     } while (x0 <= x1);
 
     while (y0-y1 < b) {  /* too early stop of flat ellipses a=1 */
-        x_plot(x0-1, y0); /* -> finish tip of ellipse */
-        x_plot(x1+1, y0++);
-        x_plot(x0-1, y1);
-        x_plot(x1+1, y1--);
+        point(x0-1, y0); /* -> finish tip of ellipse */
+        point(x1+1, y0++);
+        point(x0-1, y1);
+        point(x1+1, y1--);
     }
     free(lined);
 }
@@ -315,7 +315,7 @@ void __x_plot_quad_bezier_seg(int x0, int y0, int x1, int y1, int x2, int y2)
         dy = 4.0*sx*cur*(y0-y1)+yy-xy;
         xx += xx; yy += yy; err = dx+dy+xy;                /* error 1st step */
         do {
-            x_plot(x0,y0);                                     /* plot curve */
+            point(x0,y0);                                     /* plot curve */
             if (x0 == x2 && y0 == y2) return;  /* last pixel -> curve finished */
             y1 = 2*err < dx;                  /* save value for test of y step */
             if (2*err > dy) { x0 += sx; dx -= xy; err += dy += yy; } /* x step */
@@ -431,7 +431,7 @@ void __x_fill_arc(float centerx, float centery, int radius, int thickness, int d
                             (y == 0 && degrees_begin == 0 && x > 0)
                     )
                     )
-                x_plot(center.x+x, center.y-y);
+                point(center.x+x, center.y-y);
         }
     }
 
@@ -473,18 +473,18 @@ float __r_fractional(float x) {
 // draws a pixel on screen of given brightness
 // 0<=brightness<=1. We can use your own library
 // to draw on screen
-void __plot_bright_pixel( int x , int y , X_Color color, float brightness)
+void __plot_bright_pixel( int x , int y , Color color, float brightness)
 {
     uchar r = color.r * brightness;
     uchar g = color.g * brightness;
     uchar b = color.b * brightness;
     uchar a = color.a * brightness;
-    x_set_color((X_Color) {r, g, b,  a});
-    x_plot(x, y);
+    stroke((Color) {r, g, b,  a});
+    point(x, y);
 }
 
 void x_draw_line(int x0 , int y0 , int x1 , int y1) {
-    X_Color backup_color = x_get_color();
+    Color backup_color = get_stroke();
 
 	int steep = x_math_fabs(y1 - y0) > x_math_fabs(x1 - x0) ;
 
@@ -528,6 +528,6 @@ void x_draw_line(int x0 , int y0 , int x1 , int y1) {
 			intersectY += gradient;
 		}
 	}
-    x_set_color(backup_color);
+    stroke(backup_color);
 }
 

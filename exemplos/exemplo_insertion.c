@@ -31,8 +31,8 @@ void verify(int * vet, int size){
 
 int main() {
 
-    x_open(600, 300, "figura_insertion");
-    x_set_viewer("code");
+    open(600, 300, "figura_insertion");
+    set_viewer("code");
     x_set_lock();
     x_set_log("imgs");
     int size = 30, max = 900;
@@ -45,11 +45,11 @@ int main() {
         vet[i] = rand() % max + 1; 
 
     insertion(vet, size);
-    x_save();
+    save();
     verify(vet, size);
     x_bar_save(vet, size, NULL);
     x_make_video(3);
-    x_close();
+    close();
 
     return 0;
  }

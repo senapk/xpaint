@@ -17,12 +17,12 @@ void fractal(float x, float y, float lado, float ang){
     }
 }
 int main(){
-    x_open(800, 700, "figura_triangulo");
+    open(800, 700, "figura_triangulo");
     x_set_font_size(30);
     x_write(140, 0, "Exemplo do fractal de Sierpinski");
     fractal(50, 650, 700, 60);
-    x_save();
-    x_close();
+    save();
+    close();
     return 0;
 }
 

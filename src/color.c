@@ -6,18 +6,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-static X_Color __board_palette[256];
+static Color __board_palette[256];
 
-X_Color x_make_color(uchar r, uchar g, uchar b, uchar a){
-    X_Color x = {r, g, b, a};
+Color make_color(uchar r, uchar g, uchar b, uchar a){
+    Color x = {r, g, b, a};
     return x;
 }
 
-void x_set_palette(char c, X_Color color){
+void x_set_palette(char c, Color color){
     __board_palette[(int)c] = color;
 }
 
-X_Color x_get_palette(char c){
+Color x_get_palette(char c){
     return __board_palette[(int)c];
 }
 
@@ -51,7 +51,7 @@ void __x_init_pallete(void){
 //    return true;
 //}
 
-//bool __x_decode_hex(const char * _color, X_Color * xc){
+//bool __x_decode_hex(const char * _color, Color * xc){
 //    if(strlen(_color) != 7 || _color[0] != '#')
 //        return false;
 //    char color[8];
@@ -64,7 +64,7 @@ void __x_init_pallete(void){
 //    int readings = sscanf(color + 1, "%02x%02x%02x", &r, &g, &b);
 //    if(readings != 3)
 //        return false;
-//    *xc = (X_Color){r, g, b, 255};
+//    *xc = (Color){r, g, b, 255};
 //    return true;
 //}
 
@@ -77,7 +77,7 @@ void __x_init_pallete(void){
 //    return cont;
 //}
 
-//bool __x_decode_rgba(const char * color, X_Color * xc){
+//bool __x_decode_rgba(const char * color, Color * xc){
 //    int number_of_colons = __x_count_colon(color);
 //    if(number_of_colons != 2 && number_of_colons != 3)
 //        return false;
@@ -115,7 +115,7 @@ void __x_init_pallete(void){
 //    return true;
 //}
 
-//bool __x_color_load(const char * color, X_Color * xc){
+//bool __x_color_load(const char * color, Color * xc){
 //    if(strlen(color) == 1){
 //        int pos = color[0];
 //        *xc = __board_palette[pos];
@@ -131,12 +131,12 @@ void __x_init_pallete(void){
 //    return false;
 //}
 
-//void x_color_store(char shortcut[2], const char * entry, X_Color color){
+//void x_color_store(char shortcut[2], const char * entry, Color color){
 //    palette_set(shortcut[0], color);
 //    x_color_add(entry, color);
 //}
 
-//void x_color_add(const char * entry, X_Color color){
+//void x_color_add(const char * entry, Color color){
 //    if(x_arr_colors_size < X_MAX_ITENS){
 //        strcpy(x_arr_colors[x_arr_colors_size].key, entry);
 //        x_arr_colors[x_arr_colors_size].color = color;
@@ -223,14 +223,14 @@ void __x_init_pallete(void){
 ////    __x_init_pallete();
 //}
 
-//void x_color_show(X_Color color){
+//void x_color_show(Color color){
 //    printf("{%3d, %3d, %3d, %3d}\n", color.r, color.g, color.b, color.a);
 //}
 
-//X_Color x_color_decode(const char * color){
-//    X_Color xc;
+//Color x_color_decode(const char * color){
+//    Color xc;
 //    if(__x_decode_rgba(color, &xc) || __x_decode_hex(color, &xc) || __x_color_load(color, &xc))
 //        return xc;
-//    printf("fail: X_Color \"%s\" could not be decoded\n", color);
+//    printf("fail: Color \"%s\" could not be decoded\n", color);
 //    return xc;
 //}

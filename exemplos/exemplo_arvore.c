@@ -17,10 +17,10 @@ void fractal(float x, float y, float ang, float lado){
 }
 
 int main(){
-    x_open(800, 500, "figura_arvore");
+    open(800, 500, "figura_arvore");
     fractal(400, 450, 90, 100);
-    x_save();
-    x_close();
+    save();
+    close();
     return 0;
 }
 

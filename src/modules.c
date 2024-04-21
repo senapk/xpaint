@@ -52,8 +52,8 @@ static int __X_BAR_MAX = 0;
 void x_bar_init(int size, int max){
     __X_BAR_SIZE = size;
     __X_BAR_MAX = max;
-    __X_BAR_WIDTH = x_get_width() / (size + 2);
-    __X_BAR_YFACTOR = (x_get_height() - 4.0 * __X_BAR_WIDTH);
+    __X_BAR_WIDTH = get_width() / (size + 2);
+    __X_BAR_YFACTOR = (get_height() - 4.0 * __X_BAR_WIDTH);
     __X_BAR_YFACTOR = __X_BAR_YFACTOR < 0 ? -__X_BAR_YFACTOR : __X_BAR_YFACTOR;
     __X_BAR_YFACTOR /= max;
     if(__X_BAR_YFACTOR < 0.2)
@@ -64,28 +64,27 @@ void x_bar_one(int i, int value){
     if((i < 0)||(i >= __X_BAR_SIZE))
         return;
     int x = __X_BAR_WIDTH * (i + 1);
-    int ybase = x_get_height() - __X_BAR_WIDTH;
+    int ybase = get_height() - __X_BAR_WIDTH;
     int j;
     for(j = 0; j < ((int) __X_BAR_WIDTH - 2) ; j++)
         x_draw_line(x + j, ybase, x + j, ybase - __X_BAR_YFACTOR * value);
 }
 
 void x_bar_all(int * vet, int size, const char * colors, int * indices){
-    x_set_color(BLACK);
-    x_clear();
+    background(BLACK);
     int i = 0;
-    x_set_color(WHITE);
+    stroke(WHITE);
     for(i = 0; i < size; i++)
         x_bar_one(i, vet[i]);
     if(colors != NULL && (strcmp(colors, "") != 0)){
         int qtd = strlen(colors);
         for(i = 0; i < qtd; i++){
-            x_set_color_char(colors[i]);
+            stroke_char(colors[i]);
             x_bar_one(indices[i], vet[indices[i]]);
         }
     }
     static int atual = 0;
-    x_set_color(WHITE); /* desenhando estado */
+    stroke(WHITE); /* desenhando estado */
     x_write(0, 0, "%d", atual++);
 }
 

@@ -13,14 +13,14 @@ typedef struct{
 } Gota;
 
 void draw_gota(int x, int y, int size){
-    x_set_color_char('w');
+    stroke_char('w');
     x_fill_circle(x, y, size);
-    x_set_color_char('b');
+    stroke_char('b');
     x_fill_circle(x, y, size - 1);
 }
 
 int main(){
-    x_open(500, 500, "zz_gotas");
+    open(500, 500, "zz_gotas");
     int ngotas = 30;
     Gota gotas[ngotas];
     for(int i = 0; i < ngotas; i++){
@@ -31,8 +31,8 @@ int main(){
 
     int qtd = 100;
     while(qtd--){
-        x_set_color(BLACK);
-        //x_clear();
+        stroke(BLACK);
+        //background();
 
         for(int i = 0; i < ngotas; i++){
             gotas[i].v += 1;
@@ -47,9 +47,9 @@ int main(){
             draw_gota(gotas[i].x, gotas[i].y, 10);
         }
     }
-    x_save();
+    save();
     //x_video_make("img", 20);
-    x_close();
+    close();
     return 0;
 }
 

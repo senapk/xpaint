@@ -2457,7 +2457,7 @@ unsigned lodepng_chunk_create(unsigned char** out, size_t* outlength, unsigned l
 }
 
 /* ////////////////////////////////////////////////////////////////////////// */
-/* / X_Color types, channels, bits                                            / */
+/* / Color types, channels, bits                                            / */
 /* ////////////////////////////////////////////////////////////////////////// */
 
 /*checks if the colortype is valid and the bitdepth bd is allowed for this colortype.
@@ -3515,7 +3515,7 @@ void lodepng_compute_color_stats(LodePNGColorStats* stats,
           stats->key_g = g;
           stats->key_b = b;
         } else if(a == 65535 && stats->key && matchkey) {
-          /* X_Color key cannot be used if an opaque pixel also has that RGB color. */
+          /* Color key cannot be used if an opaque pixel also has that RGB color. */
           stats->alpha = 1;
           stats->key = 0;
           alpha_done = 1;
@@ -3528,7 +3528,7 @@ void lodepng_compute_color_stats(LodePNGColorStats* stats,
       for(i = 0; i != numpixels; ++i) {
         getPixelColorRGBA16(&r, &g, &b, &a, in, i, mode_in);
         if(a != 0 && r == stats->key_r && g == stats->key_g && b == stats->key_b) {
-          /* X_Color key cannot be used if an opaque pixel also has that RGB color. */
+          /* Color key cannot be used if an opaque pixel also has that RGB color. */
           stats->alpha = 1;
           stats->key = 0;
           alpha_done = 1;
@@ -3566,7 +3566,7 @@ void lodepng_compute_color_stats(LodePNGColorStats* stats,
           stats->key_g = g;
           stats->key_b = b;
         } else if(a == 255 && stats->key && matchkey) {
-          /* X_Color key cannot be used if an opaque pixel also has that RGB color. */
+          /* Color key cannot be used if an opaque pixel also has that RGB color. */
           stats->alpha = 1;
           stats->key = 0;
           alpha_done = 1;
@@ -3597,7 +3597,7 @@ void lodepng_compute_color_stats(LodePNGColorStats* stats,
       for(i = 0; i != numpixels; ++i) {
         getPixelColorRGBA8(&r, &g, &b, &a, in, i, mode_in);
         if(a != 0 && r == stats->key_r && g == stats->key_g && b == stats->key_b) {
-          /* X_Color key cannot be used if an opaque pixel also has that RGB color. */
+          /* Color key cannot be used if an opaque pixel also has that RGB color. */
           stats->alpha = 1;
           stats->key = 0;
           alpha_done = 1;
