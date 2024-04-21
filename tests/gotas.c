@@ -14,9 +14,9 @@ typedef struct{
 
 void draw_gota(int x, int y, int size){
     stroke_char('w');
-    x_fill_circle(x, y, size);
+    fill_circle(x, y, size);
     stroke_char('b');
-    x_fill_circle(x, y, size - 1);
+    fill_circle(x, y, size - 1);
 }
 
 int main(){

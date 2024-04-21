@@ -15,7 +15,7 @@ void __x_draw_block(int x, int y, int side){
             point(i, j);
 }
 
-int x_draw_art(int x, int y, int zoom, const char * picture){
+int draw_art(int x, int y, int zoom, const char * picture){
     int dx = 0;
     int dy = 0;
     int maxdx = 0;
@@ -42,7 +42,7 @@ int x_draw_art(int x, int y, int zoom, const char * picture){
     return (maxdx + 1) * zoom;
 }
 
-void x_draw_sline(int x0, int y0, int x1, int y1) {
+void draw_sline(int x0, int y0, int x1, int y1) {
     /* Bresenham's Line Algorithm */
     int dx = (x0 > x1) ? x0 - x1 : x1 - x0;
     int dy = (y0 > y1) ? y0 - y1 : y1 - y0;
@@ -75,7 +75,7 @@ void __x_fill_bottom_flat_triangle(float v1x, float v1y, float v2x, float v2y, f
     int scanlineY;
 
     for (scanlineY = v1y; scanlineY <= (int)v2y; scanlineY++){
-        x_draw_sline(curx1, scanlineY, curx2, scanlineY);
+        draw_sline(curx1, scanlineY, curx2, scanlineY);
         curx1 += invslope1;
         curx2 += invslope2;
     }
@@ -93,13 +93,13 @@ void __x_fill_top_flat_triangle(float v1x, float v1y, float v2x, float v2y, floa
 
     for (scanlineY = v3y; scanlineY >= v1y; scanlineY--)
     {
-        x_draw_sline(curx1, scanlineY, curx2, scanlineY);
+        draw_sline(curx1, scanlineY, curx2, scanlineY);
         curx1 -= invslope1;
         curx2 -= invslope2;
     }
 }
 
-void x_fill_triangle(float v1x, float v1y, float v2x, float v2y, float v3x, float v3y)
+void fill_triangle(float v1x, float v1y, float v2x, float v2y, float v3x, float v3y)
 {
     V2d v1 = {v1x, v1y};
     V2d v2 = {v2x, v2y};
@@ -129,34 +129,34 @@ void x_fill_triangle(float v1x, float v1y, float v2x, float v2y, float v3x, floa
     }
 }
 
-void x_fill_line(float x0, float y0, float x1, float y1, int thickness){
+void fill_line(float x0, float y0, float x1, float y1, int thickness){
     V2d a = {x0, y0};
     V2d b = {x1, y1};
     if(thickness == 1){
-        x_draw_line(a.x, a.y, b.x, b.y);
+        draw_line(a.x, a.y, b.x, b.y);
         return;
     }
 
-    V2d _offset = x_make_v2d(b.x - a.x, b.y - a.y);
-    _offset = x_v2d_dot(x_v2d_ortho(x_v2d_normalize(_offset)), (thickness / 2.f));
+    V2d _offset = make_v2d(b.x - a.x, b.y - a.y);
+    _offset = v2d_dot(v2d_ortho(v2d_normalize(_offset)), (thickness / 2.f));
 
-    V2d p1 = x_v2d_sub(a, _offset);
-    V2d p2 = x_v2d_sub(b, _offset);
-    V2d p3 = x_v2d_sum(a, _offset);
-    V2d p4 = x_v2d_sum(b, _offset);
+    V2d p1 = v2d_sub(a, _offset);
+    V2d p2 = v2d_sub(b, _offset);
+    V2d p3 = v2d_sum(a, _offset);
+    V2d p4 = v2d_sum(b, _offset);
 
-    x_fill_triangle(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);
-    x_fill_triangle(p3.x, p3.y, p2.x, p2.y, p4.x, p4.y);
+    fill_triangle(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);
+    fill_triangle(p3.x, p3.y, p2.x, p2.y, p4.x, p4.y);
 }
 
-void x_fill_rect(int x0, int y0, int width, int height){
+void fill_rect(int x0, int y0, int width, int height){
     int i, x1 = x0 + width - 1, y1 = y0 + height - 1;
     for(i = x0; i <= x1; i++)
-        x_draw_line(i, y0, i, y1);
+        draw_line(i, y0, i, y1);
 }
 
 /* https://en.wikipedia.org/wiki/Midpoint_circle_algorithm */
-void x_draw_circle(int centerx, int centery, int radius){
+void draw_circle(int centerx, int centery, int radius){
     int x = radius - 1;
     int y = 0;
     int dx = 1;
@@ -184,7 +184,7 @@ void x_draw_circle(int centerx, int centery, int radius){
     }
 }
 
-void x_fill_circle(int centerx, int centery, int radius){
+void fill_circle(int centerx, int centery, int radius){
     int x = radius - 1;
     int y = 0;
     int dx = 1;
@@ -193,26 +193,26 @@ void x_fill_circle(int centerx, int centery, int radius){
     int * lined = (int *) calloc(2 * radius, sizeof(int));
     while(x >= y){
         if(lined[y + radius] == 0){
-            x_draw_sline(centerx + x, centery + y, centerx - x, centery + y);
+            draw_sline(centerx + x, centery + y, centerx - x, centery + y);
             lined[y + radius] = 1;
         }
         if(lined[-y + radius] == 0){
-            x_draw_sline(centerx + x, centery - y, centerx - x, centery - y);
+            draw_sline(centerx + x, centery - y, centerx - x, centery - y);
             lined[-y + radius] = 1;
         }
         if(lined[x + radius] == 0){
-            x_draw_sline(centerx + y, centery + x, centerx - y, centery + x);
+            draw_sline(centerx + y, centery + x, centerx - y, centery + x);
             lined[x + radius] = 1;
         }
         if(lined[-x + radius] == 0){
-            x_draw_sline(centerx - y, centery - x, centerx + y, centery - x);
+            draw_sline(centerx - y, centery - x, centerx + y, centery - x);
             lined[-x + radius] = 1;
         }
         /* 
-        x_draw_sline(centerx + x, centery + y, centerx - x, centery + y);
-        x_draw_sline(centerx + x, centery - y, centerx - x, centery - y);
-        x_draw_sline(centerx + y, centery + x, centerx - y, centery + x);
-        x_draw_sline(centerx - y, centery - x, centerx + y, centery - x);
+        draw_sline(centerx + x, centery + y, centerx - x, centery + y);
+        draw_sline(centerx + x, centery - y, centerx - x, centery - y);
+        draw_sline(centerx + y, centery + x, centerx - y, centery + x);
+        draw_sline(centerx - y, centery - x, centerx + y, centery - x);
          */
         if(err <= 0){
             y++;
@@ -227,7 +227,7 @@ void x_fill_circle(int centerx, int centery, int radius){
     free(lined);
 }
 
-void x_draw_ellipse(int x0, int y0, int width, int height){
+void draw_ellipse(int x0, int y0, int width, int height){
     int x1 = x0 + width - 1, y1 = y0 + height - 1;
     int a = abs(x1-x0), b = abs(y1-y0), b1 = b&1; /* values of diameter */
     long dx = 4*(1-a)*b*b, dy = 4*(b1+1)*a*a; /* error increment */
@@ -256,7 +256,7 @@ void x_draw_ellipse(int x0, int y0, int width, int height){
     }
 }
 
-void x_fill_ellipse(int x0, int y0, int width, int height){
+void fill_ellipse(int x0, int y0, int width, int height){
     int ytop = y0;
     int x1 = x0 + width - 1, y1 = y0 + height - 1;
     int a = abs(x1-x0), b = abs(y1-y0), b1 = b&1; /* values of diameter */
@@ -272,11 +272,11 @@ void x_fill_ellipse(int x0, int y0, int width, int height){
     
     do {
         if(lined[y0 - ytop] == 0){
-            x_draw_sline(x1, y0, x0, y0); /*   I. Quadrant */
+            draw_sline(x1, y0, x0, y0); /*   I. Quadrant */
             lined[y0 - ytop] = 1;
         }
         if(lined[y1 - ytop] == 0){
-            x_draw_sline(x0, y1, x1, y1); /* III. Quadrant */
+            draw_sline(x0, y1, x1, y1); /* III. Quadrant */
             lined[y1 - ytop] = 1;
         }
         e2 = 2*err;
@@ -322,36 +322,36 @@ void __x_plot_quad_bezier_seg(int x0, int y0, int x1, int y1, int x2, int y2)
             if (    y1    ) { y0 += sy; dy -= xy; err += dx += xx; } /* y step */
         } while (dy < dx );           /* gradient negates -> algorithm fails */
     }
-    x_draw_sline(x0, y0, x2, y2);                  /* plot remaining part to end */
+    draw_sline(x0, y0, x2, y2);                  /* plot remaining part to end */
 }
-void x_draw_bezier(int x0, int y0, int x1, int y1, int x2, int y2)
+void draw_bezier(int x0, int y0, int x1, int y1, int x2, int y2)
 {                                          /* plot any quadratic Bezier curve */
     int x = x0-x1, y = y0-y1;
     double t = x0-2*x1+x2, r;
 
     if ((long)x*(x2-x1) > 0) {                        /* horizontal cut at P4? */
         if ((long)y*(y2-y1) > 0)                     /* vertical cut at P6 too? */
-            if (x_math_fabs((y0-2*y1+y2)/t*x) > abs(y)) {               /* which first? */
+            if (math_fabs((y0-2*y1+y2)/t*x) > abs(y)) {               /* which first? */
                 x0 = x2; x2 = x+x1; y0 = y2; y2 = y+y1;            /* swap points */
             }                            /* now horizontal cut at P4 comes first */
         t = (x0-x1)/t;
         r = (1-t)*((1-t)*y0+2.0*t*y1)+t*t*y2;                       /* By(t=P4) */
         t = (x0*x2-x1*x1)*t/(x0-x1);                       /* gradient dP4/dx=0 */
-        x = x_math_floor(t+0.5); y = x_math_floor(r+0.5);
+        x = math_floor(t+0.5); y = math_floor(r+0.5);
         r = (y1-y0)*(t-x0)/(x1-x0)+y0;                  /* intersect P3 | P0 P1 */
-        __x_plot_quad_bezier_seg(x0,y0, x,x_math_floor(r+0.5), x,y);
+        __x_plot_quad_bezier_seg(x0,y0, x,math_floor(r+0.5), x,y);
         r = (y1-y2)*(t-x2)/(x1-x2)+y2;                  /* intersect P4 | P1 P2 */
-        x0 = x1 = x; y0 = y; y1 = x_math_floor(r+0.5);             /* P0 = P4, P1 = P8 */
+        x0 = x1 = x; y0 = y; y1 = math_floor(r+0.5);             /* P0 = P4, P1 = P8 */
     }
     if ((long)(y0-y1)*(y2-y1) > 0) {                    /* vertical cut at P6? */
         t = y0-2*y1+y2; t = (y0-y1)/t;
         r = (1-t)*((1-t)*x0+2.0*t*x1)+t*t*x2;                       /* Bx(t=P6) */
         t = (y0*y2-y1*y1)*t/(y0-y1);                       /* gradient dP6/dy=0 */
-        x = x_math_floor(r+0.5); y = x_math_floor(t+0.5);
+        x = math_floor(r+0.5); y = math_floor(t+0.5);
         r = (x1-x0)*(t-y0)/(y1-y0)+x0;                  /* intersect P6 | P0 P1 */
-        __x_plot_quad_bezier_seg(x0,y0, x_math_floor(r+0.5),y, x,y);
+        __x_plot_quad_bezier_seg(x0,y0, math_floor(r+0.5),y, x,y);
         r = (x1-x2)*(t-y2)/(y1-y2)+x2;                  /* intersect P7 | P1 P2 */
-        x0 = x; x1 = x_math_floor(r+0.5); y0 = y1 = y;             /* P0 = P6, P1 = P7 */
+        x0 = x; x1 = math_floor(r+0.5); y0 = y1 = y;             /* P0 = P6, P1 = P7 */
     }
     __x_plot_quad_bezier_seg(x0,y0, x1,y1, x2,y2);                  /* remaining part */
 }
@@ -437,7 +437,7 @@ void __x_fill_arc(float centerx, float centery, int radius, int thickness, int d
 
 }
 
-void x_fill_arc(float centerx, float centery, int radius, int thickness, int degrees_begin, int degrees_lenght){
+void fill_arc(float centerx, float centery, int radius, int thickness, int degrees_begin, int degrees_lenght){
     if(degrees_lenght % 360 == 0)
         degrees_lenght = 360;
     else
@@ -483,10 +483,10 @@ void __plot_bright_pixel( int x , int y , Color color, float brightness)
     point(x, y);
 }
 
-void x_draw_line(int x0 , int y0 , int x1 , int y1) {
+void draw_line(int x0 , int y0 , int x1 , int y1) {
     Color backup_color = get_stroke();
 
-	int steep = x_math_fabs(y1 - y0) > x_math_fabs(x1 - x0) ;
+	int steep = math_fabs(y1 - y0) > math_fabs(x1 - x0) ;
 
 	// swap the co-ordinates if slope > 1 or we
 	// draw backwards

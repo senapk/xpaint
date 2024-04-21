@@ -1,11 +1,10 @@
-#define XPAINT
-#include "xpaint.h"
+#include "../src/all.h"
 
 
 int main(){
     open(1000, 600, "figura_draw");
     stroke_char('k');
-    background();
+    background(BLACK);
 
     /* cada exemplo vai ser apresentado num espaço de 200x200 pixels */
     set_font_size(30);

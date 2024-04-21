@@ -2,24 +2,24 @@
 #include "xpaint.h"
 
 void xgrid_matrix(int nl, int nc, char mat[nl][nc]){
-    x_color_load('w');
+    stroke_char('w');
     background();
     char * colors = "rgbymcov";
     int l, c;
     for(l = 0; l < nl; l++)
         for(c = 0; c < nc; c++){
-            x_color_load(mat[l][c]);
-            x_grid_square(l, c);
-            x_color_load(colors[(c + l) % strlen(colors)]);
-            x_grid_circle(l, c);
-            x_color_load('k');
+            stroke_char(mat[l][c]);
+            grid_square(l, c);
+            stroke_char(colors[(c + l) % strlen(colors)]);
+            grid_circle(l, c);
+            stroke_char('k');
             if(rand() % 2 == 0)
-                x_grid_write(l, c, "%d", rand() % 500 - 250);
+                grid_write(l, c, "%d", rand() % 500 - 250);
             else{
                 char str[] = "abcdef";
                 str[rand() % 5 + 1] = '\0';
-                x_set_font_size(30);
-                x_grid_write(l, c, str);
+                set_font_size(30);
+                grid_write(l, c, str);
             }
         }
 }
@@ -27,7 +27,7 @@ void xgrid_matrix(int nl, int nc, char mat[nl][nc]){
 int main(){
     int w = 902, h = 602, side = 100;
     open(w, h, "figura_grid");
-    x_grid_init(side, 2);
+    grid_init(side, 2);
     int nl = h / side, nc = w / side;
     char mat[nl][nc];
     char * colors = "rgbymcov";

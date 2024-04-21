@@ -5,12 +5,12 @@ int main(){
 
     for(int i = 0; i < 26; i++){
         stroke_char('a' + i);
-        stroke_rgba(x_math_rand(0, 256), x_math_rand(0, 256), x_math_rand(0, 256), 255);
-        x_fill_circle(x_math_rand(0, 1000), x_math_rand(0, 600), x_math_rand(30, 60));
+        stroke_rgba(math_rand(0, 256), math_rand(0, 256), math_rand(0, 256), 255);
+        fill_circle(math_rand(0, 1000), math_rand(0, 600), math_rand(30, 60));
     }
     for(int i = 0; i < 26; i++){
         stroke_char('A' + i);
-        x_fill_circle(x_math_rand(0, 1000), x_math_rand(0, 600), x_math_rand(30, 60));
+        fill_circle(math_rand(0, 1000), math_rand(0, 600), math_rand(30, 60));
     }
 
     save();

@@ -33,10 +33,10 @@ int main() {
 
     open(600, 300, "figura_insertion");
     set_viewer("code");
-    x_set_lock();
-    x_set_log("imgs");
+    set_lock();
+    set_log("imgs");
     int size = 30, max = 900;
-    x_bar_init(size, max);
+    bar_init(size, max);
     srand(2); 
 
     int vet[size];
@@ -48,7 +48,7 @@ int main() {
     save();
     verify(vet, size);
     x_bar_save(vet, size, NULL);
-    x_make_video(3);
+    make_video(3);
     close();
 
     return 0;

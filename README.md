@@ -163,7 +163,7 @@ void x_set_viewer(const char * viewer);      // define qual programa vai abrir a
 void x_color_set(X_Color color);
 
 /* muda a cor do pincel usando a paleta de cores*/
-void x_color_load(char color);
+void stroke_char(char color);
 
 /* return the current color for brush */
 X_Color x_color_get(void);

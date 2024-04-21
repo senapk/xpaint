@@ -12,12 +12,12 @@ int main() {
     //x_write(10, 10, texto);
 
     stroke(RED);
-    x_set_font_size(30);
-    x_write(10, 50, "Aabcdefghijklmnopqrstuvwxyz");
-    x_write(10, 100, "aeioubcdpgqyjmnwx");
-    x_write(10, 250, "ãõÃÕçÇáéíóúÁÉÍÓÚàèìòùÀÈÌÒÙâêîôûÂÊÎÔÛ");
+    set_font_size(30);
+    write(10, 50, "Aabcdefghijklmnopqrstuvwxyz");
+    write(10, 100, "aeioubcdpgqyjmnwx");
+    write(10, 250, "ãõÃÕçÇáéíóúÁÉÍÓÚàèìòùÀÈÌÒÙâêîôûÂÊÎÔÛ");
 
-    x_write(10, 70, "Jesus, queremos te ver, o teu rosto brilhara em nós");
+    write(10, 70, "Jesus, queremos te ver, o teu rosto brilhara em nós");
     save();
     close();
     return 0;

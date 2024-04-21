@@ -49,20 +49,20 @@ void xgrid_matrix(matriz<Item> mat, list<Pos> path){
         for(int c = 0; c < mat.nc; c++){
             Item& item = mat.get(Pos{l, c});
             
-            x_color_load(item.wall ? WALL : EMPTY);
-            x_grid_square(l, c);
+            stroke_char(item.wall ? WALL : EMPTY);
+            grid_square(l, c);
             if(item.distance != -1){
-                x_color_load('k');
-                x_grid_write(l, c, "%d", item.distance);
+                stroke_char('k');
+                grid_write(l, c, "%d", item.distance);
             }
         }
     }
     int i = 0;
     for(auto p : path){
         stroke(VIOLET);
-        x_grid_circle(p.l, p.c);
-        x_color_load('k');
-        x_grid_write(p.l, p.c, "%d", i++);
+        grid_circle(p.l, p.c);
+        stroke_char('k');
+        grid_write(p.l, p.c, "%d", i++);
     }
 }
 
@@ -147,7 +147,7 @@ int main(){
     } */
     
     open(1002, 402, "figura_floodfill");
-    x_grid_init(1002/nc, 1);
+    grid_init(1002/nc, 1);
     xgrid_matrix(mat, path);
     save();
     close();

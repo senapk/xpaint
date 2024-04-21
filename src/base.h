@@ -72,7 +72,7 @@ void background(Color color);
 void save(void);
 
 /* Enable interactive save and lock control */
-void x_set_lock();
+void set_lock();
 
 /*
     define folder to saves the file with a numeric sufix at the end
@@ -80,10 +80,10 @@ void x_set_lock();
     will save the following files
     img_00000.png img_00001.png img_00002.png img_00003.png
 */
-void x_set_log(const char * folder);
+void set_log(const char * folder);
 
 /* creates a .mp4 video using all .png stored in folder using ffmpeg */
-void x_make_video(int framerate);
+void make_video(int framerate);
 
 
 #endif /*XDDDX*/

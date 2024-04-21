@@ -112,7 +112,7 @@ void __x_replace_unicode(char * text, __x_Letter * output, size_t * length){
     *length = size;
 }
 
-void x_set_font_size(int value){
+void set_font_size(int value){
     __x_font_size = value;
 }
 
@@ -128,7 +128,7 @@ int __x_write(int x, int y, __x_Letter * text, size_t length){
             continue;
         }
         if(text[i].value != ' '){
-            delta = x_draw_art(x + dx, y + dy * __X_LETTER_SIZE * zoom, zoom, __x_asc_map[(int)text[i].value]);
+            delta = draw_art(x + dx, y + dy * __X_LETTER_SIZE * zoom, zoom, __x_asc_map[(int)text[i].value]);
             int adx = 0, ady = 0, Adx = 0, Ady = 0;
             if(text[i].acento != 0){
                 if(text[i].acento == __x_agudo){
@@ -151,7 +151,7 @@ int __x_write(int x, int y, __x_Letter * text, size_t length){
                     px = Adx * zoom + x + dx + delta/2;
                     py = Ady * zoom + y + dy * __X_LETTER_SIZE * zoom;
                 }
-                x_draw_art(px, py, zoom, __x_asc_map[text[i].acento]);
+                draw_art(px, py, zoom, __x_asc_map[text[i].acento]);
             }
         }
         dx += delta;
@@ -159,7 +159,7 @@ int __x_write(int x, int y, __x_Letter * text, size_t length){
     return x + dx;
 }
 
-int x_write(int x, int y, const char * format, ...){
+int write(int x, int y, const char * format, ...){
     static int init_asc = 0;
     if(!init_asc){
         init_asc = 1;

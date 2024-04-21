@@ -13,11 +13,11 @@ Color make_color(uchar r, uchar g, uchar b, uchar a){
     return x;
 }
 
-void x_set_palette(char c, Color color){
+void set_palette(char c, Color color){
     __board_palette[(int)c] = color;
 }
 
-Color x_get_palette(char c){
+Color get_palette(char c){
     return __board_palette[(int)c];
 }
 
@@ -115,7 +115,7 @@ void __x_init_pallete(void){
 //    return true;
 //}
 
-//bool __x_color_load(const char * color, Color * xc){
+//bool __stroke_char(const char * color, Color * xc){
 //    if(strlen(color) == 1){
 //        int pos = color[0];
 //        *xc = __board_palette[pos];
@@ -229,7 +229,7 @@ void __x_init_pallete(void){
 
 //Color x_color_decode(const char * color){
 //    Color xc;
-//    if(__x_decode_rgba(color, &xc) || __x_decode_hex(color, &xc) || __x_color_load(color, &xc))
+//    if(__x_decode_rgba(color, &xc) || __x_decode_hex(color, &xc) || __stroke_char(color, &xc))
 //        return xc;
 //    printf("fail: Color \"%s\" could not be decoded\n", color);
 //    return xc;

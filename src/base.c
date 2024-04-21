@@ -171,7 +171,7 @@ void stroke_rgba(uchar r, uchar g, uchar b, uchar a) {
 }
 
 void stroke_char(char c){
-    Color color = x_get_palette(c);
+    Color color = get_palette(c);
     memcpy(__stroke_color, &color, __X_BYTES_PER_PIXEL * sizeof(uchar));
 }
 
@@ -187,7 +187,7 @@ void fill_rgba(uchar r, uchar g, uchar b, uchar a) {
 }
 
 void fill_char(char c){
-    Color color = x_get_palette(c);
+    Color color = get_palette(c);
     memcpy(__fill_color, &color, __X_BYTES_PER_PIXEL * sizeof(uchar));
 }
 
@@ -297,7 +297,7 @@ void save(){
         __x_save();
 }
 
-void x_make_video(int framerate){
+void make_video(int framerate){
     char cmd[500];
     const char * folder = __board_folder;
     char * name = (char *) malloc((strlen(folder) + 20) * sizeof(char));
@@ -312,11 +312,11 @@ void x_make_video(int framerate){
     free(name);
 }
 
-void x_set_log(const char * folder) {
+void set_log(const char * folder) {
     strcpy(__board_folder, folder);
 }
 
-void x_set_lock(){
+void set_lock(){
     __board_lock = true;
 }
 

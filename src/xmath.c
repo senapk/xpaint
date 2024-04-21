@@ -7,33 +7,33 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-V2d x_make_v2d(double x, double y){
+V2d make_v2d(double x, double y){
     V2d v = {x, y};
     return v;
 }
 
-double x_v2d_length(double x, double y){
-    return x_math_sqrt(x * x + y * y);
+double v2d_length(double x, double y){
+    return math_sqrt(x * x + y * y);
 }
 
-double x_v2d_distance(double ax, double ay, double bx, double by){
-    return x_v2d_length(bx - ax, by - ay);
+double v2d_distance(double ax, double ay, double bx, double by){
+    return v2d_length(bx - ax, by - ay);
 }
 
-V2d x_v2d_sum(V2d a, V2d b){
-    return x_make_v2d(a.x + b.x, a.y + b.y);
+V2d v2d_sum(V2d a, V2d b){
+    return make_v2d(a.x + b.x, a.y + b.y);
 }
 
-V2d x_v2d_sub(V2d a, V2d b){
-    return x_make_v2d(a.x - b.x, a.y - b.y);
+V2d v2d_sub(V2d a, V2d b){
+    return make_v2d(a.x - b.x, a.y - b.y);
 }
 
-V2d x_v2d_dot(V2d a, double value){
-    return x_make_v2d(a.x * value, a.y * value);
+V2d v2d_dot(V2d a, double value){
+    return make_v2d(a.x * value, a.y * value);
 }
 
-V2d x_v2d_normalize(V2d v){
-    double lenght = x_v2d_length(v.x, v.y);
+V2d v2d_normalize(V2d v){
+    double lenght = v2d_length(v.x, v.y);
     if(lenght < 0.0000001)
         return v;
     v.x = v.x * (1.0/lenght);
@@ -41,27 +41,27 @@ V2d x_v2d_normalize(V2d v){
     return v;
 }
 
-V2d x_v2d_ortho(V2d v){
-    return x_make_v2d(v.y, -v.x);
+V2d v2d_ortho(V2d v){
+    return make_v2d(v.y, -v.x);
 }
 
-int   x_math_rand(int min, int max){
+int   math_rand(int min, int max){
     return rand() % (max - min) + min;
 }
 
 /* https://stackoverflow.com/questions/5122993/floor-int-function-implementaton?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa */
-int x_math_floor(double x) {
+int math_floor(double x) {
     int xi = (int) x;
     return x < xi ? xi - 1 : xi;
 }
 
-int x_math_round(double x) {
+int math_round(double x) {
 	return x + 0.5;
 }
 
 
 /* funcao necessario para o po */
-double x_math_sqrt(const double m)
+double math_sqrt(const double m)
 {
    double i=0;
    double x1 = 0, x2 = 0;
@@ -80,12 +80,12 @@ double x_math_sqrt(const double m)
    return x2;
 }
 
-double x_math_pow( double x, double z ){
+double math_pow( double x, double z ){
     int y =  (int) z;
     double temp;
     if (y == 0)
     return 1;
-    temp = x_math_pow (x, y / 2);
+    temp = math_pow (x, y / 2);
     if ((y % 2) == 0) {
         return temp * temp;
     } else {
@@ -96,13 +96,13 @@ double x_math_pow( double x, double z ){
     }
 }
 
-double x_math_fmod(double a, double b)
+double math_fmod(double a, double b)
 {
-    return (a - b * x_math_floor(a / b));
+    return (a - b * math_floor(a / b));
 }
 
-int x_math_ceil(double n){
-    return -x_math_floor(-n);
+int math_ceil(double n){
+    return -math_floor(-n);
 }
 
 
@@ -150,14 +150,14 @@ double __icos(long x)
     return __isin(x+90);
 }
 
-double x_math_sin(double d)
+double math_sin(double d)
 {
     double a = __isin((long) d);
     double b = __isin((long) d+1);
     return a + (d-(int)d) * (b-a);
 }
 
-double x_math_cos(double d)
+double math_cos(double d)
 {
     double a = __icos((long) d);
     double b = __icos((long) d+1);
@@ -165,7 +165,7 @@ double x_math_cos(double d)
 }
 
 /* Nvidia */
-double x_math_acos(double x) {
+double math_acos(double x) {
     double negate = (double)(x < 0);
     x = (x >= 0) ? x : -x;
     double ret = -0.0187293;
@@ -175,12 +175,12 @@ double x_math_acos(double x) {
     ret = ret - 0.2121144;
     ret = ret * x;
     ret = ret + 1.5707288;
-    ret = ret * x_math_sqrt(1.0-x);
+    ret = ret * math_sqrt(1.0-x);
     ret = ret - 2 * negate * ret;
     return negate * 3.14159265358979 + ret;
 }
 
-double x_math_fabs(double f){
+double math_fabs(double f){
     return f < 0 ? -f : f;
 }
 
