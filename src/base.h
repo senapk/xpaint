@@ -2,6 +2,8 @@
 #define BASE_H /*XDDDX*/
 
 #include "color.h" /*XDDDX*/
+#include "xmath.h" /*XDDDX*/
+
 #include <stdarg.h>
 
 /* @brief Open the board to draw */
@@ -14,6 +16,7 @@ int          get_width(void);
 const char * get_filename(void);
 uchar      * get_bitmap(void);
 
+
 /* @brief Clear all resources */
 void close(void);
 
@@ -25,45 +28,10 @@ void set_filename(const char * filename);
 /* Ex: "gthumb", "gthumb" */
 void set_viewer(const char * viewer);
 
-/* a funcao plot pinta o pixel usando a cor padrão */
-void point(int x, int y);
-
-/* a funcao plot pinta o pixel usando a cor de preenchimento padrão */
-void point_fill(int x, int y);
+void plot(int x, int y,  Color color);
 
 /* retorna a cor do pixel dessa posicao do bitmap */
 Color get_pixel(int x, int y);
-
-/* muda a cor do pincel*/
-void stroke(Color color);
-
-/* muda a cor do pincel*/
-void stroke_rgba(uchar r, uchar g, uchar b, uchar a);
-
-/* muda a cor do pincel usando a paleta de cores*/
-void stroke_char(char c);
-
-/* muda a cor do pincel*/
-void fill(Color color);
-
-/* muda a cor do pincel*/
-void fill_rgba(uchar r, uchar g, uchar b, uchar a);
-
-/* muda a cor do pincel usando a paleta de cores*/
-void fill_char(char c);
-
-/* desabilita o pincel */
-void no_stroke();
-
-/* desabilita o preenchimento */
-void no_fill();
-
-/* return the current color for brush */
-Color get_stroke(void);
-
-/* return the current color for brush */
-Color get_fill(void);
-
 
 /* limpa a tela inteira com a mesma cor */
 void background(Color color);
@@ -85,5 +53,19 @@ void set_log(const char * folder);
 /* creates a .mp4 video using all .png stored in folder using ffmpeg */
 void make_video(int framerate);
 
+typedef struct {
+    double dx;
+    double dy;
+    double s;
+    double angle;
+} Transform;
+
+
+void push();
+void pop();
+void translate(double dx, double dy);
+void scale(double s);
+void rotate(double angle);
+V2d transform(double x, double y);
 
 #endif /*XDDDX*/

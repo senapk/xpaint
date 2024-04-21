@@ -8,6 +8,7 @@
 #include <time.h>   /* time */
 #include "color.h" /*XDDDX*/
 #include "lodepng.h" /*XDDDX*/
+#include "xmath.h" /*XDDDX*/
 
 void save_ppm(unsigned dimx, unsigned dimy, unsigned char * bitmap, const char * filename);
 void save_png(unsigned dimx, unsigned dimy, unsigned char * bitmap, const char * filename);
@@ -28,18 +29,15 @@ static uchar *   __board_bitmap  = NULL;
 static unsigned  __board_width  = 0;
 static unsigned  __board_height = 0;
 
-static uchar     __stroke_color[__X_BYTES_PER_PIXEL];
-static uchar     __fill_color[__X_BYTES_PER_PIXEL];
-
-static bool      __stroke_enable = true;
-static bool      __fill_enable = true;
-
 static bool      __board_is_open = false;
 static bool      __board_lock = false;
 static char      __board_filename[200] = "";
 static char      __board_viewer  [200] = "";
 static char      __board_folder  [200] = "";
 static int       __board_step          = 1;
+
+static Transform __board_transform[10];
+static int       __board_transform_index = -1;
 
 /* Local prototypes */
 uchar * __x_get_pixel_pos(unsigned int x, unsigned int y);
@@ -50,8 +48,6 @@ uchar * __x_get_pixel_pos(unsigned int x, unsigned int y) {
 
 //plot sem as verificações de limite
 void __x_plot(int x, int y, uchar * color);
-
-
 
 void open(unsigned int width, unsigned int height, const char * filename){
     if(__board_is_open){
@@ -66,10 +62,10 @@ void open(unsigned int width, unsigned int height, const char * filename){
     __board_bitmap = (uchar*) calloc(sizeof(uchar), width * height * __X_BYTES_PER_PIXEL);
     background(make_color(30, 30, 30, 255));
 
-    __stroke_color[0] = 200;
-    __stroke_color[1] = 200;
-    __stroke_color[2] = 200;
-    __stroke_color[3] = 255;
+    // __stroke[0] = 200;
+    // __stroke[1] = 200;
+    // __stroke[2] = 200;
+    // __stroke[3] = 255;
 
     __x_init_pallete();
     __x_init_font();
@@ -100,6 +96,7 @@ void close(void){
     __board_is_open = false;
 }
 
+
 void set_filename(const char * filename){
     if(filename != NULL)
         strcpy(__board_filename, filename);
@@ -127,88 +124,26 @@ void __x_plot(int x, int y, uchar * color) {
     }
 }
 
-void point(int x, int y){
+void plot(int x, int y,  Color color) {
     if(!__board_is_open){
         fprintf(stderr, "fail: x_open(weight, width, filename) missing\n");
         exit(1);
     }
-    if (!__stroke_enable) {
-        return;
-    }
-        
+    uchar __color[__X_BYTES_PER_PIXEL];
+    __color[0] = color.r;
+    __color[1] = color.g;
+    __color[2] = color.b;
+    __color[3] = color.a;
+
     if((x >= 0) && (x < (int) __board_width) && (y >= 0) && (y <  (int) __board_height))
-        __x_plot(x, y, __stroke_color);
+        __x_plot(x, y, __color);
 }
 
-void point_fill(int x, int y){
-    if(!__board_is_open){
-        fprintf(stderr, "fail: x_open(weight, width, filename) missing\n");
-        exit(1);
-    }
-    if (!__fill_enable) {
-        return;
-    }
-    if((x >= 0) && (x < (int) __board_width) && (y >= 0) && (y <  (int) __board_height))
-        __x_plot(x, y, __fill_color);
-}
 
 Color get_pixel(int x, int y){
     uchar * pixel = __x_get_pixel_pos((unsigned) x, (unsigned) y);
     Color color;
     memcpy(&color, pixel, __X_BYTES_PER_PIXEL * sizeof(uchar));
-    return color;
-}
-
-void stroke(Color color){
-    memcpy(__stroke_color, &color, __X_BYTES_PER_PIXEL * sizeof(uchar));
-}
-
-void stroke_rgba(uchar r, uchar g, uchar b, uchar a) {
-    __stroke_color[0] = r;
-    __stroke_color[1] = g;
-    __stroke_color[2] = b;
-    __stroke_color[3] = a;
-}
-
-void stroke_char(char c){
-    Color color = get_palette(c);
-    memcpy(__stroke_color, &color, __X_BYTES_PER_PIXEL * sizeof(uchar));
-}
-
-void fill(Color color){
-    memcpy(__fill_color, &color, __X_BYTES_PER_PIXEL * sizeof(uchar));
-}
-
-void fill_rgba(uchar r, uchar g, uchar b, uchar a) {
-    __fill_color[0] = r;
-    __fill_color[1] = g;
-    __fill_color[2] = b;
-    __fill_color[3] = a;
-}
-
-void fill_char(char c){
-    Color color = get_palette(c);
-    memcpy(__fill_color, &color, __X_BYTES_PER_PIXEL * sizeof(uchar));
-}
-
-void no_stroke(){
-    __stroke_enable = false;
-}
-
-void no_fill(){
-    __fill_enable = false;
-}
-
-
-Color get_stroke(){
-    Color color;
-    memcpy(&color, __stroke_color, __X_BYTES_PER_PIXEL * sizeof(uchar));
-    return color;
-}
-
-Color get_fill(){
-    Color color;
-    memcpy(&color, __fill_color, __X_BYTES_PER_PIXEL * sizeof(uchar));
     return color;
 }
 
@@ -343,4 +278,73 @@ void save_png(unsigned dimx, unsigned dimy, unsigned char * bitmap, const char *
     if(error) {
         printf("error %u: %s\n", error, lodepng_error_text(error));
     }
+}
+
+void push() {
+    __board_transform_index += 1;
+    if(__board_transform_index >= 10){
+        fprintf(stderr, "fail: max stack size reached\n");
+        exit(1);
+    }
+    __board_transform[__board_transform_index] = (Transform) {0, 0, 1, 0};
+}
+
+void pop() {
+    if(__board_transform_index < 0){
+        fprintf(stderr, "fail: stack is empty\n");
+        exit(1);
+    }
+    __board_transform_index -= 1;
+}
+
+void translate(double dx, double dy) {
+    if(__board_transform_index < 0){
+        fprintf(stderr, "fail: stack is empty\n");
+        exit(1);
+    }
+    __board_transform[__board_transform_index].dx = dx;
+    __board_transform[__board_transform_index].dy = dy;
+}
+
+void scale(double s) {
+    if(__board_transform_index < 0){
+        fprintf(stderr, "fail: stack is empty\n");
+        exit(1);
+    }
+    __board_transform[__board_transform_index].s = s;
+}
+
+void rotate(double angle) {
+    if(__board_transform_index < 0){
+        fprintf(stderr, "fail: stack is empty\n");
+        exit(1);
+    }
+    __board_transform[__board_transform_index].angle = angle;
+}
+
+//pass x and y to all transformations in the stack
+V2d transform(double x, double y) {
+    V2d point = make_v2d(x, y);
+    for(int i = 0; i <= __board_transform_index; i++) {
+        Transform t = __board_transform[i];
+        double angle = t.angle;
+        double x = point.x;
+        double y = point.y;
+        point.x = x * math_cos(angle) - y * math_sin(angle);
+        point.y = x * math_sin(angle) + y * math_cos(angle);
+        point.x *= t.s;
+        point.y *= t.s;
+        point.x += t.dx;
+        point.y += t.dy;
+    }
+    return point;
+}
+
+
+double get_transform_scale() {
+    double s = 1;
+    for(int i = 0; i <= __board_transform_index; i++){
+        s *= __board_transform[i].s;
+    }
+    return s;
 }
