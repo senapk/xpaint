@@ -66,6 +66,7 @@ void pop();
 void translate(double dx, double dy);
 void scale(double s);
 void rotate(double angle);
-V2d transform(double x, double y);
+V2d __transform(double x, double y);
+double __get_transform_scale();
 
 #endif /*XDDDX*/

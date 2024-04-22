@@ -11,7 +11,7 @@ int main(){
     /* muda a cor do pincel para vermelho */
     stroke(RED);
     /* desenha um circulo preenchido com centro no meio da tela e raio 200 */
-    fill_circle(largura/2, altura/2, 200);
+    __fill_circle(largura/2, altura/2, 200);
     /* salva no arquivo exemplo.png */
     save();
     /* libera os recursos alocados */

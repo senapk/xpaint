@@ -2,10 +2,10 @@
 
 
 void draw_square(int x, int y, int size){
-    draw_line(x, y, x + size, y);
-    draw_line(x + size, y, x + size, y + size);
-    draw_line(x + size, y + size, x, y + size);
-    draw_line(x, y + size, x, y);
+    line(x, y, x + size, y);
+    line(x + size, y, x + size, y + size);
+    line(x + size, y + size, x, y + size);
+    line(x, y + size, x, y);
 }
 
 int main(){
@@ -21,10 +21,13 @@ int main(){
         fill_char('w');
         rotate(9 * i);
         scale(1 + 0.5 * i);
-        fill_rect(-50, -50, 100, 100);
-        stroke_char('r');
+        __fill_rect(-50, -50, 100, 100);
+        stroke_char('g');
         fill_char('r');
-        fill_ellipse(0, 0, 40, 80);
+        no_fill();
+        circle(0, 0, 70);
+        // fill_char('g');
+        ellipse(0, 0, 100, 50);
         pop();
     }
     save();

@@ -8,11 +8,11 @@
 int main() {
     srand(time(NULL));
     open(1000, 600, "figura_draw");
-    stroke(make_color(0, 0, 0, 150));
+    stroke(color(0, 0, 0, 150));
     background();
     stroke_char('g');
 
-    fill_circle(200, 200, 300);
+    __fill_circle(200, 200, 300);
     stroke(WHITE);
     fill_arc(200, 200, 150, 50, 190, 100);
 
@@ -21,7 +21,7 @@ int main() {
     pen_set_angle(-20);
     for(int i = 0; i < 5; i++){
         pen_walk(500);
-        stroke(make_color(rand() % 256, rand() % 256, rand() % 256, 255));
+        stroke(color(rand() % 256, rand() % 256, rand() % 256, 255));
         pen_rotate(-144);
     }
     save();

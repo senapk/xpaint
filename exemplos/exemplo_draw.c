@@ -16,20 +16,20 @@ int main(){
     set_font_size(20);
     int x = 10;
     int y = 100;
-    write(x, y, "draw_line");
-    draw_line(x + 30, y + 30, x + 180, y + 180);
+    write(x, y, "__draw_line");
+    __draw_line(x + 30, y + 30, x + 180, y + 180);
 
     x += 200;
-    write(x, y, "fill_line");
-    fill_line(x + 30, y + 30, x + 180, y + 180, 30);
+    write(x, y, "__fill_line");
+    __fill_line(x + 30, y + 30, x + 180, y + 180, 30);
 
     x += 200;
-    write(x, y, "draw_circle");
-    draw_circle(x + 100, y + 100, 80);
+    write(x, y, "__draw_circle");
+    __draw_circle(x + 100, y + 100, 80);
 
     x += 200;
-    write(x, y, "draw_ellipse");
-    draw_ellipse(x + 20, y + 50, 180, 100);  
+    write(x, y, "__draw_ellipse");
+    __draw_ellipse(x + 20, y + 50, 180, 100);  
 
     x += 200;
     write(x, y, "draw_bezier");
@@ -45,16 +45,16 @@ int main(){
     raw_fill_triangle(x, y + 70, x + 160, y + 30, x + 180, y + 180);  
 
     x += 200;
-    write(x, y, "fill_circle");
-    fill_circle(x + 100, y + 100, 80);
+    write(x, y, "__fill_circle");
+    __fill_circle(x + 100, y + 100, 80);
 
     x += 200;
-    write(x, y, "fill_ellipse");
-    fill_ellipse(x + 20, y + 50, 180, 100);  
+    write(x, y, "__fill_ellipse");
+    __fill_ellipse(x + 20, y + 50, 180, 100);  
 
     x += 200;
-    write(x, y, "fill_rect");
-    fill_rect(x + 30, y + 50, 120, 100);  
+    write(x, y, "__fill_rect");
+    __fill_rect(x + 30, y + 50, 120, 100);  
 
     save();
     close();

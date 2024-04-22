@@ -32,7 +32,7 @@ typedef struct{
 #define VIOLET    (Color) {108, 113, 196, 255} // v
 
 /* cria e retorna uma struct Color passando rgb */
-Color make_color(uchar r, uchar g, uchar b, uchar a);
+Color color(uchar r, uchar g, uchar b, uchar a);
 
 /* define uma cor na paleta de caracteres */
 void set_palette(char c, Color color);

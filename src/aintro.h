@@ -29,7 +29,7 @@ int main(){
     open(largura, altura, "figura_base"); 
     write(50, 30, "Pintarei um circulo vermelho em %d %d", largura/2, altura/2);
     x_color_set("red");
-    fill_circle(largura/2, altura/2, 200);
+    __fill_circle(largura/2, altura/2, 200);
     save();
     close();
     return 0;

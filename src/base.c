@@ -60,7 +60,7 @@ void open(unsigned int width, unsigned int height, const char * filename){
     strcpy(__board_filename, filename);
 
     __board_bitmap = (uchar*) calloc(sizeof(uchar), width * height * __X_BYTES_PER_PIXEL);
-    background(make_color(30, 30, 30, 255));
+    background(color(30, 30, 30, 255));
 
     // __stroke[0] = 200;
     // __stroke[1] = 200;
@@ -112,15 +112,17 @@ void set_viewer(const char * viewer){
 }
 
 void __x_plot(int x, int y, uchar * color) {
-    uchar * pos = __x_get_pixel_pos((unsigned) x, (unsigned) y);
+    if((x >= 0) && (x < (int) __board_width) && (y >= 0) && (y <  (int) __board_height)) {
+        uchar * pos = __x_get_pixel_pos((unsigned) x, (unsigned) y);
 
-    for(int i = 0; i < 3; i++) {
-        float fc = color[i] / 255.f;
-        float fa = color[3] / 255.f;
-        float bc = pos[i] / 255.f;
-        float ba = pos[3] / 255.f;
-        pos[i] = ((fc * fa) + (bc * (1 - fa))) * 255;
-        pos[3] = (fa + (ba * (1 - fa))) * 255;
+        for(int i = 0; i < 3; i++) {
+            float fc = color[i] / 255.f;
+            float fa = color[3] / 255.f;
+            float bc = pos[i] / 255.f;
+            float ba = pos[3] / 255.f;
+            pos[i] = ((fc * fa) + (bc * (1 - fa))) * 255;
+            pos[3] = (fa + (ba * (1 - fa))) * 255;
+        }
     }
 }
 
@@ -135,8 +137,20 @@ void plot(int x, int y,  Color color) {
     __color[2] = color.b;
     __color[3] = color.a;
 
-    if((x >= 0) && (x < (int) __board_width) && (y >= 0) && (y <  (int) __board_height))
+    // double s = __get_transform_scale();
+    // if (math_fabs(s - 1) < 0.01) {
         __x_plot(x, y, __color);
+    // } else {
+    //     for (int i = 0; i < 3; i++) {
+    //         for (int j = 0; j < 3; j++){
+    //             int xx = x + i;
+    //             int yy = y + j;
+    //             __x_plot(xx, yy, __color);
+    //         }
+    //     }
+
+    // }
+        
 }
 
 
@@ -323,7 +337,7 @@ void rotate(double angle) {
 }
 
 //pass x and y to all transformations in the stack
-V2d transform(double x, double y) {
+V2d __transform(double x, double y) {
     V2d point = make_v2d(x, y);
     for(int i = 0; i <= __board_transform_index; i++) {
         Transform t = __board_transform[i];
@@ -341,7 +355,7 @@ V2d transform(double x, double y) {
 }
 
 
-double get_transform_scale() {
+double __get_transform_scale() {
     double s = 1;
     for(int i = 0; i <= __board_transform_index; i++){
         s *= __board_transform[i].s;

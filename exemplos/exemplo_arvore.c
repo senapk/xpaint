@@ -9,7 +9,7 @@ void fractal(float x, float y, float ang, float lado){
     
     float fx = x + lado * math_cos(ang);
     float fy = y - lado * math_sin(ang);
-    draw_line(x, y, fx, fy); /* desenha a linha */
+    __draw_line(x, y, fx, fy); /* desenha a linha */
     
     fractal(fx, fy, ang - delta, lado * dec);
     fractal(fx, fy, ang        , lado * dec);

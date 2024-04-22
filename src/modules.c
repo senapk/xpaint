@@ -19,11 +19,11 @@ void grid_init(int side, int sep){
 
 void grid_square(int l, int c){
     int size = __X_GRID_SIZE, sep = __X_GRID_SEP;
-    fill_rect(c * size + sep, l * size + sep, size - sep, size - sep);
+    __fill_rect(c * size + sep, l * size + sep, size - sep, size - sep);
 }
 
 void grid_circle(int l, int c){
-    fill_circle(c * __X_GRID_SIZE + __X_GRID_SIZE / 2, l * __X_GRID_SIZE + __X_GRID_SIZE / 2,
+    __fill_circle(c * __X_GRID_SIZE + __X_GRID_SIZE / 2, l * __X_GRID_SIZE + __X_GRID_SIZE / 2,
                   __X_GRID_SIZE / 2 - __X_GRID_SEP + 1);
 }
 
@@ -67,7 +67,7 @@ void bar_one(int i, int value){
     int ybase = get_height() - __X_BAR_WIDTH;
     int j;
     for(j = 0; j < ((int) __X_BAR_WIDTH - 2) ; j++)
-        draw_line(x + j, ybase, x + j, ybase - __X_BAR_YFACTOR * value);
+        line(x + j, ybase, x + j, ybase - __X_BAR_YFACTOR * value);
 }
 
 void bar_all(int * vet, int size, const char * colors, int * indices){
@@ -131,7 +131,7 @@ void   pen_walk(double distance){
     double x = __X_PEN_X + distance * math_cos(__X_PEN_ANGLE);
     double y = __X_PEN_Y - distance * math_sin(__X_PEN_ANGLE);
     if(__X_PEN_DOWN)
-        fill_line(__X_PEN_X, __X_PEN_Y, x, y, __X_PEN_THICK);
+        __fill_line(__X_PEN_X, __X_PEN_Y, x, y, __X_PEN_THICK);
     __X_PEN_X = x;
     __X_PEN_Y = y;
 }
@@ -140,7 +140,7 @@ void   pen_rotate(int degrees){
 }
 void   pen_goto(double x, double y){
     if(__X_PEN_DOWN)
-        fill_line(__X_PEN_X, __X_PEN_Y, x, y, __X_PEN_THICK);
+        __fill_line(__X_PEN_X, __X_PEN_Y, x, y, __X_PEN_THICK);
     __X_PEN_X = x;
     __X_PEN_Y = y;
 }

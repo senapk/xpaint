@@ -8,7 +8,7 @@
 
 static Color __board_palette[256];
 
-Color make_color(uchar r, uchar g, uchar b, uchar a){
+Color color(uchar r, uchar g, uchar b, uchar a){
     Color x = {r, g, b, a};
     return x;
 }

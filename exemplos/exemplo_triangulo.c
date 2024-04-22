@@ -11,7 +11,7 @@ void fractal(float x, float y, float lado, float ang){
         float x0 = x, y0 = y; /* salva x e y */
         x += lado * math_cos(ang); /* translada x e y */
         y -= lado * math_sin(ang);
-        draw_line(x0, y0, x, y); /* desenha a linha */
+        __draw_line(x0, y0, x, y); /* desenha a linha */
         
         ang -= 120;
     }

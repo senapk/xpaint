@@ -7,6 +7,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+
 V2d make_v2d(double x, double y){
     V2d v = {x, y};
     return v;

@@ -6,9 +6,9 @@ int main() {
     set_font_size(40);
 
     stroke(BLACK);
-    fill_rect(20, 60, 560, 410);
+    __fill_rect(20, 60, 560, 410);
     stroke(WHITE);
-    fill_rect(190, 70, 200, 340);
+    __fill_rect(190, 70, 200, 340);
 
     int x = 300;
     stroke(RED);    write(60, 70, "    Red");
