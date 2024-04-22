@@ -16,7 +16,7 @@ int main() {
 
     __fill_circle(200, 200, 300);
     stroke(WHITE);
-    fill_arc(200, 200, 150, 50, 190, 100);
+    arc(200, 200, 150, 50, 190, 100);
 
     pen_set_thick(30);
     pen_set_pos(150, 100);

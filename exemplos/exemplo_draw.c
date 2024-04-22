@@ -37,12 +37,12 @@ int main(){
 
     x = 10;
     y += 250;
-    write(x, y, "fill_arc");
-    fill_arc(x + 100, y + 100, 80, 30, 30, 290);
+    write(x, y, "arc");
+    arc(x + 100, y + 100, 80, 30, 30, 290);
 
     x += 200;
-    write(x, y, "raw_fill_triangle");
-    raw_fill_triangle(x, y + 70, x + 160, y + 30, x + 180, y + 180);  
+    write(x, y, "__fill_raw_triangle");
+    __fill_raw_triangle(x, y + 70, x + 160, y + 30, x + 180, y + 180);  
 
     x += 200;
     write(x, y, "__fill_circle");

@@ -13,9 +13,6 @@ void stroke_weight(int thickness);
 /* a funcao plot pinta o pixel transformado */
 void point(double x, double y, Color color);
 
-/* divida pela escala atual antes de fazer a transformação */
-void __point_scale(double x, double y, Color color);
-
 /* muda a cor do pincel*/
 void stroke(Color color);
 
@@ -48,51 +45,18 @@ Color get_fill(void);
 
 
 /* desenha uma forma utilizando uma string e o mapa de cores default */
-int draw_art(int x, int y, int zoom, const char * picture);
-
-void __draw_line_scale(double x0 , double y0 , double x1 , double y1, Color color);
-
-/* desenha uma linha com anti aliasing com espessura de 1 pixel entre os pontos (x0, y0) e (x1, y1) */
-void __draw_line(double x0, double y0, double x1, double y1, Color color);
-
+int asc_art(int x, int y, int zoom, const char * picture);
 void line(double x0, double y0, double x1, double y1);
-
-/* linha sem anti aliasing */
-void __raw_sline(int x0, int y0, int x1, int y1);
-
-/* desenha uma linha com espessura de thickness pixels entre os pontos (x0, y0) e (x1, y1) */
-void __fill_line(double x0, double y0, double x1, double y1, int thickness);
-
-/* desenha um circulo com centro (centerx, centerx) e raio radius */
-void __draw_circle(double centerx, double centery, double radius);
-
-/* desenha um circulo dado centro e raio */
-void __fill_circle(double centerx, double centery, double radius);
-
-void circle(int centerx, int centery, int radius);
-
-/* desenha uma elipse dentro do rect de ponto superior esquerdo(x0, y0), largura e altura */
-void __draw_ellipse(double x0, double y0, double width, double height);
-
-/* desenha uma elipse dentro do rect de ponto superior esquerdo(x0, y0), largura e altura */
-void __fill_ellipse(double x0, double y0, double width, double height);
-
 void ellipse(double x0, double y0, double width, double height);
-
-/* desenha uma curva de bezier entre os pontos (x0, y0) e (x2, y2) */
-/* a curvatura eh dada pelo ponto (x1, y1) */
-void draw_bezier(int x0, int y0, int x1, int y1, int x2, int y2);
 
 /* desenha um arco dado o ponto de centro, raio, espessura */
 /* o angulo de inicio e o comprimento do arco em graus */
 /* ambos os valores de ângulo podem ser negativos */
-void fill_arc(double centerx, double centery, int radius, int thickness, int degrees_begin, int degrees_lenght);
-
-/* desenha um triangulo dados os 3 vertices */
-void raw_fill_triangle(double v1x, double v1y, double v2x, double v2y, double v3x, double v3y);
-
-/* desenha um retangulo dados os cantos superior esquerdo (x0, y0), largura e altura */
-void __fill_rect(double x0, double y0, double width, double height);
-
+void arc(double centerx, double centery, int radius, int thickness, int degrees_begin, int degrees_lenght);
+void circle(int centerx, int centery, int radius);
+void rect(double x, double y, double witdh, double height);
+void square(double x, double y, double size);
+void bezier(double xa, double ya, double xb, double yb, double xc, double yc, double xd, double yd);
+void triangle(double x0, double y0, double x1, double y1, double x2, double y2);
 
 #endif /*XDDDX*/

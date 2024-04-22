@@ -128,7 +128,7 @@ int __x_write(int x, int y, __x_Letter * text, size_t length){
             continue;
         }
         if(text[i].value != ' '){
-            delta = draw_art(x + dx, y + dy * __X_LETTER_SIZE * zoom, zoom, __x_asc_map[(int)text[i].value]);
+            delta = asc_art(x + dx, y + dy * __X_LETTER_SIZE * zoom, zoom, __x_asc_map[(int)text[i].value]);
             int adx = 0, ady = 0, Adx = 0, Ady = 0;
             if(text[i].acento != 0){
                 if(text[i].acento == __x_agudo){
@@ -151,7 +151,7 @@ int __x_write(int x, int y, __x_Letter * text, size_t length){
                     px = Adx * zoom + x + dx + delta/2;
                     py = Ady * zoom + y + dy * __X_LETTER_SIZE * zoom;
                 }
-                draw_art(px, py, zoom, __x_asc_map[text[i].acento]);
+                asc_art(px, py, zoom, __x_asc_map[text[i].acento]);
             }
         }
         dx += delta;

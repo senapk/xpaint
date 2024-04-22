@@ -5,33 +5,33 @@ O objetivo desse projeto é criar uma biblioteca header only para programar em C
 <!--TOC_BEGIN-->
 - [Instalação Local](#instalação-local)
 - [Instalação Global](#instalação-global)
-    - [Linux](#linux)
-    - [Windows](#windows)
+  - [Linux](#linux)
+  - [Windows](#windows)
 - [Criando animações](#criando-animações)
 - [Funções](#funções)
 - [Compilando e rodando](#compilando-e-rodando)
 - [Guia de Funções](#guia-de-funções)
-    - [Abrindo e fechando](#abrindo-e-fechando)
-    - [Limpando, plotando e salvando](#limpando-plotando-e-salvando)
-    - [Abrindo automaticamento a imagem gerada](#abrindo-automaticamento-a-imagem-gerada)
-    - [Controle interativo](#controle-interativo)
-    - [Cores](#cores)
-    - [Desenhando](#desenhando)
-    - [Escrevendo texto](#escrevendo-texto)
-    - [Vetores bidimensionais](#vetores-bidimensionais)
-    - [Funções Matemáticas](#funções-matemáticas)
-    - [Módulo de Matrizes](#módulo-de-matrizes)
-    - [Módulo de Vetores](#módulo-de-vetores)
-    - [Módulo Turtle de Desenho](#módulo-turtle-de-desenho)
+  - [Abrindo e fechando](#abrindo-e-fechando)
+  - [Limpando, plotando e salvando](#limpando-plotando-e-salvando)
+  - [Abrindo automaticamento a imagem gerada](#abrindo-automaticamento-a-imagem-gerada)
+  - [Controle interativo](#controle-interativo)
+  - [Cores](#cores)
+  - [Desenhando](#desenhando)
+  - [Escrevendo texto](#escrevendo-texto)
+  - [Vetores bidimensionais](#vetores-bidimensionais)
+  - [Funções Matemáticas](#funções-matemáticas)
+  - [Módulo de Matrizes](#módulo-de-matrizes)
+  - [Módulo de Vetores](#módulo-de-vetores)
+  - [Módulo Turtle de Desenho](#módulo-turtle-de-desenho)
 <!--TOC_END-->
 
 ---
+
 ## Instalação Local
 
 Para utilizar, basta você baixar a biblioteca para o diretório onde está o seu código fonte, compilar e executar. Se estiver no linux, pode usar os seguintes comandos para baixar a biblioteca e rodar um exemplo.
 
-
-```
+```bash
 curl https://raw.githubusercontent.com/senapk/xpaint/master/xpaint.h -o xpaint.h
 curl https://raw.githubusercontent.com/senapk/xpaint/master/exemplo_base.c -o exemplo_base.c
 gcc -Wall exemplo_base.c -o exemplo_base
@@ -42,22 +42,23 @@ Ao executar, deve ser criado o arquivo exemplo_base.png no seu diretório atual.
 
 Se estiver no windows, basta abrir os links e clicar em salvar como para salvar o arquivo.
 
+```bash
 - https://raw.githubusercontent.com/senapk/xpaint/master/xpaint.h
-
+```
 
 ---
+
 ## Instalação Global
 
 ### Linux
+
 ```
 sudo wget https://raw.githubusercontent.com/senapk/xpaint/master/xpaint.h -O /usr/local/include/xpaint.h
 ```
 
 ### Windows
-Baixe o arquivo (xpaint.h)[https://raw.githubusercontent.com/senapk/xpaint/master/xpaint.h] e coloque dentro da pasta include da instalação do Mingw.
 
-
-
+Baixe o arquivo [xpaint.h](https://raw.githubusercontent.com/senapk/xpaint/master/xpaint.h) e coloque dentro da pasta include da instalação do Mingw.
 
 ---
 ## Funções
@@ -72,18 +73,18 @@ O código a seguir cria um bitmap, escreve um texto, pinta um círculo, salva no
 int main(){
     int largura = 600, altura = 500;
     /* cria um bitmap de 600x500 que irá salvar como figura_base.png*/
-    x_open(largura, altura, "figura_base"); 
+    open(largura, altura, "figura_base"); 
     /* escreve usando a font default na posicao x=50, y=30 */
     /* utilizando o mesmo formato do printf */
-    x_write(50, 30, "Pintarei um circulo vermelho em %d %d", largura/2, altura/2);
+    write(50, 30, "Pintarei um circulo vermelho em %d %d", largura/2, altura/2);
     /* muda a cor do pincel para vermelho */
-    x_color_set(RED);
+    stroke(RED);
     /* desenha um circulo preenchido com centro no meio da tela e raio 200 */
-    x_fill_circle(largura/2, altura/2, 200);
+    circle(largura/2, altura/2, 200);
     /* salva no arquivo exemplo.png */
-    x_save();
+    save();
     /* libera os recursos alocados */
-    x_close();
+    close();
     return 0;
 }
 ```
@@ -91,7 +92,8 @@ int main(){
 ## Compilando e rodando
 
 Se estiver fazendo manual, copie o arquivo xpaint.h para mesma pasta do seu código fonte e compile seu código manualmente.
-```
+
+```bash
 # rodando pelo terminal
 gcc -Wall exemplo.c -o exemplo
 ./exemplo
@@ -99,7 +101,7 @@ gcc -Wall exemplo.c -o exemplo
 
 Ele deve gerar o arquivo figura_base.png que se parece com isso:
 
-![](exemplos/figura_base.png)
+![_](exemplos/figura_base.png)
 
 Se você clonar esse repositório, entrar na pasta exemplos e der um make, ele vai compilar e re-gerar todas as figuras.
 
@@ -108,7 +110,7 @@ Esta é uma biblioteca header only, ou seja, não está dividida em .c e .h. Dec
 Se você der o include na biblioteca ele vai incluir as declarações apenas, ou seja, os cabeçalhos.
 No módulo principal do seu programa, você deve dar o #define `XPAINT` para incluir também as definições.
 
-```
+```c
 #define XPAINT
 #include <xpaint.h> //se instalar globalmente
 //ou
@@ -119,57 +121,64 @@ No módulo principal do seu programa, você deve dar o #define `XPAINT` para inc
 ## Guia de Funções
 
 ### Abrindo e fechando
+
 ```c
 //inicia a figura
-void x_open(unsigned int width, unsigned int height, const char * filename);  
+void open(unsigned int width, unsigned int height, const char * filename);  
 // libera os recursos
-void x_close();      
+void close();      
 ```
 
 ### Limpando, plotando e salvando
+
 ```c
-void x_clear(void);                          // limpa a tela
-void x_plot(int x, int y);                   // pinta o pixel usando a cor padrão
-void x_save(void);                           // salva a figura no arquivo filename.png
+void background(Color color);                          // limpa a tela
+void point(int x, int y);                   // pinta o pixel usando a cor padrão
+void save(void);                           // salva a figura no arquivo filename.png
 
-int           x_get_height(void);            // retorna altura
-int           x_get_width(void);             // retorna largura
-const char *  x_get_filename(void);          // retorna filename
+int           get_height(void);            // retorna altura
+int           get_width(void);             // retorna largura
+const char *  get_filename(void);          // retorna filename
 
-void x_set_filename(const char * filename);  // muda o nome do arquivo
-```
-
-### Abrindo automaticamento a imagem gerada
-```c
-void x_set_viewer(const char * viewer);      // define qual programa vai abrir a imagem
+void set_filename(const char * filename);  // muda o nome do arquivo
 ```
 
 ### Utilizando cores
 
 ```c
 /* Cores default e char da paleta de cores */
-#define WHITE     (X_Color) {238, 232, 213, 255} // w
-#define BLACK     (X_Color) {7  , 54 , 66 , 255} // k
-#define GREEN     (X_Color) {133, 153, 0  , 255} // g
-#define RED       (X_Color) {211, 1  , 2  , 255} // r
-#define BLUE      (X_Color) {38 , 139, 210, 255} // b
-#define YELLOW    (X_Color) {181, 137, 0  , 255} // y
-#define CYAN      (X_Color) {42 , 161, 152, 255} // c
-#define MAGENTA   (X_Color) {211, 54 , 130, 255} // m
-#define ORANGE    (X_Color) {253, 106,   2, 255} // o
-#define VIOLET    (X_Color) {108, 113, 196, 255} // v
+#define WHITE     (Color) {238, 232, 213, 255} // w
+#define BLACK     (Color) {7  , 54 , 66 , 255} // k
+#define GREEN     (Color) {133, 153, 0  , 255} // g
+#define RED       (Color) {211, 1  , 2  , 255} // r
+#define BLUE      (Color) {38 , 139, 210, 255} // b
+#define YELLOW    (Color) {181, 137, 0  , 255} // y
+#define CYAN      (Color) {42 , 161, 152, 255} // c
+#define MAGENTA   (Color) {211, 54 , 130, 255} // m
+#define ORANGE    (Color) {253, 106,   2, 255} // o
+#define VIOLET    (Color) {108, 113, 196, 255} // v
 
 /* muda a cor do pincel*/
-void x_color_set(X_Color color);
+void stroke(Color color);
 
 /* muda a cor do pincel usando a paleta de cores*/
 void stroke_char(char color);
 
-/* return the current color for brush */
-X_Color x_color_get(void);
+/* muda usando o rgba */
+void stroke_rgba(uchar r, uchar g, uchar b, uchar a);
+
+/* muda a cor de preenchimento das formas */
+void fill(Color color);
+
+/* muda a cor de preenchimento das formas usando a paleta de cores */
+void fill_char(char color);
+
+/* muda a cor de preenchimento das formas usando o rgba */
+void fill_rgba(uchar r, uchar g, uchar b, uchar a);
 ```
 
 ### Controle interativo
+
 ```c
 /* Enable interactive save and lock control */
 void x_set_lock();
@@ -190,6 +199,7 @@ void x_make_video(int framerate);
 ### Cores
 
 ![](exemplos/figura_cores.png)
+
 ```c
 /* struct que representa uma cor RGBA */
 typedef struct{
@@ -197,75 +207,68 @@ typedef struct{
     uchar g;
     uchar b;
     uchar a;
-} X_Color;
+} Color;
 
 
-X_Color x_color_make(uchar r, uchar g, uchar b, uchar a);
+Color color(uchar r, uchar g, uchar b, uchar a);
 
 
 /* define uma cor na palheta de caracteres */
-void x_color_set_palette(char c, X_Color color);
+void set_palette(char c, Color color);
 
 /* retorna uma cor dado um char.
    os char default da paleta são rgbmcybk
    outros podem ser definidos ou redefinidor com x_color_set_palette
 */
-X_Color x_color_get_palette(char c);
+Color get_palette(char c);
 ```
 
 ### Desenhando
 
-![](exemplos/figura_draw.png)
+![_](exemplos/figura_draw.png)
 
 ```c
-/* Desenha as seguintes formas sem preenchimento */
 
-/* desenha uma linha com espessura de 1 pixel entre os pontos (x0, y0) e (x1, y1) */
-void x_draw_line(int x0, int y0, int x1, int y1);
-
-/* desenha uma linha com espessura de thickness pixels entre os pontos (x0, y0) e (x1, y1) */
-void x_fill_line(float x0, float y0, float x1, float y1, int thickness);
+/* desenha uma linha entre os pontos (x0, y0) e (x1, y1) */
+void line(int x0, int y0, int x1, int y1);
 
 /* desenha um circulo com centro (centerx, centerx) e raio radius */
-void x_draw_circle(int centerx, int centery, int radius);
+void circle(int centerx, int centery, int radius);
 
-/* desenha um circulo dado centro e raio */
-void x_fill_circle(int centerx, int centery, int radius);
+/* desenha uma elipse */
+void ellipse(int centerx, int centery, int width, int height);
 
-/* desenha uma elipse dentro do rect de ponto superior esquerdo(x0, y0), largura e altura */
-void x_draw_ellipse(int x0, int y0, int width, int height);
 
-/* desenha uma elipse dentro do rect de ponto superior esquerdo(x0, y0), largura e altura */
-void x_fill_ellipse(int x0, int y0, int width, int height);
-
-/* desenha uma curva de bezier entre os pontos (x0, y0) e (x2, y2) */
-/* a curvatura eh dada pelo ponto (x1, y1) */
-void x_draw_bezier(int x0, int y0, int x1, int y1, int x2, int y2);
+/* desenha um bezier dados os pontos de inicio A e fim D e os pontos de controle B e C */
+void bezier(int xa, int ya, int xb, int yb, int xc, int yc, int xd, int yd);
 
 /* desenha um arco dado o ponto de centro, raio, espessura */
 /* o angulo de inicio e o comprimento do arco em graus */
 /* ambos os valores de ângulo podem ser negativos */
-void x_fill_arc(float centerx, float centery, int radius, int thickness, int degrees_begin, int degrees_lenght);
+void arc(float centerx, float centery, int radius, int thickness, int degrees_begin, int degrees_lenght);
 
 /* desenha um triangulo dados os 3 vertices */
-void x_fill_triangle(float v1x, float v1y, float v2x, float v2y, float v3x, float v3y);
+void triangle(float v1x, float v1y, float v2x, float v2y, float v3x, float v3y);
 
 /* desenha um retangulo dados os cantos superior esquerdo (x0, y0), largura e altura */
-void x_fill_rect(int x0, int y0, int width, int height);
+void rect(int x0, int y0, int width, int height);
 
 ```
 
 ### Escrevendo texto
-![](exemplos/figura_texto.png)
+
+![_](exemplos/figura_texto.png)
 
 ```c
 // muda o tamanho da font
 // OBS: a font só muda em múltiplos de 8, ex: 8, 16, 24, ...
-void x_write_set_size(int size); 
+void set_font_size(int size); 
 
 // escreve utilizando o formato printf
-int  x_write(int x, int y, const char * format, ...);
+int  write(int x, int y, const char * format, ...);
+
 ```
+
 ### Vetores bidimensionais
 
 ```c
@@ -273,35 +276,35 @@ int  x_write(int x, int y, const char * format, ...);
 typedef struct{
     double x;
     double y;
-} X_V2d;
+} V2d;
 
 /* cria e retorna um vetor */
-X_V2d x_v2d_make(double x, double y);
+V2d v2d(double x, double y);
 
 /* retorna o tamanho de um vetor da origem */
-double x_v2d_length(double x, double y);
+double v2d_length(double x, double y);
 
 /* retorna a distancia entre dois pontos */
-double x_v2d_distance(double ax, double ay, double bx, double by);
+double v2d_distance(double ax, double ay, double bx, double by);
 
 /* retorna a + b */
-X_V2d x_v2d_sum(X_V2d a, X_V2d b);
+X_V2d v2d_sum(X_V2d a, X_V2d b);
 
 /* retorna a - b */
-X_V2d x_v2d_sub(X_V2d a, X_V2d b);
+X_V2d v2d_sub(X_V2d a, X_V2d b);
 
 /* retorna (a.x * value, a.y * value) */
-X_V2d x_v2d_dot(X_V2d a, double value);
+X_V2d v2d_dot(X_V2d a, double value);
 
 /* retorna o vetor normalizado */
-X_V2d x_v2d_normalize(X_V2d v);
+X_V2d v2d_normalize(X_V2d v);
 
 /* retorna o vetor orthogonal */
-X_V2d x_v2d_ortho(X_V2d v);
+X_V2d v2d_ortho(X_V2d v);
 ```
 
-
 ### Funções Matemáticas
+
 ```c
 /*
 Essas funções foram adicionadas para que a biblioteca
@@ -309,18 +312,18 @@ xpaint não dependesse de incluir a biblioteca math.h
 nos parametros de compilação com o -lm
 */
 
-double x_math_sqrt(const double m);
-double x_math_pow( double x, double y );
-int    x_math_floor(double x);
-double x_math_fmod(double a, double b);
-int    x_math_ceil(double n);
+double math_sqrt(const double m);
+double math_pow( double x, double y );
+int    math_floor(double x);
+double math_fmod(double a, double b);
+int    math_ceil(double n);
 /* degrees */
-double x_math_sin(double d);
-double x_math_cos(double d);
-double x_math_acos(double x);
-double x_math_fabs(double f);
+double math_sin(double d);
+double math_cos(double d);
+double math_acos(double x);
+double math_fabs(double f);
 /* Generates a int number in interval [min, max] */
-int    x_math_rand(int min, int max);
+int    math_rand(int min, int max);
 
 ```
 
@@ -328,7 +331,7 @@ int    x_math_rand(int min, int max);
 
 [Código de matrizes](exemplos/exemplo_grid.c)
 
-![](exemplos/figura_grid.png)
+![_](exemplos/figura_grid.png)
 
 ```c
 
@@ -341,22 +344,22 @@ int    x_math_rand(int min, int max);
 /*Init the grid*/
 /*side is the size of the cell */
 /*sep the space in black between cells */
-void x_grid_init(int side, int sep);
+void grid_init(int side, int sep);
 
 /*plots a square in cell*/
-void x_grid_square(int l, int c);
+void grid_square(int l, int c);
 
 /*plots a circle in cell*/
-void x_grid_circle(int l, int c);
+void grid_circle(int l, int c);
 
 /*writes a text until 5 char in cell*/
-void x_grid_write(int l, int c, const char *format, ...);
+void grid_write(int l, int c, const char *format, ...);
 
 ```
 
 ### Módulo de Vetores
 
-![](exemplos/figura_insertion.png)
+![_](exemplos/figura_insertion.png)
 
 ```c
 /**
@@ -365,7 +368,7 @@ void x_grid_write(int l, int c, const char *format, ...);
  * @param size the size of the array
  * @param max the max value of the array
  */
-void x_bar_init(int size, int max);
+void bar_init(int size, int max);
 
 /**
  * @brief print a single bar
@@ -373,7 +376,7 @@ void x_bar_init(int size, int max);
  * @param i the index
  * @param value the value of the bar size
  */
-void x_bar_one(int i, int value);
+void bar_one(int i, int value);
 
 /**
  * @brief show the entire array
@@ -383,37 +386,38 @@ void x_bar_one(int i, int value);
  * @param colors the array of color to mark unique elements or NULL
  * @param indices the array with the unique indices to be marked with the colors
  */
-void x_bar_all(int * vet, int size, const char * colors, int * indices);
+void bar_all(int * vet, int size, const char * colors, int * indices);
 
 
 /*
  * Save the array using vararg to pass multiple indexes 
 */
-#define x_bar_save(vet, size, colors, ...)
+#define bar_save(vet, size, colors, ...)
 ```
 
 ### Módulo Turtle de Desenho
 
 [Código do triângulo](exemplos/exemplo_triangulo.c)
 
-![](exemplos/figura_triangulo.png)
+![_](exemplos/figura_triangulo.png)
 
 [Código da árvore](exemplos/exemplo_arvore.c)
 
-![](exemplos/figura_arvore.png)
+![_](exemplos/figura_arvore.png)
+
 ```c
-void   x_pen_set_angle(double degrees);
-void   x_pen_set_thick(int thick);
-void   x_pen_set_pos(double x, double y);
-double x_pen_get_angle();
-int    x_pen_get_thick();
-double x_pen_get_x();
-double x_pen_get_y();
-void   x_pen_up(void);
-void   x_pen_down(void); 
-void   x_pen_walk(double distance);
-void   x_pen_rotate(int degrees);
-void   x_pen_goto(double x, double y);
+void   pen_set_angle(double degrees);
+void   pen_set_thick(int thick);
+void   pen_set_pos(double x, double y);
+double pen_get_angle();
+int    pen_get_thick();
+double pen_get_x();
+double pen_get_y();
+void   pen_up(void);
+void   pen_down(void); 
+void   pen_walk(double distance);
+void   pen_rotate(int degrees);
+void   pen_goto(double x, double y);
 
 ```
 
@@ -425,7 +429,7 @@ Você pode usar a função `x_set_log(folder)` para definir a pasta onde salvar 
 
 Utilizando o ffmpeg, é possível juntar todos os pngs em uma animação através do comando:
 
-```
+```bash
 ffmpeg -framerate 5 -pattern_type glob -i '*.png' -c:v libx264 -profile:v high -crf 20 -pix_fmt yuv420p video.mp4
 ```
 

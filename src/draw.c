@@ -7,6 +7,7 @@
 #include "draw.h" /*XDDDX*/
 #include "xmath.h" /*XDDDX*/
 #include "base.h" /*XDDDX*/
+#include "math.h"
 
 static Color     __stroke;
 static Color     __fill;
@@ -16,6 +17,28 @@ static bool      __fill_enable = true;
 static int       __thickness = 1;
 
 void __raw_line(int x0 , int y0 , int x1 , int y1, Color color);
+
+/* divida pela escala atual antes de fazer a transformação */
+void __point_scale(double x, double y, Color color);
+void __draw_line_scale(double x0 , double y0 , double x1 , double y1, Color color);
+/* desenha uma linha com anti aliasing com espessura de 1 pixel entre os pontos (x0, y0) e (x1, y1) */
+void __draw_line(double x0, double y0, double x1, double y1, Color color);
+/* linha sem anti aliasing */
+void __raw_sline(int x0, int y0, int x1, int y1, Color color);
+/* desenha uma linha com espessura de thickness pixels entre os pontos (x0, y0) e (x1, y1) */
+void __fill_line(double x0, double y0, double x1, double y1, int thickness, Color color);
+/* desenha um circulo dado centro e raio */
+void __fill_circle(double centerx, double centery, double radius);
+
+/* desenha uma elipse dentro do rect de ponto superior esquerdo(x0, y0), largura e altura */
+void __draw_ellipse(double x0, double y0, double width, double height);
+/* desenha uma elipse dentro do rect de ponto superior esquerdo(x0, y0), largura e altura */
+void __fill_ellipse(double x0, double y0, double width, double height);
+/* desenha um retangulo dados os cantos superior esquerdo (x0, y0), largura e altura */
+void __fill_rect(double x0, double y0, double width, double height);
+/* desenha um triangulo dados os 3 vertices */
+void __fill_raw_triangle(double v1x, double v1y, double v2x, double v2y, double v3x, double v3y, Color color);
+
 
 void __plot_block(int x, int y, int side, Color color){
     for(int i = x; i < x + side; i++)
@@ -98,7 +121,7 @@ void __x_draw_block(int x, int y, int side, Color color){
             point(i, j, color);
 }
 
-int draw_art(int x, int y, int zoom, const char * picture){
+int asc_art(int x, int y, int zoom, const char * picture){
     int dx = 0;
     int dy = 0;
     int maxdx = 0;
@@ -124,7 +147,7 @@ int draw_art(int x, int y, int zoom, const char * picture){
     return (maxdx + 1) * zoom;
 }
 
-void __raw_sline(int x0, int y0, int x1, int y1) {
+void __raw_sline(int x0, int y0, int x1, int y1, Color color) {
     /* Bresenham's Line Algorithm */
     int dx = (x0 > x1) ? x0 - x1 : x1 - x0;
     int dy = (y0 > y1) ? y0 - y1 : y1 - y0;
@@ -133,7 +156,7 @@ void __raw_sline(int x0, int y0, int x1, int y1) {
     int err = dx - dy;
 
     while (1) {
-        plot(x0, y0, __fill);
+        plot(x0, y0, color);
         if (x0 == x1 && y0 == y1) break;
         int e2 = 2 * err;
         if (e2 > -dy) {
@@ -147,7 +170,7 @@ void __raw_sline(int x0, int y0, int x1, int y1) {
     }
 }
 
-void __x_fill_bottom_flat_triangle(double v1x, double v1y, double v2x, double v2y, double v3x, double v3y)
+void __x_fill_bottom_flat_triangle(double v1x, double v1y, double v2x, double v2y, double v3x, double v3y, Color color)
 {
     double invslope1 = ((int)v2x - (int)v1x) / (double)((int)v2y - (int)v1y);
     double invslope2 = ((int)v3x - (int)v1x) / (double)((int)v3y - (int)v1y);
@@ -157,13 +180,13 @@ void __x_fill_bottom_flat_triangle(double v1x, double v1y, double v2x, double v2
     int scanlineY;
 
     for (scanlineY = v1y; scanlineY <= (int)v2y; scanlineY++){
-        __raw_sline(curx1, scanlineY, curx2, scanlineY);
+        __raw_sline(curx1, scanlineY, curx2, scanlineY, color);
         curx1 += invslope1;
         curx2 += invslope2;
     }
 }
 
-void __x_fill_top_flat_triangle(double v1x, double v1y, double v2x, double v2y, double v3x, double v3y)
+void __x_fill_top_flat_triangle(double v1x, double v1y, double v2x, double v2y, double v3x, double v3y, Color color)
 {
     double invslope1 = ((int)v3x - (int)v1x) / (double)((int)v3y - (int)v1y);
     double invslope2 = ((int)v3x - (int)v2x) / (double)((int)v3y - (int)v2y);
@@ -175,13 +198,13 @@ void __x_fill_top_flat_triangle(double v1x, double v1y, double v2x, double v2y, 
 
     for (scanlineY = v3y; scanlineY >= v1y; scanlineY--)
     {
-        __raw_sline(curx1, scanlineY, curx2, scanlineY);
+        __raw_sline(curx1, scanlineY, curx2, scanlineY, color);
         curx1 -= invslope1;
         curx2 -= invslope2;
     }
 }
 
-void raw_fill_triangle(double v1x, double v1y, double v2x, double v2y, double v3x, double v3y)
+void __fill_raw_triangle(double v1x, double v1y, double v2x, double v2y, double v3x, double v3y, Color color)
 {
     V2d v1 = {v1x, v1y};
     V2d v2 = {v2x, v2y};
@@ -197,27 +220,27 @@ void raw_fill_triangle(double v1x, double v1y, double v2x, double v2y, double v3
     /* here we know that v1.y <= v2.y <= v3.y */
     /* check for trivial case of bottom-flat triangle */
     if (v2.y == v3.y)
-        __x_fill_bottom_flat_triangle(v1.x, v1.y, v2.x, v2.y, v3.x, v3.y);
+        __x_fill_bottom_flat_triangle(v1.x, v1.y, v2.x, v2.y, v3.x, v3.y, color);
     else if (v1.y == v2.y)
-        __x_fill_top_flat_triangle(v1.x, v1.y, v2.x, v2.y, v3.x, v3.y);
+        __x_fill_top_flat_triangle(v1.x, v1.y, v2.x, v2.y, v3.x, v3.y, color);
     else
     {
         /* general case - split the triangle in a topflat and bottom-flat one */
         V2d v4 = {0.f, 0.f};
         v4.x = (v1.x + ((double)(v2.y - v1.y) / (double)(v3.y - v1.y)) * (v3.x - v1.x));
         v4.y = v2.y;
-        __x_fill_bottom_flat_triangle(v1.x, v1.y, v2.x, v2.y, v4.x, v4.y);
-        __x_fill_top_flat_triangle(v2.x, v2.y, v4.x, v4.y, v3.x, v3.y);
+        __x_fill_bottom_flat_triangle(v1.x, v1.y, v2.x, v2.y, v4.x, v4.y, color);
+        __x_fill_top_flat_triangle(v2.x, v2.y, v4.x, v4.y, v3.x, v3.y, color);
     }
 }
 
-void __fill_line(double x0, double y0, double x1, double y1, int thickness){
+void __fill_line(double x0, double y0, double x1, double y1, int thickness, Color color){
     V2d c0 = __transform(x0, y0);
     V2d c1 = __transform(x1, y1);
     V2d a = {c0.x, c0.y};
     V2d b = {c1.x, c1.y};
 
-    V2d _offset = make_v2d(b.x - a.x, b.y - a.y);
+    V2d _offset = v2d(b.x - a.x, b.y - a.y);
     _offset = v2d_dot(v2d_ortho(v2d_normalize(_offset)), (thickness / 2.f));
 
     V2d p1 = v2d_sub(a, _offset);
@@ -225,8 +248,8 @@ void __fill_line(double x0, double y0, double x1, double y1, int thickness){
     V2d p3 = v2d_sum(a, _offset);
     V2d p4 = v2d_sum(b, _offset);
 
-    raw_fill_triangle(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);
-    raw_fill_triangle(p3.x, p3.y, p2.x, p2.y, p4.x, p4.y);
+    __fill_raw_triangle(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y, color);
+    __fill_raw_triangle(p3.x, p3.y, p2.x, p2.y, p4.x, p4.y, color);
 }
 
 void __fill_rect(double x0, double y0, double width, double height){
@@ -235,8 +258,8 @@ void __fill_rect(double x0, double y0, double width, double height){
     V2d p2 = __transform(x0 + width, y0 + height);
     V2d p3 = __transform(x0, y0 + height);
 
-    raw_fill_triangle(p0.x, p0.y, p1.x, p1.y, p2.x, p2.y);
-    raw_fill_triangle(p0.x, p0.y, p2.x, p2.y, p3.x, p3.y);
+    __fill_raw_triangle(p0.x, p0.y, p1.x, p1.y, p2.x, p2.y, __fill);
+    __fill_raw_triangle(p0.x, p0.y, p2.x, p2.y, p3.x, p3.y, __fill);
 }
 
 void rect(double x, double y, double witdh, double height) {
@@ -244,43 +267,96 @@ void rect(double x, double y, double witdh, double height) {
         __fill_rect(x, y, witdh, height);
     }
     if (__stroke_enable) {
-        double s = __get_transform_scale();
-        __fill_line(x, y, x + witdh * s, y, __thickness);
-        __fill_line(x + witdh * s, y, x + witdh * s, y + height * s, __thickness);
-        __fill_line(x + witdh * s, y + height * s, x, y + height * s, __thickness);
-        __fill_line(x, y + height * s, x, y, __thickness);
+        __fill_line(x, y, x + witdh, y, __thickness, __stroke);
+        __fill_line(x + witdh, y, x + witdh, y + height, __thickness, __stroke);
+        __fill_line(x + witdh, y + height, x, y + height, __thickness, __stroke);
+        __fill_line(x, y + height, x, y, __thickness, __stroke);
     }
+}
 
+void triangle(double xa, double ya, double xb, double yb, double xc, double yc){
+    if(__fill_enable){
+        V2d a = __transform(xa, ya);
+        V2d b = __transform(xb, yb);
+        V2d c = __transform(xc, yc);
+        __fill_raw_triangle(a.x, a.y, b.x, b.y, c.x, c.y, __fill);
+    }
+    if(__stroke_enable){
+        __fill_line(xa, ya, xb, yb, __thickness, __stroke);
+        __fill_line(xb, yb, xc, yc, __thickness, __stroke);
+        __fill_line(xc, yc, xa, ya, __thickness, __stroke);
+    }
+}
+
+void square(double x, double y, double side) {
+    rect(x, y, side, side);
 }
 
 /* https://en.wikipedia.org/wiki/Midpoint_circle_algorithm */
-void __draw_circle(double centerx, double centery, double radius){
-    int x = radius - 1;
-    int y = 0;
-    int dx = 1;
-    int dy = 1;
-    int err = dx - ((int) radius << 1);
-    while(x >= y){
-        __point_scale((centerx + x), (centery + y), __stroke);
-        __point_scale((centerx - x), (centery + y), __stroke);
-        __point_scale((centerx + x), (centery - y), __stroke);
-        __point_scale((centerx - x), (centery - y), __stroke);
-        __point_scale((centerx + y), (centery + x), __stroke);
-        __point_scale((centerx - y), (centery + x), __stroke);
-        __point_scale((centerx - y), (centery - x), __stroke);
-        __point_scale((centerx + y), (centery - x), __stroke);
+// void __draw_circle(double centerx, double centery, double radius){
+//     int x = radius - 1;
+//     int y = 0;
+//     int dx = 1;
+//     int dy = 1;
+//     int err = dx - ((int) radius << 1);
+//     while(x >= y){
+//         __point_scale((centerx + x), (centery + y), __stroke);
+//         __point_scale((centerx - x), (centery + y), __stroke);
+//         __point_scale((centerx + x), (centery - y), __stroke);
+//         __point_scale((centerx - x), (centery - y), __stroke);
+//         __point_scale((centerx + y), (centery + x), __stroke);
+//         __point_scale((centerx - y), (centery + x), __stroke);
+//         __point_scale((centerx - y), (centery - x), __stroke);
+//         __point_scale((centerx + y), (centery - x), __stroke);
 
-        if(err <= 0){
-            y++;
-            err += dy;
-            dy += 2;
-        }else{
-            x--;
-            dx += 2;
-            err += dx - ((int) radius << 1);
-        }
-    }
-}
+//         if(err <= 0){
+//             y++;
+//             err += dy;
+//             dy += 2;
+//         }else{
+//             x--;
+//             dx += 2;
+//             err += dx - ((int) radius << 1);
+//         }
+//     }
+// }
+
+// void __draw_circle(double centerx, double centery, double radius) {
+//     int thickness = __thickness;
+//     // Definindo as coordenadas do círculo
+//     int x = radius - 1;
+//     int y = 0;
+//     int dx = 1;
+//     int dy = 1;
+//     int err = dx - (int)(radius * 2);
+
+//     // Desenha o círculo utilizando o algoritmo do ponto médio
+//     while (x >= y) {
+//         for (int i = 0; i < thickness; i++) {
+//             // Desenha os pontos simétricos em todas as oito octantes
+//             __point_scale((centerx + x), (centery + y + i), __stroke);
+//             __point_scale((centerx + y), (centery + x + i), __stroke);
+//             __point_scale((centerx - y), (centery + x + i), __stroke);
+//             __point_scale((centerx - x), (centery + y + i), __stroke);
+//             __point_scale((centerx - x), (centery - y - i), __stroke);
+//             __point_scale((centerx - y), (centery - x - i), __stroke);
+//             __point_scale((centerx + y), (centery - x - i), __stroke);
+//             __point_scale((centerx + x), (centery - y - i), __stroke);
+//         }
+
+//         if (err <= 0) {
+//             y++;
+//             err += dy;
+//             dy += 2;
+//         }
+
+//         if (err > 0) {
+//             x--;
+//             dx += 2;
+//             err += dx - (int)(radius * 2);
+//         }
+//     }
+// }
 
 void __fill_circle(double centerx, double centery, double radius){
     V2d center = __transform(centerx, centery);
@@ -294,22 +370,22 @@ void __fill_circle(double centerx, double centery, double radius){
     int dx = 1;
     int dy = 1;
     int err = dx - ((int) radius << 1);
-    int * lined = (int *) calloc(2 * radius, sizeof(int));
+    int * lined = (int *) calloc(2 * (int) radius + 1, sizeof(int));
     while(x >= y){
         if(lined[(int)(y + radius)] == 0){
-            __raw_sline(centerx + x, centery + y, centerx - x, centery + y);
+            __raw_sline(centerx + x, centery + y, centerx - x, centery + y, __fill);
             lined[(int)(y + radius)] = 1;
         }
         if(lined[(int)(-y + radius)] == 0){
-            __raw_sline(centerx + x, centery - y, centerx - x, centery - y);
+            __raw_sline(centerx + x, centery - y, centerx - x, centery - y, __fill);
             lined[(int)(-y + radius)] = 1;
         }
         if(lined[(int)(x + radius)] == 0){
-            __raw_sline(centerx + y, centery + x, centerx - y, centery + x);
+            __raw_sline(centerx + y, centery + x, centerx - y, centery + x, __fill);
             lined[(int)(x + radius)] = 1;
         }
         if(lined[(int)(-x + radius)] == 0){
-            __raw_sline(centerx - y, centery - x, centerx + y, centery - x);
+            __raw_sline(centerx - y, centery - x, centerx + y, centery - x, __fill);
             lined[(int)(-x + radius)] = 1;
         }
         /* 
@@ -331,45 +407,103 @@ void __fill_circle(double centerx, double centery, double radius){
     free(lined);
 }
 
-void circle(int x0, int y0, int radius){
-    if(__fill_enable){
-        __fill_circle(x0, y0, radius);
+
+
+// void __draw_ellipse(double x0, double y0, double width, double height){
+//     x0 = x0 - width / 2;
+//     y0 = y0 - height / 2;
+
+//     int x1 = x0 + width - 1, y1 = y0 + height - 1;
+//     int a = math_fabs(x1-x0), b = math_fabs(y1-y0), b1 = b&1; /* values of diameter */
+//     long dx = 4*(1-a)*b*b, dy = 4*(b1+1)*a*a; /* error increment */
+//     long err = dx+dy+b1*a*a, e2; /* error of 1.step */
+
+//     if (x0 > x1) { x0 = x1; x1 += a; } /* if called with swapped points */
+//     if (y0 > y1) y0 = y1; /* .. exchange them */
+//     y0 += (b+1)/2; y1 = y0-b1;   /* starting pixel */
+//     a *= 8*a; b1 = 8*b*b;
+
+//     do {
+//         __point_scale(x1, y0, __stroke); /*   I. Quadrant */
+//         __point_scale(x0, y0, __stroke); /*  II. Quadrant */
+//         __point_scale(x0, y1, __stroke); /* III. Quadrant */
+//         __point_scale(x1, y1, __stroke); /*  IV. Quadrant */
+//         e2 = 2*err;
+//         if (e2 <= dy) { y0++; y1--; err += dy += a; }  /* y step */
+//         if (e2 >= dx || 2*err > dy) { x0++; x1--; err += dx += b1; } /* x step */
+//     } while (x0 <= x1);
+
+//     while (y0-y1 < b) {  /* too early stop of flat ellipses a=1 */
+//         __point_scale((x0-1), (y0  ), __stroke); /* -> finish tip of ellipse */
+//         __point_scale((x1+1), (y0++), __stroke);
+//         __point_scale((x0-1), (y1  ), __stroke);
+//         __point_scale((x1+1), (y1--), __stroke);
+//     }
+// }
+
+void __draw_ellipse(double centerx, double centery, double width, double height) {
+    double radius_x = width / 2;
+    double radius_y = height / 2;
+    int thickness = __thickness;
+    // Definindo as coordenadas iniciais
+    double x = 0;
+    double y = radius_y;
+    double d1 = (radius_y * radius_y) - (radius_x * radius_x * radius_y) + (0.25 * radius_x * radius_x);
+    double dx = 2 * radius_y * radius_y * x;
+    double dy = 2 * radius_x * radius_x * y;
+
+    // Desenha a metade superior da elipse
+    while (dx < dy) {
+        for (int i = 0; i < thickness; i++) {
+            __point_scale(centerx + x, centery + y + i, __stroke);
+            __point_scale(centerx - x, centery + y + i, __stroke);
+            __point_scale(centerx + x, centery - y - i, __stroke);
+            __point_scale(centerx - x, centery - y - i, __stroke);
+
+            __point_scale(centerx + x + i, centery + y, __stroke);
+            __point_scale(centerx - x - i, centery + y, __stroke);
+            __point_scale(centerx + x + i, centery - y, __stroke);
+            __point_scale(centerx - x - i, centery - y, __stroke);
+        }
+
+        x++;
+        dx += 2 * radius_y * radius_y;
+        if (d1 < 0) {
+            d1 += dx + radius_y * radius_y;
+        } else {
+            y--;
+            dy -= 2 * radius_x * radius_x;
+            d1 += dx - dy + radius_y * radius_y;
+        }
     }
-    if(__stroke_enable){
-        double s = __get_transform_scale();
-        __draw_circle(x0 * s, y0 * s, radius * s);
-    }
-}
 
-void __draw_ellipse(double x0, double y0, double width, double height){
-    x0 = x0 - width / 2;
-    y0 = y0 - height / 2;
+    // Desenha a metade inferior da elipse
+    double d2 = ((radius_y * radius_y) * ((x + 0.5) * (x + 0.5))) +
+                ((radius_x * radius_x) * ((y - 1) * (y - 1))) -
+                (radius_x * radius_x * radius_y * radius_y);
 
-    int x1 = x0 + width - 1, y1 = y0 + height - 1;
-    int a = math_fabs(x1-x0), b = math_fabs(y1-y0), b1 = b&1; /* values of diameter */
-    long dx = 4*(1-a)*b*b, dy = 4*(b1+1)*a*a; /* error increment */
-    long err = dx+dy+b1*a*a, e2; /* error of 1.step */
+    while (y >= 0) {
+        for (int i = 0; i < thickness; i++) {
+            __point_scale(centerx + x, centery + y + i, __stroke);
+            __point_scale(centerx - x, centery + y + i, __stroke);
+            __point_scale(centerx + x, centery - y - i, __stroke);
+            __point_scale(centerx - x, centery - y - i, __stroke);
 
-    if (x0 > x1) { x0 = x1; x1 += a; } /* if called with swapped points */
-    if (y0 > y1) y0 = y1; /* .. exchange them */
-    y0 += (b+1)/2; y1 = y0-b1;   /* starting pixel */
-    a *= 8*a; b1 = 8*b*b;
+            __point_scale(centerx + x + i, centery + y, __stroke);
+            __point_scale(centerx - x - i, centery + y, __stroke);
+            __point_scale(centerx + x + i, centery - y, __stroke);
+            __point_scale(centerx - x - i, centery - y, __stroke);
+        }
 
-    do {
-        __point_scale(x1, y0, __stroke); /*   I. Quadrant */
-        __point_scale(x0, y0, __stroke); /*  II. Quadrant */
-        __point_scale(x0, y1, __stroke); /* III. Quadrant */
-        __point_scale(x1, y1, __stroke); /*  IV. Quadrant */
-        e2 = 2*err;
-        if (e2 <= dy) { y0++; y1--; err += dy += a; }  /* y step */
-        if (e2 >= dx || 2*err > dy) { x0++; x1--; err += dx += b1; } /* x step */
-    } while (x0 <= x1);
-
-    while (y0-y1 < b) {  /* too early stop of flat ellipses a=1 */
-        __point_scale((x0-1), (y0  ), __stroke); /* -> finish tip of ellipse */
-        __point_scale((x1+1), (y0++), __stroke);
-        __point_scale((x0-1), (y1  ), __stroke);
-        __point_scale((x1+1), (y1--), __stroke);
+        y--;
+        dy -= 2 * radius_x * radius_x;
+        if (d2 > 0) {
+            d2 += radius_x * radius_x - dy;
+        } else {
+            x++;
+            dx += 2 * radius_y * radius_y;
+            d2 += dx - dy + radius_x * radius_x;
+        }
     }
 }
 
@@ -392,7 +526,7 @@ void __fill_ellipse(double x0, double y0, double width, double height){
     y0 += (b+1)/2; y1 = y0-b1;   /* starting pixel */
     a *= 8*a; b1 = 8*b*b;
     
-    int * lined = (int *) calloc((int) height, sizeof(int));
+    int * lined = (int *) calloc((int) (height + 1), sizeof(int));
     
     do {
         if(lined[(int)(y0 - ytop)] == 0){
@@ -427,6 +561,16 @@ void ellipse(double x0, double y0, double width, double height) {
     }
 }
 
+void circle(int x0, int y0, int radius){
+    if(__fill_enable){
+        __fill_circle(x0, y0, radius);
+    }
+    if(__stroke_enable){
+        double s = __get_transform_scale();
+        __draw_ellipse(x0 * s, y0 * s, 2 * radius * s, 2 * radius * s);
+    }
+}
+
 void __x_plot_quad_bezier_seg(int x0, int y0, int x1, int y1, int x2, int y2)
 {
     int sx = x2-x1, sy = y2-y1;
@@ -456,39 +600,39 @@ void __x_plot_quad_bezier_seg(int x0, int y0, int x1, int y1, int x2, int y2)
             if (    y1    ) { y0 += sy; dy -= xy; err += dx += xx; } /* y step */
         } while (dy < dx );           /* gradient negates -> algorithm fails */
     }
-    __raw_sline(x0, y0, x2, y2);                  /* plot remaining part to end */
+    __raw_sline(x0, y0, x2, y2, __stroke);                  /* plot remaining part to end */
 }
-void draw_bezier(int x0, int y0, int x1, int y1, int x2, int y2)
-{                                          /* plot any quadratic Bezier curve */
-    int x = x0-x1, y = y0-y1;
-    double t = x0-2*x1+x2, r;
+// void draw_bezier(int x0, int y0, int x1, int y1, int x2, int y2)
+// {                                          /* plot any quadratic Bezier curve */
+//     int x = x0-x1, y = y0-y1;
+//     double t = x0-2*x1+x2, r;
 
-    if ((long)x*(x2-x1) > 0) {                        /* horizontal cut at P4? */
-        if ((long)y*(y2-y1) > 0)                     /* vertical cut at P6 too? */
-            if (math_fabs((y0-2*y1+y2)/t*x) > abs(y)) {               /* which first? */
-                x0 = x2; x2 = x+x1; y0 = y2; y2 = y+y1;            /* swap points */
-            }                            /* now horizontal cut at P4 comes first */
-        t = (x0-x1)/t;
-        r = (1-t)*((1-t)*y0+2.0*t*y1)+t*t*y2;                       /* By(t=P4) */
-        t = (x0*x2-x1*x1)*t/(x0-x1);                       /* gradient dP4/dx=0 */
-        x = math_floor(t+0.5); y = math_floor(r+0.5);
-        r = (y1-y0)*(t-x0)/(x1-x0)+y0;                  /* intersect P3 | P0 P1 */
-        __x_plot_quad_bezier_seg(x0,y0, x,math_floor(r+0.5), x,y);
-        r = (y1-y2)*(t-x2)/(x1-x2)+y2;                  /* intersect P4 | P1 P2 */
-        x0 = x1 = x; y0 = y; y1 = math_floor(r+0.5);             /* P0 = P4, P1 = P8 */
-    }
-    if ((long)(y0-y1)*(y2-y1) > 0) {                    /* vertical cut at P6? */
-        t = y0-2*y1+y2; t = (y0-y1)/t;
-        r = (1-t)*((1-t)*x0+2.0*t*x1)+t*t*x2;                       /* Bx(t=P6) */
-        t = (y0*y2-y1*y1)*t/(y0-y1);                       /* gradient dP6/dy=0 */
-        x = math_floor(r+0.5); y = math_floor(t+0.5);
-        r = (x1-x0)*(t-y0)/(y1-y0)+x0;                  /* intersect P6 | P0 P1 */
-        __x_plot_quad_bezier_seg(x0,y0, math_floor(r+0.5),y, x,y);
-        r = (x1-x2)*(t-y2)/(y1-y2)+x2;                  /* intersect P7 | P1 P2 */
-        x0 = x; x1 = math_floor(r+0.5); y0 = y1 = y;             /* P0 = P6, P1 = P7 */
-    }
-    __x_plot_quad_bezier_seg(x0,y0, x1,y1, x2,y2);                  /* remaining part */
-}
+//     if ((long)x*(x2-x1) > 0) {                        /* horizontal cut at P4? */
+//         if ((long)y*(y2-y1) > 0)                     /* vertical cut at P6 too? */
+//             if (math_fabs((y0-2*y1+y2)/t*x) > abs(y)) {               /* which first? */
+//                 x0 = x2; x2 = x+x1; y0 = y2; y2 = y+y1;            /* swap points */
+//             }                            /* now horizontal cut at P4 comes first */
+//         t = (x0-x1)/t;
+//         r = (1-t)*((1-t)*y0+2.0*t*y1)+t*t*y2;                       /* By(t=P4) */
+//         t = (x0*x2-x1*x1)*t/(x0-x1);                       /* gradient dP4/dx=0 */
+//         x = math_floor(t+0.5); y = math_floor(r+0.5);
+//         r = (y1-y0)*(t-x0)/(x1-x0)+y0;                  /* intersect P3 | P0 P1 */
+//         __x_plot_quad_bezier_seg(x0,y0, x, math_floor(r+0.5), x,y);
+//         r = (y1-y2)*(t-x2)/(x1-x2)+y2;                  /* intersect P4 | P1 P2 */
+//         x0 = x1 = x; y0 = y; y1 = math_floor(r+0.5);             /* P0 = P4, P1 = P8 */
+//     }
+//     if ((long)(y0-y1)*(y2-y1) > 0) {                    /* vertical cut at P6? */
+//         t = y0-2*y1+y2; t = (y0-y1)/t;
+//         r = (1-t)*((1-t)*x0+2.0*t*x1)+t*t*x2;                       /* Bx(t=P6) */
+//         t = (y0*y2-y1*y1)*t/(y0-y1);                       /* gradient dP6/dy=0 */
+//         x = math_floor(r+0.5); y = math_floor(t+0.5);
+//         r = (x1-x0)*(t-y0)/(y1-y0)+x0;                  /* intersect P6 | P0 P1 */
+//         __x_plot_quad_bezier_seg(x0,y0, math_floor(r+0.5),y, x,y);
+//         r = (x1-x2)*(t-y2)/(y1-y2)+x2;                  /* intersect P7 | P1 P2 */
+//         x0 = x; x1 = math_floor(r+0.5); y0 = y1 = y;             /* P0 = P6, P1 = P7 */
+//     }
+//     __x_plot_quad_bezier_seg(x0,y0, x1,y1, x2,y2);                  /* remaining part */
+// }
 
 /* https://github.com/Jnmattern/Minimalist_2.0/blob/master/src/bitmap.h */
 #define __TRIG_MAX (1<<24)
@@ -506,7 +650,8 @@ const int32_t __sinTable__[91] = {
     16766995, 16774660, 16777216
 };
 
-static int32_t __SIN(double value) {
+static double __SIN(double value) {
+    // return sin(value);
     int d = (int)value%360;
     if (d < 90) {
         return __sinTable__[d];
@@ -519,7 +664,8 @@ static int32_t __SIN(double value) {
     }
 }
 
-static int32_t __COS(double value) {
+static double __COS(double value) {
+    // return cos(value);
     int d = (int)value%360;
     if (d < 90) {
         return __sinTable__[90-d];
@@ -571,7 +717,7 @@ void __x_fill_arc(double centerx, double centery, int radius, int thickness, int
 
 }
 
-void fill_arc(double centerx, double centery, int radius, int thickness, int degrees_begin, int degrees_lenght){
+void arc(double centerx, double centery, int radius, int thickness, int degrees_begin, int degrees_lenght){
     if(degrees_lenght % 360 == 0)
         degrees_lenght = 360;
     else
@@ -689,5 +835,77 @@ void line(double x0 , double y0 , double x1 , double y1) {
         __draw_line(x0, y0, x1, y1, __stroke);
         return;
     }
-    __fill_line(x0, y0, x1, y1, __thickness);
+    __fill_line(x0, y0, x1, y1, __thickness, __stroke);
+}
+
+double calculateBezierPoint(double p0, double p1, double p2, double p3, double t) {
+    return p0 * (1 - t) * (1 - t) * (1 - t) + 3 * p1 * t * (1 - t) * (1 - t) + 3 * p2 * t * t * (1 - t) + p3 * t * t * t;
+}
+
+// Função para desenhar uma curva de Bezier de grau 3
+// void bezier(double xa, double ya, double xb, double yb, double xc, double yc, double xd, double yd) {
+//     // Número de segmentos
+//     int numSegments = 100;
+//     double increment = 1.0 / numSegments;
+
+//     // Desenha a curva de Bezier com triângulos
+//     for (int i = 0; i < numSegments; ++i) {
+//         double t0 = i * increment;
+//         double t1 = (i + 1) * increment;
+
+//         double x0 = calculateBezierPoint(xa, xb, xc, xd, t0);
+//         double y0 = calculateBezierPoint(ya, yb, yc, yd, t0);
+//         double x1 = calculateBezierPoint(xa, xb, xc, xd, t1);
+//         double y1 = calculateBezierPoint(ya, yb, yc, yd, t1);
+
+//         __fill_raw_triangle(x0, y0, x1, y1, x1, y1, __stroke); // desenha um triângulo com vértices coincidentes
+//     }
+// }
+
+void bezier(double xa, double ya, double xb, double yb, double xc, double yc, double xd, double yd) {
+    int thickness = __thickness;
+    // Número de segmentos
+    int numSegments = 100;
+    double increment = 1.0 / numSegments;
+
+    // Desenha a curva de Bezier com espessura
+    for (int i = 0; i < numSegments; ++i) {
+        double t0 = i * increment;
+        double t1 = (i + 1) * increment;
+
+        double x0 = calculateBezierPoint(xa, xb, xc, xd, t0);
+        double y0 = calculateBezierPoint(ya, yb, yc, yd, t0);
+        double x1 = calculateBezierPoint(xa, xb, xc, xd, t1);
+        double y1 = calculateBezierPoint(ya, yb, yc, yd, t1);
+
+        // Calcula os vetores normalizados
+        double dx = x1 - x0;
+        double dy = y1 - y0;
+        double length = math_sqrt(dx * dx + dy * dy);
+        if (length != 0) {
+            dx /= length;
+            dy /= length;
+        }
+
+        // Calcula os vetores perpendiculares
+        double vx = -dy;
+        double vy = dx;
+
+        // Calcula os vértices dos triângulos
+        double x2 = x0 + vx * thickness;
+        double y2 = y0 + vy * thickness;
+        double x3 = x1 + vx * thickness;
+        double y3 = y1 + vy * thickness;
+        double x4 = x1 - vx * thickness;
+        double y4 = y1 - vy * thickness;
+        double x5 = x0 - vx * thickness;
+        double y5 = y0 - vy * thickness;
+
+        // Desenha os triângulos formados pelos vértices
+        __fill_raw_triangle(x0, y0, x1, y1, x2, y2, __stroke);
+        __fill_raw_triangle(x1, y1, x2, y2, x3, y3, __stroke);
+        __fill_raw_triangle(x1, y1, x3, y3, x4, y4, __stroke);
+        __fill_raw_triangle(x0, y0, x5, y5, x4, y4, __stroke);
+        __fill_raw_triangle(x0, y0, x5, y5, x1, y1, __stroke);
+    }
 }

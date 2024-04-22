@@ -28,11 +28,12 @@ int main(){
     int largura = 600, altura = 500;
     open(largura, altura, "figura_base"); 
     write(50, 30, "Pintarei um circulo vermelho em %d %d", largura/2, altura/2);
-    x_color_set("red");
-    __fill_circle(largura/2, altura/2, 200);
+    background(WHITE);
+    stroke(BLACK);
+    fill(RED)
+    circle(largura/2, altura/2, 200);
     save();
     close();
     return 0;
 }
 #endif
-

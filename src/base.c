@@ -137,20 +137,7 @@ void plot(int x, int y,  Color color) {
     __color[2] = color.b;
     __color[3] = color.a;
 
-    // double s = __get_transform_scale();
-    // if (math_fabs(s - 1) < 0.01) {
-        __x_plot(x, y, __color);
-    // } else {
-    //     for (int i = 0; i < 3; i++) {
-    //         for (int j = 0; j < 3; j++){
-    //             int xx = x + i;
-    //             int yy = y + j;
-    //             __x_plot(xx, yy, __color);
-    //         }
-    //     }
-
-    // }
-        
+    __x_plot(x, y, __color);
 }
 
 
@@ -338,7 +325,7 @@ void rotate(double angle) {
 
 //pass x and y to all transformations in the stack
 V2d __transform(double x, double y) {
-    V2d point = make_v2d(x, y);
+    V2d point = v2d(x, y);
     for(int i = 0; i <= __board_transform_index; i++) {
         Transform t = __board_transform[i];
         double angle = t.angle;

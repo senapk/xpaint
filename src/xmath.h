@@ -1,6 +1,7 @@
 #ifndef XMATH_H /*XDDDX*/
 #define XMATH_H /*XDDDX*/
 
+#include "base.h" /*XDDDX*/
 /* Faz o SWAP entre dois tipos */
 #define X_SWAP(x, y, T) do { T X_SWAP = x; x = y; y = X_SWAP; } while (0)
 
@@ -10,14 +11,8 @@
 ###############################################
 */
 
-/* Define um vetor bidimensional com x e y */
-typedef struct{
-    double x;
-    double y;
-} V2d;
-
 /* cria e retorna um vetor */
-V2d make_v2d(double x, double y);
+V2d v2d(double x, double y);
 
 /* retorna o tamanho de um vetor da origem */
 double v2d_length(double x, double y);

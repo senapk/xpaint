@@ -60,12 +60,18 @@ typedef struct {
     double angle;
 } Transform;
 
+/* Define um vetor bidimensional com x e y */
+typedef struct{
+    double x;
+    double y;
+} V2d;
 
 void push();
 void pop();
 void translate(double dx, double dy);
 void scale(double s);
 void rotate(double angle);
+
 V2d __transform(double x, double y);
 double __get_transform_scale();
 

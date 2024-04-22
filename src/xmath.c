@@ -8,7 +8,7 @@
 #include <stdlib.h>
 
 
-V2d make_v2d(double x, double y){
+V2d v2d(double x, double y){
     V2d v = {x, y};
     return v;
 }
@@ -22,15 +22,15 @@ double v2d_distance(double ax, double ay, double bx, double by){
 }
 
 V2d v2d_sum(V2d a, V2d b){
-    return make_v2d(a.x + b.x, a.y + b.y);
+    return v2d(a.x + b.x, a.y + b.y);
 }
 
 V2d v2d_sub(V2d a, V2d b){
-    return make_v2d(a.x - b.x, a.y - b.y);
+    return v2d(a.x - b.x, a.y - b.y);
 }
 
 V2d v2d_dot(V2d a, double value){
-    return make_v2d(a.x * value, a.y * value);
+    return v2d(a.x * value, a.y * value);
 }
 
 V2d v2d_normalize(V2d v){
@@ -43,7 +43,7 @@ V2d v2d_normalize(V2d v){
 }
 
 V2d v2d_ortho(V2d v){
-    return make_v2d(v.y, -v.x);
+    return v2d(v.y, -v.x);
 }
 
 int   math_rand(int min, int max){
