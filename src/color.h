@@ -44,6 +44,6 @@ void setPalette(char c, Color color);
 Color getPalette(char c);
 
 
-void __x_init_pallete();
+void __init_colors();
 
 #endif /*XDDDX*/

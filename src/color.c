@@ -21,7 +21,7 @@ Color getPalette(char c){
     return __board_palette[(int)c];
 }
 
-void __x_init_pallete(void){
+void __init_colors(void){
     int i = 0;
     for(i = 0; i < 256; i++)
         __board_palette[i] = WHITE;
@@ -220,7 +220,7 @@ void __x_init_pallete(void){
 
 //    x_color_store("y", "yellow",  x_color_make(181, 137, 0  , 255));
 
-////    __x_init_pallete();
+////    __init_colors();
 //}
 
 //void x_color_show(Color color){

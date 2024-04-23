@@ -67,7 +67,7 @@ void open(unsigned int width, unsigned int height, const char * filename){
     // __stroke[2] = 200;
     // __stroke[3] = 255;
 
-    __x_init_pallete();
+    __init_colors();
     __x_init_font();
     srand((unsigned) time(NULL));
 }
