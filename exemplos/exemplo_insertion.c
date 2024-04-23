@@ -2,17 +2,18 @@
 #define XPAINT
 #include "xpaint.h"
 
-void insertion(int * vet, int size){
+void insertion(int * vet, int size) {
     int i;
     for(i = 1; i < size; i++){
         barSave(vet, size, "y", i);
         int j;
-        for(j = i - 1; j >= 0; j--){
-            if(vet[j] > vet[j + 1]){
+        for(j = i - 1; j >= 0; j--) {
+            if(vet[j] > vet[j + 1]) {
                 X_SWAP(vet[j], vet[j + 1], int);
                 barSave(vet, size, "yg", i, j);
-            }else
+            } else {
                 break;
+            }
         }
     }
 }
@@ -32,7 +33,6 @@ void verify(int * vet, int size){
 int main() {
 
     open(600, 300, "figura_insertion");
-    set_viewer("code");
     setLock();
     setLog("imgs");
     int size = 30, max = 900;
@@ -48,7 +48,7 @@ int main() {
     save();
     verify(vet, size);
     barSave(vet, size, NULL);
-    makeVideo(3);
+    makeVideo(3, "video_insertion");
     close();
 
     return 0;

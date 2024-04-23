@@ -24,18 +24,18 @@ void gridSquare(int l, int c){
 
 void gridCircle(int l, int c){
     circle(c * __X_GRID_SIZE + __X_GRID_SIZE / 2, l * __X_GRID_SIZE + __X_GRID_SIZE / 2,
-                  __X_GRID_SIZE / 2 - __X_GRID_SEP + 1);
+                  __X_GRID_SIZE - __X_GRID_SEP + 1);
 }
 
 
 void gridText(int l, int c, const char *format, ...){
-    char text[1000];
+    char _text[1000];
     va_list args;
     va_start( args, format );
-    vsprintf(text, format, args);
+    vsprintf(_text, format, args);
     va_end( args );
     float xdelta = 0.13, ydelta = 0.35;
-    text((c + xdelta) * __X_GRID_SIZE, (l + ydelta) * __X_GRID_SIZE, "%s", text);
+    text((c + xdelta) * __X_GRID_SIZE, (l + ydelta) * __X_GRID_SIZE, "%s", _text);
 
 }
 
@@ -79,7 +79,8 @@ void barAll(int * vet, int size, const char * colors, int * indices){
     if(colors != NULL && (strcmp(colors, "") != 0)){
         int qtd = strlen(colors);
         for(i = 0; i < qtd; i++){
-            stroke_char(colors[i]);
+            char c[2] = {colors[i], '\0'};
+            stroke(color(c));
             barOne(indices[i], vet[indices[i]]);
         }
     }
@@ -128,8 +129,8 @@ void   penDown(void){
     __X_PEN_DOWN = 1;
 }
 void   penWalk(double distance){
-    double x = __X_PEN_X + distance * math_cos(__X_PEN_ANGLE);
-    double y = __X_PEN_Y - distance * math_sin(__X_PEN_ANGLE);
+    double x = __X_PEN_X + distance * xcos(__X_PEN_ANGLE);
+    double y = __X_PEN_Y - distance * xsin(__X_PEN_ANGLE);
     if(__X_PEN_DOWN) {
         strokeWeight(__X_PEN_THICK);
         line(__X_PEN_X, __X_PEN_Y, x, y);

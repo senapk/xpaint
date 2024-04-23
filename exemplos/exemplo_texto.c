@@ -26,7 +26,7 @@ int main() {
 
     stroke(MAGENTA);
     textSize(50);
-    text(10, 350, "x_write_set_size(40);");
+    text(10, 350, "textSize(40);");
 
     save();
     close();

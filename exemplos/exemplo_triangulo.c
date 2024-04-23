@@ -9,15 +9,16 @@ void fractal(float x, float y, float lado, float ang){
         fractal(x, y, lado / 2, ang);
         
         float x0 = x, y0 = y; /* salva x e y */
-        x += lado * math_cos(ang); /* translada x e y */
-        y -= lado * math_sin(ang);
-        __draw_line(x0, y0, x, y); /* desenha a linha */
+        x += lado * xcos(ang); /* translada x e y */
+        y -= lado * xsin(ang);
+        line(x0, y0, x, y); /* desenha a linha */
         
         ang -= 120;
     }
 }
 int main(){
     open(800, 700, "figura_triangulo");
+    stroke(WHITE);
     textSize(30);
     text(140, 0, "Exemplo do fractal de Sierpinski");
     fractal(50, 650, 700, 60);

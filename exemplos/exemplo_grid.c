@@ -1,16 +1,24 @@
 #define XPAINT
 #include "xpaint.h"
 
+void stroke_char(char c){
+    stroke(color("%c", c));
+}
+void fill_char(char c){
+    fill(color("%c", c));
+}
+
 void xgrid_matrix(int nl, int nc, char mat[nl][nc]){
     stroke_char('w');
-    background();
+    background(BLACK);
     char * colors = "rgbymcov";
     int l, c;
+    textSize(30);
     for(l = 0; l < nl; l++)
         for(c = 0; c < nc; c++){
             stroke_char(mat[l][c]);
             gridSquare(l, c);
-            stroke_char(colors[(c + l) % strlen(colors)]);
+            fill_char(colors[(c + l) % strlen(colors)]);
             gridCircle(l, c);
             stroke_char('k');
             if(rand() % 2 == 0)
@@ -18,7 +26,6 @@ void xgrid_matrix(int nl, int nc, char mat[nl][nc]){
             else{
                 char str[] = "abcdef";
                 str[rand() % 5 + 1] = '\0';
-                textSize(30);
                 gridText(l, c, str);
             }
         }

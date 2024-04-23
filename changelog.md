@@ -1,3 +1,5 @@
+- 1.0
+    - added transformations and renamed to p5 style of names
 - 0.8 [x] split in many files
     - [x] detach write and save insepared files
     - [x] moving current color from colors to base

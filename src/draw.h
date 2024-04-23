@@ -16,20 +16,20 @@ void point(double x, double y, Color color);
 /* muda a cor do pincel*/
 void stroke(Color color);
 
-/* muda a cor do pincel*/
-void stroke_rgba(uchar r, uchar g, uchar b, uchar a);
+// /* muda a cor do pincel*/
+// void stroke_rgba(uchar r, uchar g, uchar b, uchar a);
 
-/* muda a cor do pincel usando a paleta de cores*/
-void stroke_char(char c);
+// /* muda a cor do pincel usando a paleta de cores*/
+// void stroke_char(char c);
 
 /* muda a cor do pincel*/
 void fill(Color color);
 
-/* muda a cor do pincel*/
-void fill_rgba(uchar r, uchar g, uchar b, uchar a);
+// /* muda a cor do pincel*/
+// void fill_rgba(uchar r, uchar g, uchar b, uchar a);
 
-/* muda a cor do pincel usando a paleta de cores*/
-void fill_char(char c);
+// /* muda a cor do pincel usando a paleta de cores*/
+// void fill_char(char c);
 
 /* desabilita o pincel */
 void noStroke();
@@ -53,7 +53,7 @@ void ellipse(double x0, double y0, double width, double height);
 /* o angulo de inicio e o comprimento do arco em graus */
 /* ambos os valores de ângulo podem ser negativos */
 void arc(double centerx, double centery, int radius, int thickness, int degrees_begin, int degrees_lenght);
-void circle(int centerx, int centery, int radius);
+void circle(int centerx, int centery, int diameter);
 void rect(double x, double y, double witdh, double height);
 void square(double x, double y, double size);
 void bezier(double xa, double ya, double xb, double yb, double xc, double yc, double xd, double yd);

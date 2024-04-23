@@ -2,7 +2,6 @@
 #define BASE_H /*XDDDX*/
 
 #include "color.h" /*XDDDX*/
-#include "xmath.h" /*XDDDX*/
 
 #include <stdarg.h>
 
@@ -47,7 +46,7 @@ void setLock();
 void setLog(const char * folder);
 
 /* creates a .mp4 video using all .png stored in folder using ffmpeg */
-void makeVideo(int framerate);
+void makeVideo(int framerate, const char * mp4_filename);
 
 typedef struct {
     double dx;

@@ -40,14 +40,14 @@ static Transform __board_transform[10];
 static int       __board_transform_index = -1;
 
 /* Local prototypes */
-uchar * __x_get_pixel_pos(unsigned int x, unsigned int y);
+uchar * __pixel(unsigned int x, unsigned int y);
 
-uchar * __x_get_pixel_pos(unsigned int x, unsigned int y) {
+uchar * __pixel(unsigned int x, unsigned int y) {
     return __board_bitmap + __X_BYTES_PER_PIXEL * (__board_width * y + x);
 }
 
 //__plot sem as verificações de limite
-void __x_plot(int x, int y, uchar * color);
+void __alpha_plot(int x, int y, Color color);
 
 void open(unsigned int width, unsigned int height, const char * filename){
     if(__board_is_open){
@@ -60,7 +60,7 @@ void open(unsigned int width, unsigned int height, const char * filename){
     strcpy(__board_filename, filename);
 
     __board_bitmap = (uchar*) calloc(sizeof(uchar), width * height * __X_BYTES_PER_PIXEL);
-    background(color(30, 30, 30, 255));
+    background(rgba(30, 30, 30, 255));
 
     // __stroke[0] = 200;
     // __stroke[1] = 200;
@@ -111,18 +111,66 @@ void set_viewer(const char * viewer){
         strcpy(__board_viewer, "");
 }
 
-void __x_plot(int x, int y, uchar * color) {
-    if((x >= 0) && (x < (int) __board_width) && (y >= 0) && (y <  (int) __board_height)) {
-        uchar * pos = __x_get_pixel_pos((unsigned) x, (unsigned) y);
+void __raw_plot(int x, int y, Color _color) {
+    uchar color[__X_BYTES_PER_PIXEL];
+    color[0] = _color.r;
+    color[1] = _color.g;
+    color[2] = _color.b;
+    color[3] = _color.a;
+    uchar * pos = __pixel((unsigned) x, (unsigned) y);
+    memcpy(pos, color, __X_BYTES_PER_PIXEL * sizeof(uchar));
+}
 
-        for(int i = 0; i < 3; i++) {
-            float fc = color[i] / 255.f;
-            float fa = color[3] / 255.f;
-            float bc = pos[i] / 255.f;
-            float ba = pos[3] / 255.f;
-            pos[i] = ((fc * fa) + (bc * (1 - fa))) * 255;
-            pos[3] = (fa + (ba * (1 - fa))) * 255;
-        }
+void __alpha_plot(int x, int y, Color _color) {
+    uchar color[__X_BYTES_PER_PIXEL];
+    color[0] = _color.r;
+    color[1] = _color.g;
+    color[2] = _color.b;
+    color[3] = _color.a;
+    uchar * pos = __pixel((unsigned) x, (unsigned) y);
+    for(int i = 0; i < 3; i++) {
+        float fc = color[i] / 255.f;
+        float fa = color[3] / 255.f;
+        float bc = pos[i] / 255.f;
+        float ba = pos[3] / 255.f;
+        pos[i] = ((fc * fa) + (bc * (1 - fa))) * 255;
+        pos[3] = (fa + (ba * (1 - fa))) * 255;
+    }
+}
+
+// void __alias_plot(int x, int y, Color pixel) {
+//     if (x >= 1 && x < (int) __board_width && y >= 1 && y < (int) __board_height) {
+// // Atualize o pixel na posição (x, y) com o pixel fornecido
+//         // canvas[x][y] = pixel;
+//         __raw_plot(x, y, pixel);
+
+//         // Interpolação bilinear para calcular os valores dos pixels circundantes
+//         float alpha = (float)(pixel.a) / 255.0;
+//         float r = (float)(pixel.r) * alpha;
+//         float g = (float)(pixel.g) * alpha;
+//         float b = (float)(pixel.b) * alpha;
+
+//         // Pixels vizinhos
+//         int neighbors[4][2] = {{x-1, y}, {x+1, y}, {x, y-1}, {x, y+1}};
+//         float weights[4] = {0.25, 0.25, 0.25, 0.25};
+
+//         for (int i = 0; i < 4; ++i) {
+//             int nx = neighbors[i][0];
+//             int ny = neighbors[i][1];
+//             if (nx >= 0 && nx < 100 && ny >= 0 && ny < 100) {
+//                 float w = weights[i];
+//                 __pixel(nx, ny)[0] = (unsigned char)((float)__pixel(nx, ny)[0] * (1.0 - w) + r * w);
+//                 __pixel(nx, ny)[1] = (unsigned char)((float)__pixel(nx, ny)[1] * (1.0 - w) + g * w);
+//                 __pixel(nx, ny)[2] = (unsigned char)((float)__pixel(nx, ny)[2] * (1.0 - w) + b * w);
+//             }
+//         }
+//     }
+// }
+
+
+void __normal_plot(int x, int y,  Color color) {
+    if((x >= 0) && (x < (int) __board_width) && (y >= 0) && (y <  (int) __board_height)) {
+        __alpha_plot(x, y, color);
     }
 }
 
@@ -131,18 +179,16 @@ void __plot(int x, int y,  Color color) {
         fprintf(stderr, "fail: x_open(weight, width, filename) missing\n");
         exit(1);
     }
-    uchar __color[__X_BYTES_PER_PIXEL];
-    __color[0] = color.r;
-    __color[1] = color.g;
-    __color[2] = color.b;
-    __color[3] = color.a;
-
-    __x_plot(x, y, __color);
+    __normal_plot(x, y, color);
+    // __alias_plot(x, y, color);
 }
 
 
+
+
+
 Color getPixel(int x, int y){
-    uchar * pixel = __x_get_pixel_pos((unsigned) x, (unsigned) y);
+    uchar * pixel = __pixel((unsigned) x, (unsigned) y);
     Color color;
     memcpy(&color, pixel, __X_BYTES_PER_PIXEL * sizeof(uchar));
     return color;
@@ -155,7 +201,7 @@ void background(Color color){
     unsigned x, y;
     for(x = 0; x < __board_width; x++)
         for(y = 0; y < __board_height; y++)
-            memcpy(__x_get_pixel_pos((unsigned) x, (unsigned) y), __color, __X_BYTES_PER_PIXEL * sizeof(uchar));
+            memcpy(__pixel((unsigned) x, (unsigned) y), __color, __X_BYTES_PER_PIXEL * sizeof(uchar));
 }
 
 void __x_save_buffer(const char * filename) {
@@ -233,14 +279,14 @@ void save(){
         __x_save();
 }
 
-void makeVideo(int framerate){
+void makeVideo(int framerate, const char * filename){
     char cmd[500];
     const char * folder = __board_folder;
     char * name = (char *) malloc((strlen(folder) + 20) * sizeof(char));
     strcpy(name, folder);
     if(folder[strlen(folder) - 1] != '/')
         strcat(name, "/");
-    sprintf(cmd, "ffmpeg -y -framerate %d -pattern_type glob -i '%s*.png' -c:v libx264 -profile:v high -crf 20 -pix_fmt yuv420p video.mp4", framerate, name);
+    sprintf(cmd, "ffmpeg -y -framerate %d -pattern_type glob -i '%s*.png' -c:v libx264 -profile:v high -crf 20 -pix_fmt yuv420p %s.mp4", framerate, name, filename);
     puts(cmd);
     int result = system(cmd);
     if(result != 0)
@@ -331,8 +377,8 @@ V2d __transform(double x, double y) {
         double angle = t.angle;
         double x = point.x;
         double y = point.y;
-        point.x = x * math_cos(angle) - y * math_sin(angle);
-        point.y = x * math_sin(angle) + y * math_cos(angle);
+        point.x = x * xcos(angle) - y * xsin(angle);
+        point.y = x * xsin(angle) + y * xcos(angle);
         point.x *= t.s;
         point.y *= t.s;
         point.x += t.dx;

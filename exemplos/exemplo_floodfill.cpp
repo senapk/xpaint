@@ -16,6 +16,10 @@ struct Item{
     }
 };
 
+void fill_char(char c){
+    fill(color("%c", c));
+}
+
 struct Pos{
     int l, c;
 };
@@ -44,24 +48,25 @@ void print(Item mat[], int nl, int nc){
 char WALL = 'k', EMPTY = 'w', VISITED = 'y', PATH = 'c';
 
 void xgrid_matrix(matriz<Item> mat, list<Pos> path){
-    background();
+    noStroke();
+    background(BLUE);
     for(int l = 0; l < mat.nl; l++){
         for(int c = 0; c < mat.nc; c++){
             Item& item = mat.get(Pos{l, c});
             
-            stroke_char(item.wall ? WALL : EMPTY);
+            fill_char(item.wall ? WALL : EMPTY);
             gridSquare(l, c);
             if(item.distance != -1){
-                stroke_char('k');
+                fill_char('k');
                 gridText(l, c, "%d", item.distance);
             }
         }
     }
     int i = 0;
     for(auto p : path){
-        stroke(VIOLET);
+        fill(VIOLET);
         gridCircle(p.l, p.c);
-        stroke_char('k');
+        stroke(BLACK);
         gridText(p.l, p.c, "%d", i++);
     }
 }

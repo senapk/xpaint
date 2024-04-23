@@ -14,7 +14,7 @@ V2d v2d(double x, double y){
 }
 
 double v2d_length(double x, double y){
-    return math_sqrt(x * x + y * y);
+    return xsqrt(x * x + y * y);
 }
 
 double dist(double ax, double ay, double bx, double by){
@@ -46,23 +46,23 @@ V2d v2d_ortho(V2d v){
     return v2d(v.y, -v.x);
 }
 
-int   math_rand(int min, int max){
+int   xrand(int min, int max){
     return rand() % (max - min) + min;
 }
 
 /* https://stackoverflow.com/questions/5122993/floor-int-function-implementaton?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa */
-int math_floor(double x) {
+int xfloor(double x) {
     int xi = (int) x;
     return x < xi ? xi - 1 : xi;
 }
 
-int math_round(double x) {
+int xround(double x) {
 	return x + 0.5;
 }
 
 
 /* funcao necessario para o po */
-double math_sqrt(const double m)
+double xsqrt(const double m)
 {
    double i=0;
    double x1 = 0, x2 = 0;
@@ -81,12 +81,12 @@ double math_sqrt(const double m)
    return x2;
 }
 
-double math_pow( double x, double z ){
+double xpow( double x, double z ){
     int y =  (int) z;
     double temp;
     if (y == 0)
     return 1;
-    temp = math_pow (x, y / 2);
+    temp = xpow (x, y / 2);
     if ((y % 2) == 0) {
         return temp * temp;
     } else {
@@ -97,13 +97,13 @@ double math_pow( double x, double z ){
     }
 }
 
-double math_fmod(double a, double b)
+double xfmod(double a, double b)
 {
-    return (a - b * math_floor(a / b));
+    return (a - b * xfloor(a / b));
 }
 
-int math_ceil(double n){
-    return -math_floor(-n);
+int xceil(double n){
+    return -xfloor(-n);
 }
 
 
@@ -151,14 +151,14 @@ double __icos(long x)
     return __isin(x+90);
 }
 
-double math_sin(double d)
+double xsin(double d)
 {
     double a = __isin((long) d);
     double b = __isin((long) d+1);
     return a + (d-(int)d) * (b-a);
 }
 
-double math_cos(double d)
+double xcos(double d)
 {
     double a = __icos((long) d);
     double b = __icos((long) d+1);
@@ -166,7 +166,7 @@ double math_cos(double d)
 }
 
 /* Nvidia */
-double math_acos(double x) {
+double xacos(double x) {
     double negate = (double)(x < 0);
     x = (x >= 0) ? x : -x;
     double ret = -0.0187293;
@@ -176,12 +176,12 @@ double math_acos(double x) {
     ret = ret - 0.2121144;
     ret = ret * x;
     ret = ret + 1.5707288;
-    ret = ret * math_sqrt(1.0-x);
+    ret = ret * xsqrt(1.0-x);
     ret = ret - 2 * negate * ret;
     return negate * 3.14159265358979 + ret;
 }
 
-double math_fabs(double f){
+double xfabs(double f){
     return f < 0 ? -f : f;
 }
 

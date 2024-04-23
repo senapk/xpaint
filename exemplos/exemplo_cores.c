@@ -3,12 +3,13 @@
 
 int main() {
     open(600, 600, "figura_cores");
-    textSize(40);
-
-    stroke(BLACK);
-    __fill_rect(20, 60, 560, 410);
-    stroke(WHITE);
-    __fill_rect(190, 70, 200, 340);
+    textSize(50);
+    noStroke();
+    background(color("0"));
+    fill(BLACK);
+    rect(20, 60, 560, 410);
+    fill(WHITE);
+    ellipse(270, 240, 200, 380);
 
     int x = 300;
     stroke(RED);    text(60, 70, "    Red");
@@ -19,15 +20,16 @@ int main() {
     stroke(MAGENTA);text(x, 210, "Maguenta");
     stroke(VIOLET); text(60, 280," Violet");
     stroke(ORANGE); text(x, 280, "Orange");
-    stroke(BLACK);  text(x - 100, 350, "Black");
+    stroke(BLACK);  text(x - 100, 330, "Black");
     stroke(WHITE);  text(x - 100, 410, "White");
     {
         char * colors = "rgbymcwkvo";
         x = 50;
-        textSize(40);
+        textSize(70);
         int i;
         for(i = 0; i < 10; i++){
-            stroke(getPalette(i));
+            Color c = color("%c", colors[i]);
+            stroke(c);
             x = text(x, 500, "%c", colors[i]);
         }
     }

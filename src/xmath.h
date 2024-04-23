@@ -37,19 +37,19 @@ V2d v2d_ortho(V2d v);
 
 // ####### FUNÇÕES MATEMATICAS ##############
 
-double math_sqrt(const double m);
-double math_pow( double x, double y );
-int    math_floor(double x);
-int    math_round(double x);
-double math_fmod(double a, double b);
-int    math_ceil(double n);
+double xsqrt(const double m);
+double xpow( double x, double y );
+int    xfloor(double x);
+int    xround(double x);
+double xfmod(double a, double b);
+int    xceil(double n);
 /* degrees */
-double math_sin(double d);
-double math_cos(double d);
-double math_acos(double x);
-double math_fabs(double f);
+double xsin(double d);
+double xcos(double d);
+double xacos(double x);
+double xfabs(double f);
 /* Generates a int number in interval [min, max[ */
-int    math_rand(int min, int max);
+int    xrand(int min, int max);
 
 #endif /*XDDDX*/
 

@@ -9,8 +9,8 @@
 #include "base.h" /*XDDDX*/
 #include "math.h"
 
-static Color     __stroke;
-static Color     __fill;
+static Color     __stroke = {0, 0, 0, 255};
+static Color     __fill = {255, 255, 255, 255};
 
 static bool      __stroke_enable = true;
 static bool      __fill_enable = true;
@@ -67,36 +67,36 @@ void stroke(Color color){
     __stroke_enable = true;
 }
 
-void stroke_rgba(uchar r, uchar g, uchar b, uchar a) {
-    __stroke.r = r;
-    __stroke.g = g;
-    __stroke.b = b;
-    __stroke.a = a;
-    __stroke_enable = true;
-}
+// void stroke_rgba(uchar r, uchar g, uchar b, uchar a) {
+//     __stroke.r = r;
+//     __stroke.g = g;
+//     __stroke.b = b;
+//     __stroke.a = a;
+//     __stroke_enable = true;
+// }
 
-void stroke_char(char c){
-    __stroke = getPalette(c);
-    __stroke_enable = true;
-}
+// void stroke_char(char c){
+//     __stroke = getPalette(c);
+//     __stroke_enable = true;
+// }
 
 void fill(Color color){
     __fill = color;
     __fill_enable = true;
 }
 
-void fill_rgba(uchar r, uchar g, uchar b, uchar a) {
-    __fill_enable = true;
-    __fill.r = r;
-    __fill.g = g;
-    __fill.b = b;
-    __fill.a = a;
-}
+// void fill_rgba(uchar r, uchar g, uchar b, uchar a) {
+//     __fill_enable = true;
+//     __fill.r = r;
+//     __fill.g = g;
+//     __fill.b = b;
+//     __fill.a = a;
+// }
 
-void fill_char(char c){
-    __fill = getPalette(c);
-    __fill_enable = true;
-}
+// void fill_char(char c){
+//     __fill = getPalette(c);
+//     __fill_enable = true;
+// }
 
 void noStroke(){
     __stroke_enable = false;
@@ -139,7 +139,8 @@ int ascArt(int x, int y, int zoom, const char * picture){
             dx += 1;
             maxdx = dx > maxdx ? dx : maxdx;
         }else{
-            __x_draw_block(x + dx * zoom, y + dy * zoom, zoom, getPalette(picture[i]));
+            char c[2] = {picture[i], '\0'};
+            __x_draw_block(x + dx * zoom, y + dy * zoom, zoom, color(c));
             dx += 1;
             maxdx = dx > maxdx ? dx : maxdx;
         }
@@ -414,7 +415,7 @@ void __fill_circle(double centerx, double centery, double radius){
 //     y0 = y0 - height / 2;
 
 //     int x1 = x0 + width - 1, y1 = y0 + height - 1;
-//     int a = math_fabs(x1-x0), b = math_fabs(y1-y0), b1 = b&1; /* values of diameter */
+//     int a = xfabs(x1-x0), b = xfabs(y1-y0), b1 = b&1; /* values of diameter */
 //     long dx = 4*(1-a)*b*b, dy = 4*(b1+1)*a*a; /* error increment */
 //     long err = dx+dy+b1*a*a, e2; /* error of 1.step */
 
@@ -515,8 +516,8 @@ void __fill_ellipse(double x0, double y0, double width, double height){
 
     double ytop = y0;
     double x1 = x0 + width - 1, y1 = y0 + height - 1;
-    double a = math_fabs(x1-x0);
-    double b = math_fabs(y1-y0);
+    double a = xfabs(x1-x0);
+    double b = xfabs(y1-y0);
     int b1 = (int)b&1; /* values of diameter */
     double dx = 4*(1-a)*b*b, dy = 4*(b1+1)*a*a; /* error increment */
     double err = dx+dy+b1*a*a, e2; /* error of 1.step */
@@ -561,13 +562,13 @@ void ellipse(double x0, double y0, double width, double height) {
     }
 }
 
-void circle(int x0, int y0, int radius){
+void circle(int x0, int y0, int diameter){
     if(__fill_enable){
-        __fill_circle(x0, y0, radius);
+        __fill_circle(x0, y0, diameter / 2);
     }
     if(__stroke_enable){
         double s = __get_transform_scale();
-        __draw_ellipse(x0 * s, y0 * s, 2 * radius * s, 2 * radius * s);
+        __draw_ellipse(x0 * s, y0 * s, diameter * s, diameter * s);
     }
 }
 
@@ -609,27 +610,27 @@ void __x_plot_quad_bezier_seg(int x0, int y0, int x1, int y1, int x2, int y2)
 
 //     if ((long)x*(x2-x1) > 0) {                        /* horizontal cut at P4? */
 //         if ((long)y*(y2-y1) > 0)                     /* vertical cut at P6 too? */
-//             if (math_fabs((y0-2*y1+y2)/t*x) > abs(y)) {               /* which first? */
+//             if (xfabs((y0-2*y1+y2)/t*x) > abs(y)) {               /* which first? */
 //                 x0 = x2; x2 = x+x1; y0 = y2; y2 = y+y1;            /* swap points */
 //             }                            /* now horizontal cut at P4 comes first */
 //         t = (x0-x1)/t;
 //         r = (1-t)*((1-t)*y0+2.0*t*y1)+t*t*y2;                       /* By(t=P4) */
 //         t = (x0*x2-x1*x1)*t/(x0-x1);                       /* gradient dP4/dx=0 */
-//         x = math_floor(t+0.5); y = math_floor(r+0.5);
+//         x = xfloor(t+0.5); y = xfloor(r+0.5);
 //         r = (y1-y0)*(t-x0)/(x1-x0)+y0;                  /* intersect P3 | P0 P1 */
-//         __x_plot_quad_bezier_seg(x0,y0, x, math_floor(r+0.5), x,y);
+//         __x_plot_quad_bezier_seg(x0,y0, x, xfloor(r+0.5), x,y);
 //         r = (y1-y2)*(t-x2)/(x1-x2)+y2;                  /* intersect P4 | P1 P2 */
-//         x0 = x1 = x; y0 = y; y1 = math_floor(r+0.5);             /* P0 = P4, P1 = P8 */
+//         x0 = x1 = x; y0 = y; y1 = xfloor(r+0.5);             /* P0 = P4, P1 = P8 */
 //     }
 //     if ((long)(y0-y1)*(y2-y1) > 0) {                    /* vertical cut at P6? */
 //         t = y0-2*y1+y2; t = (y0-y1)/t;
 //         r = (1-t)*((1-t)*x0+2.0*t*x1)+t*t*x2;                       /* Bx(t=P6) */
 //         t = (y0*y2-y1*y1)*t/(y0-y1);                       /* gradient dP6/dy=0 */
-//         x = math_floor(r+0.5); y = math_floor(t+0.5);
+//         x = xfloor(r+0.5); y = xfloor(t+0.5);
 //         r = (x1-x0)*(t-y0)/(y1-y0)+x0;                  /* intersect P6 | P0 P1 */
-//         __x_plot_quad_bezier_seg(x0,y0, math_floor(r+0.5),y, x,y);
+//         __x_plot_quad_bezier_seg(x0,y0, xfloor(r+0.5),y, x,y);
 //         r = (x1-x2)*(t-y2)/(y1-y2)+x2;                  /* intersect P7 | P1 P2 */
-//         x0 = x; x1 = math_floor(r+0.5); y0 = y1 = y;             /* P0 = P6, P1 = P7 */
+//         x0 = x; x1 = xfloor(r+0.5); y0 = y1 = y;             /* P0 = P6, P1 = P7 */
 //     }
 //     __x_plot_quad_bezier_seg(x0,y0, x1,y1, x2,y2);                  /* remaining part */
 // }
@@ -679,7 +680,8 @@ static double __COS(double value) {
 }
 
 /* begin should be smaller than end, and both must be in interval [0, 360] */
-void __x_fill_arc(double centerx, double centery, int radius, int thickness, int degrees_begin, int degrees_end) {
+void __x_fill_arc(double centerx, double centery, int diameter, int thickness, int degrees_begin, int degrees_end, Color color) {
+    double radius = diameter / 2;
     V2d center = {centerx, centery};
     double sslope = (double)__COS(degrees_begin) / (double)__SIN(degrees_begin);
     double eslope = (double)__COS(degrees_end) / (double)__SIN(degrees_end);
@@ -711,13 +713,13 @@ void __x_fill_arc(double centerx, double centery, int radius, int thickness, int
                             (y == 0 && degrees_begin == 0 && x > 0)
                     )
                     )
-                point(center.x+x, center.y-y, __stroke);
+                point(center.x+x, center.y-y, color);
         }
     }
 
 }
 
-void arc(double centerx, double centery, int radius, int thickness, int degrees_begin, int degrees_lenght){
+void __arc(double centerx, double centery, int diameter, int thickness, int degrees_begin, int degrees_lenght, Color color){
     if(degrees_lenght % 360 == 0)
         degrees_lenght = 360;
     else
@@ -732,13 +734,45 @@ void arc(double centerx, double centery, int radius, int thickness, int degrees_
     int degrees_end = degrees_begin + degrees_lenght;
 
     if(degrees_end <= 360){
-        __x_fill_arc(centerx, centery, radius, thickness, degrees_begin, degrees_end);
+        __x_fill_arc(centerx, centery, diameter, thickness, degrees_begin, degrees_end, color);
     }else{
-        __x_fill_arc(centerx, centery, radius, thickness, degrees_begin, 360);
-        __x_fill_arc(centerx, centery, radius, thickness, 0, degrees_end - 360);
+        __x_fill_arc(centerx, centery, diameter, thickness, degrees_begin, 360, color);
+        __x_fill_arc(centerx, centery, diameter, thickness, 0, degrees_end - 360, color);
     }
 }
 
+
+void arc(double centerx, double centery, int diameter, int thickness, int degrees_begin, int degrees_lenght) {
+    if (__fill_enable) {
+        __arc(centerx, centery, diameter, thickness, degrees_begin, degrees_lenght, __fill);
+    }
+    if (__stroke_enable) {
+        __arc(centerx, centery, diameter, __thickness, degrees_begin, degrees_lenght, __stroke);
+        __arc(centerx, centery, diameter - 2 *  thickness, __thickness, degrees_begin, degrees_lenght, __stroke);
+
+        //draw a line from begin point to end point
+        //convert degrees to radians
+        {
+            double c = xcos(degrees_begin);
+            double s = xsin(degrees_begin);
+            double x0 = centerx + (diameter / 2) * c;
+            double y0 = centery - (diameter / 2) * s;
+            double x1 = centerx + (-thickness + diameter / 2) * c;
+            double y1 = centery - (-thickness + diameter / 2) * s;
+            line(x0, y0, x1, y1);
+        }
+        {
+            double c = xcos(degrees_begin + degrees_lenght);
+            double s = xsin(degrees_begin + degrees_lenght);
+            double x0 = centerx + (diameter / 2) * c;
+            double y0 = centery - (diameter / 2) * s;
+            double x1 = centerx + (-thickness + diameter / 2) * c;
+            double y1 = centery - (-thickness + diameter / 2) * s;
+            line(x0, y0, x1, y1);
+        }
+    }
+    
+}
 
 //returns fractional part of a number
 double __m_fractional (double x) {
@@ -764,7 +798,7 @@ void __plot_raw_bright_pixel( int x , int y , Color color, double brightness)
 }
 
 void __raw_line(int x0 , int y0 , int x1 , int y1, Color color) {
-	int steep = math_fabs(y1 - y0) > math_fabs(x1 - x0) ;
+	int steep = xfabs(y1 - y0) > xfabs(x1 - x0) ;
 
 	// swap the co-ordinates if slope > 1 or we
 	// draw backwards
@@ -862,7 +896,21 @@ double calculateBezierPoint(double p0, double p1, double p2, double p3, double t
 //     }
 // }
 
-void bezier(double xa, double ya, double xb, double yb, double xc, double yc, double xd, double yd) {
+void __fill_triangle_scale(double v1x, double v1y, double v2x, double v2y, double v3x, double v3y, Color color) {
+    double s = __get_transform_scale();
+    V2d v1 = __transform(v1x/s, v1y/s);
+    V2d v2 = __transform(v2x/s, v2y/s);
+    V2d v3 = __transform(v3x/s, v3y/s);
+    v1x = v1.x;
+    v1y = v1.y;
+    v2x = v2.x;
+    v2y = v2.y;
+    v3x = v3.x;
+    v3y = v3.y;
+    __fill_raw_triangle(v1x, v1y, v2x, v2y, v3x, v3y, color);
+}
+
+void __bezier(double xa, double ya, double xb, double yb, double xc, double yc, double xd, double yd) {
     int thickness = __thickness;
     // Número de segmentos
     int numSegments = 100;
@@ -881,7 +929,7 @@ void bezier(double xa, double ya, double xb, double yb, double xc, double yc, do
         // Calcula os vetores normalizados
         double dx = x1 - x0;
         double dy = y1 - y0;
-        double length = math_sqrt(dx * dx + dy * dy);
+        double length = xsqrt(dx * dx + dy * dy);
         if (length != 0) {
             dx /= length;
             dy /= length;
@@ -902,11 +950,17 @@ void bezier(double xa, double ya, double xb, double yb, double xc, double yc, do
         double y5 = y0 - vy * thickness;
 
         // Desenha os triângulos formados pelos vértices
-        __fill_raw_triangle(x0, y0, x1, y1, x2, y2, __stroke);
-        __fill_raw_triangle(x1, y1, x2, y2, x3, y3, __stroke);
-        __fill_raw_triangle(x1, y1, x3, y3, x4, y4, __stroke);
-        __fill_raw_triangle(x0, y0, x5, y5, x4, y4, __stroke);
-        __fill_raw_triangle(x0, y0, x5, y5, x1, y1, __stroke);
+        __fill_triangle_scale(x0, y0, x1, y1, x2, y2, __stroke);
+        __fill_triangle_scale(x1, y1, x2, y2, x3, y3, __stroke);
+        __fill_triangle_scale(x1, y1, x3, y3, x4, y4, __stroke);
+        __fill_triangle_scale(x0, y0, x5, y5, x4, y4, __stroke);
+        __fill_triangle_scale(x0, y0, x5, y5, x1, y1, __stroke);
     }
 }
 
+void bezier(double xa, double ya, double xb, double yb, double xc, double yc, double xd, double yd) {
+    double s = __get_transform_scale();
+    if (__fill_enable) {
+        __bezier(xa * s, ya * s, xb * s, yb * s, xc * s, yc * s, xd * s, yd * s);
+    }
+}

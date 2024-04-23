@@ -2,15 +2,21 @@
 
 int main(){
     open(1000, 600, "zz_balls");
-
+    textSize(20);
+    stroke(WHITE);
     for(int i = 0; i < 26; i++){
-        stroke_char('a' + i);
-        stroke_rgba(math_rand(0, 256), math_rand(0, 256), math_rand(0, 256), 255);
-        __fill_circle(math_rand(0, 1000), math_rand(0, 600), math_rand(30, 60));
+        fill(color("%c", 'a' + i));
+        int x = xrand(0, 1000);
+        int y = xrand(0, 600);
+        circle(x, y, xrand(30, 60));
+        text(x, y, "%c", 'a' + i);
     }
     for(int i = 0; i < 26; i++){
-        stroke_char('A' + i);
-        __fill_circle(math_rand(0, 1000), math_rand(0, 600), math_rand(30, 60));
+        fill(color("%c", 'A' + i));
+        int x = xrand(0, 1000);
+        int y = xrand(0, 600);
+        circle(x, y, xrand(30, 60));
+        text(x, y, "%c", 'A' + i);
     }
 
     save();
