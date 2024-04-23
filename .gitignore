@@ -5,3 +5,4 @@ todo.md
 .vscode
 exemplos/xpaint.h
 
+*.o

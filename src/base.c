@@ -220,7 +220,9 @@ void __x_open_viewer() {
         if(strcmp(__board_viewer, "") != 0){
             sprintf(cmd, "%s %s%s&",__board_viewer, __board_filename, __board_extension);
             puts(cmd);
-            system(cmd);
+            int result = system(cmd);
+            if(result != 0)
+                printf("%d\n", result);
         }
     }
 }
@@ -258,7 +260,9 @@ void __x_lock(){
     if((__board_step != 0) && (rounds >= __board_step)){
         printf("(state: %i, step: %i): ", state, __board_step);
         char line[200];
-        fgets(line, sizeof(line), stdin);
+        if (fgets(line, sizeof(line), stdin) == NULL) {
+            puts("fgets error");
+        }
         char * ptr = line;
         int value = (int) strtol(line, &ptr, 10);
         if(ptr != line)
