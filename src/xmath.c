@@ -17,7 +17,7 @@ double v2d_length(double x, double y){
     return math_sqrt(x * x + y * y);
 }
 
-double v2d_distance(double ax, double ay, double bx, double by){
+double dist(double ax, double ay, double bx, double by){
     return v2d_length(bx - ax, by - ay);
 }
 

@@ -8,9 +8,9 @@
 /* ############ FUNÇÕES DE DESENHO DE LINHAS ##### */
 /* ############################################### */
 
-void stroke_weight(int thickness);
+void strokeWeight(int thickness);
 
-/* a funcao plot pinta o pixel transformado */
+/* a funcao __plot pinta o pixel transformado */
 void point(double x, double y, Color color);
 
 /* muda a cor do pincel*/
@@ -32,20 +32,20 @@ void fill_rgba(uchar r, uchar g, uchar b, uchar a);
 void fill_char(char c);
 
 /* desabilita o pincel */
-void no_stroke();
+void noStroke();
 
 /* desabilita o preenchimento */
-void no_fill();
+void noFill();
 
 /* return the current color for brush */
-Color get_stroke(void);
+Color getStroke(void);
 
 /* return the current color for brush */
-Color get_fill(void);
+Color getFill(void);
 
 
 /* desenha uma forma utilizando uma string e o mapa de cores default */
-int asc_art(int x, int y, int zoom, const char * picture);
+int ascArt(int x, int y, int zoom, const char * picture);
 void line(double x0, double y0, double x1, double y1);
 void ellipse(double x0, double y0, double width, double height);
 

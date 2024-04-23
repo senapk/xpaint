@@ -46,7 +46,7 @@ uchar * __x_get_pixel_pos(unsigned int x, unsigned int y) {
     return __board_bitmap + __X_BYTES_PER_PIXEL * (__board_width * y + x);
 }
 
-//plot sem as verificações de limite
+//__plot sem as verificações de limite
 void __x_plot(int x, int y, uchar * color);
 
 void open(unsigned int width, unsigned int height, const char * filename){
@@ -72,19 +72,19 @@ void open(unsigned int width, unsigned int height, const char * filename){
     srand((unsigned) time(NULL));
 }
 
-int get_height(void){
+int height(void){
     return (int) __board_height;
 }
 
-int get_width(void){
+int width(void){
     return (int) __board_width;
 }
 
-uchar * get_bitmap(void){
+uchar * getBitmap(void){
     return __board_bitmap;
 }
 
-const char * get_filename(void){
+const char * getFilename(void){
     return __board_filename;
 }
 
@@ -97,7 +97,7 @@ void close(void){
 }
 
 
-void set_filename(const char * filename){
+void setFilename(const char * filename){
     if(filename != NULL)
         strcpy(__board_filename, filename);
     else
@@ -126,7 +126,7 @@ void __x_plot(int x, int y, uchar * color) {
     }
 }
 
-void plot(int x, int y,  Color color) {
+void __plot(int x, int y,  Color color) {
     if(!__board_is_open){
         fprintf(stderr, "fail: x_open(weight, width, filename) missing\n");
         exit(1);
@@ -141,7 +141,7 @@ void plot(int x, int y,  Color color) {
 }
 
 
-Color get_pixel(int x, int y){
+Color getPixel(int x, int y){
     uchar * pixel = __x_get_pixel_pos((unsigned) x, (unsigned) y);
     Color color;
     memcpy(&color, pixel, __X_BYTES_PER_PIXEL * sizeof(uchar));
@@ -233,7 +233,7 @@ void save(){
         __x_save();
 }
 
-void make_video(int framerate){
+void makeVideo(int framerate){
     char cmd[500];
     const char * folder = __board_folder;
     char * name = (char *) malloc((strlen(folder) + 20) * sizeof(char));
@@ -248,17 +248,17 @@ void make_video(int framerate){
     free(name);
 }
 
-void set_log(const char * folder) {
+void setLog(const char * folder) {
     strcpy(__board_folder, folder);
 }
 
-void set_lock(){
+void setLock(){
     __board_lock = true;
 }
 
 void save_ppm(unsigned dimx, unsigned dimy, unsigned char * bitmap, const char * filename){
     /* const int dimx = x_get_width();
-    const int dimy = get_height();
+    const int dimy = height();
      */
     char path[400];
     sprintf(path,"%s.ppm", filename);

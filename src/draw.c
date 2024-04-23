@@ -43,23 +43,23 @@ void __fill_raw_triangle(double v1x, double v1y, double v2x, double v2y, double 
 void __plot_block(int x, int y, int side, Color color){
     for(int i = x; i < x + side; i++)
         for(int j = y; j < y + side; j++)
-            plot(i, j, color);
+            __plot(i, j, color);
 }
 
-void stroke_weight(int thickness){
+void strokeWeight(int thickness){
     __thickness = thickness;
 }
 
 
 void point(double x, double y, Color color){
     V2d p = __transform(x, y);
-    plot((int) p.x, (int) p.y, color);
+    __plot((int) p.x, (int) p.y, color);
 }
 
 void __point_scale(double x, double y, Color color){
     double s = __get_transform_scale();
     V2d p = __transform(x/s, y/s);
-    plot((int) p.x, (int) p.y, color);
+    __plot((int) p.x, (int) p.y, color);
 }
 
 void stroke(Color color){
@@ -76,7 +76,7 @@ void stroke_rgba(uchar r, uchar g, uchar b, uchar a) {
 }
 
 void stroke_char(char c){
-    __stroke = get_palette(c);
+    __stroke = getPalette(c);
     __stroke_enable = true;
 }
 
@@ -94,24 +94,24 @@ void fill_rgba(uchar r, uchar g, uchar b, uchar a) {
 }
 
 void fill_char(char c){
-    __fill = get_palette(c);
+    __fill = getPalette(c);
     __fill_enable = true;
 }
 
-void no_stroke(){
+void noStroke(){
     __stroke_enable = false;
 }
 
-void no_fill(){
+void noFill(){
     __fill_enable = false;
 }
 
 
-Color get_stroke(){
+Color getStroke(){
     return __stroke;
 }
 
-Color get_fill(){
+Color getFill(){
     return __fill;
 }
 
@@ -121,7 +121,7 @@ void __x_draw_block(int x, int y, int side, Color color){
             point(i, j, color);
 }
 
-int asc_art(int x, int y, int zoom, const char * picture){
+int ascArt(int x, int y, int zoom, const char * picture){
     int dx = 0;
     int dy = 0;
     int maxdx = 0;
@@ -139,7 +139,7 @@ int asc_art(int x, int y, int zoom, const char * picture){
             dx += 1;
             maxdx = dx > maxdx ? dx : maxdx;
         }else{
-            __x_draw_block(x + dx * zoom, y + dy * zoom, zoom, get_palette(picture[i]));
+            __x_draw_block(x + dx * zoom, y + dy * zoom, zoom, getPalette(picture[i]));
             dx += 1;
             maxdx = dx > maxdx ? dx : maxdx;
         }
@@ -156,7 +156,7 @@ void __raw_sline(int x0, int y0, int x1, int y1, Color color) {
     int err = dx - dy;
 
     while (1) {
-        plot(x0, y0, color);
+        __plot(x0, y0, color);
         if (x0 == x1 && y0 == y1) break;
         int e2 = 2 * err;
         if (e2 > -dy) {
@@ -760,7 +760,7 @@ void __plot_raw_bright_pixel( int x , int y , Color color, double brightness)
     color.b = color.b * brightness;
     color.a = color.a * brightness;
 
-    plot(x, y, color);
+    __plot(x, y, color);
 }
 
 void __raw_line(int x0 , int y0 , int x1 , int y1, Color color) {
@@ -909,3 +909,4 @@ void bezier(double xa, double ya, double xb, double yb, double xc, double yc, do
         __fill_raw_triangle(x0, y0, x5, y5, x1, y1, __stroke);
     }
 }
+

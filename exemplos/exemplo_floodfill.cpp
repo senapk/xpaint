@@ -50,19 +50,19 @@ void xgrid_matrix(matriz<Item> mat, list<Pos> path){
             Item& item = mat.get(Pos{l, c});
             
             stroke_char(item.wall ? WALL : EMPTY);
-            grid_square(l, c);
+            gridSquare(l, c);
             if(item.distance != -1){
                 stroke_char('k');
-                grid_write(l, c, "%d", item.distance);
+                gridText(l, c, "%d", item.distance);
             }
         }
     }
     int i = 0;
     for(auto p : path){
         stroke(VIOLET);
-        grid_circle(p.l, p.c);
+        gridCircle(p.l, p.c);
         stroke_char('k');
-        grid_write(p.l, p.c, "%d", i++);
+        gridText(p.l, p.c, "%d", i++);
     }
 }
 
@@ -147,7 +147,7 @@ int main(){
     } */
     
     open(1002, 402, "figura_floodfill");
-    grid_init(1002/nc, 1);
+    gridInit(1002/nc, 1);
     xgrid_matrix(mat, path);
     save();
     close();

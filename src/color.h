@@ -35,13 +35,13 @@ typedef struct{
 Color color(uchar r, uchar g, uchar b, uchar a);
 
 /* define uma cor na paleta de caracteres */
-void set_palette(char c, Color color);
+void setPalette(char c, Color color);
 
 /* retorna uma cor dado um char.
    os char default da paleta são rgbmcybk
    outros podem ser definidos ou redefinidor com palette_set
 */
-Color get_palette(char c);
+Color getPalette(char c);
 
 
 void __x_init_pallete();

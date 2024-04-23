@@ -7,7 +7,7 @@ int main(){
     stroke_char('w');
     fill_char('w');
     background(BLACK);
-    stroke_weight(5);
+    strokeWeight(5);
     bezier(0, 0, 0, 1200, 1200, 0, 1200, 1200);
     
     save();

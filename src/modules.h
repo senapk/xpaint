@@ -7,16 +7,16 @@
 /*Init the grid*/
 /*side is the size of the cell */
 /*sep the space in black between cells */
-void grid_init(int side, int sep);
+void gridInit(int side, int sep);
 
 /*plots a square in cell*/
-void grid_square(int l, int c);
+void gridSquare(int l, int c);
 
 /*plots a circle in cell*/
-void grid_circle(int l, int c);
+void gridCircle(int l, int c);
 
 /*writes a text until 5 char in cell*/
-void grid_write(int l, int c, const char *format, ...);
+void gridText(int l, int c, const char *format, ...);
 
 
 /*
@@ -32,7 +32,7 @@ void grid_write(int l, int c, const char *format, ...);
  * @param size the size of the array
  * @param max the max value of the array
  */
-void bar_init(int size, int max);
+void barInit(int size, int max);
 
 /**
  * @brief print a single bar
@@ -40,7 +40,7 @@ void bar_init(int size, int max);
  * @param i the index
  * @param value the value of the bar size
  */
-void bar_one(int i, int value);
+void barOne(int i, int value);
 
 /**
  * @brief show the entire array
@@ -50,12 +50,12 @@ void bar_one(int i, int value);
  * @param colors the array of color to mark unique elements or NULL
  * @param indices the array with the unique indices to be marked with the colors
  */
-void bar_all(int * vet, int size, const char * colors, int * indices);
+void barAll(int * vet, int size, const char * colors, int * indices);
 
 
-#define x_bar_save(vet, size, colors, ...) do{\
+#define barSave(vet, size, colors, ...) do{\
     int __indices[] = {__VA_ARGS__};\
-    bar_all(vet, size, colors, __indices);\
+    barAll(vet, size, colors, __indices);\
     save();\
 } while(0);
 
@@ -65,18 +65,18 @@ void bar_all(int * vet, int size, const char * colors, int * indices);
 ###############################################
 */
 
-void   pen_set_angle(double degrees);
-void   pen_set_thick(int thick);
-void   pen_set_pos(double x, double y);
-double pen_get_angle();
-int    pen_get_thick();
-double pen_get_x();
-double pen_get_y();
-void   pen_up(void);
-void   pen_down(void);
-void   pen_walk(double distance);
-void   pen_rotate(int degrees);
-void   pen_goto(double x, double y);
+void   penSetAngle(double degrees);
+void   penSetThick(int thick);
+void   penSetPos(double x, double y);
+double penGetAngle();
+int    penGetThick();
+double penGetX();
+double penGetY();
+void   penUp(void);
+void   penDown(void);
+void   penWalk(double distance);
+void   penRotate(int degrees);
+void   penGoto(double x, double y);
 
 
 

@@ -18,7 +18,7 @@ V2d v2d(double x, double y);
 double v2d_length(double x, double y);
 
 /* retorna a distancia entre dois pontos */
-double v2d_distance(double ax, double ay, double bx, double by);
+double dist(double ax, double ay, double bx, double by);
 
 /* retorna a + b */
 V2d v2d_sum(V2d a, V2d b);

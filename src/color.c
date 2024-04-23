@@ -13,11 +13,11 @@ Color color(uchar r, uchar g, uchar b, uchar a){
     return x;
 }
 
-void set_palette(char c, Color color){
+void setPalette(char c, Color color){
     __board_palette[(int)c] = color;
 }
 
-Color get_palette(char c){
+Color getPalette(char c){
     return __board_palette[(int)c];
 }
 
