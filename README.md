@@ -52,13 +52,47 @@ Se estiver no windows, basta abrir os links e clicar em salvar como para salvar 
 
 ### Linux
 
-```
+```bash
 sudo wget https://raw.githubusercontent.com/senapk/xpaint/master/xpaint.h -O /usr/local/include/xpaint.h
 ```
 
 ### Windows
 
 Baixe o arquivo [xpaint.h](https://raw.githubusercontent.com/senapk/xpaint/master/xpaint.h) e coloque dentro da pasta include da instalação do Mingw.
+
+## Instalando a versão de compilação SUPER RÁPIDA
+
+Para uma compilação mais rápida, você precisará utilizar um programa chamado `make`. Ele é um programa que lê um arquivo chamado `Makefile` e executa os comandos que estão nele. Isso possibilita que os módulos sejam compilados de forma independente e apenas os módulos que foram alterados sejam recompilados.
+
+Para instalar o make no linux, basta rodar o comando:
+
+```bash
+sudo apt-get install make
+```
+
+Para instalar no windows, você pode baixar o make através do [chocolatey](https://chocolatey.org/).
+
+```bash
+choco install make
+```
+
+Para compilar todos os exemplos, basta rodar o comando `make` dentro da pasta exemplos.
+
+```bash
+make
+```
+
+Se estiver no bash, é possível compilar e rodar com o comando:
+
+```bash
+make && ./main
+```
+
+Como a xpaint para o make não é mais header only, você no download receberá dois arquivos, o `xlite.c` e o `xlite.h` e não precisa mais definir o `XPAINT` no seu código antes do include.
+
+```bash
+curl -sSL https://raw.githubusercontent.com/senapk/xpaint/master/install/install_make.sh | bash
+```
 
 ---
 
