@@ -6,7 +6,7 @@ CFLAGS = -Wall -Wextra -g
 # Diretório dos arquivos .c
 SRCDIR = .
 # Diretório dos arquivos .o
-OBJDIR =./.obj
+OBJDIR =.obj
 
 # Lista de todos os arquivos .c na pasta src
 SRCS = $(wildcard $(SRCDIR)/*.c)
