@@ -88,11 +88,23 @@ Se estiver no bash, é possível compilar e rodar com o comando:
 make && ./main
 ```
 
-Como a xpaint para o make não é mais header only, você no download receberá dois arquivos, o `xlite.c` e o `xlite.h` e não precisa mais definir o `XPAINT` no seu código antes do include.
+Como a xpaint para o make não é mais header only, você no download receberá dois arquivos, o `xlite.c` e o `xlite.h` e não precisa mais definir o `XPAINT` no seu código antes do include. O `xlite` e o `xpaint` são exatamente a mesma biblioteca, só possuem nomes diferentes para lembrar que o `xlite` é mais rápidos, mas de compilação separada com o `make`.
+
+**ATENÇÃO**:
+
+Na hora da compilação, o make vai pegar TODOS os arquivos .c que estiverem na pasta do Makefile para montar a solução. Então, renomeie para .txt os arquivos que você não quer que sejam compilados.
+
+### Download do xlite e do Makefile
 
 ```bash
 curl -sSL https://raw.githubusercontent.com/senapk/xpaint/master/install/install_make.sh | bash
 ```
+
+## Configurando o Replit
+
+- Crie um replit em C
+- Execute o comando de download do xlite e do Makefile no shell do seu replit.
+- Aperte o botão verde.
 
 ---
 
