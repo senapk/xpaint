@@ -3,7 +3,7 @@
 
 #include "stdio.h"
 int main(){
-    open(1000, 600, "zz_draw");
+    open(1000, 600, "figura_draw");
     stroke(WHITE);
     background(BLACK);
 

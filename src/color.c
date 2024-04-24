@@ -238,7 +238,7 @@ void __init_colors() {
     __color_store("y", "yellow",  rgba(181, 137, 0  , 255));
 }
 
-void color_show(Color color) {
+void colorShow(Color color) {
     printf("{%3d, %3d, %3d, %3d}\n", color.r, color.g, color.b, color.a);
 }
 
@@ -260,9 +260,9 @@ Color color(const char * format, ...) {
     return xc;
 }
 
-void color_print_all() {
+void colorShowAll() {
     for(int i = 0; i < __arr_colors_size; i++) {
         printf("%s: ", __arr_colors[i].key);
-        color_show(__arr_colors[i].color);
+        colorShow(__arr_colors[i].color);
     }
 }

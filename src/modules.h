@@ -1,55 +1,44 @@
-/*
-###############################################
-############ FUNÇÕES DE GRID ##################
-###############################################
-*/
+
+
+// ---------------------------- GRID ------------------------------------------
+// ----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+
 #include <stdarg.h>
-/*Init the grid*/
-/*side is the size of the cell */
-/*sep the space in black between cells */
+
+// inicia o grid
+// side é o tamanho da célula
+// sep é o espaço em preto entre as células
 void gridInit(int side, int sep);
 
-/*plots a square in cell*/
+// plota um quadrado na célula
 void gridSquare(int l, int c);
 
-/*plots a circle in cell*/
+// plota um círculo na célula
 void gridCircle(int l, int c);
 
-/*writes a text until 5 char in cell*/
+// escreve um texto de até 5 caracteres na célula
 void gridText(int l, int c, const char *format, ...);
 
 
-/*
-###############################################
-####### FUNÇÕES PARA VISUALIZAR VETORES #######
-###############################################
-*/
+// ---------------------------- VETORES ---------------------------------------
+// ----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 
-/**
- * @brief initialize the module to print bars for show sort
- * 
- * @param size the size of the array
- * @param max the max value of the array
- */
+// inicia o vetor
+// size é o tamanho do vetor
+// max é o valor máximo do vetor
 void barInit(int size, int max);
 
-/**
- * @brief print a single bar
- * 
- * @param i the index
- * @param value the value of the bar size
- */
+// plota um valor no vetor
+// i é a posição do valor
+// value é o valor a ser plotado
 void barOne(int i, int value);
 
-/**
- * @brief show the entire array
- * 
- * @param vet the vector with the values
- * @param size of the vector
- * @param colors the array of color to mark unique elements or NULL
- * @param indices the array with the unique indices to be marked with the colors
- */
+// plota todos os valores do vetor
+// colors é um vetor de cores para marcar elementos únicos ou NULL
+// indices é um vetor com os índices únicos a serem marcados com as cores
 void barAll(int * vet, int size, const char * colors, int * indices);
 
 
@@ -59,11 +48,10 @@ void barAll(int * vet, int size, const char * colors, int * indices);
     save();\
 } while(0);
 
-/*
-###############################################
-####### FUNÇÕES PARA DESENHAR COM A CANETA ####
-###############################################
-*/
+
+// ---------------------------- CANETA ---------------------------------------
+// ----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 void   penSetAngle(double degrees);
 void   penSetThick(int thick);

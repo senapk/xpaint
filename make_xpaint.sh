@@ -6,6 +6,8 @@ ctemp="xpaint.cc"
 hfile="xlite.h"
 cfile="xlite.c"
 
+mdpp Readme.md
+
 cd src
 echo "#ifndef XPAINT_H" > $temp
 echo "#define XPAINT_H" >> $temp

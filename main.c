@@ -2,7 +2,7 @@
 #include "xpaint.h"
 
 int main(){
-    open(600, 500, "figura_base"); // cria uma tela de 600x500 com o nome figura_base
+    open(600, 400, "main"); // cria uma tela de 600x400 com o nome main.png
     background(BLACK); // limpa a tela com a cor preta
     stroke(WHITE); // muda a cor do pincel para branco
     textSize(20); // tamanho da fonte

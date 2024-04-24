@@ -50,7 +50,6 @@ int   xrand(int min, int max){
     return rand() % (max - min) + min;
 }
 
-/* https://stackoverflow.com/questions/5122993/floor-int-function-implementaton?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa */
 int xfloor(double x) {
     int xi = (int) x;
     return x < xi ? xi - 1 : xi;

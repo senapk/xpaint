@@ -7,7 +7,6 @@
 #include "draw.h" /*XDDDX*/
 #include "xmath.h" /*XDDDX*/
 #include "base.h" /*XDDDX*/
-#include "math.h"
 
 static Color     __stroke = {0, 0, 0, 255};
 static Color     __fill = {255, 255, 255, 255};
@@ -16,29 +15,30 @@ static bool      __stroke_enable = true;
 static bool      __fill_enable = true;
 static int       __thickness = 1;
 
-void __raw_line(int x0 , int y0 , int x1 , int y1, Color color);
 
-/* divida pela escala atual antes de fazer a transformação */
+void __plot_block(int x, int y, int side, Color color);
+// desenha uma linha com antialias sem transformação e sem espessura
+void __raw_alias_line(int x0 , int y0 , int x1 , int y1, Color color);
+// divida pela escala atual antes de fazer a transformação
 void __point_scale(double x, double y, Color color);
-void __draw_line_scale(double x0 , double y0 , double x1 , double y1, Color color);
-/* desenha uma linha com anti aliasing com espessura de 1 pixel entre os pontos (x0, y0) e (x1, y1) */
+// desenha uma linha com transf espessura de 1 pixel entre os pontos (x0, y0) e (x1, y1)
 void __draw_line(double x0, double y0, double x1, double y1, Color color);
-/* linha sem anti aliasing */
-void __raw_sline(int x0, int y0, int x1, int y1, Color color);
-/* desenha uma linha com espessura de thickness pixels entre os pontos (x0, y0) e (x1, y1) */
+// divide pela escala atual antes de fazer a transformação
+void __draw_line_scale(double x0 , double y0 , double x1 , double y1, Color color);
+// linha de espessura 1 sem transformação
+void __raw_line(int x0, int y0, int x1, int y1, Color color);
+// desenha uma linha com espessura de thickness pixels entre os pontos (x0, y0) e (x1, y1)
 void __fill_line(double x0, double y0, double x1, double y1, int thickness, Color color);
-/* desenha um circulo dado centro e raio */
+// desenha um circulo dado centro e raio
 void __fill_circle(double centerx, double centery, double radius);
-
-/* desenha uma elipse dentro do rect de ponto superior esquerdo(x0, y0), largura e altura */
+// desenha uma elipse dentro do rect de ponto superior esquerdo(x0, y0), largura e altura
 void __draw_ellipse(double x0, double y0, double width, double height);
-/* desenha uma elipse dentro do rect de ponto superior esquerdo(x0, y0), largura e altura */
+// desenha uma elipse dentro do rect de ponto superior esquerdo(x0, y0), largura e altura
 void __fill_ellipse(double x0, double y0, double width, double height);
-/* desenha um retangulo dados os cantos superior esquerdo (x0, y0), largura e altura */
+// desenha um retangulo dados os cantos superior esquerdo (x0, y0), largura e altura
 void __fill_rect(double x0, double y0, double width, double height);
-/* desenha um triangulo dados os 3 vertices */
+// desenha um triangulo dados os 3 vertices
 void __fill_raw_triangle(double v1x, double v1y, double v2x, double v2y, double v3x, double v3y, Color color);
-
 
 void __plot_block(int x, int y, int side, Color color){
     for(int i = x; i < x + side; i++)
@@ -50,10 +50,13 @@ void strokeWeight(int thickness){
     __thickness = thickness;
 }
 
-
-void point(double x, double y, Color color){
+void __point(double x, double y, Color color){
     V2d p = __transform(x, y);
     __plot((int) p.x, (int) p.y, color);
+}
+
+void point(double x, double y) {
+    __point(x, y, __stroke);
 }
 
 void __point_scale(double x, double y, Color color){
@@ -118,7 +121,7 @@ Color getFill(){
 void __x_draw_block(int x, int y, int side, Color color){
     for(int i = x; i < x + side; i++)
         for(int j = y; j < y + side; j++)
-            point(i, j, color);
+            __point(i, j, color);
 }
 
 int ascArt(int x, int y, int zoom, const char * picture){
@@ -148,7 +151,7 @@ int ascArt(int x, int y, int zoom, const char * picture){
     return (maxdx + 1) * zoom;
 }
 
-void __raw_sline(int x0, int y0, int x1, int y1, Color color) {
+void __raw_line(int x0, int y0, int x1, int y1, Color color) {
     /* Bresenham's Line Algorithm */
     int dx = (x0 > x1) ? x0 - x1 : x1 - x0;
     int dy = (y0 > y1) ? y0 - y1 : y1 - y0;
@@ -181,7 +184,7 @@ void __x_fill_bottom_flat_triangle(double v1x, double v1y, double v2x, double v2
     int scanlineY;
 
     for (scanlineY = v1y; scanlineY <= (int)v2y; scanlineY++){
-        __raw_sline(curx1, scanlineY, curx2, scanlineY, color);
+        __raw_line(curx1, scanlineY, curx2, scanlineY, color);
         curx1 += invslope1;
         curx2 += invslope2;
     }
@@ -199,7 +202,7 @@ void __x_fill_top_flat_triangle(double v1x, double v1y, double v2x, double v2y, 
 
     for (scanlineY = v3y; scanlineY >= v1y; scanlineY--)
     {
-        __raw_sline(curx1, scanlineY, curx2, scanlineY, color);
+        __raw_line(curx1, scanlineY, curx2, scanlineY, color);
         curx1 -= invslope1;
         curx2 -= invslope2;
     }
@@ -374,26 +377,26 @@ void __fill_circle(double centerx, double centery, double radius){
     int * lined = (int *) calloc(2 * (int) radius + 1, sizeof(int));
     while(x >= y){
         if(lined[(int)(y + radius)] == 0){
-            __raw_sline(centerx + x, centery + y, centerx - x, centery + y, __fill);
+            __raw_line(centerx + x, centery + y, centerx - x, centery + y, __fill);
             lined[(int)(y + radius)] = 1;
         }
         if(lined[(int)(-y + radius)] == 0){
-            __raw_sline(centerx + x, centery - y, centerx - x, centery - y, __fill);
+            __raw_line(centerx + x, centery - y, centerx - x, centery - y, __fill);
             lined[(int)(-y + radius)] = 1;
         }
         if(lined[(int)(x + radius)] == 0){
-            __raw_sline(centerx + y, centery + x, centerx - y, centery + x, __fill);
+            __raw_line(centerx + y, centery + x, centerx - y, centery + x, __fill);
             lined[(int)(x + radius)] = 1;
         }
         if(lined[(int)(-x + radius)] == 0){
-            __raw_sline(centerx - y, centery - x, centerx + y, centery - x, __fill);
+            __raw_line(centerx - y, centery - x, centerx + y, centery - x, __fill);
             lined[(int)(-x + radius)] = 1;
         }
         /* 
-        __raw_sline(centerx + x, centery + y, centerx - x, centery + y);
-        __raw_sline(centerx + x, centery - y, centerx - x, centery - y);
-        __raw_sline(centerx + y, centery + x, centerx - y, centery + x);
-        __raw_sline(centerx - y, centery - x, centerx + y, centery - x);
+        __raw_line(centerx + x, centery + y, centerx - x, centery + y);
+        __raw_line(centerx + x, centery - y, centerx - x, centery - y);
+        __raw_line(centerx + y, centery + x, centerx - y, centery + x);
+        __raw_line(centerx - y, centery - x, centerx + y, centery - x);
          */
         if(err <= 0){
             y++;
@@ -594,14 +597,14 @@ void __x_plot_quad_bezier_seg(int x0, int y0, int x1, int y1, int x2, int y2)
         dy = 4.0*sx*cur*(y0-y1)+yy-xy;
         xx += xx; yy += yy; err = dx+dy+xy;                /* error 1st step */
         do {
-            point(x0,y0, __stroke);                                     /* plot curve */
+            __point(x0,y0, __stroke);                                     /* plot curve */
             if (x0 == x2 && y0 == y2) return;  /* last pixel -> curve finished */
             y1 = 2*err < dx;                  /* save value for test of y step */
             if (2*err > dy) { x0 += sx; dx -= xy; err += dy += yy; } /* x step */
             if (    y1    ) { y0 += sy; dy -= xy; err += dx += xx; } /* y step */
         } while (dy < dx );           /* gradient negates -> algorithm fails */
     }
-    __raw_sline(x0, y0, x2, y2, __stroke);                  /* plot remaining part to end */
+    __raw_line(x0, y0, x2, y2, __stroke);                  /* plot remaining part to end */
 }
 // void draw_bezier(int x0, int y0, int x1, int y1, int x2, int y2)
 // {                                          /* plot any quadratic Bezier curve */
@@ -713,7 +716,7 @@ void __x_fill_arc(double centerx, double centery, int diameter, int thickness, i
                             (y == 0 && degrees_begin == 0 && x > 0)
                     )
                     )
-                point(center.x+x, center.y-y, color);
+                __point(center.x+x, center.y-y, color);
         }
     }
 
@@ -750,7 +753,7 @@ void arc(double centerx, double centery, int diameter, int thickness, int degree
         __arc(centerx, centery, diameter, __thickness, degrees_begin, degrees_lenght, __stroke);
         __arc(centerx, centery, diameter - 2 *  thickness, __thickness, degrees_begin, degrees_lenght, __stroke);
 
-        //draw a line from begin point to end point
+        //draw a line from begin __point to end __point
         //convert degrees to radians
         {
             double c = xcos(degrees_begin);
@@ -797,7 +800,7 @@ void __plot_raw_bright_pixel( int x , int y , Color color, double brightness)
     __plot(x, y, color);
 }
 
-void __raw_line(int x0 , int y0 , int x1 , int y1, Color color) {
+void __raw_alias_line(int x0 , int y0 , int x1 , int y1, Color color) {
 	int steep = xfabs(y1 - y0) > xfabs(x1 - x0) ;
 
 	// swap the co-ordinates if slope > 1 or we
@@ -850,7 +853,7 @@ void __draw_line(double x0 , double y0 , double x1 , double y1, Color color) {
     y0 = origin.y;
     x1 = destiny.x;
     y1 = destiny.y;
-    __raw_line(x0, y0, x1, y1, color);
+    __raw_alias_line(x0, y0, x1, y1, color);
 }
 
 void __draw_line_scale(double x0 , double y0 , double x1 , double y1, Color color) {
@@ -861,7 +864,7 @@ void __draw_line_scale(double x0 , double y0 , double x1 , double y1, Color colo
     y0 = origin.y;
     x1 = destiny.x;
     y1 = destiny.y;
-    __raw_line(x0, y0, x1, y1, color);
+    __raw_alias_line(x0, y0, x1, y1, color);
 }
 
 void line(double x0 , double y0 , double x1 , double y1) {
@@ -964,3 +967,4 @@ void bezier(double xa, double ya, double xb, double yb, double xc, double yc, do
         __bezier(xa * s, ya * s, xb * s, yb * s, xc * s, yc * s, xd * s, yd * s);
     }
 }
+

@@ -62,11 +62,6 @@ void open(unsigned int width, unsigned int height, const char * filename){
     __board_bitmap = (uchar*) calloc(sizeof(uchar), width * height * __X_BYTES_PER_PIXEL);
     background(rgba(30, 30, 30, 255));
 
-    // __stroke[0] = 200;
-    // __stroke[1] = 200;
-    // __stroke[2] = 200;
-    // __stroke[3] = 255;
-
     __init_colors();
     __x_init_font();
     srand((unsigned) time(NULL));
@@ -102,13 +97,6 @@ void setFilename(const char * filename){
         strcpy(__board_filename, filename);
     else
         strcpy(__board_filename, "");
-}
-
-void set_viewer(const char * viewer){
-    if(viewer != NULL)
-        strcpy(__board_viewer, viewer);
-    else
-        strcpy(__board_viewer, "");
 }
 
 void __raw_plot(int x, int y, Color _color) {
@@ -182,8 +170,6 @@ void __plot(int x, int y,  Color color) {
     __normal_plot(x, y, color);
     // __alias_plot(x, y, color);
 }
-
-
 
 
 
@@ -375,20 +361,20 @@ void rotate(double angle) {
 
 //pass x and y to all transformations in the stack
 V2d __transform(double x, double y) {
-    V2d point = v2d(x, y);
+    V2d __point = v2d(x, y);
     for(int i = 0; i <= __board_transform_index; i++) {
         Transform t = __board_transform[i];
         double angle = t.angle;
-        double x = point.x;
-        double y = point.y;
-        point.x = x * xcos(angle) - y * xsin(angle);
-        point.y = x * xsin(angle) + y * xcos(angle);
-        point.x *= t.s;
-        point.y *= t.s;
-        point.x += t.dx;
-        point.y += t.dy;
+        double x = __point.x;
+        double y = __point.y;
+        __point.x = x * xcos(angle) - y * xsin(angle);
+        __point.y = x * xsin(angle) + y * xcos(angle);
+        __point.x *= t.s;
+        __point.y *= t.s;
+        __point.x += t.dx;
+        __point.y += t.dy;
     }
-    return point;
+    return __point;
 }
 
 

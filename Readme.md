@@ -2,28 +2,32 @@
 
 O objetivo desse projeto é criar uma biblioteca header only para programar em C que seja capaz de criar, escrever e desenhar em pngs sem a necessidade de bibliotecas externas ou dependências.
 
-<!--TOC_BEGIN-->
+<!-- toc -->
 - [Instalação Local](#instalação-local)
 - [Instalação Global](#instalação-global)
   - [Linux](#linux)
   - [Windows](#windows)
-- [Criando animações](#criando-animações)
+- [Instalando a versão de compilação SUPER RÁPIDA](#instalando-a-versão-de-compilação-super-rápida)
+  - [Download do xlite e do Makefile](#download-do-xlite-e-do-makefile)
+- [Configurando o Replit](#configurando-o-replit)
 - [Funções](#funções)
 - [Compilando e rodando](#compilando-e-rodando)
 - [Guia de Funções](#guia-de-funções)
-  - [Abrindo e fechando](#abrindo-e-fechando)
+  - [Abrindo, salvando e fechando](#abrindo-salvando-e-fechando)
   - [Limpando, plotando e salvando](#limpando-plotando-e-salvando)
-  - [Abrindo automaticamento a imagem gerada](#abrindo-automaticamento-a-imagem-gerada)
+  - [Utilizando cores](#utilizando-cores)
   - [Controle interativo](#controle-interativo)
   - [Cores](#cores)
   - [Desenhando](#desenhando)
   - [Escrevendo texto](#escrevendo-texto)
+  - [Transformações](#transformações)
   - [Vetores bidimensionais](#vetores-bidimensionais)
   - [Funções Matemáticas](#funções-matemáticas)
   - [Módulo de Matrizes](#módulo-de-matrizes)
   - [Módulo de Vetores](#módulo-de-vetores)
   - [Módulo Turtle de Desenho](#módulo-turtle-de-desenho)
-<!--TOC_END-->
+- [Criando animações](#criando-animações)
+<!-- toc -->
 
 ---
 
@@ -110,16 +114,16 @@ curl -sSL https://raw.githubusercontent.com/senapk/xpaint/master/install/install
 
 ## Funções
 
-O código a seguir cria um bitmap, escreve um texto, pinta um círculo, salva no arquivo exemplo.png e sai. Você precisará apenas da biblioteca **xpaint.h** para o seu computador e criar o arquivo **exemplo_base.c** com o seguinte conteúdo.
+O código a seguir é um exemplo de uso. Cada comando está comentado para facilitar o entendimento.
 
-<!-- load exemplo_base.c fenced -->
+<!-- load main.c fenced -->
 
 ```c
 #define XPAINT
 #include "xpaint.h"
 
 int main(){
-    open(600, 500, "figura_base"); // cria uma tela de 600x500 com o nome figura_base
+    open(600, 400, "main"); // cria uma tela de 600x500 com o nome main.png
     background(BLACK); // limpa a tela com a cor preta
     stroke(WHITE); // muda a cor do pincel para branco
     textSize(20); // tamanho da fonte
@@ -148,11 +152,11 @@ gcc -Wall exemplo.c -o exemplo
 
 Ele deve gerar o arquivo figura_base.png que se parece com isso:
 
-![_](figura_base.png)
+![_](main.png)
 
 Se você clonar esse repositório, entrar na pasta exemplos e der um make, ele vai compilar e re-gerar todas as figuras.
 
-Esta é uma biblioteca header only, ou seja, não está dividida em .c e .h. Declarações e definições estão todas no .h. 
+Esta é uma biblioteca header only, ou seja, não está dividida em .c e .h. Declarações e definições estão todas no .h.
 
 Se você der o include na biblioteca ele vai incluir as declarações apenas, ou seja, os cabeçalhos.
 No módulo principal do seu programa, você deve dar o #define `XPAINT` para incluir também as definições.
@@ -166,30 +170,27 @@ No módulo principal do seu programa, você deve dar o #define `XPAINT` para inc
 
 ## Guia de Funções
 
-### Abrindo e fechando
+### Abrindo, salvando e fechando
 
 ```c
-//inicia a figura
-void open(unsigned int width, unsigned int height, const char * filename);  
-// libera os recursos
-void close();      
+void open(largura, altura, arquivo); // inicia o canvas
+void save();                         // gera o arquivo.png com o estado do canvas
+void close();                        // fecha o canvas
 ```
 
 ### Limpando, plotando e salvando
 
 ```c
-void background(Color color);  // limpa a tela
-void point(int x, int y);      // pinta o pixel usando a cor definida pelo stroke
-void save(void);               // salva a figura no arquivo com o nome do arquivo que foi aberto o canvas
-
-int  height(void);            // retorna altura
-int  width(void);             // retorna largura
+void background(Color color); // limpa a tela
+void point(int x, int y);     // pinta o pixel na posição x, y
+int  height();                // retorna altura
+int  width();                 // retorna largura
 ```
 
 ### Utilizando cores
 
 ```c
-/* Cores default e char da paleta de cores */
+// Cores default e char da paleta de cores
 #define WHITE     (Color) {238, 232, 213, 255} // w
 #define BLACK     (Color) {7  , 54 , 66 , 255} // k
 #define GREEN     (Color) {133, 153, 0  , 255} // g
@@ -201,30 +202,25 @@ int  width(void);             // retorna largura
 #define ORANGE    (Color) {253, 106,   2, 255} // o
 #define VIOLET    (Color) {108, 113, 196, 255} // v
 
-/* muda a cor do pincel*/
-void stroke(Color color);
-
-/* muda a cor de preenchimento das formas */
-void fill(Color color);
-
+void    stroke(Color color); // muda a cor do ponto, linha e bordas
+void    fill(Color color);   // muda a cor de preenchimento
 ```
 
 ### Controle interativo
 
 ```c
-/* Enable interactive save and lock control */
-void x_set_lock();
+// habilita controle interativo dos loops no canvas
+void setLock();
 
-/*
-    define folder to saves the file with a numeric sufix at the end
-    if the filename is img, sequencial calls of this function
-    will save the following files
-    img_00000.png img_00001.png img_00002.png img_00003.png
-*/
-void x_set_log(const char * folder);
+// define a pasta onde os arquivos serão salvos com um sufixo numérico no final
+// se o nome do arquivo for img, chamadas sequenciais dessa função
+// salvarão os seguintes arquivos
+// img_00000.png img_00001.png img_00002.png img_00003.png
+void setLog(const char * folder);
 
-/* creates a .mp4 video using all .png stored in folder using ffmpeg */
-void x_make_video(int framerate);
+// chama a função ffmpeg para gerar um vídeo com os arquivos salvos
+// na pasta definida por setLog
+void makeVideo(int framerate);
 
 ```
 
@@ -233,7 +229,7 @@ void x_make_video(int framerate);
 ![_](exemplos/figura_cores.png)
 
 ```c
-/* struct que representa uma cor RGBA */
+// struct que representa uma cor RGBA
 typedef struct{
     uchar r;
     uchar g;
@@ -241,7 +237,8 @@ typedef struct{
     uchar a;
 } Color;
 
-
+// cria e retorna uma struct Color passando rgba
+// rgba(255, 0, 0, 0); // vermelho
 Color rgba(uchar r, uchar g, uchar b, uchar a);
 
 /* cria uma nova cor ou obtém uma cor da paleta, possui vários modos
@@ -252,13 +249,15 @@ Color rgba(uchar r, uchar g, uchar b, uchar a);
     "black" ou "k"
     "white" ou "w"
     "red", "blue", "yellow", "pink", "cyan", ...
-5: pode ser construído com a sintexa do printf
-    ("%d, %d, %d", 10, 20 , 30)
+5: pode ser construído com a sintex do printf
+    color("%d, %d, %d", 10, 20, 30);
 */
 Color color(const char * format, ...);
 
-/* define ou altera um cor na palheta de caracteres */
-void setPalette(char c, Color color);
+// define uma entrada na paleta de cores
+// entry: chave para a cor, que pode ser uma letra ou palavra
+// color: cor a ser registrada
+void setPallete(const char * entry, Color color);
 ```
 
 ### Desenhando
@@ -266,6 +265,9 @@ void setPalette(char c, Color color);
 ![_](exemplos/figura_draw.png)
 
 ```c
+
+// muda a espessura do traço
+void strokeWeight(int thickness);
 
 /* desenha uma linha entre os pontos (x0, y0) e (x1, y1) */
 void line(int x0, int y0, int x1, int y1);
@@ -305,65 +307,100 @@ void square(int x0, int y0, int side);
 void textSize(int size); 
 
 // escreve utilizando o formato printf
+// retorna a posicao final em x
+// pode utilizar \n para quebra de linha
 int  text(int x, int y, const char * format, ...);
 
+```
+
+### Transformações
+
+```c
+// cria um camada de transformação
+void push();
+// desfaz a última camada de transformação
+void pop();
+// define a translação da camada de transformação atual
+void translate(double dx, double dy);
+// define a escala da camada de transformação atual
+void scale(double s);
+// define a rotação da camada de transformação atual
+void rotate(double angle); 
 ```
 
 ### Vetores bidimensionais
 
 ```c
-/* Define um vetor bidimensional com x e y */
+// Define um vetor bidimensional com x e y
 typedef struct{
     double x;
     double y;
 } V2d;
 
-/* cria e retorna um vetor */
-V2d v2d(double x, double y);
-
-/* retorna o tamanho de um vetor da origem */
-double v2d_length(double x, double y);
-
-/* retorna a distancia entre dois pontos */
+// retorna a distancia entre dois pontos
 double dist(double ax, double ay, double bx, double by);
 
-/* retorna a + b */
-X_V2d v2d_sum(X_V2d a, X_V2d b);
+// cria e retorna um vetor
+V2d v2d(double x, double y);
 
-/* retorna a - b */
-X_V2d v2d_sub(X_V2d a, X_V2d b);
+// retorna o tamanho de um vetor da origem
+double v2d_length(double x, double y);
 
-/* retorna (a.x * value, a.y * value) */
-X_V2d v2d_dot(X_V2d a, double value);
+// retorna a + b
+V2d v2d_sum(V2d a, V2d b);
 
-/* retorna o vetor normalizado */
-X_V2d v2d_normalize(X_V2d v);
+// retorna a - b
+V2d v2d_sub(V2d a, V2d b);
 
-/* retorna o vetor orthogonal */
-X_V2d v2d_ortho(X_V2d v);
+// retorna (a.x * value, a.y * value)
+V2d v2d_dot(V2d a, double value);
+
+// retorna o vetor normalizado
+V2d v2d_normalize(V2d v);
+
+// retorna o vetor orthogonal
+V2d v2d_ortho(V2d v);
 ```
 
 ### Funções Matemáticas
 
-```c
-/*
-Essas funções foram adicionadas para que a biblioteca
-xpaint não dependesse de incluir a biblioteca math.h
-nos parametros de compilação com o -lm
-*/
+Essas funções foram adicionadas para que a biblioteca `xpaint` não dependesse de incluir a biblioteca `math.h` nos parametros de compilação com o `-lm`.
 
+```c
+
+// raiz quadrada
 double xsqrt(const double m);
+
+// função potência
 double xpow( double x, double y );
+
+// função piso
 int    xfloor(double x);
+
+// função de arredondamento
+int    xround(double x);
+
+// o módulo de um número, mas com o divisor sendo um double
 double xfmod(double a, double b);
+
+// função teto
 int    xceil(double n);
-/* degrees */
+
+// calcula o seno de um angulo em graus
 double xsin(double d);
+
+// calcula o cosseno de um angulo em graus
 double xcos(double d);
+
+// calcula o arco cosseno de x em graus
 double xacos(double x);
+
+// calcula o arco seno de x em graus
 double xfabs(double f);
-/* Generates a int number in interval [min, max] */
-int    xrand(int min, int max);
+
+// gera um valor inteiro aleatório entre min e max
+// não incluindo o max
+int xrand(int min, int max);
 
 ```
 
@@ -375,25 +412,19 @@ int    xrand(int min, int max);
 
 ```c
 
-/*
-###############################################
-############ FUNÇÕES DE GRID ##################
-###############################################
-*/
-
-/*Init the grid*/
-/*side is the size of the cell */
-/*sep the space in black between cells */
+// inicia o grid
+// side é o tamanho da célula
+// sep é o espaço em preto entre as células
 void gridInit(int side, int sep);
 
-/*plots a square in cell*/
+// plota um quadrado na célula
 void gridSquare(int l, int c);
 
-/*plots a circle in cell*/
+// plota um círculo na célula
 void gridCircle(int l, int c);
 
-/*writes a text until 5 char in cell*/
-void gridWrite(int l, int c, const char *format, ...);
+// escreve um texto de até 5 caracteres na célula
+void gridText(int l, int c, const char *format, ...);
 
 ```
 
@@ -402,37 +433,20 @@ void gridWrite(int l, int c, const char *format, ...);
 ![_](exemplos/figura_insertion.png)
 
 ```c
-/**
- * @brief initialize the module to print bars for show sort
- * 
- * @param size the size of the array
- * @param max the max value of the array
- */
+// inicia o vetor
+// size é o tamanho do vetor
+// max é o valor máximo do vetor
 void barInit(int size, int max);
 
-/**
- * @brief print a single bar
- * 
- * @param i the index
- * @param value the value of the bar size
- */
+// plota um valor no vetor
+// i é a posição do valor
+// value é o valor a ser plotado
 void barOne(int i, int value);
 
-/**
- * @brief show the entire array
- * 
- * @param vet the vector with the values
- * @param size of the vector
- * @param colors the array of color to mark unique elements or NULL
- * @param indices the array with the unique indices to be marked with the colors
- */
+// plota todos os valores do vetor
+// colors é um vetor de cores para marcar elementos únicos ou NULL
+// indices é um vetor com os índices únicos a serem marcados com as cores
 void barAll(int * vet, int size, const char * colors, int * indices);
-
-
-/*
- * Save the array using vararg to pass multiple indexes 
-*/
-#define bar_save(vet, size, colors, ...)
 ```
 
 ### Módulo Turtle de Desenho
