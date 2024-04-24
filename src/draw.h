@@ -1,5 +1,6 @@
 #ifndef DRAW_H /*XDDDX*/
 #define DRAW_H /*XDDDX*/
+#include <stdarg.h>
 
 #include "color.h" /*XDDDX*/
 #include "xmath.h" /*XDDDX*/
@@ -15,10 +16,20 @@ void strokeWeight(int thickness);
 void point(double x, double y);
 
 // muda a cor do pincel para pontos, linhas e bordas
-void stroke(Color color);
+// pode ser uma cor hexadecimal, rgb, tons de cinza ou uma palavra chave
+// internamente, chama a função color
+void stroke(const char * format, ...);
 
 // muda a cor do pincel para preenchimento
-void fill(Color color);
+// pode ser uma cor hexadecimal, rgb, tons de cinza ou uma palavra chave
+// internamente, chama a função color
+void fill(const char * format, ...);
+
+// define a cor de stroke passando o objeto Color
+void setStroke(Color value);
+
+// devolve a cor atual do fill
+void setFill(Color value);
 
 // desabilita pontos, linhas e bordas
 void noStroke();

@@ -4,9 +4,9 @@
 int main(){
     open(400, 400, "zz_draw");
     
-    stroke(WHITE);
-    fill(YELLOW);
-    background(BLACK);
+    stroke("white");
+    fill("yellow");
+    background("black");
     push();
     rotate(15);
     scale(1.5);

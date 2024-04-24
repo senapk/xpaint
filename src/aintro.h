@@ -15,7 +15,7 @@ Principais fontes:
 
 Licença: GPLv3
 
-Versão: 1.0
+Versão: 1.1
 
 */
 
@@ -28,9 +28,9 @@ int main(){
     int largura = 600, altura = 500;
     open(largura, altura, "figura_base"); 
     text(50, 30, "Pintarei um circulo vermelho em %d %d", largura/2, altura/2);
-    background(WHITE);
-    stroke(BLACK);
-    fill(RED)
+    background("white");
+    stroke("black");
+    fill("red")
     circle(largura/2, altura/2, 200);
     save();
     close();

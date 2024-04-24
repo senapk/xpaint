@@ -14,7 +14,6 @@ O objetivo desse projeto é criar uma biblioteca header only para programar em C
 - [Compilando e rodando](#compilando-e-rodando)
 - [Guia de Funções](#guia-de-funções)
   - [Abrindo, salvando e fechando](#abrindo-salvando-e-fechando)
-  - [Limpando, plotando e salvando](#limpando-plotando-e-salvando)
   - [Utilizando cores](#utilizando-cores)
   - [Controle interativo](#controle-interativo)
   - [Cores](#cores)
@@ -123,13 +122,13 @@ O código a seguir é um exemplo de uso. Cada comando está comentado para facil
 #include "xpaint.h"
 
 int main(){
-    open(600, 400, "main"); // cria uma tela de 600x500 com o nome main.png
-    background(BLACK); // limpa a tela com a cor preta
-    stroke(WHITE); // muda a cor do pincel para branco
+    open(600, 400, "main"); // cria uma tela de 600x400 com o nome main.png
+    background("0, 0, 0"); // limpa a tela com a cor preta usando rgb
+    stroke("white"); // muda a cor do pincel para branco usando nome da cor
     textSize(20); // tamanho da fonte
     // escreve usando a sintaxe do printf
     text(50, 30, "Pintarei um circulo vermelho em %d %d", width() / 2, height()/ 2);
-    fill(RED); // muda a cor de preenchimento para vermelho
+    fill("red"); // muda a cor de preenchimento para vermelho
     strokeWeight(5); // muda a espessura do pincel para 5
     circle(width()/2, height()/2, 200); // desenha um circulo no centro da tela com largura 200
     save(); // salva a imagem
@@ -176,34 +175,45 @@ No módulo principal do seu programa, você deve dar o #define `XPAINT` para inc
 void open(largura, altura, arquivo); // inicia o canvas
 void save();                         // gera o arquivo.png com o estado do canvas
 void close();                        // fecha o canvas
-```
-
-### Limpando, plotando e salvando
-
-```c
-void background(Color color); // limpa a tela
-void point(int x, int y);     // pinta o pixel na posição x, y
-int  height();                // retorna altura
-int  width();                 // retorna largura
+void point(int x, int y);            // pinta o pixel na posição x, y
+int  height();                       // retorna altura
+int  width();                        // retorna largura
 ```
 
 ### Utilizando cores
 
 ```c
-// Cores default e char da paleta de cores
-#define WHITE     (Color) {238, 232, 213, 255} // w
-#define BLACK     (Color) {7  , 54 , 66 , 255} // k
-#define GREEN     (Color) {133, 153, 0  , 255} // g
-#define RED       (Color) {211, 1  , 2  , 255} // r
-#define BLUE      (Color) {38 , 139, 210, 255} // b
-#define YELLOW    (Color) {181, 137, 0  , 255} // y
-#define CYAN      (Color) {42 , 161, 152, 255} // c
-#define MAGENTA   (Color) {211, 54 , 130, 255} // m
-#define ORANGE    (Color) {253, 106,   2, 255} // o
-#define VIOLET    (Color) {108, 113, 196, 255} // v
+void background(const char* color, ...); // limpa a tela passando o texto
+void     stroke(const char* color, ...); // muda a cor do ponto, linha e bordas
+void       fill(const char* color, ...); // muda a cor de preenchimento
+void  setStroke(Color color);   // muda a cor passando o objeto Color
+void    setFill(Color color);   // muda a cor passando o objeto Color
+void setPallete(const char * entry, Color color); // registra a cor na paleta
+```
 
-void    stroke(Color color); // muda a cor do ponto, linha e bordas
-void    fill(Color color);   // muda a cor de preenchimento
+```c
+// Os valores de texto podem ser passados como 
+// hexadecimal "#ff00ff",
+// rgb "255, 0, 255",
+// rgba "255, 0, 255, 255",
+// tons de cinza "100", "0", "150",
+// palavras chave "black", "white", "red", "blue", "yellow", "pink", "cyan", ...
+// letras "k" para black, "w" para white, "r" para red, "b" para blue, ...
+// ou ainda com a sintaxe do printf ("255, %d, %d", xrand(255), xrand(255))
+// exemplo de uso
+background("#ff00ff"); // limpa a tela com a cor magenta
+stroke("black"); // muda a cor do pincel para preto
+fill("red"); // muda a cor de preenchimento para vermelho
+stroke("255, 0, 0, 255"); // muda a cor do pincel para vermelho
+// muda a cor de preenchimento para uma cor aleatória
+fill("%d, %d, %d", xrand(255), xrand(255), xrand(255)); 
+
+Color verde = color("33, 190, 30"); // cria a cor verde
+setStroke(verde); // muda a cor do pincel para verde
+
+// adicionando novas chaves na paleta de cores
+setPallete("azul", color("0, 240, 250")); // registra a cor na paleta
+stroke("azul"); // muda a cor do pincel para azul
 ```
 
 ### Controle interativo
@@ -398,9 +408,13 @@ double xacos(double x);
 // calcula o arco seno de x em graus
 double xfabs(double f);
 
-// gera um valor inteiro aleatório entre min e max
+// gera um valor inteiro aleatório entre 0 e max
 // não incluindo o max
-int xrand(int min, int max);
+int xrand(int int max);
+
+// xrand intervalado: gera um valor inteiro 
+// aleatório entre min e max não incluindo o max
+int xrandi(int min, int max);
 
 ```
 

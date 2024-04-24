@@ -18,7 +18,7 @@ void fractal(float x, float y, float lado, float ang){
 }
 int main(){
     open(800, 700, "figura_triangulo");
-    stroke(WHITE);
+    stroke("white");
     textSize(30);
     text(140, 0, "Exemplo do fractal de Sierpinski");
     fractal(50, 650, 700, 60);

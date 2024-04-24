@@ -2,8 +2,8 @@
 #include "xpaint.h"
 
 void fractal(float x, float y, float ang, float lado){
-    float delta = 35 + xrand(-2, 2); /* angulo de rotacao */
-    float dec = 0.72 + xrand(-20, 20)/100.0;
+    float delta = 35 + xrandi(-2, 2); /* angulo de rotacao */
+    float dec = 0.72 + xrandi(-20, 20)/100.0;
     if(lado < 10)
         return;
     
@@ -18,7 +18,7 @@ void fractal(float x, float y, float ang, float lado){
 
 int main(){
     open(800, 500, "figura_arvore");
-    stroke(WHITE);
+    stroke("white");
     fractal(400, 450, 90, 100);
     save();
     close();

@@ -8,10 +8,10 @@ int main() {
     //    texto[i - ' '] = (char) i;
     //texto['~' - ' ' + 1] = '\0';
 
-    stroke(WHITE);
+    stroke("white");
     //x_write(10, 10, texto);
 
-    stroke(RED);
+    stroke("red");
     textSize(40);
     text(10, 50, "abcdefghijklmnopqrstuvwxyz");
     text(10, 100, "ABCDEFGHIJKLMNOPQRSTUVWXYZ");

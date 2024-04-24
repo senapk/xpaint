@@ -14,7 +14,9 @@ typedef struct ColorEntry{
 } ColorEntry;
 
 static Color __board_palette[256];
+
 ColorEntry __arr_colors[X_MAX_ITENS];
+
 int __arr_colors_size = 0;
 
 Color rgba(uchar r, uchar g, uchar b, uchar a) {
@@ -160,6 +162,13 @@ void setPallete(const char * entry, Color color) {
 }
 
 void __init_colors() {
+
+    static bool initialized = false;
+    if (initialized) {
+        return;
+    }
+    initialized = true;
+
     //init constant time loading colors
     for(size_t i = 0; i < 256; i++) {
         __board_palette[i] = rgba(0, 0, 0, 255);
@@ -243,20 +252,22 @@ void colorShow(Color color) {
 }
 
 Color color(const char * format, ...) {
-    char color[1000];
+    __init_colors();
+    
+    char value[1000];
     va_list args;
-    va_start( args, format );
-    vsprintf(color, format, args);
+    va_start(args, format );
+    vsprintf(value, format, args);
     va_end( args );
 
     Color xc;
-    if(__decode_single_char(color, &xc) || 
-            __x_decode_rgba(color, &xc) ||
-              __decode_gray(color, &xc) || 
-               __decode_hex(color, &xc) ||
-           __decode_by_name(color, &xc))
+    if(__decode_single_char(value, &xc) || 
+            __x_decode_rgba(value, &xc) ||
+              __decode_gray(value, &xc) || 
+               __decode_hex(value, &xc) ||
+           __decode_by_name(value, &xc))
         return xc;
-    printf("fail: Color \"%s\" could not be decoded\n", color);
+    printf("fail: Color \"%s\" could not be decoded\n", value);
     return xc;
 }
 

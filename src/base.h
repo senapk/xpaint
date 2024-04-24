@@ -31,7 +31,7 @@ void setFilename(const char * filename);
 Color getPixel(int x, int y);
 
 // limpa a tela inteira com a mesma cor
-void background(Color color);
+void background(const char * format, ...);
 
 // gera o arquivo png com o valor atual do canvas
 void save(void);

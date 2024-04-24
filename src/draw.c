@@ -65,41 +65,39 @@ void __point_scale(double x, double y, Color color){
     __plot((int) p.x, (int) p.y, color);
 }
 
-void stroke(Color color){
-    __stroke = color;
+void stroke(const char * format, ...) {
+    char value[1000];
+    va_list args;
+    va_start(args, format );
+    vsprintf(value, format, args);
+    va_end( args );
+
+    __stroke = color(value);
     __stroke_enable = true;
+
 }
 
-// void stroke_rgba(uchar r, uchar g, uchar b, uchar a) {
-//     __stroke.r = r;
-//     __stroke.g = g;
-//     __stroke.b = b;
-//     __stroke.a = a;
-//     __stroke_enable = true;
-// }
+void fill(const char * format, ...) {
+    char value[1000];
+    va_list args;
+    va_start(args, format );
+    vsprintf(value, format, args);
+    va_end( args );
 
-// void stroke_char(char c){
-//     __stroke = getPalette(c);
-//     __stroke_enable = true;
-// }
-
-void fill(Color color){
-    __fill = color;
+    __fill = color(value);
     __fill_enable = true;
 }
 
-// void fill_rgba(uchar r, uchar g, uchar b, uchar a) {
-//     __fill_enable = true;
-//     __fill.r = r;
-//     __fill.g = g;
-//     __fill.b = b;
-//     __fill.a = a;
-// }
+void setStroke(Color value) {
+    __stroke = value;
+    __stroke_enable = true;
+}
 
-// void fill_char(char c){
-//     __fill = getPalette(c);
-//     __fill_enable = true;
-// }
+void setFill(Color value) {
+    __fill = value;
+    __fill_enable = true;
+}
+
 
 void noStroke(){
     __stroke_enable = false;

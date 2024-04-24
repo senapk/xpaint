@@ -4,9 +4,9 @@
 
 int main(){
     open(1200, 1200, "zz_roda");
-    stroke(WHITE);
-    fill(RED);
-    background(BLACK);
+    stroke("white");
+    fill("red");
+    background("black");
     strokeWeight(5);
     bezier(0, 0, 0, 1200, 1200, 0, 1200, 1200);
     

@@ -9,10 +9,10 @@
 
 int main() {
     open(1000, 600, "zz_figura_draw");
-    background(BLACK);
-    stroke(GREEN);
+    background("black");
+    stroke("green");
     // circle(200, 200, 300);
-    stroke(WHITE);
+    stroke("white");
     arc(200, 200, 150, 50, 190, 100);
 
     penSetThick(30);

@@ -46,8 +46,12 @@ V2d v2d_ortho(V2d v){
     return v2d(v.y, -v.x);
 }
 
-int   xrand(int min, int max){
+int   xrandi(int min, int max){
     return rand() % (max - min) + min;
+}
+
+int   xrand(int max) {
+    return xrandi(0, max);
 }
 
 int xfloor(double x) {

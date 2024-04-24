@@ -4,18 +4,18 @@
 #include "stdio.h"
 int main(){
     open(1000, 600, "figura_draw");
-    stroke(WHITE);
-    background(BLACK);
+    stroke("white");
+    background("black");
 
     // push();
 
     textSize(30);
-    stroke(YELLOW);
+    stroke("yellow");
     text(90, 30, "Exemplo das funções de desenho de\n         formas geométricas");
 
     strokeWeight(3);
-    stroke(WHITE);
-    fill(YELLOW);
+    stroke("white");
+    fill("yellow");
     textSize(20);
     int x = 10;
     int y = 100;

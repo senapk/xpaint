@@ -13,7 +13,7 @@ int main() {
     stroke_char('g');
 
     __fill_circle(200, 200, 300);
-    stroke(WHITE);
+    stroke("white");
     arc(200, 200, 150, 50, 190, 100);
 
     penSetThick(30);

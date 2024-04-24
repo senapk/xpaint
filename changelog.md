@@ -1,3 +1,5 @@
+- 1.1
+    - all colors changed to variadic strings
 - 1.0
     - added transformations and renamed to p5 style of names
 - 0.8 [x] split in many files

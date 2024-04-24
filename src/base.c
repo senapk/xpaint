@@ -60,7 +60,7 @@ void open(unsigned int width, unsigned int height, const char * filename){
     strcpy(__board_filename, filename);
 
     __board_bitmap = (uchar*) calloc(sizeof(uchar), width * height * __X_BYTES_PER_PIXEL);
-    background(rgba(30, 30, 30, 255));
+    background("30, 30, 30, 255");
 
     __init_colors();
     __x_init_font();
@@ -180,9 +180,17 @@ Color getPixel(int x, int y){
     return color;
 }
 
-void background(Color color){
+void background(const char* format, ...) {
+    char value[1000];
+    va_list args;
+    va_start(args, format );
+    vsprintf(value, format, args);
+    va_end( args );
+    Color _color = color(value);
+
+
     uchar __color[__X_BYTES_PER_PIXEL];
-    memcpy(__color, &color, __X_BYTES_PER_PIXEL * sizeof(uchar));
+    memcpy(__color, &_color, __X_BYTES_PER_PIXEL * sizeof(uchar));
 
     unsigned x, y;
     for(x = 0; x < __board_width; x++)
@@ -221,7 +229,7 @@ void __x_save(){
 void __x_log(){
     static int index = 0;
     const char * folder = __board_folder;
-    char * name = (char *) malloc((strlen(folder) + 20) * sizeof(char));
+    char * name = (char *) malloc((strlen(folder) + 100) * sizeof(char));
     if(folder[strlen(folder) - 1] != '/')
         sprintf(name, "%s/%05d", folder, index);
     else

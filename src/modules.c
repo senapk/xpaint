@@ -71,21 +71,21 @@ void barOne(int i, int value){
 }
 
 void barAll(int * vet, int size, const char * colors, int * indices){
-    background(BLACK);
+    background("black");
     int i = 0;
-    stroke(WHITE);
+    stroke("white");
     for(i = 0; i < size; i++)
         barOne(i, vet[i]);
     if(colors != NULL && (strcmp(colors, "") != 0)){
         int qtd = strlen(colors);
         for(i = 0; i < qtd; i++){
             char c[2] = {colors[i], '\0'};
-            stroke(color(c));
+            stroke("%c", c);
             barOne(indices[i], vet[indices[i]]);
         }
     }
     static int atual = 0;
-    stroke(WHITE); /* desenhando estado */
+    stroke("white"); /* desenhando estado */
     text(0, 0, "%d", atual++);
 }
 

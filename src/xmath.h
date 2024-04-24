@@ -68,9 +68,12 @@ double xacos(double x);
 // calcula o arco seno de x em graus
 double xfabs(double f);
 
-// gera um valor inteiro aleatório entre min e max
+// gera um valor inteiro aleatório entre 0 e max
 // não incluindo o max
-int xrand(int min, int max);
+int xrand(int max);
+
+// xrand intervalo
+int xrandi(int min, int max);
 
 #endif /*XDDDX*/
 
