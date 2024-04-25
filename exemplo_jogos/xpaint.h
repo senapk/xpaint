@@ -1,0 +1,1 @@
+../mode_easy/xpaint.h

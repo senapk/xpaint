@@ -1,14 +1,12 @@
 CFLAGS= -Wall -Werror
-CC = clang 
 
 %: %.c
-	$(CC)  $@.c -o exec_$@ $(CFLAGS)
+	gcc  $@.c -o run_$@ $(CFLAGS)
 %: %.cpp
-	g++ -Wall  $@.cpp -o exec_$@
+	g++ -Wall  $@.cpp -o run_$@
 
 
-all: clean exemplo_cores exemplo_arvore exemplo_texto exemplo_draw exemplo_triangulo exemplo_grid
-	# encontra nessa pasta todos os arquivos que comecam com exec_ e executa
-	find . -name "exec_*" -printf '%p\n' -exec sh -c {} \;
+all: clean ex_arvore ex_balls ex_cores ex_draw ex_floodfill ex_grid ex_rotate ex_texto ex_triangulo 
+	find . -name "run_*" -printf '%p\n' -exec sh -c {} \;
 clean:
-	rm -f exec_* imgs/figura_*
+	rm -f run_* figura_*.png

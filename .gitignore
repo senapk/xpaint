@@ -4,5 +4,7 @@ figura_base.png
 todo.md
 .vscode
 exemplos/xpaint.h
-
+main
 *.o
+.obj
+run_*

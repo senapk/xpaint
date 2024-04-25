@@ -5,26 +5,24 @@ O objetivo desse projeto é criar uma biblioteca header only para programar em C
 <!-- toc -->
 - [Instalação Local](#instalação-local)
 - [Instalação Global](#instalação-global)
-  - [Linux](#linux)
-  - [Windows](#windows)
-- [Instalando a versão de compilação SUPER RÁPIDA](#instalando-a-versão-de-compilação-super-rápida)
-  - [Download do xlite e do Makefile](#download-do-xlite-e-do-makefile)
+- [Instalando a versão de compilação RÁPIDA](#instalando-a-versão-de-compilação-rápida)
+  - [Download do xpaint.c, xpaint.h, main.c e do Makefile](#download-do-xpaintc-xpainth-mainc-e-do-makefile)
 - [Configurando o Replit](#configurando-o-replit)
 - [Funções](#funções)
 - [Compilando e rodando](#compilando-e-rodando)
 - [Guia de Funções](#guia-de-funções)
   - [Abrindo, salvando e fechando](#abrindo-salvando-e-fechando)
   - [Utilizando cores](#utilizando-cores)
-  - [Controle interativo](#controle-interativo)
   - [Cores](#cores)
   - [Desenhando](#desenhando)
   - [Escrevendo texto](#escrevendo-texto)
   - [Transformações](#transformações)
   - [Vetores bidimensionais](#vetores-bidimensionais)
   - [Funções Matemáticas](#funções-matemáticas)
-  - [Módulo de Matrizes](#módulo-de-matrizes)
-  - [Módulo de Vetores](#módulo-de-vetores)
   - [Módulo Turtle de Desenho](#módulo-turtle-de-desenho)
+  - [Módulo de Matrizes](#módulo-de-matrizes)
+  - [Controle interativo](#controle-interativo)
+  - [Módulo de Vetores](#módulo-de-vetores)
 - [Criando animações](#criando-animações)
 <!-- toc -->
 
@@ -35,35 +33,25 @@ O objetivo desse projeto é criar uma biblioteca header only para programar em C
 Para utilizar, basta você baixar a biblioteca para o diretório onde está o seu código fonte, compilar e executar. Se estiver no linux, pode usar os seguintes comandos para baixar a biblioteca e rodar um exemplo.
 
 ```bash
-curl https://raw.githubusercontent.com/senapk/xpaint/master/xpaint.h -o xpaint.h
-curl https://raw.githubusercontent.com/senapk/xpaint/master/exemplo_base.c -o exemplo_base.c
-gcc -Wall exemplo_base.c -o exemplo_base
-./exemplo_base
+curl https://raw.githubusercontent.com/senapk/xpaint/master/mode_easy/xpaint.h -o xpaint.h
+curl https://raw.githubusercontent.com/senapk/xpaint/master/mode_easy/main.c -o main.c
+gcc -Wall main.c -o main.exe
+./main.exe
 ```
 
-Ao executar, deve ser criado o arquivo exemplo_base.png no seu diretório atual. 
+Ao executar, deve ser criado o arquivo main.png no seu diretório atual.
 
 Se estiver no windows, basta abrir os links e clicar em salvar como para salvar o arquivo.
 
 ```bash
-- https://raw.githubusercontent.com/senapk/xpaint/master/xpaint.h
+- https://raw.githubusercontent.com/senapk/xpaint/master/modo_easy/xpaint.h
 ```
 
 ---
 
 ## Instalação Global
 
-### Linux
-
-```bash
-sudo wget https://raw.githubusercontent.com/senapk/xpaint/master/xpaint.h -O /usr/local/include/xpaint.h
-```
-
-### Windows
-
-Baixe o arquivo [xpaint.h](https://raw.githubusercontent.com/senapk/xpaint/master/xpaint.h) e coloque dentro da pasta include da instalação do Mingw.
-
-## Instalando a versão de compilação SUPER RÁPIDA
+## Instalando a versão de compilação RÁPIDA
 
 Para uma compilação mais rápida, você precisará utilizar um programa chamado `make`. Ele é um programa que lê um arquivo chamado `Makefile` e executa os comandos que estão nele. Isso possibilita que os módulos sejam compilados de forma independente e apenas os módulos que foram alterados sejam recompilados.
 
@@ -79,25 +67,13 @@ Para instalar no windows, você pode baixar o make através do [chocolatey](http
 choco install make
 ```
 
-Para compilar todos os exemplos, basta rodar o comando `make` dentro da pasta exemplos.
-
-```bash
-make
-```
-
-Se estiver no bash, é possível compilar e rodar com o comando:
-
-```bash
-make && ./main
-```
-
-Como a xpaint para o make não é mais header only, você no download receberá dois arquivos, o `xlite.c` e o `xlite.h` e não precisa mais definir o `XPAINT` no seu código antes do include. O `xlite` e o `xpaint` são exatamente a mesma biblioteca, só possuem nomes diferentes para lembrar que o `xlite` é mais rápidos, mas de compilação separada com o `make`.
+Como a xpaint para o make não é mais header only, você no download receberá dois arquivos, o `xpaint.c` e o `xpaint.h` e não precisa mais definir o `XPAINT` no seu código antes do include.
 
 **ATENÇÃO**:
 
 Na hora da compilação, o make vai pegar TODOS os arquivos .c que estiverem na pasta do Makefile para montar a solução. Então, renomeie para .txt os arquivos que você não quer que sejam compilados.
 
-### Download do xlite e do Makefile
+### Download do xpaint.c, xpaint.h, main.c e do Makefile
 
 ```bash
 curl -sSL https://raw.githubusercontent.com/senapk/xpaint/master/install/install_make.sh | bash
@@ -115,7 +91,7 @@ curl -sSL https://raw.githubusercontent.com/senapk/xpaint/master/install/install
 
 O código a seguir é um exemplo de uso. Cada comando está comentado para facilitar o entendimento.
 
-<!-- load main.c fenced -->
+<!-- load mode_fast/main.c fenced -->
 
 ```c
 #define XPAINT
@@ -151,7 +127,7 @@ gcc -Wall exemplo.c -o exemplo
 
 Ele deve gerar o arquivo figura_base.png que se parece com isso:
 
-![_](main.png)
+![_](mode_easy/main.png)
 
 Se você clonar esse repositório, entrar na pasta exemplos e der um make, ele vai compilar e re-gerar todas as figuras.
 
@@ -161,9 +137,7 @@ Se você der o include na biblioteca ele vai incluir as declarações apenas, ou
 No módulo principal do seu programa, você deve dar o #define `XPAINT` para incluir também as definições.
 
 ```c
-#define XPAINT
-#include <xpaint.h> //se instalar globalmente
-//ou
+#define XPAINT // obrigatório no modo easy, desnecessário no modo fast
 #include "xpaint.h" //se instalar localmente
 ```
 
@@ -216,25 +190,9 @@ setPallete("azul", color("0, 240, 250")); // registra a cor na paleta
 stroke("azul"); // muda a cor do pincel para azul
 ```
 
-### Controle interativo
-
-```c
-// habilita controle interativo dos loops no canvas
-void setLock();
-
-// define a pasta onde os arquivos serão salvos com um sufixo numérico no final
-// se o nome do arquivo for img, chamadas sequenciais dessa função
-// salvarão os seguintes arquivos
-// img_00000.png img_00001.png img_00002.png img_00003.png
-void setLog(const char * folder);
-
-// chama a função ffmpeg para gerar um vídeo com os arquivos salvos
-// na pasta definida por setLog
-void makeVideo(int framerate);
-
-```
-
 ### Cores
+
+[Código das cores](exemplos/ex_cores.c)
 
 ![_](exemplos/figura_cores.png)
 
@@ -271,6 +229,8 @@ void setPallete(const char * entry, Color color);
 ```
 
 ### Desenhando
+
+[Código das figuras](exemplos/ex_draw.c)
 
 ![_](exemplos/figura_draw.png)
 
@@ -309,6 +269,8 @@ void square(int x0, int y0, int side);
 
 ### Escrevendo texto
 
+[Código do texto](exemplos/ex_texto.c)
+
 ![_](exemplos/figura_texto.png)
 
 ```c
@@ -325,6 +287,14 @@ int  text(int x, int y, const char * format, ...);
 
 ### Transformações
 
+[Código do Rotate](exemplos/ex_rotate.c)
+
+![_](exemplos/figura_rotate.png)
+
+[Código das Transformações](exemplos/ex_transf.c)
+
+![_](exemplos/figura_transf.png)
+
 ```c
 // cria um camada de transformação
 void push();
@@ -339,6 +309,10 @@ void rotate(double angle);
 ```
 
 ### Vetores bidimensionais
+
+[Código das Bolas](exemplos/ex_balls.c)
+
+![_](exemplos/figura_balls.png)
 
 ```c
 // Define um vetor bidimensional com x e y
@@ -418,9 +392,39 @@ int xrandi(int min, int max);
 
 ```
 
+### Módulo Turtle de Desenho
+
+[Código do triângulo](exemplos/ex_triangulo.c)
+
+![_](exemplos/figura_triangulo.png)
+
+[Código da árvore](exemplos/ex_arvore.c)
+
+![_](exemplos/figura_arvore.png)
+
+```c
+void   penSetAngle(double degrees);
+void   penSetThick(int thick);
+void   penSetPos(double x, double y);
+double penGetAngle();
+int    penGetThick();
+double penGetX();
+double penGetY();
+void   penUp(void);
+void   penDown(void); 
+void   penWalk(double distance);
+void   penRotate(int degrees);
+void   penGoto(double x, double y);
+
+```
+
 ### Módulo de Matrizes
 
-[Código de matrizes](exemplos/exemplo_grid.c)
+[Código de matrizes](exemplos/ex_floodfill.cpp)
+
+![_](exemplos/figura_floodfill.png)
+
+[Código de grid](exemplos/ex_grid.c)
 
 ![_](exemplos/figura_grid.png)
 
@@ -455,47 +459,41 @@ void barInit(int size, int max);
 // plota um valor no vetor
 // i é a posição do valor
 // value é o valor a ser plotado
-void barOne(int i, int value);
+void barDrawOne(int i, int value);
 
 // plota todos os valores do vetor
 // colors é um vetor de cores para marcar elementos únicos ou NULL
-// indices é um vetor com os índices únicos a serem marcados com as cores
-void barAll(int * vet, int size, const char * colors, int * indices);
+// os elementos a seguir são os índices a serem marcados pelas cores
+void barDrawColors(int * vet, int size, const char * colors, ...);
 ```
 
-### Módulo Turtle de Desenho
+### Criando animaçoes
 
-[Código do triângulo](exemplos/exemplo_triangulo.c)
-
-![_](exemplos/figura_triangulo.png)
-
-[Código da árvore](exemplos/exemplo_arvore.c)
-
-![_](exemplos/figura_arvore.png)
+![_](exemplos_interativos/video.webp)
 
 ```c
-void   penSetAngle(double degrees);
-void   penSetThick(int thick);
-void   penSetPos(double x, double y);
-double penGetAngle();
-int    penGetThick();
-double penGetX();
-double penGetY();
-void   penUp(void);
-void   penDown(void); 
-void   penWalk(double distance);
-void   penRotate(int degrees);
-void   penGoto(double x, double y);
+// habilita controle interativo dos loops no canvas
+void setLock();
+
+// define a pasta onde os arquivos serão salvos com um sufixo numérico no final
+// se o nome do arquivo for img, chamadas sequenciais dessa função
+// salvarão os seguintes arquivos
+// img_00000.png img_00001.png img_00002.png img_00003.png
+void setLog(const char * folder);
+
+// chama a função ffmpeg para gerar um vídeo com os arquivos salvos
+// na pasta definida por setLog
+void makeVideo(int framerate, const char * filename);
 
 ```
 
-## Criando animações
+O exemplo_insertion.c mostra como criar animações.
 
-O exemplo_insertion.c mostra como criar animações. O nome do arquivo a ser gerado deve conter também o path onde os arquivos serão salvos.
-
-Você pode usar a função `setLog(folder)` para definir a pasta onde salvar cada save gerado. 
+Você pode usar a função `setLog(folder)` para definir a pasta onde salvar cada save gerado.
 
 Utilizando o ffmpeg, é possível juntar todos os pngs em uma animação através do comando:
+
+Isso é feito automaticamente pela função `makeVideo(framerate, filename)`.
 
 ```bash
 ffmpeg -framerate 5 -pattern_type glob -i '*.png' -c:v libx264 -profile:v high -crf 20 -pix_fmt yuv420p video.mp4
@@ -504,3 +502,13 @@ ffmpeg -framerate 5 -pattern_type glob -i '*.png' -c:v libx264 -profile:v high -
 O framerate define a quantidade de imagens por segundo, se quiser que passe mais tempo numa imagem, diminua o framerate.
 
 Será gerado o arquivo video.mp4 na pasta atual.
+
+## Jogos
+
+Como a imagem é atualizada enquanto o programa roda, e é possível o input pelo terminal, diversos jogos são possíveis de serem feitos.
+
+[Código zero a 100](exemplo_jogos/zero_a_cem.c)
+
+![_](exemplo_jogos/jogo.png)
+
+![_](exemplo_jogos/tela.png)
