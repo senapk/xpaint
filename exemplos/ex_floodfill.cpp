@@ -51,19 +51,19 @@ void xgrid_matrix(matriz<Item> mat, list<Pos> path){
             Item& item = mat.get(Pos{l, c});
             
             fill("%c", item.wall ? WALL : EMPTY);
-            gridSquare(l, c);
+            gridSquare(c, l);
             if(item.distance != -1){
                 fill("%c", 'k');
-                gridText(l, c, "%d", item.distance);
+                gridText(c, l, 4, 4, "%d", item.distance);
             }
         }
     }
     int i = 0;
+    fill("violet");
+    stroke("0");
     for(auto p : path){
-        fill("violet");
-        gridCircle(p.l, p.c);
-        stroke("black");
-        gridText(p.l, p.c, "%d", i++);
+        gridCircle(p.c, p.l);
+        gridText(p.c, p.l, 4, 4, "%d", i++);
     }
 }
 

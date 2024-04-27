@@ -52,10 +52,10 @@ void line(double x0, double y0, double x1, double y1);
 // desenha uma elipse dado o ponto de centro, largura e altura
 void ellipse(double x0, double y0, double width, double height);
 
-// desenha um arco dado o ponto de centro, raio, espessura
+// desenha um arco dado o ponto de centro, diametro externo, diametro interno
 // o angulo de inicio e o comprimento do arco em graus
 // ambos os valores de ângulo podem ser negativos
-void arc(double centerx, double centery, int radius, int thickness, int degrees_begin, int degrees_lenght);
+void arc(double centerx, double centery, int out_diameter, int in_diameter, int degrees_begin, int degrees_lenght);
 
 // desenha um círculo dado o ponto de centro e o diâmetro
 void circle(int centerx, int centery, int diameter);

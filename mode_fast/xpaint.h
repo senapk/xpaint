@@ -226,10 +226,10 @@ void line(double x0, double y0, double x1, double y1);
 // desenha uma elipse dado o ponto de centro, largura e altura
 void ellipse(double x0, double y0, double width, double height);
 
-// desenha um arco dado o ponto de centro, raio, espessura
+// desenha um arco dado o ponto de centro, diametro externo, diametro interno
 // o angulo de inicio e o comprimento do arco em graus
 // ambos os valores de ângulo podem ser negativos
-void arc(double centerx, double centery, int radius, int thickness, int degrees_begin, int degrees_lenght);
+void arc(double centerx, double centery, int out_diameter, int in_diameter, int degrees_begin, int degrees_lenght);
 
 // desenha um círculo dado o ponto de centro e o diâmetro
 void circle(int centerx, int centery, int diameter);
@@ -255,7 +255,7 @@ void triangle(double x0, double y0, double x1, double y1, double x2, double y2);
 // ----------------------------------------------------------------------------
 
 // muda o tamanho da font
-// OBS: a font só muda em múltiplos de 8, ex: 8, 16, 24, ...
+// OBS: a font só muda em múltiplos de 10, ex: 10, 20, 30, ...
 void textSize(int size);
 
 // escreve utilizando o formato printf
@@ -359,13 +359,16 @@ int xrandi(int min, int max);
 void gridInit(int side, int sep);
 
 // plota um quadrado na célula
-void gridSquare(int l, int c);
+void gridSquare(int x, int y);
 
 // plota um círculo na célula
-void gridCircle(int l, int c);
+void gridCircle(int x, int y);
 
-// escreve um texto de até 5 caracteres na célula
-void gridText(int l, int c, const char *format, ...);
+V2d gridPos(int x, int y);
+
+// escreve o texto na posição da grid (x, y)
+// texto pode ser ajustado usando dx e dy
+void gridText(int x, int y, int dx, int dy, const char *format, ...);
 
 
 // ---------------------------- VETORES ---------------------------------------

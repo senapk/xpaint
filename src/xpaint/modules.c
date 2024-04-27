@@ -17,25 +17,32 @@ void gridInit(int side, int sep){
     __X_GRID_SEP = sep;
 }
 
-void gridSquare(int l, int c){
+void gridSquare(int x, int y){
     int size = __X_GRID_SIZE, sep = __X_GRID_SEP;
-    rect(c * size + sep, l * size + sep, size - sep, size - sep);
-}
-
-void gridCircle(int l, int c){
-    circle(c * __X_GRID_SIZE + __X_GRID_SIZE / 2, l * __X_GRID_SIZE + __X_GRID_SIZE / 2,
-                  __X_GRID_SIZE - __X_GRID_SEP + 1);
+    rect(x * size + sep, y * size + sep, size - sep, size - sep);
 }
 
 
-void gridText(int l, int c, const char *format, ...){
+void gridCircle(int x, int y){
+    circle(x * __X_GRID_SIZE + __X_GRID_SIZE / 2,
+           y * __X_GRID_SIZE + __X_GRID_SIZE / 2,
+               __X_GRID_SIZE - __X_GRID_SEP + 1);
+}
+
+V2d gridPos(int x, int y){
+    return v2d(x * __X_GRID_SIZE + __X_GRID_SIZE / 2,
+               y * __X_GRID_SIZE + __X_GRID_SIZE / 2);
+}
+
+
+void gridText(int x, int y, int dx, int dy, const char *format, ...){
     char _text[1000];
     va_list args;
     va_start( args, format );
     vsprintf(_text, format, args);
     va_end( args );
-    float xdelta = 0.13, ydelta = 0.35;
-    text((c + xdelta) * __X_GRID_SIZE, (l + ydelta) * __X_GRID_SIZE, "%s", _text);
+    text(x * __X_GRID_SIZE + dx, 
+         y * __X_GRID_SIZE + dy, "%s", _text);
 
 }
 

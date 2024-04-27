@@ -8,7 +8,7 @@
 // ----------------------------------------------------------------------------
 
 // muda o tamanho da font
-// OBS: a font só muda em múltiplos de 8, ex: 8, 16, 24, ...
+// OBS: a font só muda em múltiplos de 10, ex: 10, 20, 30, ...
 void textSize(int size);
 
 // escreve utilizando o formato printf

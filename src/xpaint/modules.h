@@ -5,6 +5,7 @@
 // ----------------------------------------------------------------------------
 
 #include <stdarg.h>
+#include "base.h" /*XDDDX*/
 
 // inicia o grid
 // side é o tamanho da célula
@@ -12,13 +13,16 @@
 void gridInit(int side, int sep);
 
 // plota um quadrado na célula
-void gridSquare(int l, int c);
+void gridSquare(int x, int y);
 
 // plota um círculo na célula
-void gridCircle(int l, int c);
+void gridCircle(int x, int y);
 
-// escreve um texto de até 5 caracteres na célula
-void gridText(int l, int c, const char *format, ...);
+V2d gridPos(int x, int y);
+
+// escreve o texto na posição da grid (x, y)
+// texto pode ser ajustado usando dx e dy
+void gridText(int x, int y, int dx, int dy, const char *format, ...);
 
 
 // ---------------------------- VETORES ---------------------------------------

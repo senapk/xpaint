@@ -11,16 +11,16 @@ void xgrid_matrix(int nl, int nc, char mat[nl][nc]){
     for(l = 0; l < nl; l++)
         for(c = 0; c < nc; c++){
             stroke("%c", mat[l][c]);
-            gridSquare(l, c);
+            gridSquare(c, l);
             fill("%c", colors[(c + l) % strlen(colors)]);
-            gridCircle(l, c);
+            gridCircle(c, l);
             stroke("k");
             if(rand() % 2 == 0)
-                gridText(l, c, "%d", rand() % 500 - 250);
+                gridText(c, l, 10, 30, "%d", rand() % 500 - 250);
             else{
                 char str[] = "abcdef";
                 str[rand() % 5 + 1] = '\0';
-                gridText(l, c, str);
+                gridText(c, l, 10, 30, str);
             }
         }
 }
@@ -28,6 +28,7 @@ void xgrid_matrix(int nl, int nc, char mat[nl][nc]){
 int main(){
     int w = 902, h = 602, side = 100;
     open(w, h, "figura_grid");
+    srand(0);
     gridInit(side, 2);
     int nl = h / side, nc = w / side;
     char mat[nl][nc];

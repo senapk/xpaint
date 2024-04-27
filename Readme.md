@@ -21,9 +21,9 @@ O objetivo desse projeto é criar uma biblioteca header only para programar em C
   - [Funções Matemáticas](#funções-matemáticas)
   - [Módulo Turtle de Desenho](#módulo-turtle-de-desenho)
   - [Módulo de Matrizes](#módulo-de-matrizes)
-  - [Controle interativo](#controle-interativo)
   - [Módulo de Vetores](#módulo-de-vetores)
-- [Criando animações](#criando-animações)
+  - [Criando animaçoes](#criando-animaçoes)
+- [Jogos](#jogos)
 <!-- toc -->
 
 ---
@@ -81,8 +81,8 @@ curl -sSL https://raw.githubusercontent.com/senapk/xpaint/master/install/install
 
 ## Configurando o Replit
 
-- Crie um replit em C
-- Execute o comando de download do xlite e do Makefile no shell do seu replit.
+- Crie um replit em C.
+- Execute o comando de download do xpaint e do Makefile no shell do seu replit.
 - Aperte o botão verde.
 
 ---
@@ -131,7 +131,7 @@ Ele deve gerar o arquivo figura_base.png que se parece com isso:
 
 Se você clonar esse repositório, entrar na pasta exemplos e der um make, ele vai compilar e re-gerar todas as figuras.
 
-Esta é uma biblioteca header only, ou seja, não está dividida em .c e .h. Declarações e definições estão todas no .h.
+Se estiver utilizando a versão header-only da biblioteca, ela não está dividida em .c e .h. Declarações e definições estão todas no .h.
 
 Se você der o include na biblioteca ele vai incluir as declarações apenas, ou seja, os cabeçalhos.
 No módulo principal do seu programa, você deve dar o #define `XPAINT` para incluir também as definições.
@@ -507,8 +507,6 @@ Será gerado o arquivo video.mp4 na pasta atual.
 
 Como a imagem é atualizada enquanto o programa roda, e é possível o input pelo terminal, diversos jogos são possíveis de serem feitos.
 
-[Código zero a 100](exemplo_jogos/zero_a_cem.c)
+[Código zero a 100](exemplos_jogos/zero_a_cem.c)
 
-![_](exemplo_jogos/jogo.png)
-
-![_](exemplo_jogos/tela.png)
+![_](exemplos_jogos/jogo.png)

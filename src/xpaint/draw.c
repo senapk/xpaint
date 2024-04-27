@@ -743,36 +743,44 @@ void __arc(double centerx, double centery, int diameter, int thickness, int degr
 }
 
 
-void arc(double centerx, double centery, int diameter, int thickness, int degrees_begin, int degrees_lenght) {
+void arc(double centerx, double centery, int out_diameter, int in_diameter, int degrees_begin, int degrees_lenght) {
+    double thickness = in_diameter / 2.0;
+    if (thickness < 0) {
+        thickness = 0;
+    }
+    if (thickness > out_diameter / 2.0) {
+        thickness = out_diameter / 2.0;
+    }
+    
     if (__fill_enable) {
-        __arc(centerx, centery, diameter, thickness, degrees_begin, degrees_lenght, __fill);
+        __arc(centerx, centery, out_diameter, thickness, degrees_begin, degrees_lenght, __fill);
     }
     if (__stroke_enable) {
-        __arc(centerx, centery, diameter, __thickness, degrees_begin, degrees_lenght, __stroke);
-        __arc(centerx, centery, diameter - 2 *  thickness, __thickness, degrees_begin, degrees_lenght, __stroke);
+        __arc(centerx, centery, out_diameter, __thickness, degrees_begin, degrees_lenght, __stroke);
+        __arc(centerx, centery, out_diameter - 2 *  thickness, __thickness, degrees_begin, degrees_lenght, __stroke);
 
         //draw a line from begin __point to end __point
         //convert degrees to radians
+        double r = out_diameter / 2.0;
         {
             double c = xcos(degrees_begin);
             double s = xsin(degrees_begin);
-            double x0 = centerx + (diameter / 2) * c;
-            double y0 = centery - (diameter / 2) * s;
-            double x1 = centerx + (-thickness + diameter / 2) * c;
-            double y1 = centery - (-thickness + diameter / 2) * s;
+            double x0 = centerx + r * c;
+            double y0 = centery - r * s;
+            double x1 = centerx + (r - thickness) * c;
+            double y1 = centery - (r - thickness) * s;
             line(x0, y0, x1, y1);
         }
         {
             double c = xcos(degrees_begin + degrees_lenght);
             double s = xsin(degrees_begin + degrees_lenght);
-            double x0 = centerx + (diameter / 2) * c;
-            double y0 = centery - (diameter / 2) * s;
-            double x1 = centerx + (-thickness + diameter / 2) * c;
-            double y1 = centery - (-thickness + diameter / 2) * s;
+            double x0 = centerx + r * c;
+            double y0 = centery - r * s;
+            double x1 = centerx + (r - thickness) * c;
+            double y1 = centery - (r - thickness) * s;
             line(x0, y0, x1, y1);
         }
     }
-    
 }
 
 //returns fractional part of a number
