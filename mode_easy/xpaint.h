@@ -145,6 +145,8 @@ void setLog(const char * folder);
 void makeVideo(int framerate, const char * mp4_filename);
 
 typedef struct {
+    double cx;
+    double cy;
     double dx;
     double dy;
     double s;
@@ -168,11 +170,14 @@ void scale(double s);
 // define a rotação da camada de transformação atual
 void rotate(double angle); 
 
+// define o centro de rotação da transformação atual
+void center(double x, double y);
+
 // ---------------------------- FUNÇÕES INTERNAS ------------------------------
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
 
-void   __plot(int x, int y,  Color color);
+void   __plot(double x, double y,  Color color);
 V2d    __transform(double x, double y);
 double __get_transform_scale();
 
@@ -334,7 +339,7 @@ double xcos(double d);
 // calcula o arco cosseno de x em graus
 double xacos(double x);
 
-// calcula o arco seno de x em graus
+// valor absoluto de um float
 double xfabs(double f);
 
 // gera um valor inteiro aleatório entre 0 e max
@@ -8907,48 +8912,18 @@ void __alpha_plot(int x, int y, Color _color) {
     }
 }
 
-// void __alias_plot(int x, int y, Color pixel) {
-//     if (x >= 1 && x < (int) __board_width && y >= 1 && y < (int) __board_height) {
-// // Atualize o pixel na posição (x, y) com o pixel fornecido
-//         // canvas[x][y] = pixel;
-//         __raw_plot(x, y, pixel);
-
-//         // Interpolação bilinear para calcular os valores dos pixels circundantes
-//         float alpha = (float)(pixel.a) / 255.0;
-//         float r = (float)(pixel.r) * alpha;
-//         float g = (float)(pixel.g) * alpha;
-//         float b = (float)(pixel.b) * alpha;
-
-//         // Pixels vizinhos
-//         int neighbors[4][2] = {{x-1, y}, {x+1, y}, {x, y-1}, {x, y+1}};
-//         float weights[4] = {0.25, 0.25, 0.25, 0.25};
-
-//         for (int i = 0; i < 4; ++i) {
-//             int nx = neighbors[i][0];
-//             int ny = neighbors[i][1];
-//             if (nx >= 0 && nx < 100 && ny >= 0 && ny < 100) {
-//                 float w = weights[i];
-//                 __pixel(nx, ny)[0] = (unsigned char)((float)__pixel(nx, ny)[0] * (1.0 - w) + r * w);
-//                 __pixel(nx, ny)[1] = (unsigned char)((float)__pixel(nx, ny)[1] * (1.0 - w) + g * w);
-//                 __pixel(nx, ny)[2] = (unsigned char)((float)__pixel(nx, ny)[2] * (1.0 - w) + b * w);
-//             }
-//         }
-//     }
-// }
-
-
 void __normal_plot(int x, int y,  Color color) {
     if((x >= 0) && (x < (int) __board_width) && (y >= 0) && (y <  (int) __board_height)) {
         __alpha_plot(x, y, color);
     }
 }
 
-void __plot(int x, int y,  Color color) {
+void __plot(double x, double y,  Color color) {
     if(!__board_is_open){
         fprintf(stderr, "fail: x_open(weight, width, filename) missing\n");
         exit(1);
     }
-    __normal_plot(x, y, color);
+    __normal_plot(xround(x), xround(y), color);
     // __alias_plot(x, y, color);
 }
 
@@ -9112,7 +9087,7 @@ void push() {
         fprintf(stderr, "fail: max stack size reached\n");
         exit(1);
     }
-    __board_transform[__board_transform_index] = (Transform) {0, 0, 1, 0};
+    __board_transform[__board_transform_index] = (Transform) {0, 0, 0, 0, 1, 0};
 }
 
 void pop() {
@@ -9140,6 +9115,15 @@ void scale(double s) {
     __board_transform[__board_transform_index].s = s;
 }
 
+void center(double x, double y) {
+    if(__board_transform_index < 0){
+        fprintf(stderr, "fail: stack is empty\n");
+        exit(1);
+    }
+    __board_transform[__board_transform_index].cx = x;
+    __board_transform[__board_transform_index].cy = y;
+}
+
 void rotate(double angle) {
     if(__board_transform_index < 0){
         fprintf(stderr, "fail: stack is empty\n");
@@ -9153,11 +9137,18 @@ V2d __transform(double x, double y) {
     V2d __point = v2d(x, y);
     for(int i = 0; i <= __board_transform_index; i++) {
         Transform t = __board_transform[i];
-        double angle = t.angle;
+        __point.x -= t.cx;
+        __point.y -= t.cy;
         double x = __point.x;
         double y = __point.y;
-        __point.x = x * xcos(angle) - y * xsin(angle);
-        __point.y = x * xsin(angle) + y * xcos(angle);
+        double angle = t.angle;
+        // if (angle != 0 && angle != 180) {
+            __point.x = x * xcos(angle) - y * xsin(angle);
+            __point.y = x * xsin(angle) + y * xcos(angle);
+        // }
+        __point.x += t.cx;
+        __point.y += t.cy;
+
         __point.x *= t.s;
         __point.y *= t.s;
         __point.x += t.dx;
@@ -9189,9 +9180,9 @@ static bool      __fill_enable = true;
 static int       __thickness = 1;
 
 
-void __plot_block(int x, int y, int side, Color color);
+void __plot_block(double x, double y, int side, Color color);
 // desenha uma linha com antialias sem transformação e sem espessura
-void __raw_alias_line(int x0 , int y0 , int x1 , int y1, Color color);
+void __raw_alias_line(double x0 , double y0 , double x1 , double y1, Color color);
 // divida pela escala atual antes de fazer a transformação
 void __point_scale(double x, double y, Color color);
 // desenha uma linha com transf espessura de 1 pixel entre os pontos (x0, y0) e (x1, y1)
@@ -9199,7 +9190,7 @@ void __draw_line(double x0, double y0, double x1, double y1, Color color);
 // divide pela escala atual antes de fazer a transformação
 void __draw_line_scale(double x0 , double y0 , double x1 , double y1, Color color);
 // linha de espessura 1 sem transformação
-void __raw_line(int x0, int y0, int x1, int y1, Color color);
+void __raw_line(double x0, double y0, double x1, double y1, Color color);
 // desenha uma linha com espessura de thickness pixels entre os pontos (x0, y0) e (x1, y1)
 void __fill_line(double x0, double y0, double x1, double y1, int thickness, Color color);
 // desenha um circulo dado centro e raio
@@ -9213,7 +9204,7 @@ void __fill_rect(double x0, double y0, double width, double height);
 // desenha um triangulo dados os 3 vertices
 void __fill_raw_triangle(double v1x, double v1y, double v2x, double v2y, double v3x, double v3y, Color color);
 
-void __plot_block(int x, int y, int side, Color color){
+void __plot_block(double x, double y, int side, Color color){
     for(int i = x; i < x + side; i++)
         for(int j = y; j < y + side; j++)
             __plot(i, j, color);
@@ -9225,17 +9216,26 @@ void strokeWeight(int thickness){
 
 void __point(double x, double y, Color color){
     V2d p = __transform(x, y);
-    __plot((int) p.x, (int) p.y, color);
+    __plot(p.x, p.y, color);
 }
 
 void point(double x, double y) {
-    __point(x, y, __stroke);
+    double s = __get_transform_scale();
+    if (s < 2) {
+        __point(x, y, __stroke);
+        return;
+    }
+    for (int i = 0; i < s; ++i) {
+        for (int j = 0; j < s; ++j) {
+            __point(x + (i / s), y + (j / s), __stroke);
+        }
+    }
 }
 
 void __point_scale(double x, double y, Color color){
     double s = __get_transform_scale();
     V2d p = __transform(x/s, y/s);
-    __plot((int) p.x, (int) p.y, color);
+    __plot(p.x, p.y, color);
 }
 
 void stroke(const char * format, ...) {
@@ -9322,7 +9322,7 @@ int ascArt(int x, int y, int zoom, const char * picture){
     return (maxdx + 1) * zoom;
 }
 
-void __raw_line(int x0, int y0, int x1, int y1, Color color) {
+void __raw_line_int(int x0, int y0, int x1, int y1, Color color) {
     /* Bresenham's Line Algorithm */
     int dx = (x0 > x1) ? x0 - x1 : x1 - x0;
     int dy = (y0 > y1) ? y0 - y1 : y1 - y0;
@@ -9345,6 +9345,10 @@ void __raw_line(int x0, int y0, int x1, int y1, Color color) {
     }
 }
 
+void __raw_line(double x0, double y0, double x1, double y1, Color color) {
+    __raw_line_int(xround(x0), xround(y0), xround(x1), xround(y1), color);
+}
+
 void __x_fill_bottom_flat_triangle(double v1x, double v1y, double v2x, double v2y, double v3x, double v3y, Color color)
 {
     double invslope1 = ((int)v2x - (int)v1x) / (double)((int)v2y - (int)v1y);
@@ -9352,9 +9356,8 @@ void __x_fill_bottom_flat_triangle(double v1x, double v1y, double v2x, double v2
 
     double curx1 = v1x;
     double curx2 = v1x;
-    int scanlineY;
 
-    for (scanlineY = v1y; scanlineY <= (int)v2y; scanlineY++){
+    for (int scanlineY = v1y; scanlineY <= v2y; scanlineY++){
         __raw_line(curx1, scanlineY, curx2, scanlineY, color);
         curx1 += invslope1;
         curx2 += invslope2;
@@ -9369,9 +9372,7 @@ void __x_fill_top_flat_triangle(double v1x, double v1y, double v2x, double v2y, 
     double curx1 = v3x;
     double curx2 = v3x;
 
-    int scanlineY;
-
-    for (scanlineY = v3y; scanlineY >= v1y; scanlineY--)
+    for (int scanlineY = v3y; scanlineY >= v1y; scanlineY--)
     {
         __raw_line(curx1, scanlineY, curx2, scanlineY, color);
         curx1 -= invslope1;
@@ -9441,12 +9442,12 @@ void rect(double x, double y, double witdh, double height) {
     if (__fill_enable) {
         __fill_rect(x, y, witdh, height);
     }
-    if (__stroke_enable) {
-        __fill_line(x, y, x + witdh, y, __thickness, __stroke);
-        __fill_line(x + witdh, y, x + witdh, y + height, __thickness, __stroke);
-        __fill_line(x + witdh, y + height, x, y + height, __thickness, __stroke);
-        __fill_line(x, y + height, x, y, __thickness, __stroke);
-    }
+    // if (__stroke_enable) {
+    //     __fill_line(x, y, x + witdh, y, __thickness, __stroke);
+    //     __fill_line(x + witdh, y, x + witdh, y + height, __thickness, __stroke);
+    //     __fill_line(x + witdh, y + height, x, y + height, __thickness, __stroke);
+    //     __fill_line(x, y + height, x, y, __thickness, __stroke);
+    // }
 }
 
 void triangle(double xa, double ya, double xb, double yb, double xc, double yc){
@@ -9704,13 +9705,13 @@ void __fill_ellipse(double x0, double y0, double width, double height){
     int * lined = (int *) calloc((int) (height + 1), sizeof(int));
     
     do {
-        if(lined[(int)(y0 - ytop)] == 0){
+        if(lined[xround(y0 - ytop)] == 0){
             __draw_line_scale(x1, y0, x0, y0, __fill); /*   I. Quadrant */
-            lined[(int)(y0 - ytop)] = 1;
+            lined[xround(y0 - ytop)] = 1;
         }
-        if(lined[(int)(y1 - ytop)] == 0){
+        if(lined[xround(y1 - ytop)] == 0){
             __draw_line_scale(x0, y1, x1, y1, __fill); /* III. Quadrant */
-            lined[(int)(y1 - ytop)] = 1;
+            lined[xround(y1 - ytop)] = 1;
         }
         e2 = 2*err;
         if (e2 <= dy) { y0++; y1--; err += dy += a; }  /* y step */
@@ -9969,7 +9970,7 @@ double __r_fractional(double x) {
 // draws a pixel on screen of given brightness
 // 0<=brightness<=1. We can use your own library
 // to draw on screen
-void __plot_raw_bright_pixel( int x , int y , Color color, double brightness)
+void __plot_raw_bright_pixel(double x , double y , Color color, double brightness)
 {
     color.r = color.r * brightness;
     color.g = color.g * brightness;
@@ -9979,18 +9980,18 @@ void __plot_raw_bright_pixel( int x , int y , Color color, double brightness)
     __plot(x, y, color);
 }
 
-void __raw_alias_line(int x0 , int y0 , int x1 , int y1, Color color) {
+void __raw_alias_line(double x0 , double y0 , double x1 , double y1, Color color) {
 	int steep = xfabs(y1 - y0) > xfabs(x1 - x0) ;
 
 	// swap the co-ordinates if slope > 1 or we
 	// draw backwards
 	if (steep) {
-        X_SWAP(x0, y0, int);
-        X_SWAP(x1, y1, int);
+        X_SWAP(x0, y0, double);
+        X_SWAP(x1, y1, double);
 	}
 	if (x0 > x1) {
-        X_SWAP(x0, x1, int);
-        X_SWAP(y0, y1, int);
+        X_SWAP(x0, x1, double);
+        X_SWAP(y0, y1, double);
 	}
 
 	//compute the slope
@@ -10009,16 +10010,16 @@ void __raw_alias_line(int x0 , int y0 , int x1 , int y1, Color color) {
 		for (int x = xpxl1 ; x <=xpxl2 ; x++) {
 			// pixel coverage is determined by fractional
 			// part of y co-ordinate
-			__plot_raw_bright_pixel((int) intersectY    , x, color, __r_fractional(intersectY));
-			__plot_raw_bright_pixel((int) intersectY + 1, x, color, __m_fractional(intersectY));
+			__plot_raw_bright_pixel(intersectY    , x, color, __r_fractional(intersectY));
+			__plot_raw_bright_pixel(intersectY + 1, x, color, __m_fractional(intersectY));
 			intersectY += gradient;
 		}
 	} else {
 		for (int x = xpxl1 ; x <=xpxl2 ; x++) {
 			// pixel coverage is determined by fractional
 			// part of y co-ordinate
-			__plot_raw_bright_pixel(x, (int) intersectY    , color, __r_fractional(intersectY));
-			__plot_raw_bright_pixel(x, (int) intersectY + 1, color, __m_fractional(intersectY));
+			__plot_raw_bright_pixel(x, intersectY    , color, __r_fractional(intersectY));
+			__plot_raw_bright_pixel(x, intersectY + 1, color, __m_fractional(intersectY));
 			intersectY += gradient;
 		}
 	}

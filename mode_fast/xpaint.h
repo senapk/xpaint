@@ -145,6 +145,8 @@ void setLog(const char * folder);
 void makeVideo(int framerate, const char * mp4_filename);
 
 typedef struct {
+    double cx;
+    double cy;
     double dx;
     double dy;
     double s;
@@ -168,11 +170,14 @@ void scale(double s);
 // define a rotação da camada de transformação atual
 void rotate(double angle); 
 
+// define o centro de rotação da transformação atual
+void center(double x, double y);
+
 // ---------------------------- FUNÇÕES INTERNAS ------------------------------
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
 
-void   __plot(int x, int y,  Color color);
+void   __plot(double x, double y,  Color color);
 V2d    __transform(double x, double y);
 double __get_transform_scale();
 
@@ -334,7 +339,7 @@ double xcos(double d);
 // calcula o arco cosseno de x em graus
 double xacos(double x);
 
-// calcula o arco seno de x em graus
+// valor absoluto de um float
 double xfabs(double f);
 
 // gera um valor inteiro aleatório entre 0 e max

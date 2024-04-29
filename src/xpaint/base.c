@@ -126,48 +126,18 @@ void __alpha_plot(int x, int y, Color _color) {
     }
 }
 
-// void __alias_plot(int x, int y, Color pixel) {
-//     if (x >= 1 && x < (int) __board_width && y >= 1 && y < (int) __board_height) {
-// // Atualize o pixel na posição (x, y) com o pixel fornecido
-//         // canvas[x][y] = pixel;
-//         __raw_plot(x, y, pixel);
-
-//         // Interpolação bilinear para calcular os valores dos pixels circundantes
-//         float alpha = (float)(pixel.a) / 255.0;
-//         float r = (float)(pixel.r) * alpha;
-//         float g = (float)(pixel.g) * alpha;
-//         float b = (float)(pixel.b) * alpha;
-
-//         // Pixels vizinhos
-//         int neighbors[4][2] = {{x-1, y}, {x+1, y}, {x, y-1}, {x, y+1}};
-//         float weights[4] = {0.25, 0.25, 0.25, 0.25};
-
-//         for (int i = 0; i < 4; ++i) {
-//             int nx = neighbors[i][0];
-//             int ny = neighbors[i][1];
-//             if (nx >= 0 && nx < 100 && ny >= 0 && ny < 100) {
-//                 float w = weights[i];
-//                 __pixel(nx, ny)[0] = (unsigned char)((float)__pixel(nx, ny)[0] * (1.0 - w) + r * w);
-//                 __pixel(nx, ny)[1] = (unsigned char)((float)__pixel(nx, ny)[1] * (1.0 - w) + g * w);
-//                 __pixel(nx, ny)[2] = (unsigned char)((float)__pixel(nx, ny)[2] * (1.0 - w) + b * w);
-//             }
-//         }
-//     }
-// }
-
-
 void __normal_plot(int x, int y,  Color color) {
     if((x >= 0) && (x < (int) __board_width) && (y >= 0) && (y <  (int) __board_height)) {
         __alpha_plot(x, y, color);
     }
 }
 
-void __plot(int x, int y,  Color color) {
+void __plot(double x, double y,  Color color) {
     if(!__board_is_open){
         fprintf(stderr, "fail: x_open(weight, width, filename) missing\n");
         exit(1);
     }
-    __normal_plot(x, y, color);
+    __normal_plot(xround(x), xround(y), color);
     // __alias_plot(x, y, color);
 }
 
@@ -331,7 +301,7 @@ void push() {
         fprintf(stderr, "fail: max stack size reached\n");
         exit(1);
     }
-    __board_transform[__board_transform_index] = (Transform) {0, 0, 1, 0};
+    __board_transform[__board_transform_index] = (Transform) {0, 0, 0, 0, 1, 0};
 }
 
 void pop() {
@@ -359,6 +329,15 @@ void scale(double s) {
     __board_transform[__board_transform_index].s = s;
 }
 
+void center(double x, double y) {
+    if(__board_transform_index < 0){
+        fprintf(stderr, "fail: stack is empty\n");
+        exit(1);
+    }
+    __board_transform[__board_transform_index].cx = x;
+    __board_transform[__board_transform_index].cy = y;
+}
+
 void rotate(double angle) {
     if(__board_transform_index < 0){
         fprintf(stderr, "fail: stack is empty\n");
@@ -372,11 +351,18 @@ V2d __transform(double x, double y) {
     V2d __point = v2d(x, y);
     for(int i = 0; i <= __board_transform_index; i++) {
         Transform t = __board_transform[i];
-        double angle = t.angle;
+        __point.x -= t.cx;
+        __point.y -= t.cy;
         double x = __point.x;
         double y = __point.y;
-        __point.x = x * xcos(angle) - y * xsin(angle);
-        __point.y = x * xsin(angle) + y * xcos(angle);
+        double angle = t.angle;
+        // if (angle != 0 && angle != 180) {
+            __point.x = x * xcos(angle) - y * xsin(angle);
+            __point.y = x * xsin(angle) + y * xcos(angle);
+        // }
+        __point.x += t.cx;
+        __point.y += t.cy;
+
         __point.x *= t.s;
         __point.y *= t.s;
         __point.x += t.dx;

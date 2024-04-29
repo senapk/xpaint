@@ -65,7 +65,7 @@ double xcos(double d);
 // calcula o arco cosseno de x em graus
 double xacos(double x);
 
-// calcula o arco seno de x em graus
+// valor absoluto de um float
 double xfabs(double f);
 
 // gera um valor inteiro aleatório entre 0 e max
