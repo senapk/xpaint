@@ -56,7 +56,16 @@ void __point(double x, double y, Color color){
 }
 
 void point(double x, double y) {
-    __point(x, y, __stroke);
+    double s = __get_transform_scale();
+    if (s < 2) {
+        __point(x, y, __stroke);
+        return;
+    }
+    for (int i = 0; i < s; ++i) {
+        for (int j = 0; j < s; ++j) {
+            __point(x + (i / s), y + (j / s), __stroke);
+        }
+    }
 }
 
 void __point_scale(double x, double y, Color color){
