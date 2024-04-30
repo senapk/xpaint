@@ -99,15 +99,15 @@ void setFilename(const char * filename){
         strcpy(__board_filename, "");
 }
 
-void __raw_plot(int x, int y, Color _color) {
-    uchar color[__X_BYTES_PER_PIXEL];
-    color[0] = _color.r;
-    color[1] = _color.g;
-    color[2] = _color.b;
-    color[3] = _color.a;
-    uchar * pos = __pixel((unsigned) x, (unsigned) y);
-    memcpy(pos, color, __X_BYTES_PER_PIXEL * sizeof(uchar));
-}
+// void __raw_plot(int x, int y, Color _color) {
+//     uchar color[__X_BYTES_PER_PIXEL];
+//     color[0] = _color.r;
+//     color[1] = _color.g;
+//     color[2] = _color.b;
+//     color[3] = _color.a;
+//     uchar * pos = __pixel((unsigned) x, (unsigned) y);
+//     memcpy(pos, color, __X_BYTES_PER_PIXEL * sizeof(uchar));
+// }
 
 void __alpha_plot(int x, int y, Color _color) {
     uchar color[__X_BYTES_PER_PIXEL];
@@ -126,19 +126,15 @@ void __alpha_plot(int x, int y, Color _color) {
     }
 }
 
-void __normal_plot(int x, int y,  Color color) {
-    if((x >= 0) && (x < (int) __board_width) && (y >= 0) && (y <  (int) __board_height)) {
-        __alpha_plot(x, y, color);
-    }
-}
 
 void __plot(double x, double y,  Color color) {
     if(!__board_is_open){
         fprintf(stderr, "fail: x_open(weight, width, filename) missing\n");
         exit(1);
     }
-    __normal_plot(xround(x), xround(y), color);
-    // __alias_plot(x, y, color);
+    if((x >= 0) && (x < (int) __board_width) && (y >= 0) && (y <  (int) __board_height)) {
+        __alpha_plot(x, y, color);
+    }
 }
 
 
@@ -351,18 +347,18 @@ V2d __transform(double x, double y) {
     V2d __point = v2d(x, y);
     for(int i = 0; i <= __board_transform_index; i++) {
         Transform t = __board_transform[i];
-        __point.x -= t.cx;
-        __point.y -= t.cy;
-        double x = __point.x;
-        double y = __point.y;
-        double angle = t.angle;
-        // if (angle != 0 && angle != 180) {
+        if (t.angle != 0) {
+            __point.x -= t.cx;
+            __point.y -= t.cy;
+            double x = __point.x;
+            double y = __point.y;
+            double angle = t.angle;
+            // if (angle != 0 && angle != 180) {
             __point.x = x * xcos(angle) - y * xsin(angle);
             __point.y = x * xsin(angle) + y * xcos(angle);
-        // }
-        __point.x += t.cx;
-        __point.y += t.cy;
-
+            __point.x += t.cx;
+            __point.y += t.cy;
+        }
         __point.x *= t.s;
         __point.y *= t.s;
         __point.x += t.dx;
