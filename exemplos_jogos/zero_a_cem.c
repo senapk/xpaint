@@ -25,7 +25,7 @@ void draw(int inf, int sup) {
 
 int main() {
   puts("Abra a tela.png para começar a jogar");
-  open(800, 250, "tela");
+  xopen(800, 250, "tela");
   strokeWeight(2);
   int escolha = xrandi(1, 101);
   int inf = 0;
@@ -49,6 +49,6 @@ int main() {
       break;
     }
   }
-  close(); // libera recursos alocados
+  xclose(); // libera recursos alocados
   return 0;
 }

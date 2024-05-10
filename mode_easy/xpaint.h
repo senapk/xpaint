@@ -31,14 +31,14 @@ Versão: 1.1
 #include "xpaint.h"
 int main(){
     int largura = 600, altura = 500;
-    open(largura, altura, "figura_base"); 
+    xopen(largura, altura, "figura_base"); 
     text(50, 30, "Pintarei um circulo vermelho em %d %d", largura/2, altura/2);
     background("white");
     stroke("black");
     fill("red")
     circle(largura/2, altura/2, 200);
     save();
-    close();
+    xclose();
     return 0;
 }
 #endif
@@ -100,7 +100,7 @@ void __init_colors(void);
 #include <stdarg.h>
 
 // inicia o canvas de width x height, e define o nome do arquivo png a ser gerado
-void open(unsigned int width, unsigned int height, const char * filename);
+void xopen(unsigned int width, unsigned int height, const char * filename);
 
 // altura do canvas
 int height(void);
@@ -116,7 +116,7 @@ uchar  * getBitmap(void);
 
 
 // finaliza o canvas
-void close(void);
+void xclose(void);
 
 // muda o nome do arquivo png a ser gerado
 void setFilename(const char * filename);
@@ -167,7 +167,7 @@ void pop();
 void translate(double dx, double dy);
 // define a escala da camada de transformação atual
 void scale(double s);
-// define a rotação da camada de transformação atual
+// define a rotação da camada de transformação atual no sentido horario
 void rotate(double angle); 
 
 // define o centro de rotação da transformação atual
@@ -8835,7 +8835,7 @@ uchar * __pixel(unsigned int x, unsigned int y) {
 //__plot sem as verificações de limite
 void __alpha_plot(int x, int y, Color color);
 
-void open(unsigned int width, unsigned int height, const char * filename){
+void xopen(unsigned int width, unsigned int height, const char * filename){
     if(__board_is_open){
         fprintf(stderr, "fail: bitmat already open\n");
         return;
@@ -8869,7 +8869,7 @@ const char * getFilename(void){
     return __board_filename;
 }
 
-void close(void){
+void xclose(void){
     if(__board_bitmap != NULL){
         free(__board_bitmap);
         __board_is_open = false;
@@ -9139,7 +9139,6 @@ V2d __transform(double x, double y) {
             double x = __point.x;
             double y = __point.y;
             double angle = t.angle;
-            // if (angle != 0 && angle != 180) {
             __point.x = x * xcos(angle) - y * xsin(angle);
             __point.y = x * xsin(angle) + y * xcos(angle);
             __point.x += t.cx;
@@ -9735,7 +9734,7 @@ void __arc(double centerx, double centery, int diameter, int thickness, int degr
 
 
 void arc(double centerx, double centery, int out_diameter, int in_diameter, int degrees_begin, int degrees_lenght) {
-    double thickness = in_diameter / 2.0;
+    double thickness = out_diameter - in_diameter;
     if (thickness < 0) {
         thickness = 0;
     }

@@ -2,7 +2,7 @@
 #include "xpaint.h"
 
 int main() {
-    open(600, 600, "figura_cores");
+    xopen(600, 600, "figura_cores");
     textSize(50);
     noStroke();
     background("0");
@@ -39,7 +39,7 @@ int main() {
     text(40, 480, "Na paleta, cada letra corresponde a uma cor.");
     save();
 
-    close();
+    xclose();
     return 0;
 }
 

@@ -98,7 +98,7 @@ O código a seguir é um exemplo de uso. Cada comando está comentado para facil
 #include "xpaint.h"
 
 int main(){
-    open(600, 400, "main"); // cria uma tela de 600x400 com o nome main.png
+    xopen(600, 400, "main"); // cria uma tela de 600x400 com o nome main.png
     background("0, 0, 0"); // limpa a tela com a cor preta usando rgb
     stroke("white"); // muda a cor do pincel para branco usando nome da cor
     textSize(20); // tamanho da fonte
@@ -108,7 +108,7 @@ int main(){
     strokeWeight(5); // muda a espessura do pincel para 5
     circle(width()/2, height()/2, 200); // desenha um circulo no centro da tela com largura 200
     save(); // salva a imagem
-    close(); // libera recursos alocados
+    xclose(); // libera recursos alocados
     return 0;
 }
 ```
@@ -146,9 +146,9 @@ No módulo principal do seu programa, você deve dar o #define `XPAINT` para inc
 ### Abrindo, salvando e fechando
 
 ```c
-void open(largura, altura, arquivo); // inicia o canvas
+void xopen(largura, altura, arquivo); // inicia o canvas
 void save();                         // gera o arquivo.png com o estado do canvas
-void close();                        // fecha o canvas
+void xclose();                        // fecha o canvas
 void point(int x, int y);            // pinta o pixel na posição x, y
 int  height();                       // retorna altura
 int  width();                        // retorna largura

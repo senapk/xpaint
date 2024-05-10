@@ -26,14 +26,14 @@ Versão: 1.1
 #include "xpaint.h"
 int main(){
     int largura = 600, altura = 500;
-    open(largura, altura, "figura_base"); 
+    xopen(largura, altura, "figura_base"); 
     text(50, 30, "Pintarei um circulo vermelho em %d %d", largura/2, altura/2);
     background("white");
     stroke("black");
     fill("red")
     circle(largura/2, altura/2, 200);
     save();
-    close();
+    xclose();
     return 0;
 }
 #endif

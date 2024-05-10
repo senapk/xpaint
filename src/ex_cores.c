@@ -2,7 +2,7 @@
 #include "xpaint.h"
 
 int main() {
-    open(100, 100, "figura_cores");
+    xopen(300, 300, "figura_cores");
     strokeWeight(1);
     stroke("white");
     fill("red");
@@ -15,10 +15,11 @@ int main() {
     ellipse(50, 50, 10, 10);
     circle(50, 70, 10);
     square(5, 5, 30);
-    triangle(10, 70, 50, 80, 15, 90);
+    noFill();
+    triangle(270, 30, 50, 180, 150, 190);
     pop();
     save();
-    close();
+    xclose();
     return 0;
 }
 

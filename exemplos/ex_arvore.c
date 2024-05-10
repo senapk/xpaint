@@ -17,11 +17,11 @@ void fractal(float x, float y, float ang, float lado){
 }
 
 int main(){
-    open(800, 500, "figura_arvore");
+    xopen(800, 500, "figura_arvore");
     stroke("white");
     fractal(400, 450, 90, 100);
     save();
-    close();
+    xclose();
     return 0;
 }
 

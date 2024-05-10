@@ -36,7 +36,7 @@ void verify(int * vet, int size){
 
 int main() {
 
-    open(600, 300, "figura_insertion");
+    xopen(600, 300, "figura_insertion");
     // setLock();
     setLog("imgs");
     int size = 30, max = 900;
@@ -54,7 +54,7 @@ int main() {
     barDrawAll(vet, size, NULL);
     save();
     makeVideo(5, "video_insertion");
-    close();
+    xclose();
 
     return 0;
  }

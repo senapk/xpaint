@@ -8,7 +8,7 @@ void center_rect(int x, int y, int width, int height){
 }
 
 int main(){
-    open(400, 400, "figura_rotate");
+    xopen(400, 400, "figura_rotate");
     background("black");    
     stroke("white");
     fill("yellow");
@@ -20,12 +20,12 @@ int main(){
         strokeWeight(3);
         int x = 0;
         int y = 0;
-        arc(x, y, 200, 25, 45, 270);
+        arc(x, y, 200, 180, 45, 270);
         center_rect(x, y, 100, 100);
         circle(x, y, 100);
     pop();
 
     save();
-    close();
+    xclose();
     return 0;
 }

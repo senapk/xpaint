@@ -31,14 +31,14 @@ Versão: 1.1
 #include "xpaint.h"
 int main(){
     int largura = 600, altura = 500;
-    open(largura, altura, "figura_base"); 
+    xopen(largura, altura, "figura_base"); 
     text(50, 30, "Pintarei um circulo vermelho em %d %d", largura/2, altura/2);
     background("white");
     stroke("black");
     fill("red")
     circle(largura/2, altura/2, 200);
     save();
-    close();
+    xclose();
     return 0;
 }
 #endif
@@ -100,7 +100,7 @@ void __init_colors(void);
 #include <stdarg.h>
 
 // inicia o canvas de width x height, e define o nome do arquivo png a ser gerado
-void open(unsigned int width, unsigned int height, const char * filename);
+void xopen(unsigned int width, unsigned int height, const char * filename);
 
 // altura do canvas
 int height(void);
@@ -116,7 +116,7 @@ uchar  * getBitmap(void);
 
 
 // finaliza o canvas
-void close(void);
+void xclose(void);
 
 // muda o nome do arquivo png a ser gerado
 void setFilename(const char * filename);
@@ -167,7 +167,7 @@ void pop();
 void translate(double dx, double dy);
 // define a escala da camada de transformação atual
 void scale(double s);
-// define a rotação da camada de transformação atual
+// define a rotação da camada de transformação atual no sentido horario
 void rotate(double angle); 
 
 // define o centro de rotação da transformação atual

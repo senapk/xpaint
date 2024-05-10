@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 int main() {
-    open(600, 600, "figura_insertion");
+    xopen(600, 600, "figura_insertion");
     int size = 40;
     int max = 100;
     int vet[size];
@@ -18,6 +18,6 @@ int main() {
     //gera e salvar a imagem
     barDrawAll(vet, size, "rgb", 0, 2, 9);
     save();
-    close();
+    xclose();
     return 0;
 }

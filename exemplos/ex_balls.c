@@ -15,7 +15,7 @@ bool collide(int x, int y, V2d balls[], int balls_size) {
 }
 
 int main(){
-    open(500, 300, "figura_balls");
+    xopen(500, 300, "figura_balls");
     textSize(24);
     srand(0);
     stroke("black");
@@ -36,6 +36,6 @@ int main(){
         }
     }
     save();
-    close();
+    xclose();
     return 0;
 }

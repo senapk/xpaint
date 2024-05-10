@@ -3,7 +3,7 @@
 
 #include "stdio.h"
 int main(){
-    open(1000, 600, "figura_draw");
+    xopen(1000, 600, "figura_draw");
     stroke("white");
     background("black");
 
@@ -55,6 +55,6 @@ int main(){
 
 
     save();
-    close();
+    xclose();
     return 0;
 }

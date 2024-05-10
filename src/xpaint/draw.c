@@ -575,7 +575,7 @@ void __arc(double centerx, double centery, int diameter, int thickness, int degr
 
 
 void arc(double centerx, double centery, int out_diameter, int in_diameter, int degrees_begin, int degrees_lenght) {
-    double thickness = in_diameter / 2.0;
+    double thickness = out_diameter - in_diameter;
     if (thickness < 0) {
         thickness = 0;
     }

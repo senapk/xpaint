@@ -6,7 +6,7 @@
 #include <stdarg.h>
 
 // inicia o canvas de width x height, e define o nome do arquivo png a ser gerado
-void open(unsigned int width, unsigned int height, const char * filename);
+void xopen(unsigned int width, unsigned int height, const char * filename);
 
 // altura do canvas
 int height(void);
@@ -22,7 +22,7 @@ uchar  * getBitmap(void);
 
 
 // finaliza o canvas
-void close(void);
+void xclose(void);
 
 // muda o nome do arquivo png a ser gerado
 void setFilename(const char * filename);
@@ -73,7 +73,7 @@ void pop();
 void translate(double dx, double dy);
 // define a escala da camada de transformação atual
 void scale(double s);
-// define a rotação da camada de transformação atual
+// define a rotação da camada de transformação atual no sentido horario
 void rotate(double angle); 
 
 // define o centro de rotação da transformação atual
