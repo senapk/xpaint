@@ -15,7 +15,7 @@ Principais fontes:
 
 Licença: GPLv3
 
-Versão: 1.1
+Versão: 1.2
 
 */
 

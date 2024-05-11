@@ -44,7 +44,7 @@ int main() {
       puts("voce acertou");
       textSize(30);
       stroke("red");
-      text(30, 240, "VOCÊ ACERTOU, PARABÉNS");
+      text(30, 200, "VOCÊ ACERTOU, PARABÉNS");
       save();
       break;
     }
