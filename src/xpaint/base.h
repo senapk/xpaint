@@ -6,7 +6,7 @@
 #include <stdarg.h>
 
 // inicia o canvas de width x height, e define o nome do arquivo png a ser gerado
-void xopen(unsigned int width, unsigned int height, const char * filename);
+void create(unsigned int width, unsigned int height, const char * filename);
 
 // altura do canvas
 int height(void);
@@ -22,7 +22,7 @@ uchar  * getBitmap(void);
 
 
 // finaliza o canvas
-void xclose(void);
+void destroy(void);
 
 // muda o nome do arquivo png a ser gerado
 void setFilename(const char * filename);

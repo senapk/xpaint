@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 int main() {
-    xopen(400, 400, "figura_transf");
+    create(400, 400, "figura_transf");
     srand(1);//lock random seed
     for (int i = 0; i < 100; i++) {
         push();
@@ -15,5 +15,5 @@ int main() {
         pop();
     }
     save();
-    xclose();
+    destroy();
 }

@@ -8,7 +8,7 @@ void center_rect(int x, int y, int width, int height){
 }
 
 int main(){
-    xopen(400, 400, "figura_rotate");
+    create(400, 400, "figura_rotate");
     background("black");    
     stroke("white");
     fill("yellow");
@@ -26,6 +26,6 @@ int main(){
     pop();
 
     save();
-    xclose();
+    destroy();
     return 0;
 }

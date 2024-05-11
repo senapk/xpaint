@@ -49,7 +49,7 @@ uchar * __pixel(unsigned int x, unsigned int y) {
 //__plot sem as verificações de limite
 void __alpha_plot(int x, int y, Color color);
 
-void xopen(unsigned int width, unsigned int height, const char * filename){
+void create(unsigned int width, unsigned int height, const char * filename){
     if(__board_is_open){
         fprintf(stderr, "fail: bitmat already open\n");
         return;
@@ -83,7 +83,7 @@ const char * getFilename(void){
     return __board_filename;
 }
 
-void xclose(void){
+void destroy(void){
     if(__board_bitmap != NULL){
         free(__board_bitmap);
         __board_is_open = false;

@@ -31,14 +31,14 @@ Versão: 1.1
 #include "xpaint.h"
 int main(){
     int largura = 600, altura = 500;
-    xopen(largura, altura, "figura_base"); 
+    create(largura, altura, "figura_base"); 
     text(50, 30, "Pintarei um circulo vermelho em %d %d", largura/2, altura/2);
     background("white");
     stroke("black");
     fill("red")
     circle(largura/2, altura/2, 200);
     save();
-    xclose();
+    destroy();
     return 0;
 }
 #endif
@@ -100,7 +100,7 @@ void __init_colors(void);
 #include <stdarg.h>
 
 // inicia o canvas de width x height, e define o nome do arquivo png a ser gerado
-void xopen(unsigned int width, unsigned int height, const char * filename);
+void create(unsigned int width, unsigned int height, const char * filename);
 
 // altura do canvas
 int height(void);
@@ -116,7 +116,7 @@ uchar  * getBitmap(void);
 
 
 // finaliza o canvas
-void xclose(void);
+void destroy(void);
 
 // muda o nome do arquivo png a ser gerado
 void setFilename(const char * filename);

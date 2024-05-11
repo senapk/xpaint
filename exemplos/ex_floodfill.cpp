@@ -147,11 +147,11 @@ int main(){
         cout << '\n';
     } */
     
-    xopen(1002, 402, "figura_floodfill");
+    create(1002, 402, "figura_floodfill");
     gridInit(1002/nc, 1);
     xgrid_matrix(mat, path);
     save();
-    xclose();
+    destroy();
     
     return 0;
 }

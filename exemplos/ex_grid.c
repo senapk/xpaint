@@ -27,7 +27,7 @@ void xgrid_matrix(int nl, int nc, char mat[nl][nc]){
 
 int main(){
     int w = 902, h = 602, side = 100;
-    xopen(w, h, "figura_grid");
+    create(w, h, "figura_grid");
     srand(0);
     gridInit(side, 2);
     int nl = h / side, nc = w / side;
@@ -41,6 +41,6 @@ int main(){
     }
     xgrid_matrix(nl, nc, mat);
     save();
-    xclose();
+    destroy();
     return 0;
 }

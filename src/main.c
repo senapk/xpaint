@@ -6,7 +6,7 @@
 #include <time.h>
 
 int main(){
-    xopen(200, 200, "main");
+    create(200, 200, "main");
 
     while (true) {
         time_t t = time(NULL);
@@ -31,6 +31,6 @@ int main(){
         save(); // salva a imagem
         sleep(1); // dorme por 1 segundo
     }
-    xclose();
+    destroy();
     return 0;
 }

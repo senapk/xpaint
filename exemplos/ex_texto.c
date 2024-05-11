@@ -2,7 +2,7 @@
 #include "xpaint.h"
 
 int main() {
-    xopen(700, 500, "figura_texto");
+    create(700, 500, "figura_texto");
     textSize(20);
     stroke("white");
     text(130, 30, "texto.png - Escrevendo em imagens");
@@ -29,7 +29,7 @@ int main() {
     text(10, 350, "textSize(40);");
 
     save();
-    xclose();
+    destroy();
     return 0;
 }
 
