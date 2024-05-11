@@ -1,5 +1,7 @@
 #define XPAINT
 #include "xpaint.h"
+#include "stdlib.h"
+#include "string.h"
 
 
 void xgrid_matrix(int nl, int nc, char mat[nl][nc]){
