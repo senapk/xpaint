@@ -1,5 +1,5 @@
 # Opções de compilação
-CFLAGS = -Wall -Wextra -g
+CFLAGS = -Wall -Wno-unused-result
 
 main: xpaint.o main.c
 	gcc main.c -c $(CFLAGS)
@@ -11,5 +11,10 @@ xpaint.o: xpaint.c
 %: %.c xpaint.o
 	gcc  $@.c -c $(CFLAGS) 
 	gcc  $@.o xpaint.o -o $@.out $(CFLAGS)
+
+clean:
+	rm -f *.o *.out
+
+
 
 
